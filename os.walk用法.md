@@ -3,28 +3,29 @@
 ## 知识点
 
 - os.walk()  输出目录中文件路径及文件名称
+- `os.walk()`  输出目录中文件路径及文件名称
 
 - print(" \* " \* 20)  连续打印2个*号
 
-- os.path.join() 拼接文件夹名和文件名
+- `os.path.join()` 拼接文件夹名和文件名
 
-- endswith()  截取文件后缀
+- `endswith()`  截取文件后缀
 
-- starswith() 判断字符串是否以指定字符串开头
+- `starswith()` 判断字符串是否以指定字符串开头
 
-- split() 用指定分割符将字符串拆隔成列表
+- `split()` 用指定分割符将字符串拆隔成列表
 
-- os.rename() 重命名文件或文件夹
+- `os.rename()` 重命名文件或文件夹
 
-- os.remove() 删除路径为path的文件
+- `os.remove()` 删除路径为path的文件
 
-- removedirs() 递归删除目录
+- `removedirs()` 递归删除目录
 
-- os.mkdir(path) 创建文件夹path
+- `os.mkdir(path)` 创建文件夹path
 
-- os.listdir() 获取文件夹下所有文件和子文件夹名称
+- `os.listdir()` 获取文件夹下所有文件和子文件夹名称
 
-- append() 给列表添加元素
+- `append()` 给列表添加元素
 
 - > openpyxl 只能处理.xlsx文件
     >
@@ -36,7 +37,7 @@
     > writer.book=book
     > ```
 
-- reset_index(drop=True,inplace=True) pandas 中重新生成行索引（drop=True），直接修改原表（inplace=True）
+- `reset_index(drop=True,inplace=True)` pandas 中重新生成行索引（`drop=True`），直接修改原表（`inplace=True`）
 
 ## 介绍
 
@@ -46,7 +47,7 @@
 
 ## 语法
 
-**walk()**方法语法格式如下：
+​    **walk()**方法语法格式如下：
 
 ```
 os.walk(top[, topdown=True[, onerror=None[, followlinks=False]]])

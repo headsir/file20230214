@@ -70,7 +70,7 @@ os.walk(top[, topdown=True[, onerror=None[, followlinks=False]]])
 
 假设文件夹data有如下的目录结构(cmd 命令：tree /f)
 
-![image-20211121181739021](imge/Untitled.assets/image-20211121181739021.png)
+![image-20211121181739021](imge/os.walk用法.assets/image-20211121181739021.png)
 
 ### **扫描所有文件**
 

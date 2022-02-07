@@ -27,3 +27,7 @@ ssh-keygen -t rsa -C "你的邮箱"
 ### 4、.git/config 文件配置
 
 ![image-20220207150928858](D:\用户\文档\GitHub\file\github\imge\github 公钥配置.assets\image-20220207150928858.png)
+
+### 5、.gitconfig 文件配置
+
+![image-20220207151519509](D:\用户\文档\GitHub\file\github\imge\github 公钥配置.assets\image-20220207151519509.png)

@@ -6,4 +6,4 @@
 
 移动性功能--NR语音开关指示
 
-![image-20220211150356447](D:\用户\文档\GitHub\file\网优\imge\VONR功能测试参数修改.assets\image-20220211150356447.png)
+![image-20220211150356447](imge\VONR功能测试参数修改.assets\image-20220211150356447.png)

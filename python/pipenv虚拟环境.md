@@ -57,3 +57,9 @@ pipenv exit
 pipenv install -r requirements.txt
 ```
 
+### 7、使用方法
+
+​		`pipenv graph` 模块查询
+
+​		`pipenv update` 模块更新
+

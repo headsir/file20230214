@@ -1,6 +1,6 @@
 # PyCharm-PyQt5开发环境配置
 
-## 一、开发环境配置
+
 
 ![img](imge/PyCharm-PyQt5开发环境配置.assets/2405210-20210522191810963-608942593.png)
 

@@ -51,3 +51,6 @@ pyinstaller httpclient.py --noconsole --hidden-import PySide2.QtXml --icon="logo
 
 注意：这些应用程序图标ico文件，在使用PyInstaller创建可执行程序时，不需要要拷贝到程序所在目录。因为它已经被嵌入可执行程序了。
 ```
+
+
+

@@ -112,7 +112,7 @@ ___粗斜体文本___
 
 ​	说明[^举例] 
 
-[^举例]:
+[^举例]:bbbbbb
 
 ### 2.6、换行
 
@@ -124,6 +124,43 @@ ___粗斜体文本___
 ​		前 瞻 <br/>价 值
 
 ​		前 瞻 ‘<br>价 值
+
+### 2.7、复选框
+
+```
+- [x] 这 是 已 完 成 的 任 务
+- [ ] 这 是 状 态 未 知 的 任 务
+```
+
+举例：
+
+- [x] 这 是 已 完 成 的 任 务
+- [ ] 这 是 状 态 未 知 的 任 务
+
+### 2.8、emoji 表情符号
+
+```
+:+1: :sparkles: :camel: :tada:
+:rocket: :metal: :heart_eyes: :sob:
+可以通过下面这个网站来查看支持哪些 emoji表情：
+emoji-cheat-sheet
+```
+
+举例：
+
+:+1: :sparkles: :camel: :tada:
+
+:rocket: :metal: :heart_eyes: :sob:
+
+### 2.9、文本背景强调
+
+用一对 == 将文字包 裹起来
+
+举例：
+
+​		==强调==
+
+
 
 ## 三、列表
 
@@ -284,7 +321,9 @@ $(document).ready(function () {
 
 ## 六、流程图
 
-### 6.1 Mermaid使用
+
+
+### 6.1、 Mermaid使用
 
 #### 6.1.1 方向
 
@@ -302,7 +341,7 @@ graph 方向描述
 | 从右到左 | RL   |
 | 从左到右 | LR   |
 
-### 6.2 节点定义
+#### 6.1.2 节点定义
 
 即流程图中每个文本块，包括开始、结束、处理、判断等。Mermaid 中每个节点都有一个 id，以及节点的文字
 
@@ -316,7 +355,7 @@ graph 方向描述
 | 右向旗帜状节点 | id>文字]   |
 | 菱形节点       | id{文字}   |
 
-### 6.3 节点连间线
+#### 6.1.3 节点连间线
 
 | 说明           | 表述     |
 | -------------- | -------- |
@@ -329,7 +368,7 @@ graph 方向描述
 | 虚线           | -.-      |
 | 虚线加文字     | -.文字.- |
 
-### 6.4 子图表
+#### 6.1.4 子图表
 
 添加子图表
 
@@ -356,9 +395,95 @@ graph TB
 	end
 ```
 
+#### 6.1.5 gantt图
+
+```mermaid
+gantt
+        dateFormat  YYYY-MM-DD
+        title 快乐的生活
+        section 吃一把鸡就学习
+        学习            :done,    des1, 2014-01-06,2014-01-09
+        疯狂学习               :active,  des2, 2014-01-09, 3d
+        继续疯狂学习               :         des3, after des2, 5d
+        吃鸡！               :         des4, after des3, 4d
+        section 具体内容
+        学习Python :crit, done, 2014-01-06,72h
+        学习C++          :crit, done, after des1, 2d
+        学习Lisp             :crit, active, 3d
+        学习图形学        :crit, 4d
+        跳伞           :2d
+        打枪                      :2d
+```
+
+
+
+### 6.2、flow使用
+
+#### 6.2.1 流程图元素：
+
+- strat：开始框
+- operation：处理框
+- condition：判断框
+- inputoutput：输入输出框
+- end：结束框
+- subroutine：子流程
+
+各框通过“->”连接。
+
+定义上述基本元素的语句是：
+
+```dart
+元素ID=>元素类型：展示文字
+
+元素ID(方向）->元素ID
+```
+
+其中，方向有以下四种
+
+```swift
+(top)
+(bottom)
+(right)
+(left)
+```
+
+
+
+举例1：
+
+```flow
+st=>start: 开始
+op=>operation: 你的操作
+cond=>condition: 是 / 否?
+e=>end
+st->op->cond
+cond(yes)->e
+cond(no)->op
+```
+
+举例2：
+
+```flow
+start1=>start: 初始设计
+op1=>operation: P=0
+op2=>operation: 结构分析与敏度分析
+op3=>operation: 建立原问题（Primal Problem）
+op4=>operation: 建立近似问题（Approximate Proble）
+op5=>operation: 求解近似问题，得到$X^{P+1}$
+cond1=>condition: 是否小于允许误差
+op6=>operation: P=P+1
+end=>end: 结束
+
+start1->op1->op2->op3->op4->op5->cond1
+cond1(no)->op6(top)->op2
+cond1(yes)->end
+```
+
+
+
 ## 七、链接
 
-### 7.1 链接使用方法：
+### 7.1、 链接使用方法：
 
 ```
 [链接名称](链接地址)
@@ -378,7 +503,7 @@ graph TB
 
 ​	https://www.runoob.com
 
-### 7.2 高级链接
+### 7.2、 高级链接
 
 我们可以通过变量来设置一个链接，变量赋值在文档末尾进行：
 
@@ -528,15 +653,15 @@ Markdown 制作表格使用 | 来分隔不同的单元格，使用 - 来分隔�
 
 `<div STYLE = “page-break-after: always;”></div>`
 
-在 Preview 窗口不能看到分页的效果，但是在 输出的 pdf 文件中会完成分页
+在 Preview 窗口不能看到分页的效果，但是在 输出的 pdf文件中会完成分页
 
 ## 十一、数学公式
 
 数学公式有两种，一种是用在正文中的，一种 是单独显示的。 
 
-正文中的公式如下: $ ... $ 
+正文中的公式如下: `$ ... $ `
 
-单独一行显示的时候使用如下命令： $$...$$ 
+单独一行显示的时候使用如下命令：` $$...$$ `
 
 其中，$ 符号中间包含的三个点表格的是 LaTex 的公式命令。
 
@@ -546,5 +671,5 @@ Markdown 制作表格使用 | 来分隔不同的单元格，使用 - 来分隔�
 
 下 面 是 单 独 一 行 显 示： 
 
-$f(x) = \sum_{i=0}^{N} \int_{a}^{ b} g(t,i) \text{d}t \tag{a}
+$$f(x) = \sum_{i=0}^{N} \int_{a}^{ b} g(t,i) \text{d}t \tag{a}$$
 

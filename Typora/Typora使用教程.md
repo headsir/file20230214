@@ -17,6 +17,10 @@
 ###### 六级标题		Ctrl + 6
 ```
 
+### 1.2、目录
+
+​	目录 (Table of Content) 可以通过在 markdown 文件的开头输入`[TOC]`的标记来实现
+
 ## 二、段落
 
 ### 2.1、字体
@@ -108,7 +112,18 @@ ___粗斜体文本___
 
 ​	说明[^举例] 
 
-[^举例]:说明 
+[^举例]:
+
+### 2.6、换行
+
+文本换行可以使用 `<br />`、`<br/>`、`<br>`标记符号
+
+举例：
+
+​		前 瞻<br />价 值
+​		前 瞻 <br/>价 值
+
+​		前 瞻 ‘<br>价 值
 
 ## 三、列表
 
@@ -134,7 +149,7 @@ ___粗斜体文本___
 
 * 第一项 
 
-### 3.2、无序列表
+### 3.2、有序列表
 
 有序列表使用数字并加上 . 号来表示，如：
 
@@ -146,7 +161,7 @@ ___粗斜体文本___
 
 举例：
 
- 	1. 第一项
+1. 第一项
 
 ### 3.3、列表嵌套
 
@@ -351,13 +366,17 @@ graph TB
 或者
 
 <链接地址>
+
+或者
+
+直接输入网址
 ```
 
 举例：
 
 ​	这是一个链接 [菜鸟教程](https://www.runoob.com)
 
-​	<https://www.runoob.com>
+​	https://www.runoob.com
 
 ### 7.2 高级链接
 
@@ -371,3 +390,161 @@ graph TB
   [1]: http://www.google.com/
   [runoob]: http://www.runoob.com/
 ```
+
+举例：
+
+​	这个链接用 1 作为网址变量 [Google][1]
+​	这个链接用 runoob 作为网址变量 [Runoob][runoob]
+
+[1]: http://www.google.com/
+[runoob]: http://www.runoob.com/
+
+## 八、图片
+
+### 8.1、 基础用法
+
+Markdown 图片语法格式如下：
+
+```
+![alt 属性文本](图片地址)
+![alt 属性文本](图片地址 "可选标题") #鼠标放到图片上面可显示标题
+```
+
+举例：
+
+![RUNOOB 图标](imge/Typora使用教程.assets/runoob-logo.png)
+
+![RUNOOB 图标](imge/Typora使用教程.assets/runoob-logo-16518193343912.png "RUNOOB")
+
+### 8.2 、图片链接用法
+
+```
+这个链接用 1 作为网址变量 [RUNOOB][1].
+然后在文档的结尾为变量赋值（网址）
+
+[1]: http://static.runoob.com/images/runoob-logo.png
+```
+
+举例：
+
+这个链接用 5 作为网址变量 [RUNOOB][5]
+然后在文档的结尾为变量赋值（网址）
+
+[5]: http://static.runoob.com/images/runoob-logo.png
+
+### 8.3、img 标签指定图片高度与宽度属性
+
+指定图片的高度与宽度使用普通的 <img> 标签
+
+```
+<img src="http://static.runoob.com/images/runoob-logo.png" width="50" height="30">
+```
+
+举例：
+
+​	按照比例缩放：
+
+<img src="http://static.runoob.com/images/runoob-logo.png" width="50%">
+
+指定固定尺寸
+
+<img src = " http://static.runoob.com/images/runoob-logo.png" width="500"  height="200">
+
+### 8.4、多张图片在一行
+
+在一行中，可以放置 2 个或多个图片：
+
+<img src="http://static.runoob.com/images/runoob-logo.png" width="30%"> <img src="imge/Typora使用教程.assets/runoob-logo-16518211407744.png" width="20%"><img src="imge/Typora使用教程.assets/runoob-logo-16518211407744.png" width="10%">
+
+## 九、表格
+
+### 9.1、表格语法
+
+Markdown 制作表格使用 | 来分隔不同的单元格，使用 - 来分隔表头和其他行。
+
+语法格式如下：
+
+```
+|  表头   | 表头  |
+|  ----  | ----  |
+| 单元格  | 单元格 |
+| 单元格  | 单元格 |
+```
+
+举例：
+
+| 表头   | 表头   |
+| ------ | ------ |
+| 单元格 | 单元格 |
+| 单元格 | 单元格 |
+
+### 9.2、对齐方式
+
+**设置表格的对齐方式：**
+
+- -: 设置内容和标题栏居右对齐。
+- :- 设置内容和标题栏居左对齐。
+- :-: 设置内容和标题栏居中对齐。
+
+实例如下：
+
+```
+| 左对齐 | 右对齐 | 居中对齐 |
+| :-----| ----: | :----: |
+| 单元格 | 单元格 | 单元格 |
+| 单元格 | 单元格 | 单元格 |
+```
+
+举例：
+
+| 左对齐 | 右对齐 | 居中对齐 |
+| :----- | -----: | :------: |
+| 单元格 | 单元格 |  单元格  |
+| 单元格 | 单元格 |  单元格  |
+
+## 十、HTML语法
+
+支持原生 HTML 语法
+
+举例：
+
+将图片尺寸缩小，并且居中显示
+
+<div align="center">
+    <img src="http://static.runoob.com/images/runoob-logo.png" width="50%">
+</div>
+
+### 10.1、邮箱
+
+使用一对 <> 将你的邮箱括起来
+
+举例：
+
+​	<liyangbit@gmail.com>
+
+### 10.2、强制分页
+
+文本中需要分页的地方添入：
+
+`<div STYLE = “page-break-after: always;”></div>`
+
+在 Preview 窗口不能看到分页的效果，但是在 输出的 pdf 文件中会完成分页
+
+## 十一、数学公式
+
+数学公式有两种，一种是用在正文中的，一种 是单独显示的。 
+
+正文中的公式如下: $ ... $ 
+
+单独一行显示的时候使用如下命令： $$...$$ 
+
+其中，$ 符号中间包含的三个点表格的是 LaTex 的公式命令。
+
+ 举例： 
+
+下 面 是 行 内 公 式 我 是 行 内 公 式 $\sqrt{x^2+y^2}$ 行 内 公 式 
+
+下 面 是 单 独 一 行 显 示： 
+
+$f(x) = \sum_{i=0}^{N} \int_{a}^{ b} g(t,i) \text{d}t \tag{a}
+

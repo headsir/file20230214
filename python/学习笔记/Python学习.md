@@ -275,5 +275,193 @@ print(a.split(' ')) # ['hi', 'hello', 'world']
 
 语法:range(起始值，终止值，步长)
 
+## 4.9 字符串查找替换
 
+函数：`replace()`
+
+语法：字符串.replace(要查找的内容，要替换为的内容)
+
+```python
+a = '<em>面朝大海，</em>春暖花开'
+a = a.replace('<em>', '')
+```
+
+## 4.10 删除字符串首尾空白字符
+
+函数：`strip()`
+
+语法：字符串.strip()
+
+# 五、自定义函数
+
+## 5.1 函数定义与调用
+
+函数定义语法：
+
+```python
+def 函数名(参数)：
+	代码
+```
+
+举例：
+
+```python
+# 定义函数,x为形式参数
+def y(x):
+    print(x + 1)
+    
+# 调用函数
+y(1)
+```
+
+## 5.2 return语句
+
+定义函数返回值，或跳出函数
+
+## 5.3 变量作用域
+
+### 5.3.1 局部变量
+
+在函数定义内声明变量的时候，它们与函数外具有相同名称的其他变量没有任何关系，即 变量名称对于函数来说是 局部 的。
+
+```python
+def func(x):
+    print 'x is', x
+    x = 2
+    print ('Changed local x to', x)
+x = 50
+func(x)
+print 'x is still', x
+
+# 输出结果
+x is 50
+Changed local x to 2
+x is still 50 
+```
+
+### 5.3.2 全局变量
+
+使用global语句声明变量为全局变量
+
+```python
+def func():
+    global x
+    print 'x is', x
+    x = 2
+    print 'Changed local x to', x
+x = 50
+func()
+print 'Value of x is', x
+
+# 输出结果
+x is 50
+Changed global x to 2
+Value of x is 2 
+```
+
+## 5.4 默认参数
+
+在函数定义的形参名后 加上赋值运算符（=）和默认值，从而给形参指定默认参数值。
+
+==备注==：只有在形参表末尾的那些参数可以有默认参数值，例如，def func(a, b=5)是有效的，但是def func (a=5, b)是 无效 的。
+
+举例：
+
+```python
+def say(message, times = 1):  # 参数time为默认参数 
+	print message * times
+say('Hello')
+say('World', 5)
+```
+
+## 5.5 关键参数
+
+通过参数名来为部分参数赋值
+
+```python
+def func(a, b=5, c=10):
+	print 'a is', a, 'and b is', b, 'and c is', c
+func(3, 7)
+func(25, c=24)
+func(c=50, a=100) 
+
+# 输出结果
+a is 3 and b is 7 and c is 10
+a is 25 and b is 5 and c is 24
+a is 100 and b is 5 and c is 50
+```
+
+## 5.6 不定长参数
+
+传入的函数中实际参数可以是0个，一个，两个到任意个。
+
+> 主要形式：
+>
+> - *parameter 【列表】
+> - **parameter  【字典】
+
+举例：*parameter
+
+```python
+def player(*obj):
+	print(obj)
+
+player('C罗')
+player('C罗','梅西')
+
+# 列表调用
+playerlist = ['C罗','梅西']
+player(*playerlist)
+```
+
+
+
+举例：**parameter
+
+```python
+def Fruits(**MyFruits):
+    print("我买的水果价格：\n")
+    for key,vslue in MyFruits.items():
+        print('{0}:{1}'.format(key,vlue))
+        
+Fruits(Apple = 3.24, Grape = 3.35, Lemon = 3.67)
+
+# 字典调用
+dict1 = {'Apple' :'3.24', 'Grape' :' 3.35', 'Lemon' :'3.67'}
+Fruits(**dict1)
+```
+
+
+
+## 5.7 函数说明文档
+
+DocStrings(==文档字符串==)使你的程序文档更加简单易懂
+
+举例：
+
+```python
+# coding=UTF-8
+# Filename: func_doc.py
+
+def sum(x, y):
+    """
+    2个数字求和
+    :param x: 数字1
+    :param y: 数字2
+    :return: 2个数字和
+    """
+    return x + y
+
+
+print(sum(2, 3))  # 调用函数
+print(sum.__doc__)  # 打印函数说明文档
+
+# 输出结果
+5
+
+    2个数字求和
+    :param x: 数字1
+    :param y: 数字2
+    :return: 2个数字和
+```
 

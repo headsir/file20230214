@@ -465,3 +465,76 @@ print(sum.__doc__)  # 打印函数说明文档
     :return: 2个数字和
 ```
 
+# 六、模块
+
+## 6.1 模块来源
+
+### 6.1.1 内置模块
+
+Python自带模块，如：sys、time、math等
+
+### 6.1.2 第三方开源模块
+
+由一些程序员或企业开发并免费分享给大家使用，使用需要安装
+
+模块安装：
+
+#### 6.1.2.1 pip工具
+
+> - pip安装
+>
+>   > - 默认软件自带
+>   >
+>   > - 手动安装
+>   >
+>   >   > 1. 将 pip-9.0.1.tar.gz解压到目录 比如C:/test 目录
+>   >   >
+>   >   > 2. 然后使用管理员身份打开cmd窗口，cd C:/test 目录，执行 python setup.py install
+>   >   >
+>   >   > 3. 执行完毕后 切换到 python 安装目录的scripts下，执行这个命令查看安装结果 pip --version
+>   >   >
+>   >   > 4. 至此 以后就可以使用 pip安装 python的各种包了
+>   >   >
+>   >   > 查看pip的版本，判断pip是否安装
+>   >   > pip --version
+>
+>   
+>
+> - pip使用
+>
+>   > - 安装模块
+>   >
+>   >   > pip install 模块名
+>   >   > pip install 模块名==版本号 
+>   >   > pip install -i https://pypi.tuna.tsinghua.edu.cn/simple 模块名
+>   >
+>   > - 卸载模块
+>   >
+>   >   > pip uninstall 模块名
+>   >
+>   > - 其他
+>   >
+>   >   > pip list                      #列出已经安装的模块
+>   >   > pip list -o                   #列出可升级的模块
+>   >   > pip install -U 模块名          #升级模块
+>   >   > pip install pip-review		#批量更新包工具
+>   >   > pip-review --local interactive #批量更新包
+
+#### 6.1.2.2 pipenv工具
+
+​		[使用方法详见](../python/虚拟环境建立/pipenv虚拟环境.md)
+
+### 6.1.3 自定义模块
+
+用户可以将自己编写的代码或函数封装成模块
+
+==注意：==自定义模块不能和内置模块重名
+
+## 6.2 模块导入
+
+### 6.2.1 import 语句导入
+
+
+
+
+

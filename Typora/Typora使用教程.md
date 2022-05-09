@@ -1,4 +1,4 @@
-# 										Typora使用教程
+<font size =6>**Typora使用教程**</font>
 
 笔记来源：https://www.runoob.com/markdown/md-link.html
 
@@ -325,6 +325,8 @@ $(document).ready(function () {
 
 ### 6.1、 Mermaid使用
 
+在线工具:  <https://mermaid-js.github.io/mermaid-live-editor/>
+
 #### 6.1.1 方向
 
 ```
@@ -395,12 +397,18 @@ graph TB
 	end
 ```
 
-#### 6.1.5 gantt图
+#### 6.1.5 gantt图(甘特图)
+
+从上之下 ：
+
+图片标题、日期格式、项目、项目细分的任务
+
+举例：
 
 ```mermaid
 gantt
+		title 快乐的生活
         dateFormat  YYYY-MM-DD
-        title 快乐的生活
         section 吃一把鸡就学习
         学习            :done,    des1, 2014-01-06,2014-01-09
         疯狂学习               :active,  des2, 2014-01-09, 3d
@@ -412,7 +420,81 @@ gantt
         学习Lisp             :crit, active, 3d
         学习图形学        :crit, 4d
         跳伞           :2d
-        打枪                      :2d
+        打枪              :2d
+```
+
+#### 6.1.6 sequence使用(时序图)
+
+举例：
+
+```mermaid
+sequenceDiagram
+    李雷 ->> 韩梅梅: Hello 梅梅, How are you?
+    Note right of 韩梅梅: 韩梅梅心想
+    韩梅梅 --> 李雷: I'm fine, thanks, and you?
+```
+
+#### 6.1.7 state(状态图)
+
+*号表示开始或者结束
+
+如果在箭头右边则表示结束。
+
+举例：
+
+```mermaid
+stateDiagram
+	[*]-->s1
+	s1-->[*]
+```
+
+#### 6.1.8 class(类图)
+
+<|-- 表示继承
+
+\+ 表示public
+
+\- 表示private
+
+举例：
+
+```mermaid
+classDiagram
+	Animal <|--Duck
+	Animal <|--Fish
+	Animal <|--Zebra
+	Animal : +int age
+	Animal : +isMammal()
+	Animal : +mate()
+	class Duck{
+		+string beakColor
+		+swim()
+		+quack()
+	}
+	class Fish{
+		-int sizeInfeet
+		-canEat()
+	}
+    class Zebra{
+    +int sizeInfeet
+    -canEat()
+    }
+	
+```
+
+#### 6.1.9 pie(饼图)
+
+举例：
+
+标题下面分别是：区域名称及其百分比
+
+```mermaid
+pie
+	title Key elements in Product X
+	"Calcium" :42.96
+	"Potassium" : 50.05
+	"Magnesium" :2.09
+	"Iron" :5
 ```
 
 
@@ -478,6 +560,31 @@ start1->op1->op2->op3->op4->op5->cond1
 cond1(no)->op6(top)->op2
 cond1(yes)->end
 ```
+
+```flow
+st=>start: 群聊开始
+op=>operation: 群友发言
+con=>condition: 赖子发屎图
+en=>end: 群聊结束
+
+st(left)->op->con(yes,bottom)->en
+con(no,left)->op
+con@>op({"stroke":"blue","arrow-end":"classic-wide-long","stroke-dasharray":"."})
+```
+
+### 6.3、sequence使用
+
+举例：
+
+```sequence
+李雷 -> 韩梅梅: Hello 梅梅, How are you?
+Note right of 韩梅梅: 韩梅梅心想
+韩梅梅 --> 李雷: I'm fine, thanks, and you?
+```
+
+
+
+
 
 
 
@@ -656,6 +763,8 @@ Markdown 制作表格使用 | 来分隔不同的单元格，使用 - 来分隔�
 在 Preview 窗口不能看到分页的效果，但是在 输出的 pdf文件中会完成分页
 
 ## 十一、数学公式
+
+### 11.1、LaTex 公式
 
 数学公式有两种，一种是用在正文中的，一种 是单独显示的。 
 

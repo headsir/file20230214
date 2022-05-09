@@ -532,6 +532,12 @@ Python自带模块，如：sys、time、math等
 
 ## 6.2 模块导入
 
+```mermaid
+graph LR
+	id1(模块导入) --> id2[import语句导入]
+	id1(模块导入) --> id3[from语句导入]
+```
+
 ### 6.2.1 import 语句导入
 
 

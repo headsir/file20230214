@@ -292,6 +292,18 @@ a = a.replace('<em>', '')
 
 语法：字符串.strip()
 
+## 4.11 迭代器
+
+函数：`iter()`
+
+语法：iter(object[, sentinel])
+
+```python
+lst = [1, 2, 3]
+	for i in iter(lst):
+    print(i)  # 1	2	3
+```
+
 # 五、自定义函数
 
 ## 5.1 函数定义与调用
@@ -465,6 +477,26 @@ print(sum.__doc__)  # 打印函数说明文档
     :return: 2个数字和
 ```
 
+## 5.8 匿名函数
+
+使用` lambda `来创建匿名函数
+
+语法：
+
+```python
+lambda [arg1 [,arg2,.....argn]]:expression
+```
+
+举例：
+
+```python
+sum = lambda arg1, arg2: arg1 + arg2
+ 
+# 调用sum函数
+print "相加后的值为 : ", sum( 10, 20 )
+print "相加后的值为 : ", sum( 20, 20 )
+```
+
 # 六、模块
 
 ## 6.1 模块来源
@@ -540,7 +572,277 @@ graph LR
 
 ### 6.2.1 import 语句导入
 
+导入指定模块中的所有函数，适用于需要使用指定模块中的==大量函数==的情况，调用函数时需要在函数名前==加上模块名==的前缀。
 
+语法格式：
+
+```python
+import 模块名
+```
+
+举例:
+
+```python
+import math
+a = math.sqrt(16)
+print(a)
+```
+
+### 6.2.2 from 语句导入
+
+导入指定模块中的指定函数，适用于只需要使用模块中的==少数几个函数==，调用函数时直接写出函数名，==无需添加模块名==前缀。
+
+```python
+from 模块名 import 函数名
+```
+
+举例：
+
+```ptyhon
+from math import sqrt
+a = sqrt(16)
+print(a)
+```
+
+备注：可以使用“ * ”代替函数名，代表模块下面所有函数
+
+### 6.2.3 关键字 as
+
+导入模块或函数时可以使用关键字as简化
+
+举例：
+
+```python
+import xlwings as xw
+from math import factorial as fc
+```
+
+# 七、异常处理
+
+## 7.1 标准异常
+
+| 异常名称                  | 描述                                               |
+| ------------------------- | -------------------------------------------------- |
+| BaseException             | 所有异常的基类                                     |
+| SystemExit                | 解释器请求退出                                     |
+| KeyboardInterrupt         | 用户中断执行(通常是输入^C)                         |
+| Exception                 | 常规错误的基类                                     |
+| StopIteration             | 迭代器没有更多的值                                 |
+| GeneratorExit             | 生成器(generator)发生异常来通知退出                |
+| StandardError             | 所有的内建标准异常的基类                           |
+| ArithmeticError           | 所有数值计算错误的基类                             |
+| FloatingPointError        | 浮点计算错误                                       |
+| OverflowError             | 数值运算超出最大限制                               |
+| ZeroDivisionError         | 除(或取模)零 (所有数据类型)                        |
+| AssertionError            | 断言语句失败                                       |
+| AttributeError            | 对象没有这个属性                                   |
+| EOFError                  | 没有内建输入,到达EOF 标记                          |
+| EnvironmentError          | 操作系统错误的基类                                 |
+| IOError                   | 输入/输出操作失败                                  |
+| OSError                   | 操作系统错误                                       |
+| WindowsError              | 系统调用失败                                       |
+| ImportError               | 导入模块/对象失败                                  |
+| LookupError               | 无效数据查询的基类                                 |
+| IndexError                | 序列中没有此索引(index)                            |
+| KeyError                  | 映射中没有这个键                                   |
+| MemoryError               | 内存溢出错误(对于Python 解释器不是致命的)          |
+| NameError                 | 未声明/初始化对象 (没有属性)                       |
+| UnboundLocalError         | 访问未初始化的本地变量                             |
+| ReferenceError            | 弱引用(Weak reference)试图访问已经垃圾回收了的对象 |
+| RuntimeError              | 一般的运行时错误                                   |
+| NotImplementedError       | 尚未实现的方法                                     |
+| SyntaxError               | Python 语法错误                                    |
+| IndentationError          | 缩进错误                                           |
+| TabError                  | Tab 和空格混用                                     |
+| SystemError               | 一般的解释器系统错误                               |
+| TypeError                 | 对类型无效的操作                                   |
+| ValueError                | 传入无效的参数                                     |
+| UnicodeError              | Unicode 相关的错误                                 |
+| UnicodeDecodeError        | Unicode 解码时的错误                               |
+| UnicodeEncodeError        | Unicode 编码时错误                                 |
+| UnicodeTranslateError     | Unicode 转换时错误                                 |
+| Warning                   | 警告的基类                                         |
+| DeprecationWarning        | 关于被弃用的特征的警告                             |
+| FutureWarning             | 关于构造将来语义会有改变的警告                     |
+| OverflowWarning           | 旧的关于自动提升为长整型(long)的警告               |
+| PendingDeprecationWarning | 关于特性将会被废弃的警告                           |
+| RuntimeWarning            | 可疑的运行时行为(runtime behavior)的警告           |
+| SyntaxWarning             | 可疑的语法的警告                                   |
+| UserWarning               | 用户代码生成的警告                                 |
+
+## 7.2 捕获异常
+
+### 7.2.1 不带异常类型
+
+==不能通过该程序识别出具体的异常信息。因为它捕获所有的异常。==
+
+```python
+try:
+    正常的操作
+   ......................
+except:
+    发生异常，执行这块代码
+   ......................
+else:  # 可省略
+    如果没有异常执行这块代码
+```
+
+### 7.2.2 带异常类型
+
+```python
+try:
+    正常的操作
+   ......................
+except(Exception1[, Exception2[,...ExceptionN]]):
+   发生以上多个异常中的一个，执行这块代码
+   ......................
+else:  # 可省略
+    如果没有异常执行这块代码
+```
+
+## 7.3 异常处理
+
+```python
+try:
+    正常的操作
+   ......................
+except(Exception1[, Exception2[,...ExceptionN]]):
+   发生以上多个异常中的一个，执行这块代码
+   ......................
+finally:  # 可省略
+    任何情况都执行
+```
+
+## 7.4 抛出异常
+
+我们可以使用raise语句自己抛出异常
+
+raise语法格式如下：
+
+```
+raise [Exception [, args [, traceback]]]
+```
+
+语句中 Exception 是异常的类型（例如，NameError）参数标准异常中任一种，args 是自已提供的异常参数。
+
+最后一个参数是可选的（在实践中很少使用），如果存在，是跟踪异常对象。
+
+## 7.5 自定义异常
+
+通过创建一个新的异常类，程序可以命名它们自己的异常。异常应该是典型的继承自Exception类，通过直接或间接的方式。
+
+# 八、面向对象
+
+程序设计的三个基本特征：
+
+- 封装：面向对象编程的核心思想，将对象的属性和行为封装起来，其载体就是类。
+- 继承：子类通过继承复用父类的属性和行为，同时添加子类特有的属性和行为。
+- 多态：将父类对象应用于子类的特征就是多态。
+
+## 8.1 类
+
+### 8.1.1 类定义
+
+语法：
+
+```python
+class CassName:  # 类名称采用“驼峰式命名”
+    "类的帮助信息"
+    stattement  # 类体
+```
+
+### 8.1.2 类初始化方法
+
+`__int__`当创建了类的实例时就会调用该方法
+
+举例：
+
+```python
+# coding=UTF-8
+# Filename: Class.py
+
+class Car:
+    """汽车类"""
+
+    def __init__(self):
+        print("我是汽车")
+
+
+CarObj = Car()  # 我是汽车
+```
+
+### 8.1.3 创造类成员
+
+```mermaid
+graph LR
+	id1(类成员)  --> id2(类方法)
+	id1(类成员)  --> id3(数据成员)
+	id2(类方法) --> id4(实例方法)
+	id2(类方法) --> id5(静态方法)
+```
+
+#### 8.1.3.1 创建实例方法并访问
+
+实例方法：类定义的函数
+
+语法格式：
+
+```python
+def functionName(self, parameterlist):
+    blok
+    
+"""
+functionName: 方法名，一般使用小写字母开头
+self: 必要参数，表示类的实例
+parameterlist：用于指定初self参数以外的参数，各参数间使用逗号“，”分隔
+blok:方法体，实现具体功能
+"""
+```
+
+#### 8.1.3.2 创建数据成员
+
+数据成员:类中定义的变量，即属性
+
+根据定义位置分为：
+
+- 类属性：定义在类中，并且在函数体外的属性
+- 实例属性：定义在类的方法中的属性
+
+举例：类属性
+
+```python
+class People(object):
+    name = "Jack"  # 类属性（公有）
+    country = "China"
+    def __int__(self):
+        print("构造函数自动调用：", People.country)
+        
+print(People.country)  # 通过类对象，打印类属性： country 输出为China
+p = People()  # 创建实例化对象
+print(p.country)  # 通过实例化的对象，打印类属性： country 输出China
+p.country = "England"  # 通过实例化对象修改
+print(p.country)  # 通过实例化的对象，打印类属性： country 输出England
+print(People.country)  # 通过实例化的对象，打印类属性： country 输出China
+del p.country  # 删除实例属性
+print(p.country)  # 实例属性被删除后，再调用同名称的属性，会调用类属性：China
+```
+
+举例：实例属性
+
+```python
+class People(object):
+    address = "南京"  # 类属性
+    
+    def __int__(self):
+        self.name = "xiaowang"  # 实例属性
+        self.age = 20  # 实例属性
+```
+
+## 8.1.4 类访问限制
+
+- `__foo__`：首尾双下划线表示定义特殊方法，一般是系统定义名字，如 `__int_()`
+- `_foo`：单下划线开关的表示protected(保护)类型成员，只允许类本身和子类、类实例访问，不能使用”from module import * “语句导入
+- `__foo`：双下划线表示prviate(私有)定类型的成员，只允许定义该方法的类本身访问，不能通过类的实例访问，但可以通过”类的实例名.类名__XXX“方式访问。
 
 
 

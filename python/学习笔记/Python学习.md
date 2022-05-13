@@ -45,6 +45,16 @@ graph LR
 - 字符串是不可变的
 - 按字面意义级连字符串
 
+### 3.3.3、布尔值
+
+```mermaid
+graph LR
+	id1[布尔值] -.-> id2["True：大部分对象"]
+	id1[布尔值] -.-> id3["False：None（没有值）、False、0、空数据类型"]
+```
+
+
+
 ## 3.4 数据结构
 
 数据结构：列表、字典、元组、集合
@@ -208,6 +218,42 @@ break语句是用来 终止 循环语句的，即哪怕循环条件没有称为F
 
 continue语句被用来告诉Python跳过当前循环块中的剩余语句，然后 继续 进行下一轮循环。
 
+### 3.7.6 推导式
+
+- 列表推导式
+
+  ```python
+  # 挑出美元在后面的元素
+  # for结构
+  currency = ["USDJPY", "USDGBP", "USDCHF", "USDCAD", "AUDUSD", "NZDUSD"]
+  
+  usd = []
+  for pair in currency:
+      if pair[3:] == "USD":
+          usd.append(pair[:3])
+  print(usd)  # ["AUD", "NZD"]
+  
+  # 列表推导式
+  [pair[:3] for pair in currency if pair[3:] == "USD"]  # ["AUD", "NZD"]
+  ```
+
+- 字典推导式
+
+  ```python
+  exchange = {"EURUSD" : 1.1152,
+             	"GBPUSD" : 1.2454,
+              "AUDUSD" : 0.6161}
+  {k: v *100 for (k, v) in exchange.items()}  # "EURUSD" :111.52,"GBPUSD": 124.54,"AUDUSD": 61.61"
+  ```
+
+- 集合推导式
+
+  ```python
+  {s + "USD" for s in ["EUR", "GBP", "EUR", "NZD", "NZD"]}  # {"EURUSD", "GBPUSD", "NZDUSD"}
+  ```
+
+  
+
 # 四、内置函数
 
 ## 4.1 数据类型查询
@@ -303,6 +349,28 @@ lst = [1, 2, 3]
 	for i in iter(lst):
     print(i)  # 1	2	3
 ```
+
+## 4.12 字母转化成大写
+
+函数：`upper()`
+
+语法：str.upper()
+
+```
+"python".upper()  # PYTHON
+```
+
+## 4.13 字母转化成小写
+
+函数：`lower()`
+
+语法：str.lower()
+
+```
+"PYTHON".lower()  # python
+```
+
+## 
 
 # 五、自定义函数
 
@@ -738,6 +806,8 @@ raise [Exception [, args [, traceback]]]
 - 封装：面向对象编程的核心思想，将对象的属性和行为封装起来，其载体就是类。
 - 继承：子类通过继承复用父类的属性和行为，同时添加子类特有的属性和行为。
 - 多态：将父类对象应用于子类的特征就是多态。
+
+备注：在对象中==变量==被称作==属性==（访问对象数据），==函数==被称作==方法==（执行某种操作）
 
 ## 8.1 类
 

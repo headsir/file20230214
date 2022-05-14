@@ -83,19 +83,44 @@ array([5. 7. 9.])
 
 ## 1.4 存取元素
 
+<img src="NumPy基础.assets/image-20220514001907936.png" width =20%><img src= "NumPy基础.assets/image-20220514002040719.png" width = 20%><img src= "NumPy基础.assets/image-20220514002218753.png" width=20%><img src= "NumPy基础.assets/image-20220514002856778.png" width=20%><img src= "NumPy基础.assets/image-20220514003042945.png" width=20%>
 
+## 1.5 数组构造器
 
+```python
+# coding = UTF-8
+# Filename:NumPy基础.py
 
+"""
+学习案例
+"""
+import numpy as np
 
+# 构造数组之arange函数
+array = np.arange(2 * 5).reshape(2, 5)  # 2行5列
+print(array)
 
+# 服从正态分布的伪随机数数组
+print(np.random.randn(2, 3))  # 2行3列
 
+#  创建全是1的数组
+print(np.ones(6).reshape(6, 1))  # 6行1列
 
+#  创建全是0的数组
+print(np.zeros(6).reshape(3, 2))  # 3行2列
 
+# 创建单位矩阵
+print(np.eye(4))
+```
 
+## 1.6 视图和副本
 
+对视图[^注3]值修改会改变原数组中的值
 
+对副本值修改不影响原数组，副本创建 `subset = array2[:,:2].copy()`
 
 ---
 
 [^注1]: 同构：所有数据必须是相同类型
 [^注2]: 标量：某种Python基本数据类型，比如浮点型和字符串，是为了将其和列表及字典一类的多元素数据结构以及一维和二维的NumPy数组区分开来。
+[^注3]: 视图：NumPy数组切片时返回值

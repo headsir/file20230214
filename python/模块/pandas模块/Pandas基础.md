@@ -4,6 +4,33 @@
 
 ### 1.1 Series 数据结构
 
+```mermaid
+graph LR
+	id0((<font color = red size = 6>Series <br>数据结构</font>))
+	id0-->id1
+	id0-->id8
+	id0-->id10
+	id1[创建 Series]
+		id2(传入列表)
+			id4(数据标签默认从0开始)
+			id5(指定索引,通过设置 index 参数自定义索引)			
+		id3(传入字典)
+			id6(key 是数据标签)
+			id7(value 是数据值)
+		
+        id1 -->id2
+            id2 -.- id4
+            id2 -.- id5
+        id1 -->id3
+            id3 -.-id6
+            id3 -.-id7
+	id8[获取 Series 索引]-->id9(直接利用 index 方法获取 Series 索引值)
+	id10[获取 Series 值]-->id11(直接利用 values 方法获取 Series 索引值)
+	
+```
+
+
+
 #### 1.1.1 创建 Series
 
 - 传入列表
@@ -85,6 +112,38 @@ array([1, 2, 3, 4], dtype=int64)
 ```
 
 ### 1.2 DataFrame 表格型数据结构
+
+```mermaid
+graph LR
+	id0((<font color = red size = 6>DataFrame <br>表格型数据结构</font>))
+	id0-->id1
+	id0-->id8
+	id0-->id10
+	id1[创建 DataFrame]
+		id2(传入列表)
+			id2_3(传入列表)
+			id2_4(传入嵌套列表)
+			id2_5(传入嵌套元组)	
+            id2_6("指定行、列索引")
+		id3(传入字典)
+			id6(字典 key 值相当于列索引)
+			id7(使用 index 参数自定义行索引)
+		
+        id1 -->id2
+        	id2 -.- id2_3
+            id2 -.- id2_4
+            id2 -.- id2_5
+            id2 -.- id2_6
+        id1 -->id3
+            id3 -.-id6
+            id3 -.-id7
+	id8["获取 DataFrame 行、列索引"]-->id9("1、利用 columns 方法获取 DataFrame 列索引 
+									<br> 2、利用 index 方法获取 DataFrame 行索引")
+	id10[获取 DataFrame 值]-->id11("详见后面【数据选择】")
+	
+```
+
+
 
 #### 1.2.1 创建 DataFrame
 
@@ -234,3 +293,394 @@ array([1, 2, 3, 4], dtype=int64)
 
 ​		详见后面【数据选择】内容
 
+## 二、Pandas 获取数据
+
+### 2.1 导入外部数据
+
+主要用到 Pandas 里面的 read_x() 方法，x 表示导入文件格式
+
+```mermaid
+graph LR
+	id2_1((<font color = red size = 6>导入<br>外部数据</font>))
+		id2_1_1["导入 .xlsx 文件 <br> read_excel()"]
+			id2_1_1-1(基本导入)
+			id2_1_1-2(指定 sheet 导入:sheet_name)
+			id2_1_1-3(指定行索引:index_col)
+			id2_1_1-4(指定列索引:header)
+			id2_1_1-5(指定导入列:usecols)
+		id2_1_2["导入 .csv 文件 <br> read_csv()"]
+			id2_1_2-1(直接导入)
+			id2_1_2-2(指明分隔符:sep)
+			id2_1_2-3(指明读取行数:nrows)
+			id2_1_2-4(指明编码格式:encoding)
+			id2_1_2-5(指定解析语言:engine)
+			id2_1_2-6("其它:涉及行、列索引设置及指定导入某列，设定方法与导入 .xlsx 文件一致")
+		id2_1_3["导入 .txt 文件 <br> read_table()"]
+			id2_1_3-1("是将利用分隔符分开的文件导入的通用函数，还可以导入 .csv 文件，必须用sep指明分隔符。")
+		id2_1_4["导入SQL文件 <br> read_sql()"]
+			id2_1_4-1("利用 sqlalchemy 模块连接数据库")
+			
+		
+	id2_1-->id2_1_1 
+        id2_1_1-.->id2_1_1-1
+        id2_1_1-.->id2_1_1-2
+        id2_1_1-.->id2_1_1-3
+        id2_1_1-.->id2_1_1-4
+        id2_1_1-.->id2_1_1-5
+     id2_1-->id2_1_2 
+     	id2_1_2 -.->id2_1_2-1
+     	id2_1_2 -.->id2_1_2-2
+     	id2_1_2 -.->id2_1_2-3
+     	id2_1_2 -.->id2_1_2-4
+     	id2_1_2 -.->id2_1_2-5
+     	id2_1_2 -.->id2_1_2-6
+     id2_1-->id2_1_3
+     	id2_1_3-.->id2_1_3-1
+     id2_1-->id2_1_4
+     	id2_1_4-.->id2_1_4-1
+```
+
+
+
+#### 2.1.1 导入 .xlsx 文件
+
+导入方法：read_excel()
+
+- 基本导入
+
+  ```python
+  import pandas as pd
+  df = pd.read_excel(r"C:\Users\WT\数据分析20220612\对比Excel,轻松学习Python数据分析数据集\郑州电信FDDLTE基站信息表20220318.xlsx")
+  print(df)
+  
+         地市  厂家         ECI  PLMN  MCC  MNC   制式    簇        子网  ENodeBID  ...  \
+  0      郑州  中兴   979168-18     1  460   11  FDD   31  410133.0    979168  ...   
+  1      郑州  中兴   979168-17     1  460   11  FDD   31  410133.0    979168  ...   
+  2      郑州  中兴   979168-16     1  460   11  FDD   31  410133.0    979168  ...   
+  3      郑州  中兴   979166-18     1  460   11  FDD   50  410133.0    979166  ...   
+  4      郑州  中兴   979166-17     1  460   11  FDD   50  410133.0    979166  ...   
+  
+  [43503 rows x 64 columns]
+  ```
+
+- 指定 sheet 导入
+
+  通过设置 sheet_name 参数指定导入特定 sheet 表
+
+  ```python
+  df1 = pd.read_excel(r"C:\Users\WT\数据分析20220612\对比Excel,轻松学习Python数据分析数据集\郑州电信FDDLTE基站信息表20220318.xlsx" , sheet_name = "子网")
+  print(df1)
+  
+       城区        子网   城区.1  tac1    11264  Unnamed: 5    1    S1  Unnamed: 8  \
+  0   中原区  410102.0    中原区  tac2  11265.0         NaN  2.0   S11         NaN   
+  1   二七区  410103.0    二七区  tac3  11266.0         NaN  3.0  S111         NaN   
+  2   管城区  410104.0  管城回族区  tac4  11267.0         NaN  4.0  S211         NaN   
+  3   金水区  410105.0    金水区  tac5  11268.0         NaN  5.0  S221         NaN   
+  4   上街区  410106.0    上街区  tac6  11269.0         NaN  6.0  S222         NaN   
+  
+  [70 rows x 18 columns]
+  ```
+
+- 指定行索引
+
+  通过设置 index_col 参数指定特定行索引
+
+  ```python
+  df3 = pd.read_excel(r"C:\Users\WT\数据分析20220612\对比Excel,轻松学习Python数据分析数据集\郑州电信FDDLTE基站信息表20220318.xlsx" , index_col = 0)
+  print(df3)
+      厂家         ECI  PLMN  MCC  MNC   制式    簇        子网  ENodeBID   行政区域  ...  \
+  地市                                                                       ...   
+  郑州  中兴   979168-18     1  460   11  FDD   31  410133.0    979168    金水区  ...   
+  郑州  中兴   979168-17     1  460   11  FDD   31  410133.0    979168    金水区  ...   
+  郑州  中兴   979168-16     1  460   11  FDD   31  410133.0    979168    金水区  ...   
+  郑州  中兴   979166-18     1  460   11  FDD   50  410133.0    979166    金水区  ...   
+  郑州  中兴   979166-17     1  460   11  FDD   50  410133.0    979166    金水区  ...   
+  
+  [43503 rows x 63 columns]
+  ```
+
+  
+
+- 指定列索引
+
+  通过设置 header 参数指定特定列索引
+
+  ```
+  # 使用第一行作为列索引
+  df3 = pd.read_excel(r"C:\Users\WT\数据分析20220612\对比Excel,轻松学习Python数据分析数据集\郑州电信FDDLTE基站信息表20220318.xlsx" , header = 0)
+  
+  print(df3)  
+         地市  厂家         ECI  PLMN  MCC  MNC   制式    簇        子网  ENodeBID  ...  \
+  0      郑州  中兴   979168-18     1  460   11  FDD   31  410133.0    979168  ...   
+  1      郑州  中兴   979168-17     1  460   11  FDD   31  410133.0    979168  ...   
+  2      郑州  中兴   979168-16     1  460   11  FDD   31  410133.0    979168  ...   
+  3      郑州  中兴   979166-18     1  460   11  FDD   50  410133.0    979166  ...   
+  4      郑州  中兴   979166-17     1  460   11  FDD   50  410133.0    979166  ...   
+  
+  [43503 rows x 64 columns]
+  ```
+
+  ```
+  # 使用第二行作为列索引
+  df4 = pd.read_excel(r"C:\Users\WT\数据分析20220612\对比Excel,轻松学习Python数据分析数据集\郑州电信FDDLTE基站信息表20220318.xlsx" , header = 2)
+  
+  print(df4)
+         郑州  中兴   979168-17  1  460  11  FDD   31    410133  979168  ...  \
+  0      郑州  中兴   979168-16  1  460  11  FDD   31  410133.0  979168  ...   
+  1      郑州  中兴   979166-18  1  460  11  FDD   50  410133.0  979166  ...   
+  2      郑州  中兴   979166-17  1  460  11  FDD   50  410133.0  979166  ...   
+  3      郑州  中兴   979166-16  1  460  11  FDD   50  410133.0  979166  ...   
+  4      郑州  中兴   979790-16  1  460  11  FDD   16  410129.0  979790  ...   
+  
+  [43501 rows x 64 columns]
+  ```
+
+  ```
+  # 使用默认从0开始的数作为列索引
+  df5 = pd.read_excel(r"C:\Users\WT\数据分析20220612\对比Excel,轻松学习Python数据分析数据集\郑州电信FDDLTE基站信息表20220318.xlsx" , header = None)
+  print(df5)  
+         0   1           2     3    4    5    6    7       8         9   ...  \
+  0      地市  厂家         ECI  PLMN  MCC  MNC   制式    簇      子网  ENodeBID  ...   
+  1      郑州  中兴   979168-18     1  460   11  FDD   31  410133    979168  ...   
+  2      郑州  中兴   979168-17     1  460   11  FDD   31  410133    979168  ...   
+  3      郑州  中兴   979168-16     1  460   11  FDD   31  410133    979168  ...   
+  4      郑州  中兴   979166-18     1  460   11  FDD   50  410133    979166  ...   
+  
+  [43504 rows x 64 columns]
+  ```
+
+- 指定导入列
+
+  通过设置 usecols 参数指定导入列
+
+  ```
+  df6 = pd.read_excel(r"C:\Users\WT\数据分析20220612\对比Excel,轻松学习Python数据分析数据集\郑州电信FDDLTE基站信息表20220318.xlsx" , usecols = ["ECI"])
+  print(df6)  
+                ECI
+  0       979168-18
+  1       979168-17
+  2       979168-16
+  3       979166-18
+  4       979166-17
+  ...           ...
+  43498    180998-5
+  43499  741475-179
+  43500  741475-180
+  43501  741475-181
+  43502  742530-178
+  
+  [43503 rows x 1 columns]
+  ```
+
+#### 2.1.2 导入 .csv 文件
+
+导入方法：read_csv()
+
+- 直接导入
+
+  ```
+  import pandas as pd
+  df = pd.read_csv(r"C:\Users\WT\数据分析20220612\对比Excel,轻松学习Python数据分析数据集\loan.csv")
+  print(df)
+  
+            用户ID  好坏客户  年龄          负债率      月收入  家属数量
+  0            1     1  45     0.802982   9120.0   2.0
+  1            2     0  40     0.121876   2600.0   1.0
+  2            3     0  38     0.085113   3042.0   0.0
+  3            4     0  30     0.036050   3300.0   0.0
+  4            5     0  49     0.024926  63588.0   0.0
+  
+  [150000 rows x 6 columns]
+  ```
+
+- 指明分隔符
+
+  read_csv()默认文件中的数据是以逗号分开的，但是有的文件不是用逗号分开的，会报错。
+
+  通过 sep 参数指定分隔符，常见的分隔符除了逗号还有空格、制表符（\t）
+
+- 指明读取行数
+
+  通过设置 nrows 参数指明读取前 nrows 行。
+
+- 指定编码格式
+
+  通过设置 enc0ding 参数指明文件编码格式，常见有 UTF-8、gbk
+
+- 指定解析语言
+
+  默认使用C语言作为解析语言，当文件路径路经或者文件名包含中文时，默认方式可能会报错。
+
+  通过设置 engine 参数指明解析语言为 Python 可解决。
+
+- 其它
+
+  涉及行、列索引设置及指定导入某列，设定方法与导入 .xlsx 文件一致。
+
+#### 2.1.3 导入 .txt 文件
+
+导入方法：read_table()
+
+是将利用分隔符分开的文件导入的通用函数，还可以导入 .csv 文件，必须用sep指明分隔符。
+
+#### 2.1.4 导入SQL文件
+
+导入方法：read_read_sql()
+
+利用 sqlalchemy 模块连接数据库
+
+```
+from sqlalchemy import create_engine
+import pandas as pd
+
+# 创建数据库连接,mysql用户名是root，密码是qazwsx，本地的数据库服务是localhost,数据库的名称试验库,数据库编码utf8
+engine = create_engine('mysql+pymysql://root:qazwsx@localhost/试验库?charset=utf8')
+
+# 读取mysql数据,使用pandas的read_sql()查询mysql表department中的数据
+db = pd.read_sql(sql='select * from 试验库.information_bbu', con=engine)
+print(db)
+
+   序号      子网       网元                     网元名称     机房名称  
+0      1  410117  4849673  5AZYZOSFF0009建设IDC机房06D  建设IDC机房   
+1      2  410117  4849683    5AZYZOSFF0013建设威科姆0ED    建设威科姆   
+2      3  410117  4849698  5AZYZOSFF0022建设谦祥万和城01D  建设谦祥万和城   
+3      4  410117  4849706    5AZYZOSFF002A建设威科姆01D    建设威科姆   
+4      5  410117  4849699  5AZYZOSFF0023建设天健湖机房13D  建设天健湖机房   
+
+[740 rows x 12 columns]
+```
+
+### 2.2 了解数据
+
+只有对数据充分熟悉，才能更好分析。
+
+```mermaid
+graph LR
+	id2_2((<font color = red size = 6>了解数据</font>))
+		id2_2_1(head 预览前几行)
+		id2_2_2(shape 获取数据表的大小)
+		id2_2_3(info 获取数据类型)
+		id2_2_4(describe 获取数值分布情况)
+	
+	id2_2 --> id2_2_1
+	id2_2 --> id2_2_2
+	id2_2 --> id2_2_3
+	id2_2 --> id2_2_4
+```
+
+
+
+#### 2.2.1  head 预览前几行
+
+通过 head() 方法控制显示行数，默认显示前5行。
+
+```
+db.head()
+
+序号	子网	网元	网元名称	机房名称	5G业务IP电信	5G业务IP联通	BBU经度	BBU纬度	软件版本	备注	更新时间
+0	1	410117	4849673	5AZYZOSFF0009建设IDC机房06D	建设IDC机房	240E:0183:C00C:0000:0200::42BA	2408:8160:C100:0010:0200::42BA	113.535754	34.803838	V5.45.20.20	None	2022-05-12 10:14:13
+1	2	410117	4849683	5AZYZOSFF0013建设威科姆0ED	建设威科姆	240E:0183:C00C:0000:0200::4206	2408:8160:C100:0010:0200::4206	113.556622	34.824446	V5.45.20.20	None	2022-05-12 10:14:13
+2	3	410117	4849698	5AZYZOSFF0022建设谦祥万和城01D	建设谦祥万和城	240E:0183:C00C:0000:0200::416A	2408:8160:C100:0010:0200::416A	113.534413	34.833985	V5.45.20.20	None	2022-05-12 10:14:13
+3	4	410117	4849706	5AZYZOSFF002A建设威科姆01D	建设威科姆	240E:0183:C00C:0000:0200::4212	2408:8160:C100:0010:0200::4212	113.556624	34.824469	V5.45.20.20	None	2022-05-12 10:14:13
+4	5	410117	4849699	5AZYZOSFF0023建设天健湖机房13D	建设天健湖机房	240E:0183:C00C:0000:0200::415E	2408:8160:C100:0010:0200::415E	113.496189	34.814425	V5.45.20.20	None	2022-05-12 10:14:13
+```
+
+#### 2.2.2  shape 获取数据表的大小
+
+通过 shape() 方法获取数据表的行、列数量,不会统计行索引和列索引。
+
+```
+db.shape
+
+(740, 12)
+```
+
+#### 2.2.3  info 获取数据类型
+
+不同数据类型分析思路不一样。
+
+```
+db.info()
+
+<class 'pandas.core.frame.DataFrame'>
+RangeIndex: 740 entries, 0 to 739
+Data columns (total 12 columns):
+ #   Column    Non-Null Count  Dtype         
+---  ------    --------------  -----         
+ 0   序号        740 non-null    int64         
+ 1   子网        740 non-null    object        
+ 2   网元        740 non-null    object        
+ 3   网元名称      740 non-null    object        
+ 4   机房名称      740 non-null    object        
+ 5   5G业务IP电信  740 non-null    object        
+ 6   5G业务IP联通  740 non-null    object        
+ 7   BBU经度     740 non-null    object        
+ 8   BBU纬度     740 non-null    object        
+ 9   软件版本      740 non-null    object        
+ 10  备注        0 non-null      object        
+ 11  更新时间      740 non-null    datetime64[ns]
+dtypes: datetime64[ns](1), int64(1), object(10)
+memory usage: 69.5+ KB
+```
+
+#### 2.2.4  describe 获取数值分布情况
+
+数据的分布情况，即均值是多少，最值是多少，方差及分位数分别又是多少。
+
+```
+db.describe()
+
+序号
+count	740.000000
+mean	370.535135
+std	213.825046
+min	1.000000
+25%	185.750000
+50%	370.500000
+75%	555.250000
+max	748.000000
+```
+
+## 三、Pandas 数据预处理
+
+处理不规整数据，主要有缺失数据、重复数据、异常数据。
+
+### 3.1 缺失值处理
+
+某些原因导致部分数据为空，一般有两种处理方式：
+
+- 删除：含有缺失值的数据删除
+- 填充：缺失部分数据用某个值代替
+
+#### 3.1.1 缺失值查看
+
+- 通过 info() 方法查看，对比非 null 数量
+
+- 通过 isnull() 方法查看，缺失值返回 True
+
+  ```
+  db.isnull()
+  序号	子网	网元	网元名称	机房名称	5G业务IP电信	5G业务IP联通	BBU经度	BBU纬度	软件版本	备注	更新时间
+  0	False	False	False	False	False	False	False	False	False	False	True	False
+  1	False	False	False	False	False	False	False	False	False	False	True	False
+  2	False	False	False	False	False	False	False	False	False	False	True	False
+  3	False	False	False	False	False	False	False	False	False	False	True	False
+  4	False	False	False	False	False	False	False	False	False	False	True	False
+  
+  740 rows × 12 columns
+  ```
+
+#### 3.1.2 缺失值删除
+
+通过 dropna() 方法实现，默认删除含有缺失值的行，传入参数 how = "all" 只删除全为空值的行。
+
+#### 3.1.3 缺失值填充
+
+- 通过 fillna(“填充值”) 方法对数据表中所有缺失值填充，
+- 通过 fillna({"列1" : "填充值" , "列2":"填充值"}) 方法指定特定列名，对特定列空值填充。
+
+### 3.2 重复值处理
+
+- 通过 drop_duplicates() 方法对所有值进行重复值判断，且保留第一个值
+- 通过参数 subset = ["列1","列2"]指定特定列名进行重复值判断，且保留第一个值
+- 通过参数 keep 定义保留哪一个值，默认 first  第一个值， last 最后一个值，False 全部删除。

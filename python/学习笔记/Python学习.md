@@ -52,6 +52,19 @@ Anaconda自带工具，数据分析领域使用的比较多
 >
 > 
 
+### 2.1.8 自定义表格展示式样
+
+可以根据个人喜好设置。border 是边框粗细，像素可以自己改，比如现在是1px；可以改成粗一点,5px；color：可以换成red，blue等；!important这个不要去掉，以免被其他CSS样式覆盖掉。
+
+```HTML
+%%HTML
+<style type="text/css">
+table.dataframe td, table.dataframe th {
+    border: 2px  black solid !important;
+  color: red !important;
+}
+```
+
 
 
 # 三、基本概念

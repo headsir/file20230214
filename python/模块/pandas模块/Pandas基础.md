@@ -231,7 +231,7 @@ graph LR
 
 - 传入字典
 
-  字典 key 值相当于列索引
+  默认字典 key 值相当于列索引，可以利用 from_dict 函数中参数 orient 设置，默认 orient = 'columns'
 
   ```
   data ={"小写":["a","b","c","d"] , "大写" : ["A","B","C","D"]}
@@ -967,3 +967,18 @@ df1.reset_index(drop = True)
 行（列）用切片索引，列（行）用普通索引，这种交叉索引利用 ix 方法，举例：df.ix[0:3 , ["列1" , "列2"]]
 
 ## 五、Pandas 数据操作
+
+### 5.1 数值替换
+
+利用 replace() 方法
+
+- 一对一替换：replace(A , B)，举例：df["年龄"].replace(240 , 33 , inplace[^1] = True) ,df.replace(np.NaN[^2] ,  0)
+- 多对一替换：replace([A,B] , C)，举例：df.replace([240 , 260 , 280] , 33)
+- 多对多替换：replace({ "A" : "a" , "B" : "b"})，举例：df.replace({240 : 32 , 260 : 33 , 280 : 34})
+
+### 5.2 数值排序
+
+
+
+[^1]: inplace参数：是否改变原始表数据
+[^2]: np.NaN:对缺失值的一种表示方法

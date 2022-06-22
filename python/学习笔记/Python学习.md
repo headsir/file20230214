@@ -12,27 +12,27 @@ Anaconda自带工具，数据分析领域使用的比较多
 
 ### 2.1.1 新建文件
 
-![image-20220610192032189](Python学习.assets/image-20220610192032189.png)
+![image-20220610192032189](imge/Python学习.assets/image-20220610192032189.png)
 
 ### 2.1.2 运行代码
 
-![image-20220610192444331](Python学习.assets/image-20220610192444331.png)
+![image-20220610192444331](imge/Python学习.assets/image-20220610192444331.png)
 
 ### 2.1.3 重命名文件
 
-![image-20220610192549254](Python学习.assets/image-20220610192549254.png)
+![image-20220610192549254](imge/Python学习.assets/image-20220610192549254.png)
 
 ### 2.1.4 保存文件
 
-![image-20220610192846393](Python学习.assets/image-20220610192846393.png)
+![image-20220610192846393](imge/Python学习.assets/image-20220610192846393.png)
 
 ### 2.1.5 导入本地文件
 
-![image-20220610193323012](Python学习.assets/image-20220610193323012.png)
+![image-20220610193323012](imge/Python学习.assets/image-20220610193323012.png)
 
 ### 2.1.6 文本框模式
 
-![image-20220610193426986](Python学习.assets/image-20220610193426986.png)
+![image-20220610193426986](imge/Python学习.assets/image-20220610193426986.png)
 
 ### 2.1.7 添加目录
 
@@ -48,7 +48,7 @@ Anaconda自带工具，数据分析领域使用的比较多
 >
 > 4、添加目录功能 
 >
-> ![image-20220610195015588](Python学习.assets/image-20220610195015588.png)
+> ![image-20220610195015588](imge/Python学习.assets/image-20220610195015588.png)
 >
 > 
 

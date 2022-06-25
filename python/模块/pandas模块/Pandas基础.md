@@ -891,7 +891,7 @@ B  a    5   6
    b    7   8
 
 df1.reset_index()
-Z1	Z2	C1	C2
+   Z1	Z2	C1	C2
 0	A	a	1	2
 1	A	b	3	4
 2	B	a	5	6
@@ -1066,9 +1066,137 @@ df1.reset_index(drop = True)
 
 ### 5.9 插入新的行或列
 
-- 插入行：
+- 插入行：利用纵轴拼接的方法变相插入行，拼接方法参考后面章节
+- 插入列：
+  - 利用 insert() 方法，举例：df.insert(插入位置 , 新列列名 , 插入列数据)
+  - 索引方式插入列：举例：df["新列列名"] = [插入列数据]
 
+### 5.10 行列互换
 
+利用 .T 方法，举例：df.T
+
+### 5.11 索引重塑
+
+重塑：数据从表格型数据转换到树形数据的过程。
+
+- 表格转树形：利用 stack() 方法 ,举例：df.stack
+- 树形转表格：利用 unstack() 方法，举例：df.unstack()
+
+### 5.12 长宽表转换
+
+将比较长（很多行）的表转换为比较宽（很多列）的表。
+
+宽表：
+
+|      |  Company | Name | Sate2013 | Sate2014 | Sate2015 | Sate2016 |
+| ---: | -------: | ---: | -------: | -------: | -------: | -------- |
+|    0 |    Apple | 苹果 |     5000 |     5050 |     5050 | 5050     |
+|    1 |   Google | 谷歌 |     3500 |     3800 |     3800 | 3800     |
+|    2 | Facebook | 脸书 |     2300 |     2900 |     2900 | 2900     |
+
+长表：
+
+|      |  Company | Name |  level_2 | 0    |
+| ---: | -------: | ---: | -------: | ---- |
+|    0 |    Apple | 苹果 | Sate2013 | 5000 |
+|    1 |    Apple | 苹果 | Sate2014 | 5050 |
+|    2 |    Apple | 苹果 | Sate2015 | 5050 |
+|    3 |    Apple | 苹果 | Sate2016 | 5050 |
+|    4 |   Google | 谷歌 | Sate2013 | 3500 |
+|    5 |   Google | 谷歌 | Sate2014 | 3800 |
+|    6 |   Google | 谷歌 | Sate2015 | 3800 |
+|    7 |   Google | 谷歌 | Sate2016 | 3800 |
+|    8 | Facebook | 脸书 | Sate2013 | 2300 |
+|    9 | Facebook | 脸书 | Sate2014 | 2900 |
+|   10 | Facebook | 脸书 | Sate2015 | 2900 |
+|   11 | Facebook | 脸书 | Sate2016 | 2900 |
+
+#### 5.12.1 长表转换为宽表
+
+常用的方法是透视表，参考后面章节
+
+#### 5.12.2 宽表转换为长表
+
+##### 1、利用 stack() 方法
+
+> - 设置索引，举例：df.set_index(["Company" ,"Name"])
+>
+> |          |      | Sate2013 | Sate2014 | Sate2015 | Sate2016 |
+> | -------: | ---: | -------: | -------: | -------: | -------: |
+> |  Company | Name |          |          |          |          |
+> |    Apple | 苹果 |     5000 |     5050 |     5050 |     5050 |
+> |   Google | 谷歌 |     3500 |     3800 |     3800 |     3800 |
+> | Facebook | 脸书 |     2300 |     2900 |     2900 |     2900 |
+>
+> - 连索引转换成行索引，举例：df.set_index(["Company" ,"Name"]).stack()
+>
+> ```
+> Company   Name          
+> Apple     苹果   Sate2013    5000
+>                 Sate2014    5050
+>                 Sate2015    5050
+>                 Sate2016    5050
+> Google    谷歌   Sate2013    3500
+>                 Sate2014    3800
+>                 Sate2015    3800
+>                 Sate2016    3800
+> Facebook  脸书   Sate2013    2300
+>                 Sate2014    2900
+>                 Sate2015    2900
+>                 Sate2016    2900
+> ```
+>
+> - 索引重置
+>
+> |      |  Company | Name |  level_2 |    0 |
+> | ---: | -------: | ---: | -------: | ---: |
+> |    0 |    Apple | 苹果 | Sate2013 | 5000 |
+> |    1 |    Apple | 苹果 | Sate2014 | 5050 |
+> |    2 |    Apple | 苹果 | Sate2015 | 5050 |
+> |    3 |    Apple | 苹果 | Sate2016 | 5050 |
+> |    4 |   Google | 谷歌 | Sate2013 | 3500 |
+> |    5 |   Google | 谷歌 | Sate2014 | 3800 |
+> |    6 |   Google | 谷歌 | Sate2015 | 3800 |
+> |    7 |   Google | 谷歌 | Sate2016 | 3800 |
+> |    8 | Facebook | 脸书 | Sate2013 | 2300 |
+> |    9 | Facebook | 脸书 | Sate2014 | 2900 |
+> |   10 | Facebook | 脸书 | Sate2015 | 2900 |
+> |   11 | Facebook | 脸书 | Sate2016 | 2900 |
+
+##### 2、利用 melt() 方法，推荐
+
+举例：df.melt(id_vars = [不变的列] , var_name = "列转换行后的列名" , value_name = "新索引对应值的列名" )
+
+```
+df.melt(id_vars = ["Company" ,"Name"],var_name = "Year" , value_name = "Sale")
+```
+
+|      |  Company | Name |     Year | Sale |
+| ---: | -------: | ---: | -------: | ---: |
+|    0 |    Apple | 苹果 | Sate2013 | 5000 |
+|    1 |   Google | 谷歌 | Sate2013 | 3500 |
+|    2 | Facebook | 脸书 | Sate2013 | 2300 |
+|    3 |    Apple | 苹果 | Sate2014 | 5050 |
+|    4 |   Google | 谷歌 | Sate2014 | 3800 |
+|    5 | Facebook | 脸书 | Sate2014 | 2900 |
+|    6 |    Apple | 苹果 | Sate2015 | 5050 |
+|    7 |   Google | 谷歌 | Sate2015 | 3800 |
+|    8 | Facebook | 脸书 | Sate2015 | 2900 |
+|    9 |    Apple | 苹果 | Sate2016 | 5050 |
+|   10 |   Google | 谷歌 | Sate2016 | 3800 |
+|   11 | Facebook | 脸书 | Sate2016 | 2900 |
+
+### 5.13 apply() 与 applymap() 函数
+
+与匿名函数 lambda 结合使用
+
+#### 5.13.1 apply() 函数
+
+对某一行或列中的元素执行相同函数操作，举例：df[ "列名" ] .apply(lambda x:x+1)
+
+#### 5.13.2 applymap() 函数
+
+对每一个元素执行相同的函数操作，举例：df.applymap(lamdba x:x+1)
 
 
 

@@ -1198,6 +1198,40 @@ df.melt(id_vars = ["Company" ,"Name"],var_name = "Year" , value_name = "Sale")
 
 对每一个元素执行相同的函数操作，举例：df.applymap(lamdba x:x+1)
 
+## 六、Pandas 数据分组
+
+利用 groupby() 方法，数据类型为 DataFrameGroupBy
+
+### 6.1 分组键是列名
+
+- 单列分组：df.groupby("列名").count()，举例：`df1.groupby("Year").sum()`
+- 多列分组：df.groupby(["列名1" ,"列名2"  ]).count()，举例：`df1.groupby(["Name" ,"Year"]).sum()`
+
+### 6.2 分组键是 Series
+
+- 单列分组：df.groupby(df["列名"]).count()，举例：`df1.groupby(df["Year"]).sum()`
+- 多列分组：df.groupby([df["列名1"] ,df["列名2"]  ]).count()，举例：`df1.groupby([df["Name"] ,df["Year"]]).sum()`
+
+### 6.3 aggregate 方法
+
+#### 6.3.1 同时多种汇总方式
+
+df.groupby("列名").aggregate( [ "count" , "sum"])
+
+#### 6.3.2 不同列不同汇总方式
+
+df.groupby("列名").aggregate( {"列3" : "count" , "列5" : "sum"})
+
+### 6.4 对分组后结果重置索引
+
+将 DataFrameGroupBy 类型转换为 DataFrame 形式，利用重置索引 reset_index() 方法
+
+## 七、Pandas 数据透视
+
+
+
+
+
 
 
 [^1]: inplace参数：是否改变原始表数据

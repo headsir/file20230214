@@ -84,9 +84,13 @@ datetime.now().isocalendar()
 
 利用 `str()` 方法，举例：`str(datetime.now())`
 
+利用 `strftime()` 方法，举例：`datetime.now().strftime("%Y-%m-%d")`
+
 ## 3.2、字符串格式转换为时间格式
 
-利用 parse() 方法，举例：`parse("2022-6-25")`
+- 利用 `strptime()` 方法，举例：`datetime.strptime("2022-6-25","%Y-%m-%d")`
+
+- 利用 parse() 方法，举例：`parse("2022-6-25")`
 
 ```
 from dateutil.parser import parse

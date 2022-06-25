@@ -1228,7 +1228,19 @@ df.groupby("列名").aggregate( {"列3" : "count" , "列5" : "sum"})
 
 ## 七、Pandas 数据透视
 
+利用 pivot_table() 方法，pd.pivot_table(*data*, *values=None*, *index=None*, *columns=None*, *aggfunc='mean'*, *fill_value=None*, *margins=False*, *dropna=True*, *margins_name='All'*)，参数如下：
 
+| 参数         | 说明                                                         |
+| ------------ | ------------------------------------------------------------ |
+| data         | 必选参数，设定需要操作的  DataFrame                          |
+| values       | 可选参数，对应 Excel 中值的那个框，用于指定汇总计算字段      |
+| index        | 必选参数，对应 Excel 中行的那个框，用于指定行字段，作为结果DataFrame的行索引 |
+| columns      | 必选参数，对应 Excel 中列的那个框，用于指定列字段，作为结果DataFrame的列索引 |
+| aggfunc      | 用于指定汇总计算的方式，可以用字典对不同列不同方式汇总       |
+| fill_value   | 用于对空值的填充， 默认不填充                                |
+| dropna       | True 默认值  如果列的值都是NaN，将被删除；False时，被保留    |
+| margins      | False 默认值 True时，会添加行/列的总计                       |
+| margins_name | 'All'  默认值 margins = True 时，设定margins 行/列的名称     |
 
 
 

@@ -8,7 +8,7 @@
 
 ## 2.1 Jupyter Notebook介绍
 
-Anaconda自带工具，数据分析领域使用的比较多
+Anaconda自带工具，数据分析领域使用的比较多。
 
 ### 2.1.1 新建文件
 

@@ -1339,7 +1339,7 @@ df.groupby("列名").aggregate( {"列3" : "count" , "列5" : "sum"})
 
 ## 九、Pandas 数据导出
 
-### 9.1 导出到excel中
+### 9.1 导出为 .xlsx 文件
 
 利用 to_excel() 方法。
 
@@ -1347,9 +1347,73 @@ df.groupby("列名").aggregate( {"列3" : "count" , "列5" : "sum"})
 
 通过参数 excel_writer 设置文件导出路径，举例：df.to_excel(excel_writer = "文件保存路径")
 
+#### 9.1.2 设置 Sheet 名称
 
+通过参数 sheet_name 设置，举例：df.to_excel(excel_writer = "文件保存路径" , sheet_name = "表1")
 
+#### 9.1.3 设置索引
 
+通过参数 index 设置，默认 index = True ,默认从 0 开始自然索引，index =False 去掉索引。
+
+#### 9.1.4 设置导出的列
+
+通过参数 columns 指定要导出的列
+
+#### 9.1.5 设置编码格式
+
+通过参数 encoding 设置，一般选择” utf-8 “
+
+#### 9.1.6 缺失值（Nan）处理
+
+通过参数 na_rep 设置填充值
+
+#### 9.1.7 无穷值（inf）处理
+
+通过参数 inf_rep 设置填充值
+
+### 9.2 导出为 .csv 文件
+
+利用 to_csv() 方法。
+
+#### 9.2.1 设置文件导出路径
+
+通过参数 path_or_buf 设置文件导出路径，举例：df.to_excel(path_or_buf = "文件保存路径")
+
+#### 9.2.2 设置分隔符号
+
+通过参数 sep 指明分隔符号，常用分隔符：逗号、空格、制表符、分号等
+
+#### 9.2.3 设置编码格式
+
+通过参数 encoding 设置，默认为 UTF-8 ，中文会乱码，一般使用 utf-8-sig 、gbk
+
+#### 9.3 在新建文件中添加多个Sheet
+
+利用 ExcelWriter() 函数，参数 engine 设置所使用的包，举例：
+
+```python
+writer = pd.ExcelWriter(r"D:/桌面/4.xlsx",engine = "xlsxwriter")
+df1.to_excel(writer,sheet_name = "df1",index = False)
+df2.to_excel(writer,sheet_name = "df2",index = False)
+df3.to_excel(writer,sheet_name = "df3",index = False)
+writer.save()
+```
+
+#### 9.4 在已存在文件中添加Sheet
+
+利用 openpyxl 模块
+
+```
+from openpyxl import load_workbook
+path_file = r"D:/桌面/11.xlsx"
+book = load_workbook(path_file)
+writer = pd.ExcelWriter(path_file,engine="openpyxl")
+writer.book = book
+df1.to_excel(writer,sheet_name = "df8",index = False)
+df2.to_excel(writer,sheet_name = "df7",index = False)
+df3.to_excel(writer,sheet_name = "df6",index = False)
+writer.save()
+```
 
 
 

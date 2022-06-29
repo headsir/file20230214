@@ -929,7 +929,7 @@ df1.reset_index(drop = True)
 
 普通索引、位置索引都可以，推荐使用位置索引,位置索引中使用==位置区间==又称为切片索引。举例：df.iloc[: , 0:3]
 
-#### 4.1.2 选择某一列某部分字符
+#### 4.1.3 选择某一列某部分字符
 
 - 正则选取：df[‘new_col’] = df[‘selected_col’].str.extract(‘[正则表达式](https://so.csdn.net/so/search?q=正则表达式&spm=1001.2101.3001.7020)’, expand = True)
 
@@ -980,6 +980,7 @@ df1.reset_index(drop = True)
 - 多对一替换：replace([A,B] , C)，举例：df.replace([240 , 260 , 280] , 33)
 - 多对多替换：replace({ "A" : "a" , "B" : "b"})，举例：df.replace({240 : 32 , 260 : 33 , 280 : 34})
 - 某列部分字符替换：data_new["列名"]=data["列名"].str.replace("A","B")
+- 正则表达式替换：data_new["列名"]=data["列名"].str.replace(A , B,regex=True)
 
 ### 5.2 数值排序
 

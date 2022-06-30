@@ -1414,6 +1414,8 @@ from openpyxl import load_workbook
 path_file = r"D:/桌面/11.xlsx"
 book = load_workbook(path_file)
 writer = pd.ExcelWriter(path_file,engine="openpyxl")
+# 在ExcelWriter的源代码中，它初始化空工作簿并删除所有工作表，
+# writer.book = book将原来表里面的内容保存到writer中
 writer.book = book
 df1.to_excel(writer,sheet_name = "df8",index = False)
 df2.to_excel(writer,sheet_name = "df7",index = False)

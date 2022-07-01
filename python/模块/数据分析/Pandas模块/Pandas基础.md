@@ -672,7 +672,7 @@ max	748.000000
 
 #### 3.1.2 缺失值删除
 
-通过 dropna() 方法实现，默认删除含有缺失值的行，传入参数 how = "all" 只删除全为空值的行。
+通过 dropna() 方法实现，默认删除含有缺失值的行，传入参数 how = "all" 只删除全为空值的行 , 参数 subset 选择列，参数 inplace 是否修改原表
 
 #### 3.1.3 缺失值填充
 
@@ -931,7 +931,7 @@ df1.reset_index(drop = True)
 
 #### 4.1.3 选择某一列某部分字符
 
-- 正则选取：df[‘new_col’] = df[‘selected_col’].str.extract(‘[正则表达式](https://so.csdn.net/so/search?q=正则表达式&spm=1001.2101.3001.7020)’, expand = True)
+- 正则选取：df[‘new_col’] = df[‘selected_col’].str.extract(‘正则表达式’, expand = True)
 
 ### 4.2 行选择
 
@@ -968,7 +968,9 @@ df1.reset_index(drop = True)
 
 #### 4.3.5 切片索引 + 普通索引
 
-行（列）用切片索引，列（行）用普通索引，这种交叉索引利用 ix 方法，举例：df.ix[0:3 , ["列1" , "列2"]]
+行（列）用切片索引，列（行）用普通索引，这种交叉索引利用 ix 方法，举例：df.ix[0:3 , ["列1" , "列2"]]，
+
+此方法已弃用
 
 ## 五、Pandas 数据操作
 

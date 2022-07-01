@@ -1425,9 +1425,14 @@ df3.to_excel(writer,sheet_name = "df6",index = False)
 writer.save()
 ```
 
+## 十、日常笔记
 
+### 10.1 求两列的差集[^3]
+
+举例：np.setdiffid(arr1,arr2)
 
 
 
 [^1]: inplace参数：是否改变原始表数据
 [^2]: np.NaN:对缺失值的一种表示方法
+[^3]: 差集：返回在 arr1 数组中存在，但是在 arr2 数组中不存在的元素

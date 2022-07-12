@@ -1,3 +1,5 @@
+
+
 # 一、安装Python
 
 网上教程很多，可以自行百度。
@@ -920,7 +922,7 @@ class CassName:  # 类名称采用“驼峰式命名”
 
 ### 8.1.2 类初始化方法
 
-`__int__`当创建了类的实例时就会调用该方法
+`__init__`当创建了类的实例时就会调用该方法
 
 举例：
 
@@ -942,10 +944,11 @@ CarObj = Car()  # 我是汽车
 
 ```mermaid
 graph LR
-	id1(类成员)  --> id2(类方法)
-	id1(类成员)  --> id3(数据成员)
-	id2(类方法) --> id4(实例方法)
-	id2(类方法) --> id5(静态方法)
+	id1(类成员)  --> id2("【实例方法】<br>类定义的函数")
+	id1(类成员)  --> id3("【数据成员】<br>类中定义的变量，即属性")
+		id3 -->id3_1("【类属性】<br>定义在类中，并且在函数体外的属性")
+		id3 -->id3_2("【实例属性】<br>定义在类的方法中的属性")
+
 ```
 
 #### 8.1.3.1 创建实例方法并访问
@@ -1005,11 +1008,78 @@ class People(object):
         self.age = 20  # 实例属性
 ```
 
-## 8.1.4 类访问限制
+### 8.1.4 类访问限制
 
 - `__foo__`：首尾双下划线表示定义特殊方法，一般是系统定义名字，如 `__int_()`
 - `_foo`：单下划线开关的表示protected(保护)类型成员，只允许类本身和子类、类实例访问，不能使用”from module import * “语句导入
 - `__foo`：双下划线表示prviate(私有)定类型的成员，只允许定义该方法的类本身访问，不能通过类的实例访问，但可以通过”类的实例名.类名__XXX“方式访问。
+
+protected(保护)类型成员
+
+```
+class people_test:
+    def __init__(self, name, age):  # 构造函数
+        self.name = name
+        self.age = age
+
+    _features = "直立行走"  # 定义类的属性
+    brain = "智商较高"  # 定义类的属性
+
+    def detail(self):  # 实例化的方法
+        print(self.name)
+        print(self.age)
+        print(people_test._features)
+        print(people_test.brain)
+
+
+t1 = people_test("张三", 12)  # 实例化
+print(t1._features)  # 访问保护属性，直立行走
+print(people_test._features)  # 访问保护属性，直立行走
+```
+
+prviate(私有)定类型的成员
+
+```
+# coding=UTF-8
+# Filename: XXXXX.py
+
+
+class people_test:
+    def __init__(self, name, age):  # 构造函数
+        self.name = name
+        self.age = age
+
+    __features = "直立行走"  # 定义类的属性
+    brain = "智商较高"  # 定义类的属性
+
+    def detail(self):  # 实例化的方法
+        print(self.name)
+        print(self.age)
+        print(people_test._features)
+        print(people_test.brain)
+
+
+t1 = people_test("张三", 12)  # 实例化
+print(t1._people_test__features)  # 可以法访问，直立行走
+```
+
+### 8.1.5 类语法
+
+```mermaid
+graph LR
+	id2(类方法)
+		id2 --> id4("【实例方法】<br>第一个参数是self,表示一个具体实例本身")
+		id2 --> id5("【静态方法】<br>类成员前面加上@staticmethod,<br>放在类作用域里的普通函数")
+		id2 --> id6("【类方法】<br>类成员前面加上@classmethod,第一个参数是cls")
+```
+
+
+
+
+
+
+
+
 
 # 九、Python 项目开发规范
 

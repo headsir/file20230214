@@ -16,6 +16,227 @@ pip3 install -U pywebio
 pip3 install -U https://code.aliyun.com/wang0618/pywebio/repository/archive.zip
 ```
 
-**系统要求**: PyWebIO要求 Python 版本在 3.5.2 及以上
+**系统要求**: PyWebIO要求 Python 版本在 3.5.2 及以上，3.8版本有异常
 
-二、
+# 二、输入函数
+
+模块：pywebio.input.对应功能
+
+```
+# 文本输入
+password = input("Input password", type=PASSWORD)
+```
+
+| 函数           | 简介         | 参数                                                         |
+| -------------- | ------------ | ------------------------------------------------------------ |
+| `input`        | 文本输入     | `pywebio.input.input`(*label=''*, *type='text'*, ***, *validate=None*, *name=None*, *value=None*, *action=None*, *onchange=None*, *placeholder=None*, *required=None*, *readonly=None*, *datalist=None*, *help_text=None*, ***other_html_attrs*) |
+| `textarea`     | 多行文本输入 | `pywebio.input.textarea`(*label=''*, ***, *rows=6*, *code=None*, *maxlength=None*, *minlength=None*, *validate=None*, *name=None*, *value=None*, *onchange=None*, *placeholder=None*, *required=None*, *readonly=None*, *help_text=None*, ***other_html_attrs*) |
+| `select`       | 下拉选择框   | `pywebio.input.select`(*label=''*, *options=None*, ***, *multiple=None*, *validate=None*, *name=None*, *value=None*, *onchange=None*, *required=None*, *help_text=None*, ***other_html_attrs*) |
+| `checkbox`     | 勾选选项     | `pywebio.input.checkbox`(*label=''*, *options=None*, ***, *inline=None*, *validate=None*, *name=None*, *value=None*, *onchange=None*, *help_text=None*, ***other_html_attrs*) |
+| `radio`        | 单选选项     | `pywebio.input.radio`(*label=''*, *options=None*, ***, *inline=None*, *validate=None*, *name=None*, *value=None*, *onchange=None*, *required=None*, *help_text=None*, ***other_html_attrs*) |
+| `slider`       | 滑块输入     | `pywebio.input.slider`(*label=''*, ***, *name=None*, *value=0*, *min_value=0*, *max_value=100*, *step=1*, *validate=None*, *onchange=None*, *required=None*, *help_text=None*, ***other_html_attrs*) |
+| `actions`      | 按钮选项     | `pywebio.input.actions`(*label=''*, *buttons=None*, *name=None*, *help_text=None*) |
+| `file_upload`  | 文件上传     | `pywebio.input.file_upload`(*label=''*, *accept=None*, *name=None*, *placeholder='Choose file'*, *multiple=False*, *max_size=0*, *max_total_size=0*, *required=None*, *help_text=None*, ***other_html_attrs*) |
+| `input_group`  | 输入组       | `pywebio.input.input_group`(*label=''*, *inputs=None*, *validate=None*, *cancelable=False*) |
+| `input_update` | 更新输入项   | `pywebio.input.input_update`(*name=None*, ***spec*)          |
+
+## 2.1 input参数
+
+- **label** (*str*) – 输入框标签
+
+- **type** (*str*) – 输入类型，目前支持的类型是：`TEXT` , `NUMBER` , `FLOAT` , `PASSWORD` , `URL` , `DATE` , `TIME`, `COLOR`, `DATETIME_LOCAL`
+
+其中 `DATE` , `TIME` 类型在某些浏览器上不被支持，详情见 https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input#Browser_compatibility
+
+- **validate** (*callable*) – 输入值校验函数。 如果提供，当用户输入完毕或提交表单后校验函数将被调用。
+
+`validate` 接收输入值作为参数，当输入值有效时，返回 `None` ，当输入值无效时，返回错误提示字符串. 比如:
+
+```
+def check_age(p):  # return None when the check passes, otherwise return the error message
+    if p < 10:
+        return 'Too young!!'
+    if p > 60:
+        return 'Too old!!'
+
+age = input("How old are you?", type="number", validate=check_age)
+```
+
+- **name** (*str*) – 输入框的名字。与 [`input_group`](about:reader?url=https%3A%2F%2Fpywebio.readthedocs.io%2Fzh_CN%2Flatest%2Finput.html#pywebio.input.input_group) 配合使用，用于在输入组的结果中标识不同输入项。  **在单个输入中，不可以设置该参数！**
+
+- **value** (*str*) – 输入框的初始值
+
+- **action** (*tuple**(**label:str**,* *callback:callable**)*) –在输入框右侧显示一个按钮，用户可通过点击按钮为输入框设置值。
+
+  `label` 为按钮的显示文本， `callback` 为按钮点击的回调函数。
+
+  回调函数需要接收一个 `set_value` 位置参数， `set_value` 是一个可调用对象，接受单参数调用和双参数调用。
+
+  单参数调用时，签名为 `set_value(value:str)` ，调用set_value即可将表单项的值设置为传入的 `value` 参数。
+
+  双参数调用时，签名为 `set_value(value:any, label:str)` ，其中：
+
+  > - `value` 参数为最终输入项的返回值，可以为任意Python对象，并不会传递给用户浏览器
+  > - `label` 参数用于显示在用户表单项上
+
+  使用双参数调用 `set_value` 后，用户表单项会变为只读状态。
+
+  双参数调用的使用场景为：表单项的值通过回调动态生成，同时希望用户表单显示的和实际提交的数据不同(例如表单项上可以显示更人性化的内容，而表单项的值则可以保存更方便被处理的对象)
+
+  ```
+  import time
+  def set_now_ts(set_value):
+      set_value(int(time.time()))
+  
+  ts = input('Timestamp', type="number", action=('Now', set_now_ts))
+  from datetime import date,timedelta
+  def select_date(set_value):
+      with popup('Select Date'):
+          put_buttons(['Today'], onclick=[lambda: set_value(date.today(), 'Today')])
+          put_buttons(['Yesterday'], onclick=[lambda: set_value(date.today() - timedelta(days=1), 'Yesterday')])
+  
+  d = input('Date', action=('Select', select_date), readonly=True)
+  put_text(type(d), d)
+  ```
+
+  Note: 当使用 [基于协程的会话实现](https://pywebio.readthedocs.io/zh_CN/latest/advanced.html#coroutine-based-session) 时，回调函数 `callback` 可以为协程函数.
+
+- **onchange** (*callable*) – 
+
+  A callback function which will be called when user change the value of this input field.
+
+  `onchange` 回调函数接收一个参数——输入项改变后的值。 `onchange` 的典型用途是配合 [`input_update()`](about:reader?url=https%3A%2F%2Fpywebio.readthedocs.io%2Fzh_CN%2Flatest%2Finput.html#pywebio.input.input_update) 来在一个表单中实现相互依赖的输入。
+
+- **placeholder** (*str*) – 输入框的提示内容。提示内容会在输入框未输入值时以浅色字体显示在输入框中
+
+- **required** (*bool*) – 当前输入是否为必填项，默认为 `False`
+
+- **readonly** (*bool*) – 输入框是否为只读
+
+- **datalist** (*list*) – 输入建议内容列表，在页面上的显示效果为下拉候选列表，用户可以忽略建议内容列表而输入其他内容。仅当输入类型 `type` 为 `TEXT` 时可用
+
+- **help_text** (*str*) – 输入框的帮助文本。帮助文本会以小号字体显示在输入框下方
+
+- **other_html_attrs** – 在输入框上附加的额外html属性。参考： [https://developer.mozilla.org/zh-CN/docs/Web/HTML/Element/input#%E5%B1%9E%E6%80%A7](https://developer.mozilla.org/zh-CN/docs/Web/HTML/Element/input#属性)
+
+## 2.2 其它参考官方文档
+
+# 三、输出函数
+
+模块：pywebio.output.对应功能
+
+```
+# 文本输出
+password = output.put_text("Input password")
+```
+
+|             | 函数                                                         | 简介                                              | 参数                                                         |
+| ----------- | ------------------------------------------------------------ | ------------------------------------------------- | ------------------------------------------------------------ |
+| 输出域Scope | `put_scope`                                                  | 创建一个新的scope.                                | `pywebio.output.put_scope`(*name*, *content=[]*, *scope=None*, *position=- 1*) |
+|             | `use_scope`†                                                 | 进入输出域                                        | `pywebio.output.use_scope`(*name=None*, *clear=False*)       |
+|             | `get_scope`                                                  | 获取当前正在使用的输出域                          | `pywebio.output.get_scope`(*stack_idx=- 1*)                  |
+|             | `clear`                                                      | 清空scope内容                                     | `pywebio.output.clear`(*scope=None*)                         |
+|             | `remove`                                                     | 移除Scope                                         | `pywebio.output.remove`(*scope=None*)                        |
+|             | `scroll_to`                                                  | 将页面滚动到 scope Scope处                        | `pywebio.output.scroll_to`(*scope=None*, *position='top'*)   |
+| 内容输出    | `put_text`                                                   | 输出文本                                          | `pywebio.output.``put_text`(**texts*, *sep=' '*, *inline=False*, *scope=None*, *position=- 1*) |
+|             | `put_markdown`                                               | 输出Markdown                                      | `pywebio.output.put_markdown`(*mdcontent*, *lstrip=True*, *options=None*, *sanitize=True*, *scope=None*, *position=- 1*, ***kwargs*) |
+|             | `put_info`*† <br>`put_success`*† <br>`put_warning`*† <br>`put_error`*† | 输出通知消息                                      | `pywebio.output.put_info`(**contents*, *closable=False*, *scope=None*, *position=- 1*) <br>其它同理 |
+|             | `put_html`                                                   | 输出Html                                          | `pywebio.output.put_html`(*html*, *sanitize=False*, *scope=None*, *position=- 1*) |
+|             | `put_link`                                                   | 输出链接                                          | `pywebio.output.put_link`(*name*, *url=None*, *app=None*, *new_window=False*, *scope=None*, *position=- 1*) |
+|             | `put_processbar`                                             | 输出进度条                                        | `pywebio.output.put_processbar`(*name*, *init=0*, *label=None*, *auto_close=False*, *scope=None*, *position=- 1*)<br>`pywebio.output.set_processbar`(*name*, *value*, *label=None*) |
+|             | `put_loading`†                                               | 输出加载提示                                      | `pywebio.output.put_loading`(*shape='border'*, *color='dark'*, *scope=None*, *position=- 1*) |
+|             | `put_code`                                                   | 输出代码块                                        | `pywebio.output.put_code`(*content*, *language=''*, *rows=None*, *scope=None*, *position=- 1*) |
+|             | `put_table`*                                                 | 输出表格                                          | `pywebio.output.put_table`(*tdata*, *header=None*, *scope=None*, *position=- 1*) |
+|             | `put_button`<br>`put_buttons`                                | 输出按钮，并绑定点击事件                          | `pywebio.output.put_button`(*label*, *onclick*, *color=None*, *small=None*, *link_style=False*, *outline=False*, *disabled=False*, *scope=None*, *position=- 1*) <br>`pywebio.output.put_buttons`(*buttons*, *onclick*, *small=None*, *link_style=False*, *outline=False*, *group=False*, *scope=None*, *position=- 1*, ***callback_options*) |
+|             | `put_image`                                                  | 输出图片                                          | `pywebio.output.put_image`(*src*, *format=None*, *title=''*, *width=None*, *height=None*, *scope=None*, *position=- 1*) |
+|             | `put_file`                                                   | 显示一个文件下载链接                              | `pywebio.output.put_file`(*name*, *content*, *label=None*, *scope=None*, *position=- 1*) |
+|             | `put_tabs`*                                                  | 输出横向标签栏Tabs                                | `pywebio.output.put_tabs`(*tabs*, *scope=None*, *position=- 1*) |
+|             | `put_collapse`*†                                             | 输出可折叠的内容                                  | `pywebio.output.put_collapse`(*title*, *content=[]*, *open=False*, *scope=None*, *position=- 1*) |
+|             | `put_scrollable`*†                                           | 固定高度内容输出区域 内容超出则显示滚动条 .       | `pywebio.output.put_scrollable`(*content=[]*, *height=400*, *keep_bottom=False*, *border=True*, *scope=None*, *position=- 1*, ***kwargs*) |
+|             | `put_widget`*                                                | 输出自定义的控件                                  | `pywebio.output.put_widget`(*template*, *data*, *scope=None*, *position=- 1*) |
+| 其他交互    | `toast`                                                      | 显示一条通知消息                                  | `pywebio.output.toast`(*content*, *duration=2*, *position='center'*, *color='info'*, *onclick=None*) |
+|             | `popup`*†                                                    | 显示弹窗                                          | `pywebio.output.popup`(*title*, *content=None*, *size='normal'*, *implicit_close=True*, *closable=True*) |
+|             | `close_popup`                                                | 关闭正在显示的弹窗                                | `pywebio.output.close_popup`()                               |
+| 布局与样式  | `put_row`*†                                                  | 使用行布局输出内容                                | `pywebio.output.put_row`(*content=[]*, *size=None*, *scope=None*, *position=- 1*) |
+|             | `put_column`*†                                               | 使用列布局输出内容                                | `pywebio.output.put_column`(*content=[]*, *size=None*, *scope=None*, *position=- 1*) |
+|             | `put_grid`*                                                  | 使用网格布局输出内容                              | `pywebio.output.put_grid`(*content*, *cell_width='auto'*, *cell_height='auto'*, *cell_widths=None*, *cell_heights=None*, *direction='row'*, *scope=None*, *position=- 1*) |
+|             | `span`                                                       | 在 `put_table()`和 `put_grid()`中设置内容跨单元格 | `pywebio.output.span`(*content*, *row=1*, *col=1*)           |
+|             | `style`*                                                     | 自定义输出内容的css样式                           | `pywebio.output.``style`(*outputs*, *css_style*)             |
+
+举例：
+
+```
+from pywebio.output import put_text,put_buttons,popup,put_table,span,put_html,put_markdown,put_file
+# 'Name' cell across 2 rows, 'Address' cell across 2 columns
+put_table([
+    [span('Name',row=2), span('Address', col=2)],
+    ['City', 'Country'],
+    ['Wang', 'Beijing', 'China'],
+    ['Liu', 'New York', 'America'],
+])
+
+# Use `put_xxx()` in `put_table()`
+put_table([
+    ['Type', 'Content'],
+    ['html', put_html('X<sup>2</sup>')],
+    ['text', '<hr/>'],
+    ['buttons', put_buttons(['A', 'B'], onclick=...)],  
+    ['markdown', put_markdown('`Awesome PyWebIO!`')],
+    ['file', put_file('hello.text', b'hello world')],
+    ['table', put_table([['A', 'B'], ['C', 'D']])]
+])
+
+# Set table header
+put_table([
+    ['Wang', 'M', 'China'],
+    ['Liu', 'W', 'America'],
+], header=['Name', 'Gender', 'Address'])
+
+# When ``tdata`` is list of dict
+put_table([
+    {"Course":"OS", "Score": "80"},
+    {"Course":"DB", "Score": "93"},
+], header=["Course", "Score"])  # or header=[(put_markdown("*Course*"), "Course"), (put_markdown("*Score*") ,"Score")]
+```
+
+# 四、会话相关
+
+模块：pywebio.session.对应功能
+
+```
+# 文本输出
+password = output.put_text("Input password")
+```
+
+| 函数                         | 简介                                                         | 参数                                                         |
+| ---------------------------- | ------------------------------------------------------------ | ------------------------------------------------------------ |
+| `download`                   | 向用户推送文件，用户浏览器会将文件下载到本地                 | `pywebio.session.download`(*name*, *content*)                |
+| `run_js`                     | 在用户浏览器中运行JavaScript代码,代码运行在浏览器的JS全局作用域中 | `pywebio.session.run_js`(*code_*, ***args*)                  |
+| `eval_js`                    | 在用户浏览器中执行JavaScript表达式，并获取表达式的值         | `pywebio.session.eval_js`(*expression_*, ***args*)           |
+| `register_thread`            | 注册线程，以便在线程内调用 PyWebIO 交互函数,仅能在默认的基于线程的会话上下文中调用。 | `pywebio.session.register_thread`(*thread: threading.Thread*) |
+| `defer_call`                 | 设置会话结束时调用的函数。无论是用户主动关闭会话还是任务结束会话关闭，设置的函数都会被运行,在会话中可以多次调用 [`defer_call()`](https://pywebio.readthedocs.io/zh_CN/latest/session.html#pywebio.session.defer_call) ,会话结束后将会顺序执行设置的函数 | `pywebio.session.defer_call`(*func*)                         |
+| `local`                      | 当前会话的数据对象(session-local object),`local` 是一个可以通过属性取值的字典，它的目标是用来存储应用中会话独立的状态。 `local` 中存储的内容不会在会话之间共享，每个会话只能访问到自己存储在其中的数据。 | `pywebio.session.local`                                      |
+| `set_env`                    | 当前会话的环境设置                                           | `pywebio.session.set_env`(***env_info*)                      |
+| `go_app`                     | 在同一PyWebIO应用的不同服务之间跳转。仅在PyWebIO Server模式下可用 | `pywebio.session.go_app`(*name*, *new_window=True*)          |
+| `info`                       | 表示会话信息的对象                                           | `pywebio.session.info`                                       |
+| `coroutinebased.TaskHandler` | 协程任务句柄                                                 | *class* `pywebio.session.coroutinebased.TaskHandler`(*close*, *closed*) |
+| `run_async`                  | 异步运行协程对象。协程中依然可以调用 PyWebIO 交互函数。      | `pywebio.session.run_async`(*coro_obj*)                      |
+| `run_asyncio_coroutine`      | 若会话线程和运行asyncio事件循环的线程不是同一个线程，需要用 [`run_asyncio_coroutine()`](https://pywebio.readthedocs.io/zh_CN/latest/session.html#pywebio.session.run_asyncio_coroutine) 来运行asyncio中的协程。 | `pywebio.session.run_asyncio_coroutine`(*coro_obj*)          |
+
+# 五、应用部署
+
+## 5.1 路径中部署PyWebIO应用
+
+- 服务端使用WebSocket协议与浏览器进行通讯。
+
+`pywebio.platform.path_deploy`(*base*, *port=0*, *host=''*, *index=True*, *static_dir=None*, *reconnect_timeout=0*, *cdn=True*, *debug=False*, *allowed_origins=None*, *check_origin=None*, *max_payload_size='200M'*, ***tornado_app_settings*)
+
+- 服务端使用HTTP协议与浏览器进行通讯。
+
+`pywebio.platform.path_deploy_http`(*base*, *port=0*, *host=''*, *index=True*, *static_dir=None*, *cdn=True*, *debug=False*, *allowed_origins=None*, *check_origin=None*, *session_expire_seconds=None*, *session_cleanup_interval=None*, *max_payload_size='200M'*, ***tornado_app_settings*)
+
+## 5.2 Web服务器部署PyWebIO应用
+
+`pywebio.platform.tornado.start_server`(*applications*, *port=0*, *host=''*, *debug=False*, *cdn=True*, *static_dir=None*, *remote_access=False*, *reconnect_timeout=0*, *allowed_origins=None*, *check_origin=None*, *auto_open_webbrowser=False*, *max_payload_size='200M'*, ***tornado_app_settings*)
+
+# 六、持续性输入

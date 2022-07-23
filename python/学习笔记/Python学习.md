@@ -67,6 +67,16 @@ table.dataframe td, table.dataframe th {
 }
 ```
 
+## 2.2 Anaconda3系统变量配置
+
+```
+D:\ProgramData\anaconda3;
+D:\ProgramData\anaconda3\Library\mingw-w64\bin;
+D:\ProgramData\anaconda3\Library\usr\bin;
+D:\ProgramData\anaconda3\Library\bin;
+D:\ProgramData\anaconda3\Scripts;
+```
+
 
 
 # 三、基本概念

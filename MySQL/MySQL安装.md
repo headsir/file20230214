@@ -14,11 +14,15 @@
 
 在命令行窗口输入：mysqld --install，回车，提示：Service successfully installed，说明注册服务成功。
 
+```
+mysqld --install MySQL --defaults-file="D:\Program Files\MySQL\my.ini"
+```
+
 ## 5、获取初始密码，以管理员的身份打开cmd命令窗口
 
-使用mysqld --initialize --console命令，生成随机密码  qazwsx W;o1DHh*!wL,
+使用mysqld --initialize --console命令，生成随机密码  qazwsx W;o1DHh*!wL,  29 laFhCeXBp0?g
 
-## 6、启动服务 **net start mysql**	net stop mysql(停止服务)  sc delete mysq删除服务
+## 6、启动服务 **net start mysql**	net stop mysql(停止服务)  sc delete mysql删除服务
 
 ## 7、使用随机密码登录 ： mysql -u root -p  
 

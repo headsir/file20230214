@@ -15,12 +15,52 @@
 在命令行窗口输入：mysqld --install，回车，提示：Service successfully installed，说明注册服务成功。
 
 ```
+# 注册服务，指明配置文件
 mysqld --install MySQL --defaults-file="D:\Program Files\MySQL\my.ini"
 ```
 
+my.ini
+
+```
+[client]
+	# 设置mysql客户端默认字符集
+	default-character-set=utf8mb4
+[mysqld]
+	# 解除group_conca长度限制
+	group_concat_max_len=888888
+	#设置3306端口
+	port = 3306 
+	# 设置mysql的安装目录
+	basedir=D:\Program Files\mysql-8.0.25-winx64\mysql-8.0.25-winx64
+	# 设置mysql数据库的数据的存放目录
+	datadir=D:\Program Files\mysql-8.0.25-winx64\mysql-8.0.25-winx64\data
+	# 允许最大连接数
+	max_connections=200
+	# 服务端使用的字符集默认为8比特编码的latin1字符集
+	character-set-server=utf8mb4
+	# 创建新表时将使用的默认存储引擎
+	default-storage-engine=INNODB
+	# BLOB配置
+	max_allowed_packet=1G
+	wait_timeout=2880000
+	interactive_timeout = 2880000
+
+```
+
+服务启动失败解决办法：
+
+regedit注册表
+
+```
+# 注册表配置
+"D:\Program Files\MySQL\mysql-8.0.29-winx64\bin\mysqld" -- defaults-file="D:\Program Files\MySQL\my.ini" MySQL29
+```
+
+![image-20220723161954201](imge/MySQL安装.assets/image-20220723161954201.png)
+
 ## 5、获取初始密码，以管理员的身份打开cmd命令窗口
 
-使用mysqld --initialize --console命令，生成随机密码  qazwsx W;o1DHh*!wL,  29 laFhCeXBp0?g
+使用mysqld --initialize --console命令，生成随机密码  qazwsx W;o1DHh*!wL,  29 oB/pCfK4E8q2
 
 ## 6、启动服务 **net start mysql**	net stop mysql(停止服务)  sc delete mysql删除服务
 

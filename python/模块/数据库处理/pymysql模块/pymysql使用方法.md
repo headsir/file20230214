@@ -165,5 +165,7 @@ traffic_columns = "`,`".join(list(traffic.columns))
 traffic_list = [tuple(i) for i in traffic.fillna("/").values]
 # 计算VALUE值个数
 s_count_traffic = len(traffic_list[0]) * "%s,"
+
+备注：字段出现 % 需使用 %%
 ```
 

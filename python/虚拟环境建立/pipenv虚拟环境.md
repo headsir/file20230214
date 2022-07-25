@@ -63,3 +63,9 @@ pipenv install -r requirements.txt
 
 ​		`pipenv update` 模块更新
 
+​		`exit`退出虚拟环境
+
+​		`pipenv graph`显示包依赖关系
+
+​	    `pipenv --venv`显示虚拟环境安装路径
+

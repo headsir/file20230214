@@ -32,8 +32,8 @@ python -m playwright codegen --help
 # 命令行键入
 python -m playwright codegen -o D:\playwright_demo.py
 
-# 例如：启动firefox浏览器，并将操作结果输出到script.py文件
-playwright codegen -o script.py -b firefox https://www.baidu.com
+# 例如：启动firefox浏览器，并将操作结果输出到script.py文件,--ignore-https-errors忽略错误,--lang "zh-CN"中文
+playwright codegen -o script.py -b firefox --lang "zh-CN" --ignore-https-errors   https://137.32.158.166:28001//uportal
 ```
 
 打开 D:\playwright_demo.py 在代码中可以看到：

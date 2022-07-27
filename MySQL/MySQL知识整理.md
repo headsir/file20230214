@@ -314,3 +314,287 @@ SELECT ==CONCAT('姓名：',name,'的地址是江西')== AS '地址信息' FROM 
 
 分组（透视）	SELECT 分组列 FROM 表名 GROUP BY 分组列;
 
+# 四、SQL中的流程控制
+
+**流程控制的定义**
+
+一般是指用来控制程序执行和流程分至点额命令，一般指的是逻辑计算部分的控制。
+
+**流程控制种类**
+
+常见的流程控制有以下8种
+
+> BEGIN ... END：将多个T-SQL语句合为一个逻辑块
+> WAITFOR：挂起语句的执行，直到指定的时间点或者指定的时间间隔
+> GOTO：改变程序执行的流程，使程序跳转到标识符指定的程序行再继续往下执行
+> WHILE：循环控制，当满足WHILE后面的条件后，就可以循环执行WHILE下面的语句
+> IF ... ELSE：表示条件判断
+> BREAK：程序完全跳出循环语句
+> RETURN：使程序从一个查询、存储过程或批量处理中无条件返回，其后面的语句不再执行
+> CONTINUE：命令继续返回执行
+
+## 4.1 **BEGIN...END**
+
+**语法**
+
+> BEGIN 
+>
+> sql_statement... 
+>
+> END
+
+**示例**
+
+我们在数据库中打印出我们公众号的名称"SQL数据库开发"
+
+```
+DECLARE @A VARCHAR(20)
+SET @A='SQL数据库开发'
+BEGIN
+SELECT @A
+END
+```
+
+## 4.2 **IF [...ELSE]**
+
+### 4.2.1 **IF语法**
+
+> IF <条件表达式>
+>
+>  {命令行 | 程序块}
+
+**IF示例**
+
+如果某字符串的长度大于5，就打印该字符串
+
+```
+DECLARE @A VARCHAR(20)
+SET @A='SQL数据库开发'
+IF LEN(@A)>5
+SELECT @A
+```
+
+### 4.2.2 **IF...ELSE语法**
+
+> IF <条件表达式> 
+>
+> {命令行 | 程序块} 
+>
+> ELSE {命令行 | 程序块}
+
+**IF...ELSE示例**
+
+如果字符串的长度大于10，就打印该字符串，否则打印"字符串长度太短"
+
+```
+DECLARE @A VARCHAR(20)
+SET @A='SQL数据库开发'
+IF LEN(@A)>10
+SELECT @A
+ELSE
+SELECT '字符串长度太短'
+```
+
+## 4.3 **WHILE**
+
+**语法**
+
+> WHILE <条件表达式>
+>
+>  {命令行 | 程序块} 
+>
+> CONTINUE 
+>
+> {命令行 | 程序块} 
+>
+> BREAK 
+>
+> {命令行 | 程序块}
+
+**示例**
+
+有1到10这样一组数字，从1按顺序开始，遇到偶数就跳过，遇到奇数就打印出来，当遇到9就结束打印。
+
+```
+DECLARE @i int;
+SET @i = 0;
+WHILE(@i < 10)
+BEGIN
+    SET @i = @i + 1;
+    IF(@i % 2 = 0)
+    BEGIN
+        PRINT ('跳过偶数数' + CAST(@i AS varchar));
+        CONTINUE;
+    END
+    ELSE IF (@i = 9)
+    BEGIN
+        PRINT ('到' + CAST(@i AS varchar) + '就结束打印');
+        BREAK;
+    END
+    PRINT @i;
+END
+```
+
+## 4.3 RETURN
+
+**语法**
+
+> RETURN [整数表达式]
+
+**示例**
+
+```
+BEGIN
+    PRINT(1);
+    PRINT(2);
+    RETURN ;
+    PRINT(3); --在RETURN之后的代码不会被执行，因为会跳过当前批处理
+    PRINT(4);
+END
+GO
+BEGIN
+    PRINT(5);
+END
+```
+
+## 4.4 GOTO
+
+注意：
+
+- 语句标识符可以是数字或者字母的组合，但必须以":"结束。而在GOTO语句后的标识符不必带":"。
+- GOTO语句和跳转标签可以在存储过程、批处理或语句块中的任何地方使用，但不能超出批处理的范围。
+
+**语法**
+
+> GOTO 标识符
+
+**示例**
+
+```
+DECLARE @i INT;
+SET @i = 1;
+PRINT @i;
+SET @i = 2;
+PRINT @i;
+GOTO ME;
+SET @i = 3; --这行被跳过了
+PRINT @i;
+
+ME:PRINT('跳到我了?');
+PRINT @i
+```
+
+## 4.5 **WAITFOR**
+
+注意：
+
+WAITFOR常用语某个特定的时间点或时间间隔自动执行某些任务。在WAITFOR语句中不能包含打开游标，定义视图这样的操作。在包含事务的语句中不要使用WAITFOR语句，因为WAITFOR语句在时间点或时间间隔执行期间将一直拥有对象的锁，当事务中包含WAITFOR语句，事务的其他语句又需要访问被锁住的数据对象事就容易发生死锁现象。
+
+**指定时间点的语法**
+
+> WAITFOR  TIME <具体时间>
+
+**示例**
+
+在'08:10:00'执行打印字符串"SQL数据库开发"
+
+```
+WAITFOR TIME '08:10:00'
+PRINT 'SQL数据库开发'
+```
+
+如果你执行这句话，那如果在今天这个点之前，那么等到这个时候它就会打印字符串，如果在今天这个点之后，那你需要等到第二天的这个时间点才会打印。在未执行之前查询窗口是一直"正在执行查询..."状态
+
+![图片](imge/MySQL知识整理.assets/640.png)
+
+
+
+**指定等待时间间隔的语法**
+
+> WAITFOR DELAY 'INTERVAR'
+
+INTERVAR为时间间隔，指定执行WAITFOR 语句之前需要等待的时间，最多为24小时。
+
+**示例**
+
+```
+WAITFOR DELAY '00:00:03'
+PRINT 'SQL数据库开发'
+```
+
+在等到3秒钟后，会打印出字符串
+
+# 五、**SQL 的书写规范**
+
+## 5.1 表名
+
+表名要有意义，且标准 SQL 中规定表名的第一个字符应该是字母。
+
+## 5.2注释
+
+有单行注释和多行注释，如下
+
+```
+-- 单行注释
+-- 从SomeTable中查询col_1 
+SELECT col_1
+  FROM SomeTable;
+
+/*
+多行注释
+从 SomeTable 中查询 col_1 
+*/
+SELECT col_1
+  FROM SomeTable;
+```
+
+多行注释很多人不知道，这种写法不仅可以用来添加真正的注释，也可以用来注释代码，非常方便
+
+## 5.3缩进
+
+就像写 Java，Python 等编程语言一样 ，SQL 也应该有缩进，良好的缩进对提升代码的可读性帮助很大，以下分别是好的缩进与坏的缩进示例
+
+```
+-- 好的缩进
+SELECT col_1, 
+    col_2, 
+    col_3,
+    COUNT(*) 
+  FROM tbl_A
+ WHERE col_1 = 'a'
+   AND col_2 = ( SELECT MAX(col_2)
+                   FROM tbl_B
+                  WHERE col_3 = 100 )
+ GROUP BY col_1,
+          col_2,
+          col_3
+
+
+-- 坏的示例
+SELECT col1_1, col_2, col_3, COUNT(*)
+FROM   tbl_A
+WHERE  col1_1 = 'a'
+AND    col1_2 = (
+SELECT MAX(col_2)
+FROM   tbl_B
+WHERE  col_3 = 100
+) GROUP BY col_1, col_2, col_3
+```
+
+## 5.4 空格
+
+代码中应该适当留有一些空格，如果一点不留，代码都凑到一起， 逻辑单元不明确，阅读的人也会产生额外的压力，以下分别是是好的与坏的示例
+
+```
+-- 好的示例
+SELECT col_1
+  FROM tbl_A A, tbl_B B
+ WHERE ( A.col_1 >= 100 OR A.col_2 IN ( 'a', 'b' ) )
+   AND A.col_3 = B.col_3;
+
+-- 坏的示例
+SELECT col_1
+  FROM tbl_A A,tbl_B B
+ WHERE (A.col_1>=100 OR A.col_2 IN ('a','b'))
+   AND A.col_3=B.col_3;
+```

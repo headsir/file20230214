@@ -822,6 +822,116 @@ def add(a, b):
 print(add(3, 5))
 ```
 
+### 5.9.7 类装饰器
+
+**类装饰器实际上装饰的是类的初始化方法。只有初始化的时候会装饰一次**。
+
+用装饰器实现单例模式
+
+```
+def singleton(cls):
+    '''创建一个单例模式'''
+
+    def single_wrapper(*args, **kwargs):
+    	#如果没有实例，则创建实例
+        if not single_wrapper.instance:
+            single_wrapper.instance = cls(*args, **kwargs)
+        #返回原来的实例，或者新的实例
+        return single_wrapper.instance
+    #给新创建的函数添加一个属性保存实例
+    single_wrapper.instance = None
+
+    return single_wrapper
+
+@singleton
+class Counter():
+    def __init__(self):
+        self._count = 0
+
+    def visit(self):
+        self._count += 1
+        print(f'visiting: {self._count}')
+
+
+c1 = Counter()
+c1.visit()
+c1.visit()
+
+c2 = Counter()
+c2.visit()
+c2.visit()
+```
+
+>  single_wrapper.instance = None
+
+在创建完函数后，又给函数添加了一个属性，用来保存实例，开始为None，就是没有实例。
+
+再来分析一下代码逻辑：
+
+1. 先判断是否有实例，如果没有就创建一个。反过来，已经有了就不用创建。
+2. 返回实例。
+
+把这个装饰器加到类上的时候，就相当于加到了初始化方法。
+
+### 5.9.8 带状态的装饰器
+
+装饰器自己保存了一个实例，你要的时候它就给你这一个，所以才实现了单例模式。这种就叫做带状态的装饰器。
+
+```
+def count(func):
+    def wrapper_count():
+        wrapper_count.count += 1
+        print(f'{func.__name__}：第{wrapper_count.count}次调用')
+        func()
+    wrapper_count.count = 0
+    return wrapper_count
+
+@count
+def run():
+    print('跑步有利于身体健康，来一圈')
+
+run()
+run()
+run()
+```
+
+> wrapper_count.count = 0
+
+给wrapper_count函数添加了count属性，来记录函数调用的次数，它也是一个有状态的装饰器。
+
+### 5.9.9 多个装饰器嵌套
+
+装饰器的本质就是先调用装饰器，装饰器再调用函数。既然这样，那么多调用几层也无妨吧。
+
+```
+import time
+from slow import slow
+
+def timer(func):
+ def wrapper():
+    start_time = time.perf_counter()
+    func()
+    end_time = time.perf_counter()
+    used_time = end_time - start_time
+    print(f'{func.__name__} used {used_time}')
+ return wrapper
+
+@slow
+@timer
+def run():
+    print('跑步有利于身体健康，来一圈')
+
+run()
+```
+
+这个例子中，run函数用了两个装饰器，slow和timer。它的执行过程就相当于：
+
+> slow(time(run()))
+
+从上到下调用，先是调用slow，然后slow去调用timer，然后timer去调用run
+
+
+
 
 
 

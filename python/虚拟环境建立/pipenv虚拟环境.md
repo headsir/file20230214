@@ -10,20 +10,62 @@
 
 ### 1、安装 pipenv
 
-`pip3 install pipenv`
+`pip install pipenv`
 
-### 2、模块安装
+### 2、创建虚拟环境
 
 ```
+# 创建虚拟环境
 pipenv install
+
+pipenv --python 3.7  # 也可指定具体版本
 ```
 
 说明：会自动更新配置文件
 
-### 3、模块卸载
+### 3、虚拟环境包管理
 
-```bash
-pipenv  uninstall
+#### 3.1 安装包
+
+```
+pipenv install -e .  # 安装本地包到虚拟环境
+pipenv install 模块  # 模块安装
+pipenv install --dev  # 安装所有依赖
+pipenv install -r requirements.txt  # 导入requirements.txt
+```
+
+#### 3.2 更新包
+
+```
+pipenv update 模块名  # 更新指定包
+pipenv update  # 更新所有包
+pipenv update --outdated  # 打印所有要更新的包
+```
+
+#### 3.3 卸载包
+
+```
+pipenv  uninstall  # 模块卸载
+pipenv  uninstall --all  # 卸载全部包
+```
+
+#### 3.4 导出包
+
+导出requirements.txt
+
+```
+导出虚拟环境安装的包
+方法1：pipenv run pip freeze > requirements.txt # 相当于【pipenv run pip freeze】
+方法2：pipenv lock -r > requirements.txt
+
+导出开发用的包：pipenv lock -r --dev
+```
+
+#### 3.5 其它
+
+```
+pipenv graph  # 显示包依赖关系
+pipenv check  # 检查安全漏洞
 ```
 
 如果通过 pipenv 命令安装和卸载 package，安装或卸载完成后还会更新 `Pipfile.lock` 文件，有时候会卡在这个步骤。通常可以 `ctrl+c` 强制推出，删除 `Pipfile.lock`, 然后
@@ -34,38 +76,26 @@ pipenv lock
 
 重新生成该文件
 
-### 4、进入虚拟环境
+### 4、虚拟环境
 
 ```text
+# 进入虚拟环境
 pipenv shell
+# 退出虚拟环境
+exit
 ```
 
-### 5、退出虚拟环境
-
-```text
-pipenv exit
-```
-
-### 6、 `requirements.txt` 文件
-
-```bash
-导出requirements.txt
-方法1：pipenv run pip freeze > requirements.txt
-方法2：pipenv lock -r --dev > requirements.txt
-
-导入requirements.txt
-pipenv install -r requirements.txt
-```
-
-### 7、使用方法
-
-​		`pipenv graph` 模块查询
-
-​		`pipenv update` 模块更新
-
-​		`exit`退出虚拟环境
-
-​		`pipenv graph`显示包依赖关系
+### 5、使用方法
 
 ​	    `pipenv --venv`显示虚拟环境安装路径
+
+​		`pipenv --where`返回项目路径
+
+​		`pipenv --py`返回虚拟环境解释器
+
+​		`pipenv --rm`移除虚拟环境目录
+
+
+
+
 

@@ -930,7 +930,7 @@ run()
 
 从上到下调用，先是调用slow，然后slow去调用timer，然后timer去调用run
 
-
+## 5.10 偏函数
 
 
 

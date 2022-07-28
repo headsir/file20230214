@@ -1353,7 +1353,189 @@ graph LR
 
 
 
-# 九、Python 项目开发规范
+# 九、并发编程
+
+## 9.1 . 基本概念
+
+- 串行 ：一个人在同一时间段只能干一件事，譬如吃完饭才能看电视； 
+
+- 并行 ：一个人在同一时间段可以干多件事，譬如可以边吃饭边看电视；
+
+- 多线程，交替执行，另一种意义上的串行。
+
+- 多进程，并行执行，真正意义上的并发
+
+## 9.2 单线程VS多线程VS多进程
+
+四种类型的场景 和多线程、多进程 的适用场景有关
+
+CPU计算密集型：计算量很大,多个CPU同时进行计算工作
+
+磁盘IO密集型：计算量很小， 主要是IO等待时间的浪费
+
+网络IO密集型：计算量很小， 主要是IO等待时间的浪费
+
+【模拟】IO密集型：计算量很小， 主要是IO等待时间的浪费
+
+```
+## CPU计算密集型
+import time
+import requests
+
+def count(x=1, y=1):
+    # ֵ是程序完成150万
+    c = 0
+    while c < 500000:
+        c += 1
+    x += x
+    y += y
+
+## 磁盘读写IO密集型
+def io_disk():
+    with open("file.txt", "w") as f:
+        for x in range(5000000):
+            f.write("python-learning\n")
+
+## 网络IO密集型
+header = {
+    'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; WOW64) '
+                  'AppleWebKit/537.36 (KHTML, like Gecko) Chrome / 66.0.3359.139Safari / 537.36'}
+url = "https://www.tieba.com/"
+
+def io_request():
+    try:
+        webPage = requests.get(url, headers=header)
+        html = webPage.text
+        return html
+    except Exception as e:
+        return {"error": e}
+
+## 【模拟】IO密集型
+def io_simulation():
+    time.sleep(2)
+```
+
+```
+# 时间计时器
+def timer(mode):
+    def wrapper(func):
+        def deco(*args, **kw):
+            type = kw.setdefault('type', None)
+            t1 = time.time()
+            func(*args, **kw)
+            t2 = time.time()
+            cost_time = t2 - t1
+            print("{}-{}花费时间：{}秒".format(mode, type, cost_time))
+        return deco
+    return wrapper
+```
+
+### 9.2.1 单线程
+
+```
+@timer("【单线程】")
+def single_thread(func, type=""):
+    for i in range(10):
+        func()
+        
+## 单线程
+single_thread(count, type="CPU计算密集型")
+single_thread(io_disk, type="磁盘IO密集型")
+single_thread(io_request, type="网络IO密集型")
+single_thread(io_simulation, type="【模拟】IO密集型")
+
+【单线程】-CPU计算密集型花费时间：0.29221677780151367秒
+【单线程】-磁盘IO密集型花费时间：23.14224362373352秒
+【单线程】-网络IO密集型花费时间：1.8724982738494873秒
+【单线程】-【模拟】IO密集型花费时间：20.102575540542603秒
+```
+
+### 9.2.2 多线程
+
+```
+from threading import Thread
+
+@timer("【多线程】")
+def multi_thread(func, type=""):
+    thread_list = []
+    for i in range(10):
+        t = Thread(target=func, args=())
+        thread_list.append(t)
+        t.start()
+    e = len(thread_list)
+    while True:
+        for th in thread_list:
+            if not th.is_alive():
+                e -= 1
+        if e <= 0:
+            break
+
+
+## 多线程
+multi_thread(count, type="CPU计算密集型")
+multi_thread(io_disk, type="磁盘IO密集型")
+multi_thread(io_request, type="网络IO密集型")
+multi_thread(io_simulation, type="【模拟】IO密集型")
+
+【多线程】-CPU计算密集型花费时间：0.26007771492004395秒
+【多线程】-磁盘IO密集型花费时间：29.776642322540283秒
+【多线程】-网络IO密集型花费时间：0.6917674541473389秒
+【多线程】-【模拟】IO密集型花费时间：2.0239551067352295秒
+```
+
+### 9.2.3 多进程
+
+==为什么在Windows中Process（）必须放到`if __name__ == '__main__':`下==
+
+由于Windows没有fork，多处理模块启动一个新的Python进程并导入调用模块。
+
+如果在导入时调用Process（），那么这将启动无限继承的新进程（或直到机器耗尽资源）。
+
+这是隐藏对Process（）内部调用的原，使用`if __name__ == '__main__':`，这个if语句中的语句将不会在导入时被调用。
+
+```
+from multiprocessing import Process
+
+@timer("【多进程】")
+def multi_process(func, type=""):
+    process_list = []
+    for x in range(10):
+        p = Process(target=func, args=())
+        process_list.append(p)
+        p.start()
+    e = process_list.__len__()
+    while True:
+        for pr in process_list:
+            if not pr.is_alive():
+                e -= 1
+        if e <= 0:
+            break
+
+if __name__ == '__main__':
+
+    ## 多进程
+    multi_process(count, type="CPU计算密集型")
+    multi_process(io_disk, type="磁盘IO密集型")
+    multi_process(io_request, type="网络IO密集型")
+    multi_process(io_simulation, type="【模拟】IO密集型")
+    
+【多进程】-CPU计算密集型花费时间：0.606135368347168秒
+【多进程】-磁盘IO密集型花费时间：6.140481948852539秒
+【多进程】-网络IO密集型花费时间：0.9574322700500488秒
+【多进程】-【模拟】IO密集型花费时间：2.685659885406494秒
+```
+
+>  单线程总是最慢的，多进程总是最快的。 
+>
+> 多线程适合在IO密集场景下使用，譬如爬虫，网站开发等 
+>
+> 多进程适合在对CPU计算运算要求较高的场景下使用，譬如大数据分析，机器学习等 多进程虽然总是最快的，但是不一定是最优的选择，因为它需要CPU资源支持下才能体现优势
+
+Python创建多线程主要有如下两种方法： 函数、类
+
+
+
+# 十、Python 项目开发规范
 
 ## 9.1 新建工程初始文件
 

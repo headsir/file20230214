@@ -674,6 +674,158 @@ print "相加后的值为 : ", sum( 10, 20 )
 print "相加后的值为 : ", sum( 20, 20 )
 ```
 
+## 5.9 装饰器
+
+### 5.9.1 装饰器介绍
+
+装饰器经常用于有切面需求的场景，比如：插入日志、性能测试、事务处理、缓存、权限校验等场景。
+
+Python 对某个对象是否能通过装饰器（ @decorator ）形式使用只有一个要求：decorator 必须是一个“可被调用（callable）的对象。 
+
+ 使用方法:
+
+- 先定义一个装饰器（帽子） 
+
+- 再定义你的业务函数或者类（人）
+
+- 最后把这装饰器（帽子）扣在这个函数（人）头上
+
+### 5.9.2 普通装饰器
+
+1. wrapper使用了通配符，*args代表所有的位置参数，**kwargs代表所有的关键词参数。这样就可以应对任何参数情况。
+2. wrapper调用被装饰的函数的时候，只要原封不动的把参数再传递进去就可以了
+
+```
+import time
+
+# 定义帽子
+def timer(func):  # 参数 func 是被装饰的函数
+    '''统计函数运行时间的装饰器'''
+
+    def wrapper(*args, **kwargs):
+        start = time.time()  # 开始时间
+        func(*args, **kwargs)  # 调用函数
+        end = time.time()  # 结束时间
+        used = end - start  # 运行时长
+        print(f'{func.__name__} used {used}')
+
+    return wrapper
+
+@timer  # 调用装饰器
+def step1(num):
+ print(f'我走了#{num}步')
+```
+
+### 5.9.3 带参数的函数装饰器
+
+要让装饰器接受参数，需要在普通装饰器的外面再套上一层
+
+```
+def repeat(nums=3):
+    def decorator_repeat(func):
+        def wrapper_repeat(*args, **kwargs):
+            for i in range(nums):
+                func(*args, **kwargs)
+        return wrapper_repeat
+    return decorator_repeat
+
+@repeat(3)
+def run():
+    print('跑步有利于身体健康，来一圈')
+
+#这里会重复执行3次
+run()
+```
+
+### 5.9.4 不带参数的类装饰器
+
+基于类装饰器的实现，必须实现 `__call__` 和 `__init__ `两个内置函数。
+
+- `__init__ `：接收被装饰函数
+
+-  `__call__` ：实现装饰逻辑。
+
+```
+class logger(object):
+    def __init__(self, func):
+        self.func = func
+
+    def __call__(self, *args, **kwargs):
+        print("[INFO]: the function {func}() is running...".format(func=self.func.__name__))
+        return self.func(*args, **kwargs)
+
+@logger
+def say(something):
+    print("say {}!".format(something))
+
+say("hello")
+```
+
+### 5.9.5 带参数的类装饰器 
+
+ `__init__ `：接收传入参数。
+
+ `__call__` ：接收被装饰函数，实现装饰逻辑。
+
+```python
+class logger(object):
+    def __init__(self, level='INFO'):
+        self.level = level
+    def __call__(self, func):  # 接收函数
+        def wrapper(*args, **kwargs):
+            print("[{level}]: the function {func}() is running...".format(level=self.level, func=func.__name__))
+            func(*args, **kwargs)
+        return wrapper  # 返回函数
+
+@logger(level='WARNING')
+def say(something):
+    print("say {}!".format(something))
+
+say("hello")
+```
+
+### 5.9.6 使用偏函数与类实现装饰器
+
+类和偏函数结合实现一个与众不同的装饰器。 
+
+DelayFunc 是一个实现了 `__call__` 的类，delay 返回一个偏函数，delay 就可以做为一个装饰器。（以下代码摘自 Python工匠：使用装饰器的小技巧）
+
+```
+import time
+import functools
+
+class DelayFunc:
+    def __init__(self, duration, func):
+        self.duration = duration
+        self.func = func
+    def __call__(self, *args, **kwargs):
+        print(f'Wait for {self.duration} seconds...')
+        time.sleep(self.duration)
+        return self.func(*args, **kwargs)
+    def eager_call(self, *args, **kwargs):
+        print('Call without delay')
+        return self.func(*args, **kwargs)
+
+def delay(duration):
+    """
+    装饰器：推迟某个函数的执行，同时提供 .eager_call 方法立即执行
+    """
+    # 为了避免定义额外函数
+    # 直接使用 functools.partial 帮助构造 DelayFunc 实例
+    return functools.partial(DelayFunc, duration)
+
+# 业务函数
+@delay(duration=1)
+def add(a, b):
+    return a + b
+
+print(add(3, 5))
+```
+
+
+
+
+
 # 六、模块
 
 ## 6.1 模块来源
@@ -1095,11 +1247,13 @@ graph LR
 
 ## 9.1 新建工程初始文件
 
-工程包含：`__init__.py`、`main.py`文件
+工程包含：`__init__.py`、`main.py`、`config.ini`文件
 
 - `__init__.py`文件:
 
 - `main.py`文件：用于脚本代码的编写，是工程的主入口，必须定义一个execute(**kw)函数作为脚本程序的主入口
+
+- `config.ini`文件：程序配置文件
 
 
 

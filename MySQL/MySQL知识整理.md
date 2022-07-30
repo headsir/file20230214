@@ -314,6 +314,67 @@ SELECT ==CONCAT('姓名：',name,'的地址是江西')== AS '地址信息' FROM 
 
 分组（透视）	SELECT 分组列 FROM 表名 GROUP BY 分组列;
 
+## 3.8 触发器
+
+### 3.8.1 触发器语法
+
+        触发器经常用于加强数据的完整性约束和业务规则等。 触发器创建语法四要素：
+        1.监视地点(table)
+        2.监视事件(insert/update/delete) 
+        3.触发时间(after/before) 
+        4.触发事件(insert/update/delete)
+触发器的特性：
+
+　　1、有begin end体，begin end;之间的语句可以写的简单或者复杂
+
+　　2、什么条件会触发：I、D、U
+
+　　3、什么时候触发：在增删改前或者后
+
+　　4、触发频率：针对每一行执行
+
+　　5、触发器定义在表上，附着在表上。
+
+也就是由事件来触发某个操作，事件包括INSERT语句，UPDATE语句和DELETE语句；可以协助应用在数据库端确保数据的完整性。
+
+```
+delimiter 自定义结束符号
+create trigger 触发器名字 触发时间 触发事件 on 表 for each row
+begin
+    -- 触发器内容主体，每行用分号结尾
+end
+自定义的结束符合
+
+delimiter ;
+```
+
+### 3.8.2 Navicat中触发器实现
+
+- 删除：
+
+  OLD表示将要删掉的原数据,触发：after,before 都可用
+
+  ```
+  begin
+      INSERT INTO student_copy1(`stu_id`, `stu_name`, `stu_gender`, `stu_age`) 
+      VALUES (OLD.`stu_id`, OLD.`stu_name`, OLD.`stu_gender`, OLD.`stu_age`);
+  end
+  ```
+
+- 插入
+
+  new表示将要插入的数据,触发：after,before 都可用
+
+  ```
+  begin
+      INSERT INTO student_copy1(`stu_id`, `stu_name`, `stu_gender`, `stu_age`) VALUES (new.`stu_id`, new.`stu_name`, new.`stu_gender`, new.`stu_age`);
+  end
+  ```
+
+  
+
+
+
 # 四、SQL中的流程控制
 
 **流程控制的定义**

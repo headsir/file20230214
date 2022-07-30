@@ -525,7 +525,10 @@ $$
 
 ## **表12 AMS 希腊和希伯来字母**
 
-
+| 符号         | LaTex命令 | 符号2         | LaTex命令2 | 符号3   | LaTex命令3 |
+| ------------ | --------- | ------------- | ---------- | ------- | ---------- |
+| $ \digamma $ | \digamma  | $ \varkappa $ | \varkappa  | $\beth$ | \beth      |
+| $ \gimel $   | \gimel    | $ \daleth $   | \daleth    |         |            |
 
 ## **表13 AMS 二元关系**
 

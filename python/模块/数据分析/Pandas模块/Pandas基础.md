@@ -509,7 +509,7 @@ graph LR
 
 - 指定编码格式
 
-  通过设置 enc0ding 参数指明文件编码格式，常见有 UTF-8、gbk
+  通过设置 encoding 参数指明文件编码格式，常见有 UTF-8、gbk
 
 - 指定解析语言
 

@@ -1546,6 +1546,65 @@ if __name__ == '__main__':
 
 Python创建多线程主要有如下两种方法： 函数、类
 
+## 9.3 使用案例
+
+### 9.3.1 多线程
+
+```
+class MyThread(Thread):
+    def __init__(self, file_paths, sheet):
+        Thread.__init__(self)
+        self.file_paths = file_paths
+        self.sheet = sheet
+
+    def run(self):
+        self.result = excel(self.file_paths, self.sheet)
+
+    def get_result(self):
+        return self.result
+        
+        
+    thread_list = []
+    df = pd.DataFrame()
+    for i in range(len(file)):
+        thread_list.append(MyThread(file[i], sheet))
+    for thread in thread_list:
+        thread.start()
+    for thread in thread_list:
+        thread.join()
+    for thread in thread_list:
+        df = pd.concat([df, thread.get_result()], ignore_index=False)
+```
+
+### 9.3.2 多进程
+
+```
+class MyProcess(Process):
+    def __init__(self, file_paths, sheet):
+        Process.__init__(self)
+        self.file_paths = file_paths
+        self.sheet = sheet
+        self.result = Queue()
+
+    def run(self):
+        df = excel(self.file_paths, self.sheet)
+        self.result.put(df)
+
+    def get_result(self):
+        return self.result.get()
+        
+     process_list = []
+    df = pd.DataFrame()
+    for i in range(len(file)):
+        process_list.append(MyProcess(file[i], sheet))
+    for process in process_list:
+        process.start()
+    for process in process_list:
+        df = pd.concat([df, process.get_result()], ignore_index=False)
+    for process in process_list:
+        process.join()     
+```
+
 
 
 # 十、Python 项目开发规范

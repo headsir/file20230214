@@ -22,7 +22,6 @@ sysstr = "\""+zipSysDir+"\""+" x "+"\""+filepath+"\""+" -o"+"\""+outpath+"\""+" 
 import os
 
 
-
 class Call7Z:
     def __init__(self, path):
         # zipSysDir：7-zip安装的系统目录

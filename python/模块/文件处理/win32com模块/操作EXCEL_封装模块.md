@@ -1,11 +1,12 @@
 # win32com操作excel
 
+# 封装模块
+
 ```
 # coding = utf-8
 # 模块及版本要求：pywin32==227
 
 import win32com.client
-
 
 class Win32Model(object):
     def __init__(self, file_path):

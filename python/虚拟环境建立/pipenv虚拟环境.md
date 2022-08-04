@@ -32,6 +32,16 @@ pipenv install -e .  # 安装本地包到虚拟环境
 pipenv install 模块  # 模块安装
 pipenv install --dev  # 安装所有依赖
 pipenv install -r requirements.txt  # 导入requirements.txt
+
+华为镜像源  https://mirrors.huaweicloud.com/
+阿里云 http://mirrors.aliyun.com/pypi/simple/
+中国科学技术大学 http://pypi.mirrors.ustc.edu.cn/simple/
+清华大学 https://pypi.tuna.tsinghua.edu.cn/simple/
+浙江大学开源镜像站    http://mirrors.zju.edu.cn/
+腾讯开源镜像站    http://mirrors.cloud.tencent.com/pypi/simple
+豆瓣 http://pypi.douban.com/simple/
+网易开源镜像站    http://mirrors.163.com/
+搜狐开源镜像    http://mirrors.sohu.com/
 ```
 
 #### 3.2 更新包

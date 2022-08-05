@@ -1605,6 +1605,30 @@ class MyProcess(Process):
         process.join()     
 ```
 
+### 9.3.3 协程
+
+```
+import time
+import asyncio
+
+# 异步函数定义需要在def前加async前缀
+async def wash_clothes():
+  # sleep也需要使用协程专用的模块支持，同步的库不能在异步中使用
+ asyncio.sleep(2)
+ print(f"衣服洗好了！当前时间：{time.time()}")
+
+def run():
+ for i in range(20):
+    # 将协程函数注册到loop（循环事件）中
+  loop.run_until_complete(wash_clothes())
+
+# 创建一个协程loop（循环事件）中
+loop = asyncio.get_event_loop()
+
+if __name__ =='__main__':
+ run()
+```
+
 
 
 # 十、Python 项目开发规范

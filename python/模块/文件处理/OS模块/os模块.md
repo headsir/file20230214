@@ -143,3 +143,27 @@
 #是否块设备stat.S_ISBLK(fileStats[stat.ST_MODE])
 #是否字符设置stat.S_ISCHR(fileStats[stat.ST_MODE])
 ```
+
+## 批量创建文件夹
+
+```
+# coding=UTF-8
+import os
+
+
+def mk_dir(path):
+    """
+    指定路径下创建文件夹
+    :param path: 指定路径下创建指定文件夹
+    :return: 创建文件夹路径
+    """
+    folder = os.path.exists(path)
+    if not folder:
+        print("-------创建文件夹：%s-------" %path)
+        os.makedirs(path)
+        print("------OK------")
+    else:
+        print("------%s 文件夹已存在------"%path)
+    return path
+```
+

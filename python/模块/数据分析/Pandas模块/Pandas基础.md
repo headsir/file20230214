@@ -1971,6 +1971,13 @@ df1.to_excel(writer,sheet_name = "df8",index = False)
 df2.to_excel(writer,sheet_name = "df7",index = False)
 df3.to_excel(writer,sheet_name = "df6",index = False)
 writer.save()
+
+# 推进使用：
+book = load_workbook(path_file)  # 保存Excel表原始数据
+with pd.ExcelWriter(path_file, engine="openpyxl") as writer:
+    writer.book = book
+    data.to_excel(excel_writer=writer, sheet_name=sheeetname, index=False)  # index=False,忽略行标签
+    writer.save()
 ```
 
 ## 十、日常笔记

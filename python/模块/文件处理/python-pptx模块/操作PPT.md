@@ -276,8 +276,6 @@ chart = slide.shapes.add_chart(
 chart = chart.chart
 ```
 
-
-
 ### 设置图表样式
 
 ```
@@ -351,3 +349,269 @@ https://docs.microsoft.com/zh-cn/office/vba/api/Office.MsoAutoShapeType
 https://python-pptx.readthedocs.io/en/latest/api/enum/MsoAutoShapeType.html#msoautoshapetype
 
 ![image-20220806105403175](imge/操作PPT.assets/image-20220806105403175.png)
+
+```
+from pptx.enum.shapes import MSO_AUTO_SHAPE_TYPE
+
+# 添加矩形
+# 设置位置以及大小
+left, top, width, height = Cm(2.5), Cm(4.5), Cm(30), Cm(0.5)
+# 添加形状
+rectangle = slide.shapes.add_shape(MSO_AUTO_SHAPE_TYPE.RECTANGLE, left, top, width, height)
+```
+
+### 设置形状样式
+
+```
+# 设置背景填充
+rectangle.fill.solid()
+# 设置背景颜色
+rectangle.fill.fore_color.rgb = RGBColor(34, 134, 165)
+# 设置边框颜色
+rectangle.line.color.rgb = RGBColor(34, 134, 165)
+```
+
+## 添加图片
+
+```
+# 设置待添加的图片
+img_name  = 'seaborn生成的图片.png'
+# 设置位置
+left, top, width, height = Cm(6), Cm(6), Cm(20), Cm(9)
+# 进行添加
+slide.shapes.add_picture(image_file=img_name,left=left,top=top,width=width,height=height)
+
+```
+
+# 封装
+
+## 20220806v1
+
+```
+# coding = utf-8
+# 模块及版本要求：python-pptx, python==3.9版本，3.10报错
+import sys
+import time
+
+from loguru import logger
+from pptx import Presentation  # 创建PPT
+from pptx.chart.data import CategoryChartData
+from pptx.enum.chart import XL_CHART_TYPE
+from pptx.enum.shapes import MSO_AUTO_SHAPE_TYPE
+from pptx.util import Cm
+
+
+class PptxModel(object):
+    def __init__(self, file_path=None):
+        """
+        :param file_path: 打开PPT文件路径
+        """
+        self.file_path = file_path
+        # 如果PPT路径为空，新建PPT
+        if file_path == None:
+            self.pptSel = Presentation()
+        else:
+            self.__open(self.file_path)
+
+    # 打开文件
+    def __open(self, file_path):
+        try:
+            self.pptSel = Presentation(file_path)
+            logger.debug("文件打开成功")
+            return "文件打开成功"
+        except Exception as error:
+            print(error)
+            logger.critical(error)
+            sys.exit(0)
+
+    def __slide(self, n_page):
+        # 获取需要添加文字的页面对象
+        try:
+            slide = self.pptSel.slides[n_page - 1]
+        except Exception as e:
+            logger.critical(e)
+            sys.exit(0)
+        return slide
+
+    # 添加一页ppt
+    def add_slide(self, index=0):
+        """
+        添加PPT幻灯片
+        :param index: 选择对应的模板
+        :return:
+        """
+        # 新建页面
+        slide = self.pptSel.slides.add_slide(self.pptSel.slide_layouts[index])
+        logger.info("ppt模板页{}已添加完成".format(index))
+        return slide
+
+    # 删除某一页ppt
+    def del_slide(self, index):
+        slides = list(self.pptSel.slides._sldIdLst)
+        self.pptSel.slides._sldIdLst.remove(slides[index - 1])  # index从0开始
+        logger.info("ppt页面{}已删除完成".format(index))
+
+    # 添加文本框
+    def add_textBox(self, n_page, left, top, width, height):
+        """
+        添加文本框
+        :param n_page:int,需要添加文本框的页面，从1开始
+        :param left:float,水平位置
+        :param top:float,垂直位置
+        :param width:float,宽度
+        :param height:float,高度
+        :return:返回文本框对象
+        """
+        # 获取需要添加文字的页面对象
+        slide = self.__slide(n_page)
+        # 设置添加文字框的位置以及大小
+        left, top, width, height = Cm(left), Cm(top), Cm(width), Cm(height)
+        # 添加文本框
+        textBox = slide.shapes.add_textbox(left=left, top=top, width=width, height=height)
+
+        logger.info("文本框添加完成")
+        return textBox
+
+    # 添加表格
+    def add_table(self, n_page, number_rows, number_column, left, top, width, height):
+        """
+        添加表格
+        :param n_page: int,需要添加文本框的页面，从1开始
+        :param number_rows: int,行数
+        :param number_column: int 列数
+        :param left: float,水平位置
+        :param top: float,垂直位置
+        :param width: float,宽度
+        :param height: float,高度
+        :return: 返回表格对象
+        """
+        # 获取需要添加文字的页面对象
+        slide = self.__slide(n_page)
+        # 设置添加表格的位置以及大小
+        left, top, width, height = Cm(left), Cm(top), Cm(width), Cm(height)
+        # 添加表格
+        shape = slide.shapes.add_table(number_rows, number_column, left, top, width, height)
+
+        logger.info("表格添加完成")
+        return shape
+
+    # 添加图表
+    def add_chart(self, n_page, left, top, width, height, content_arr, chart_type=XL_CHART_TYPE.LINE):
+        """
+        添加图表
+        :param n_page: int,需要添加文本框的页面，从1开始
+        ::param left: float,水平位置
+        :param top: float,垂直位置
+        :param width: float,宽度
+        :param height: float,高度
+        :param content_arr: DataFrame，数据结构，第一列为横轴坐标，第二列开始为纵轴数据
+        :param chart_type:图表类型，默认XL_CHART_TYPE.LINE 折线图，XL_CHART_TYPE.COLUMN_CLUSTERED 柱状图
+        :return:
+        """
+        # 获取需要添加文字的页面对象
+        slide = self.__slide(n_page)
+        # 图表初始化
+        chart_data = CategoryChartData()
+        # x轴
+        chart_data.categories = content_arr.iloc[:, 0]
+        # y轴
+        columns_title = content_arr.columns.values.tolist()
+        # 图表数据
+        for i in range(1, len(columns_title)):
+            chart_data.add_series(columns_title[i], tuple(content_arr[columns_title[i]].tolist()))
+        # 设置添加表格的位置以及大小
+        left, top, width, height = Cm(left), Cm(top), Cm(width), Cm(height)
+        # 添加表格
+        chart = slide.shapes.add_chart(chart_type, left, top, width, height, chart_data)
+
+        logger.info("图表添加完成")
+        return chart
+
+    # 添加形状
+    def add_shape(self, n_page, left, top, width, height, shape_type=MSO_AUTO_SHAPE_TYPE.RECTANGLE):
+        """
+        添加形状
+        :param n_page: int,需要添加文本框的页面，从1开始
+        ::param left: float,水平位置
+        :param top: float,垂直位置
+        :param width: float,宽度
+        :param height: float,高度
+        :param shape_type: 形状类型
+        :return: 返回形状对象
+        """
+        # 获取需要添加形状的页面对象
+        # 获取需要添加文字的页面对象
+        slide = self.__slide(n_page)
+        # 添加形状
+        # 设置位置以及大小
+        left, top, width, height = Cm(left), Cm(top), Cm(width), Cm(height)
+        # 添加形状
+        sp_ty = slide.shapes.add_shape(shape_type, left, top, width, height)
+
+        logger.info("形状添加完成")
+        return sp_ty
+
+    # 添加图片
+    def add_picture(self, n_page, left, top, width, height, img_file):
+        """
+        添加图片
+         :param n_page: int,需要添加文本框的页面，从1开始
+        ::param left: float,水平位置
+        :param top: float,垂直位置
+        :param width: float,宽度
+        :param height: float,高度
+        :param img_file: 添加图片路径
+        :return: 返回图片对象
+        """
+        # 获取需要添加文字的页面对象
+        slide = self.__slide(n_page)
+        # 设置待添加的图片
+        # img_file = 'seaborn生成的图片.png'
+        # 设置位置
+        left, top, width, height = Cm(left), Cm(top), Cm(width), Cm(height)
+        # 进行添加
+        picture = slide.shapes.add_picture(image_file=img_file, left=left, top=top, width=width, height=height)
+
+        logger.info("图片添加完成")
+        return picture
+
+    # 保存
+    def save(self, file=None):
+        """
+        保存PPT，如果保存路径 file=None,保存文件，否侧另存为file
+        :param file: 保存路径
+        :return:
+        """
+        try:
+            if file == None:
+                if self.file_path == None:
+                    while True:
+                        logger.critical("PPT文件名为空,文件未保存")
+                        logger.info("""
+                                ==========================================================
+                                = 1、输入【0】结束程序
+                                = 2、输入【文件保存路径及文件名字】保存文件
+                                ==========================================================
+                        """)
+                        time.sleep(0.5)
+                        file = input("请输入：\n")
+                        if file == "0":
+                            sys.exit(0)
+                        else:
+                            break
+                else:
+                    file = self.file_path
+            self.pptSel.save(file)
+            logger.info(f"文件已保存【{file}】")
+        except Exception as e:
+            logger.critical(e)
+
+
+if __name__ == '__main__':
+    path = r"D:\数据库\2022年项目\pythonProject_learning\OfficeAutomation\PPT\221.pptx"
+    ppt = PptxModel(path)
+    ppt.add_picture(2, 6, 10, 16.1, 7.5, "1.png")
+    ppt.add_picture(3, 6, 10, 16.1, 7.5, "2.jpg")
+    ppt.save()
+```
+

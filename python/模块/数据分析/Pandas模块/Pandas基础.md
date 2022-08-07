@@ -350,6 +350,29 @@ graph LR
 
 导入方法：read_excel()
 
+```
+pd.read_excel(io, sheet_name=0, header=0, names=None, index_col=None,
+              usecols=None, squeeze=False,dtype=None, engine=None,
+              converters=None, true_values=None, false_values=None,
+              skiprows=None, nrows=None, na_values=None, parse_dates=False,
+              date_parser=None, thousands=None, comment=None, skipfooter=0,
+              convert_float=True, **kwds)
+```
+
+| 参数名称   | 说明                                                         |
+| ---------- | ------------------------------------------------------------ |
+| io         | 表示 Excel 文件的存储路径。                                  |
+| sheet_name | 要读取的工作表名称。                                         |
+| header     | 指定作为列名的行，默认0，即取第一行的值为列名；若数据不包含列名，则设定 header = None。若将其设置  为 header=2，则表示将前两行作为多重索引。 |
+| names      | 一般适用于Excel缺少列名，或者需要重新定义列名的情况；names的长度必须等于Excel表格列的长度，否则会报错。 |
+| index_col  | 用做行索引的列，可以是工作表的列名称，如 index_col = '列名'，也可以是整数或者列表。 |
+| usecols    | int或list类型，默认为None，表示需要读取所有列。              |
+| squeeze    | boolean，默认为False，如果解析的数据只包含一列，则返回一个Series。 |
+| converters | 规定每一列的数据类型。                                       |
+| skiprows   | 接受一个列表，表示跳过指定行数的数据，从头部第一行开始。     |
+| nrows      | 需要读取的行数。                                             |
+| skipfooter | 接受一个列表，省略指定行数的数据，从尾部最后一行开始。       |
+
 - 基本导入
 
   ```python
@@ -1898,6 +1921,24 @@ df.groupby("列名").aggregate( {"列3" : "count" , "列5" : "sum"})
 ### 9.1 导出为 .xlsx 文件
 
 利用 to_excel() 方法。
+
+```
+DataFrame.to_excel(excel_writer, sheet_name='Sheet1', na_rep='', float_format=None, columns=None, header=True, index=True, index_label=None, startrow=0, startcol=0, engine=None, merge_cells=True, encoding=None, inf_rep='inf', verbose=True, freeze_panes=None) 
+```
+
+| 参数名称     | 描述说明                                                     |
+| ------------ | ------------------------------------------------------------ |
+| excel_wirter | 文件路径或者 ExcelWrite 对象。                               |
+| sheet_name   | 指定要写入数据的工作表名称。                                 |
+| na_rep       | 缺失值的表示形式。                                           |
+| float_format | 它是一个可选参数，用于格式化浮点数字符串。                   |
+| columns      | 指要写入的列。                                               |
+| header       | 写出每一列的名称，如果给出的是字符串列表，则表示列的别名。   |
+| index        | 表示要写入的索引。                                           |
+| index_label  | 引用索引列的列标签。如果未指定，并且 hearder 和 index 均为为 True，则使用索引名称。如果 DataFrame  使用 MultiIndex，则需要给出一个序列。 |
+| startrow     | 初始写入的行位置，默认值0。表示引用左上角的行单元格来储存 DataFrame。 |
+| startcol     | 初始写入的列位置，默认值0。表示引用左上角的列单元格来储存 DataFrame。 |
+| engine       | 它是一个可选参数，用于指定要使用的引擎，可以是 openpyxl 或 xlsxwriter。 |
 
 #### 9.1.1 设置文件导出路径
 

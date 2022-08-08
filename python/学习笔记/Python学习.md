@@ -704,11 +704,11 @@ def timer(func):  # 参数 func 是被装饰的函数
 
     def wrapper(*args, **kwargs):
         start = time.time()  # 开始时间
-        func(*args, **kwargs)  # 调用函数
+        ret_value = func(*args, **kwargs)  # 调用函数
         end = time.time()  # 结束时间
         used = end - start  # 运行时长
         print(f'{func.__name__} used {used}')
-
+		return ret_value
     return wrapper
 
 @timer  # 调用装饰器

@@ -54,8 +54,8 @@
 ```
 #将文件路径和文件名分割(会将最后一个目录作为文件名而分离)os.path.split(filename)
 #将文件路径和文件扩展名分割成一个元组os.path.splitext(filename) 
-#返回文件路径的目录部分os.path.dirname(filename) 
-#返回文件路径的文件名部分os.path.basename(filename) 
+#返回【文件路径的目录部分】os.path.dirname(filename) 
+#返回【文件路径的文件名部分】os.path.basename(filename) 
 #将文件路径和文件名凑成完整文件路径os.path.join(dirname,basename) 
 #获得绝对路径os.path.abspath(name) 
 #把路径分割为挂载点和文件名os.path.splitunc(path) 

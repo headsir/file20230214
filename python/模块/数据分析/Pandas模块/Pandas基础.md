@@ -1010,6 +1010,7 @@ df1.reset_index(drop = True)
 - 多对多替换：replace({ "A" : "a" , "B" : "b"})，举例：df.replace({240 : 32 , 260 : 33 , 280 : 34})
 - 某列部分字符替换：data_new["列名"]=data["列名"].str.replace("A","B")
 - 正则表达式替换：data_new["列名"]=data["列名"].str.replace(A , B,regex=True)
+- 根据一列值确定另一列值：df_new.loc[df_new["网元链路状态"]=="Broken","小区服务状态"]="断链"
 
 ### 5.2 数值排序
 

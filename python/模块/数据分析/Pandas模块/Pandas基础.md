@@ -1828,6 +1828,27 @@ df.groupby("列名").aggregate( {"列3" : "count" , "列5" : "sum"})
 
 横向将两个表依据公共列拼接在一起，水平拼接，利用 merge() 方法。
 
+```
+merge(left,right,how="inner",on=None,left_on=None,right_on=None,left_index=False,right_index=False,
+    sort=False,suffixes=("_x", "_y"),copy=True,indicator=False,validate=None,)
+```
+
+| 参数        | 说明                                                         |
+| ----------- | ------------------------------------------------------------ |
+| left        | 左表                                                         |
+| right       | 右表                                                         |
+| how         | 连接方式，inner、left、right、outer，默认为inner             |
+| on          | 用于连接的列名称                                             |
+| left_on     | 左表用于连接的列名                                           |
+| right_on    | 右表用于连接的列名                                           |
+| left_index  | 是否使用左表的行索引作为连接键，默认False                    |
+| right_index | 是否使用右表的行索引作为连接键，默认False                    |
+| sort        | 默认为False，将合并的数据进行排序                            |
+| copy        | 默认为True，总是将数据复制到数据结构中，设置为False可以提高性能 |
+| suffixes    | 存在相同列名时在列名后面添加的后缀，默认为(’_x’, ‘_y’)       |
+| indicator   | 显示合并数据中数据来自哪个表                                 |
+| validate    | 参数:validate : str, optional  <br>If specified, checks if merge is of specified type. <br> “one_to_one” or “1:1”: check if merge keys are unique in both left and right datasets.  <br/>“one_to_many” or “1:m”: check if merge keys are unique in left dataset. <br/>“many_to_one” or “m:1”: check if merge keys are unique in right dataset. <br/> “many_to_many” or “m:m”: allowed, but does not result in checks. |
+
 #### 8.1.1 连接表
 
 待连接的两个表根据同名列连接，默认取交集，举例：pd.merge(df1,df2,on = "连接键")

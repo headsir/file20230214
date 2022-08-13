@@ -481,6 +481,35 @@ lst = [1, 2, 3]
 
 语法：list.extend()
 
+## 4.15 Open函数
+
+打开文件，是非常方便的函数，但开销也很大，毕竟直接返回了一个文件对象。
+
+```
+open(file, mode, buffering, encoding, errors, newline, closefd, opener)
+# file，文件
+# mode，操作模式
+# buffering，缓冲设置
+# encoding，打开文件所用的编码
+# errors，编解码报错的处理模式
+# newline，换行符设置
+# closefd，控制file参数的传入值类型
+# opener，
+```
+
+用法：
+
+```
+# 读
+with open(file, 'rb') as fp:
+	fp.read()
+# 写
+with open(save_file, 'a', errors="ignore") as f:
+	f.write(i.get('words') + "\n")  # "\n"换行
+```
+
+
+
 # 五、自定义函数
 
 ## 5.1 函数定义与调用

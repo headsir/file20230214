@@ -1232,6 +1232,26 @@ df.melt(id_vars = ["Company" ,"Name"],var_name = "Year" , value_name = "Sale")
 
 对某一行或列中的元素执行相同函数操作，举例：df[ "列名" ] .apply(lambda x:x+1)
 
+举例1：
+
+```
+df["备注"] = df["工程状态"].apply(lambda x: "网管小区目标已删除" if pd.isna(x) else "")
+```
+
+举例2：
+
+```
+   def __traffic_fun(x):
+        if x > 0:
+            return "非零流量"
+        else:
+            return "零流量"
+
+    df["是否零流量"] = df["gNB空口总业务流量（GB）"].apply(lambda x: __traffic_fun(x))
+```
+
+
+
 #### 5.13.2 applymap() 函数
 
 对每一个元素执行相同的函数操作，举例：df.applymap(lamdba x:x+1)

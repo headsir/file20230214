@@ -685,6 +685,8 @@ max	748.000000
 
 - 通过 isnull() 方法查看，缺失值返回 True
 
+- 单个值通过isna()/isnull()方法查看，缺失值返回 True
+
   ```
   db.isnull()
   序号	子网	网元	网元名称	机房名称	5G业务IP电信	5G业务IP联通	BBU经度	BBU纬度	软件版本	备注	更新时间

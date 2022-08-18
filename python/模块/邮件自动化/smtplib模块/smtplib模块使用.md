@@ -1,5 +1,7 @@
 # **smtplib模块**
 
+SMTP（Simple Mail Transfer Protocol）即简单邮件传输协议,它是一组用于由源地址到目的地址传送邮件的规则，由它来控制信件的中转方式。
+
 smtplib模块，作用==发送邮件==
 
 smtplib使用较为简单。以下是最基本的语法。
@@ -18,3 +20,4 @@ smtp.sendmail(send_add, to_add, msg.as_string())
 # 用于结束SMTP会话
 smtp.quit()
 ```
+

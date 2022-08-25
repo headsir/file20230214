@@ -1087,6 +1087,8 @@ from math import factorial as fc
 
 # 七、异常处理
 
+参考文章：https://mp.weixin.qq.com/s/8RTGhX8IhzEKROQh819LrA
+
 ## 7.1 标准异常
 
 | 异常名称                  | 描述                                               |
@@ -1170,6 +1172,25 @@ else:  # 可省略
     如果没有异常执行这块代码
 ```
 
+举例：
+
+```
+while True:
+    try:
+        # 提示用户输入一个整数
+        num = int(input("输入一个整数："))
+        # 输入不是整数就报错，输入0也是报错，这里我们需要捕获异常
+        result = 8 / num
+        print(result)
+    except ZeroDivisionError:
+        print("错误，除数不能为0")
+    except ValueError:
+        print("请输入数字")
+    # 捕获未知错误
+    except Exception as result:
+        print("未知错误 %s" %result)
+```
+
 ## 7.3 异常处理
 
 ```python
@@ -1181,6 +1202,42 @@ except(Exception1[, Exception2[,...ExceptionN]]):
    ......................
 finally:  # 可省略
     任何情况都执行
+```
+
+```
+try:
+    # 提示用户输入一个整数
+    num = int(input("输入一个整数："))
+    # 输入不是整数就报错，输入0也是报错，这里我们需要捕获异常
+    result = 8 / num
+    print(result)
+except ValueError:
+    print("请输入数字")
+except Exception as result:
+    print("未知错误%s" % result)
+else:
+    print("尝试成功！")
+finally:
+    print("无论是否出现错误都会执行的代码")
+
+    输入：`z`
+输出：请输入数字
+输出：无论是否出现错误都会执行的代码
+```
+
+从产生异常的地方开始传递到调用异常的地方，如果一直没有处理异常，就会一直传递到主函数，然后停止程序并报出异常信息。只需要在主程序中做一个异常处理就可以完成代码的异常处理
+
+```
+def demo1():
+    return int(input("输入整数："))
+def demo2():
+    return demo1()
+    
+#利用异常的传递性，在主程序捕获异常
+try:
+    print(demo2())
+except Exception as result:
+    print("程序出现了%s错误"%(result))
 ```
 
 ## 7.4 抛出异常
@@ -1196,6 +1253,26 @@ raise [Exception [, args [, traceback]]]
 语句中 Exception 是异常的类型（例如，NameError）参数标准异常中任一种，args 是自已提供的异常参数。
 
 最后一个参数是可选的（在实践中很少使用），如果存在，是跟踪异常对象。
+
+```
+def input_password():
+    #1.提示用户输入密码
+    result =input("请输入密码")
+    #2.判断密码长度 >=8 ,返回用户输入的密码
+    if len(result) >=8:
+        return result
+    #3.如果<8 主动抛出异常
+    print("主动抛出异常！")
+    #1>创建异常对象 -可以使用错误信息字符串作为参数
+    ex =Exception("密码长度不够！")
+    #2> 主动抛出异常
+    raise ex
+#提示用户输入密码
+try:
+    print(input_password())
+except Exception as result:
+    print(result)
+```
 
 ## 7.5 自定义异常
 

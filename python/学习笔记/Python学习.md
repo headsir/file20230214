@@ -1744,10 +1744,20 @@ if __name__ =='__main__':
 工程包含：`__init__.py`、`main.py`、`config.ini`文件
 
 - `__init__.py`文件:
-
 - `main.py`文件：用于脚本代码的编写，是工程的主入口，必须定义一个execute(**kw)函数作为脚本程序的主入口
-
 - `config.ini`文件：程序配置文件
+
+## 9.2 新建文件文件头
+
+```
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+# @File    : ${NAME}.py
+# @Time    : ${DATE} ${TIME}
+# @Author  : 978345836@qq.com
+# @Software: win11 python3.9
+# @Function: 
+```
 
 
 

@@ -278,11 +278,11 @@ Send_keys方法：
 >
 > 例如：
 >
-> 按F5：send_keys({VK_F5})
+> 按F5：send_keys(“{VK_F5}”)
 >
-> 按F12：send_keys({VK_F12})
+> 按F12：send_keys(“{VK_F12}”)
 >
-> 按回车键：send_keys({VK_RETURN}) 
+> 按回车键：send_keys(“{VK_RETURN}”) 
 >
 > 按普通字母键：send_keys(‘A’)
 
@@ -354,7 +354,3 @@ task.click()
 app["通知溢出"].print_control_identifiers()
 app["通知溢出"]["小智桌面"].click()
 ```
-
-# 十六、结合selenium实现文件上传
-
-文件上传练习地址：https://www.layui.com/demo/upload.html

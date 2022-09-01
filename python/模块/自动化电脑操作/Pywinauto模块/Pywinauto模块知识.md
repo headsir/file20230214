@@ -83,6 +83,8 @@ dlg = app.窗口类名
 ```
 # 打印窗口中所有的控件
 dlg.print_control_identifiers()
+# 打印可见控件
+dlg.children()
 ```
 
 3、获取应用程序所有得窗口

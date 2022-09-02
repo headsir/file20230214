@@ -1,5 +1,7 @@
 # Pywinauto模块
 
+官方文档：https://www.kancloud.cn/gnefnuy/pywinauto_doc
+
 # 一、安装模块
 
 ````

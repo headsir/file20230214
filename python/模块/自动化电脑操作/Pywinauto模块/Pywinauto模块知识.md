@@ -33,6 +33,12 @@ pip install Pywinauto
 - Desktop
 
   Desktop的作用可以跨进程。主要用于一个程序可以包含多个实例（进程）的程序。
+  
+  ```
+  app = Desktop(backend="uia")
+  ```
+  
+  
 
 # 四、检测工具
 

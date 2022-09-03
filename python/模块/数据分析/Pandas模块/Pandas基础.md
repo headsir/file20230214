@@ -1955,10 +1955,9 @@ merge(left,right,how="inner",on=None,left_on=None,right_on=None,left_index=False
 
 ### 8.2 纵向拼接
 
-垂直拼接，利用 concat() 方法，举例：pd.concat([df1 ,df2] , ignore_index = True , drop_duplicates())
+垂直拼接，利用 concat() 方法，举例：pd.concat([df1 ,df2] , ignore_index = True )
 
 - 参数 ignore_index 索引设置，默认 False 保留原表索引
-- 参数 drop_duplicates() , 删除重复行
 
 ## 九、Pandas 数据导出
 

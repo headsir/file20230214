@@ -175,6 +175,8 @@ click_input：点击菜单
 
 menu.rectangle().mid_point(),返回中心点
 
+menu.rectangle()，返回坐标
+
 # 十一、等待机制
 
 ## 1、Wait方法
@@ -340,6 +342,13 @@ Send_keys方法：
 > - 参数：
 >   - wheel_dist，传入滚动单位，正往上，负往下
 >   - coords,传入点击位置
+
+```
+实例：
+mouse.click(button='left', coords=(cords.left + 10, cords.top + 10))
+```
+
+
 
 # 十五、访问系统通知区域
 

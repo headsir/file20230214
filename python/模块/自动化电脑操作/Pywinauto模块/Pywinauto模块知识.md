@@ -101,8 +101,8 @@ app.windows()
 
 # 八、应用程序窗口操作方法
 
-- 最大化：dlg.maxmize()
-- 最小化：dlg.minmize()
+- 最大化：dlg.maximize()
+- 最小化：dlg.minimize()
 - 恢复正常大小：dlg.restore()
 - 查看窗口显示状态：dlg.get_show_state()  # 最大化 返回1，正常返回0
 - 关闭窗口：dlg.close()

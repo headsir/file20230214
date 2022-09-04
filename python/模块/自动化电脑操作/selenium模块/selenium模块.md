@@ -25,11 +25,12 @@ selenium的脚本可以控制浏览器进行操作，可以实现多个浏览器
 ### 操作浏览器的函数如下：
 
 > - refresh()：刷新网页
-> - back()：回到上一个页面
+> - back()：回到上一个页面，必须有访问记录
 > - forward()：进入下一个页面
 > - close()：关闭窗口
 > - quit()：结束浏览器的执行
 > - get(url)：浏览URL 网址所指向的网页
+> - maximize_window()：窗口最大化
 
 ### 访问 HTML 代码中数据的函数如下：
 
@@ -70,12 +71,118 @@ driver.find_element(by=By.ID,value='BIZ_hq_historySearch')
 > - page_source：返回当前页面的 HTML 代码
 > - title：获取当前 HTML 页面的 title 属性值
 > - text：返回标签中的文本内容
+> - click：点击
+> - send_keys：输入操作
+> - get_attribute：获取元素的属性值
+
+### 元素状态
+
+> - 存在
+> - 可见
+> - 可用
+> - 不可用
+
+## 3.2 等待
+
+### sleep - 强制等待
+
+```
+time.sleep(2)
+```
+
+### implicitly_wait - 隐形等待
+
+一次会话中只需要调用一次，一般放在会话开始
+
+场景：
+
+- 等待元素被找着
+- 等待命令被执行完成
+
+```
+driver.implicitly_wait(15)
+```
+
+# 4、web自动化
+
+## 4.1 8种定位方式
+
+1类：根据元素的单一属性来定位,可能有多个值，定位只能选择一个
+
+- id
+- name
+- class_name
+- tag_name
+- a链接元素 
+-  文本
+
+2类：组合元素的特征和关系来定位
+
+- xpath（Ctrl + F）
+
+  - 绝对定位(完整xpath): /开头 父子路径顺序，网页结构可能会变化，不稳定，不推荐
+
+  - 相对定位: 
+
+    - //标签名[@属性=值] 	
+
+      //input[@id=‘kw’]
+
+    - 逻辑运算： and or  
+
+      //标签名[@属性=值 and @属性=值] 
+
+    - 文本内容
+
+      //标签名[text()=值]
+
+    - 层级定位
+
+      //标签名[@属性=值] //标签名[@属性=值] 
+
+- css_selector
+
+## 4.2 DOM对象
+
+ HTML DOM 是关于如何获取、修改、添加或删除 HTML 元素的标准
+
+- 获取到html的元素、元素的属性
+- 可以对html的元素、元素的属性进行添加、修改、删除操作
+- 对事件的响应
+
+document对象：整个文档对象
+
+### 获取元素
+
+> document.getElementByID
+>
+> document.getElementsByName
+>
+> document.getElementsByTagName
+>
+> document.getElementsByClassName
+
+### 获取元素属性
+
+> ele.属性名称
+>
+> ele.getAttribute(属性名称)
+
+### 修改元素的值
+
+> ele.属性名称 = 值
+>
+> ele.setAttribute(属性名称)
 
 
 
-### 案例：
 
-##### 打开浏览器和一个网页
+
+
+
+# 案例：
+
+## 爬虫案例
 
 ```
 from selenium import webdriver

@@ -10,6 +10,12 @@ pip install selenium
 
 selenium的脚本可以控制浏览器进行操作，可以实现多个浏览器的调用，包括IE（7, 8, 9, 10, 11），Firefox，Safari，Google Chrome，Opera等。最常用的是 Firefox
 
+浏览器驱动下载网址：
+
+火狐浏览器：https://github.com/mozilla/geckodriver/releases 
+
+谷歌浏览器：https://npm.taobao.org/mirrors/chromedriver/
+
 # 3、selenium使用
 
 ## 3.1 常用的API
@@ -48,6 +54,16 @@ selenium的脚本可以控制浏览器进行操作，可以实现多个浏览器
 
 ​		查找所有元素使用elements
 
+<font color='red' size =6>重要：</font>
+
+新版本调用方法
+
+```
+from selenium.webdriver.common.by import By
+
+driver.find_element(by=By.ID,value='BIZ_hq_historySearch')
+```
+
 ### 常用属性：
 
 > - current_url：获取当前页面的网址
@@ -57,29 +73,64 @@ selenium的脚本可以控制浏览器进行操作，可以实现多个浏览器
 
 
 
+### 案例：
 
+##### 打开浏览器和一个网页
 
-- 打开浏览器和一个网页
+```
+from selenium import webdriver
+from selenium.webdriver.common.by import By
+from selenium.webdriver.firefox.service import Service
 
-  ```python
-  from selenium import webdriver
-  driver = webdriver.Firefox()
-  driver.get("http://www.santostang.com/2018/07/04/hello-world/")
-  ```
+# 创建 Firefox 浏览器使用的Webdriver对象
+driver_service = Service(executable_path=
+                         r'D:\数据库\2022年项目\TOOL\火狐浏览器驱动-win64\geckodriver.exe')
+# 把上述地址改成你电脑中geckodriver.exe程序的地址
+driver = webdriver.Firefox(service=driver_service)
 
-  运行之后，发现程序报错，错误为：
-   selenium.common.exceptions.WebDriverException:Message: ‘geckodriver’ executable needs to be in PATH.
-   在selenium之前的版本中，这样做是不会报错的，但是Selenium新版无法运行。
+url = 'http://q.stock.sohu.com/cn/{0}/lshq.shtml'
+strURL = url.format('600519')
+print("请求的URL：", strURL)
 
-  我们要下载geckodriver，可以到https://github.com/mozilla/geckodriver/releases  下载相应操作系统的geckodriver，这是一个压缩文件，解压后可以放在桌面，如C:\Users\santostang\Desktop\geckodriver.exe。最后的代码如下：
+# 发送请求
+driver.get(strURL)
 
-  ```python
-  from selenium import webdriver
-  from selenium.webdriver.firefox.service import Service
-  driver_service = Service(executable_path=r'D:\数据库\2022年项目\爬虫系列\selenium 浏览器驱动\火狐驱动\geckodriver.exe')
-  # 把上述地址改成你电脑中geckodriver.exe程序的地址
-  driver = webdriver.Firefox(service=driver_service)
-  driver.get("http://www.santostang.com/2018/07/04/hello-world/")
-  ```
+# 通过id找到表格标签对象， <table class="tableQ" id="BIZ_hq_historySearch">
+tableElement = driver.find_element(by=By.ID, value='BIZ_hq_historySearch')
 
-#### 
+#  通过标签名找出表格中所有tr元素
+trList = tableElement.find_elements(by=By.TAG_NAME, value='tr')
+
+#  保存数据列表
+datas = []
+for index, tr in enumerate(trList):
+    # 跳过表格前四行数据
+    if index < 4:
+        continue
+    # 找到tr下面所有的元素
+    tds = tr.find_elements(by=By.TAG_NAME, value='td')
+
+    # 保存一行数据的字典对象
+    row = dict()
+
+    # 日期
+    row['Date'] = tds[0].text
+    # 开盘价
+    row['Open'] = float(tds[1].text.replace(',', ''))
+    # 收盘价
+    row['Close'] = float(tds[2].text.replace(',', ''))
+    # 最低价
+    row['Low'] = float(tds[5].text.replace(',', ''))
+    # 最高价
+    row['High'] = float(tds[6].text.replace(',', ''))
+    # 成交量
+    row['Volume'] = float(tds[7].text.replace(',', ''))
+    datas.append(row)
+
+# 测试一下爬虫回来的数据
+print(datas)
+
+# 退出浏览器
+driver.quit()
+```
+

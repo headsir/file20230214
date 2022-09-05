@@ -33,7 +33,7 @@ selenium的脚本可以控制浏览器进行操作，可以实现多个浏览器
 > - maximize_window()：窗口最大化
 > - window_handles：  所有窗口句柄
 > - current_window_handle ：当前窗口句柄
-> - switch_to.alert：处理弹窗
+> - switch_to.alert：切换到弹窗
 > - switch_to.window：切换窗口
 
 ### 访问 HTML 代码中数据的函数如下：
@@ -82,6 +82,11 @@ driver.find_element(by=By.ID,value='BIZ_hq_historySearch')
 > - tag_name：元素名称
 > - rect：元素大小、位置
 > - screenshot()：单个元素截图
+> - clear：清空内容
+> - is_selected：是否被选中，返回True
+> - is_enabled：是否可用
+> - is_displayed：是否显示
+> - value_of_css_property：css属性值
 
 ### 元素状态
 
@@ -170,6 +175,16 @@ ele = driver.find_element(by=By.XPATH,value="")
 ac.move_to_element(ele).perform()
 ```
 
+键盘的操作
+
+【参考】https://www.bilibili.com/video/BV1BS4y1g74o?p=17&vd_source=d6c3edd9a4f6205095ccfba6b2a61eec
+
+```
+from selenium.webdriver.common.keys import Keys
+```
+
+
+
 
 
 ## 3.5 使用设置
@@ -194,6 +209,39 @@ driver.execute_script("边框格式"," 元素") #给选择元素加边框
 
 debugger()
 ```
+
+## 3.6 下拉列表的操作
+
+> 1. 根据值选择：select_by_value
+> 2. 根据索引选择：select_by_index
+> 3. 根据文本选择：select_by_visible_text
+> 4. 反选使用：deselect
+> 5. 反选所有：deselect_all
+> 6. 所有选项：options
+> 7. 所有选中选项：all_selected_options
+> 8. 第一个选择选项：first_selected_option
+
+```
+from selenium.webdriver.support.select import Select
+
+```
+
+## 3.7 页面弹窗操作
+
+> 页面弹出种类：
+>
+> - alert：用来提示
+>
+> - confirm：用来确认
+>
+> - prompt：输入内容
+>
+>   方法：
+>
+>   - accept：接受
+>   - dismiss：取消
+>   - text：显示文本
+>   - send_keys：输入内容
 
 # 4、web自动化
 

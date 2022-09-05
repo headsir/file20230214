@@ -31,6 +31,10 @@ selenium的脚本可以控制浏览器进行操作，可以实现多个浏览器
 > - quit()：结束浏览器的执行
 > - get(url)：浏览URL 网址所指向的网页
 > - maximize_window()：窗口最大化
+> - window_handles：  所有窗口句柄
+> - current_window_handle ：当前窗口句柄
+> - switch_to.alert：处理弹窗
+> - switch_to.window：切换窗口
 
 ### 访问 HTML 代码中数据的函数如下：
 
@@ -74,6 +78,10 @@ driver.find_element(by=By.ID,value='BIZ_hq_historySearch')
 > - click：点击
 > - send_keys：输入操作
 > - get_attribute：获取元素的属性值
+> - get_screenshot_as_file()  # 保存浏览器截图，以.png保存
+> - tag_name：元素名称
+> - rect：元素大小、位置
+> - screenshot()：单个元素截图
 
 ### 元素状态
 
@@ -103,14 +111,88 @@ time.sleep(2)
 driver.implicitly_wait(15)
 ```
 
-## 3.3 使用设置
+### 显性等待
+
+根据条件等待
+
+WebDriverWait(driver（会话对象）,等待总时长,判断间隔时长（默认0.5秒）)
+
+```
+from selenium.webdriver.support.wait import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+
+# 条件：指定的元素可见
+ele_locator = (By.XPATH,'//div[@id="u1"]//a[@name="tj_login"]')
+EC.visibility_of_element_located(ele_locator)  # 条件
+
+wait = WebDriverWait(driver,15)  # 对象设置
+wait.until(EC.visibility_of_element_located(ele_locator))  # 条件判断
+```
+
+## 3.3 窗口切换
+
+- 等到所有的窗口：wins = driver.window_handles  返回的是窗口的句柄列表
+- 新窗口： new_win = wins[-1]  最后一个窗口
+- 切换窗口： driver.switch_to.window(new_win)
+- 等待新窗口出现
+
+## 3.4 鼠标操作
+
+ActionChains类
+
+鼠标操作（参数为元素对象）：
+
+> 1. 点击 - click
+> 2. 右键 - context_click
+> 3. 双击 - double_click
+> 4. 悬浮 - move_to_element
+> 5. 按下左键 - click_and_hold
+> 6. 释放按键 - release
+> 7. 拖拽 - drag_and_drop
+> 8. 等待 - pause
+> 9. 输入 - send_keys
+
+执行鼠标操作：
+
+perform()
+
+操作实例：
+
+```
+# 导入模块
+from selenium.webdriver.common.action_chains import ActionChains
+
+# 实例化ActionChains类
+ac = ActionChains(driver)
+# 找到要操作的元素，再调用鼠标操作
+ele = driver.find_element(by=By.XPATH,value="")
+# 调用perform执行鼠标操作
+ac.move_to_element(ele).perform()
+```
+
+
+
+## 3.5 使用设置
 
 ```python
+import ssl
+# 忽略报错
+ssl._create_default_https_context = ssl._create_unverified_context
+
 # 设置浏览器驱动
 driver_service = Service(executable_path=
                          r'D:\数据库\2022年项目\TOOL\火狐浏览器驱动-win64\geckodriver.exe')
 # 把上述地址改成你电脑中geckodriver.exe程序的地址
-driver = webdriver.Firefox(firefox_profile=fp,service=driver_service)
+driver = webdriver.Firefox(service=driver_service)
+
+# 添加cookie
+driver.add_cookie({"name":"","value":"值"})
+
+# 给元素加框
+d='arguments[0].style.border="3px dashed #FFCCFF"'#边框格式 颜色
+driver.execute_script("边框格式"," 元素") #给选择元素加边框
+
+debugger()
 ```
 
 # 4、web自动化
@@ -150,6 +232,10 @@ driver = webdriver.Firefox(firefox_profile=fp,service=driver_service)
 
       //标签名[@属性=值] //标签名[@属性=值] 
 
+  - xpath调试
+
+    控制台 $x(语法)
+
 - css_selector
 
 ## 4.2 DOM对象
@@ -184,9 +270,15 @@ document对象：整个文档对象
 >
 > ele.setAttribute(属性名称)
 
+## 4.3 文件上传
 
+点击上传：input标签不能点击，可以输入文件绝对路径
 
+拖拽上传（drop方法）：upload_by_drop(文件绝对路径)
 
+## 4.4 文件下载
+
+设置下载目录：set_download_path(目录)
 
 
 

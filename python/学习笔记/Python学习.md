@@ -553,7 +553,38 @@ with open(save_file, 'a', errors="ignore") as f:
 	f.write(i.get('words') + "\n")  # "\n"换行
 ```
 
+## 4.16 getattr() 函数
 
+用于返回一个对象属性值。
+
+```
+getattr(object, name[, default])
+```
+
+参数
+
+- object -- 对象。
+
+- name -- 字符串，对象属性。
+
+- default -- 默认返回值，如果不提供该参数，在没有对应属性时，将触发 AttributeError。
+
+  ```
+  class A(object):
+       bar = 1
+   
+  a = A()
+  getattr(a, 'bar')        # 获取属性 bar 值
+  1
+  getattr(a, 'bar2')       # 属性 bar2 不存在，触发异常
+  Traceback (most recent call last):
+    File "<stdin>", line 1, in <module>
+  AttributeError: 'A' object has no attribute 'bar2'
+  getattr(a, 'bar2', 3)    # 属性 bar2 不存在，但设置了默认值
+  3
+  ```
+
+  
 
 # 五、自定义函数
 

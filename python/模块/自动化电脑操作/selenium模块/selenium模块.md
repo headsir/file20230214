@@ -103,6 +103,16 @@ time.sleep(2)
 driver.implicitly_wait(15)
 ```
 
+## 3.3 使用设置
+
+```python
+# 设置浏览器驱动
+driver_service = Service(executable_path=
+                         r'D:\数据库\2022年项目\TOOL\火狐浏览器驱动-win64\geckodriver.exe')
+# 把上述地址改成你电脑中geckodriver.exe程序的地址
+driver = webdriver.Firefox(firefox_profile=fp,service=driver_service)
+```
+
 # 4、web自动化
 
 ## 4.1 8种定位方式

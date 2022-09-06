@@ -1,14 +1,32 @@
 # pyinstaller打包程序
 
+# 安装pyinstaller
+
+```
+pip install pyinstaller
+```
+
+# 准备图标
+
+图标使用48*48大小(可以按需调整)的ico图标比较合适，可以在线转换
+
 ## 语法：
 
 pyinstaller 参数1 参数2 参数3 参数4 -------参数n  xxx.py
+
+如果需要查看pyinstaller的所有参数，可以在命令行执行pyinstaller --help查看。
+
+```
+pyinstaller --help
+```
+
+
 
 参数含义：
 
 | 参数    | 具体参数               | 含义                                                         | 备注     |
 | ------- | ---------------------- | ------------------------------------------------------------ | -------- |
-| -F      | --onefile              | 产生单个的可执行文件                                         |          |
+| -F      | --onefile              | 产生单个的可执行文件（创建一个.exe可执行文件，所有的第三方依赖和代码均被打包进该.exe文件） |          |
 | -D      | --onedir               | 产生一个文件夹，其中包含可执行程序文件                       |          |
 | -w      | --windowed,--noconsole | 程序运行时不显示命令行窗口（仅对Windows有效）                |          |
 | -c      | --nowindowed,--console | 程序运行时显示命令行窗口（仅对Windows有效）                  |          |
@@ -16,6 +34,13 @@ pyinstaller 参数1 参数2 参数3 参数4 -------参数n  xxx.py
 | -p DIR  | --path=DIR             | 设置Python导入模块的路径（和设置PYTHONPATH环境变量的作用相似<br>也可使用路径分隔符（Windows使用分号，Linux使用冒号）来分隔多个路径 |          |
 | -n NAME | --name=NAME            | 指定项目（生成的spec文件）的名字。如果省略该选项，<br>则使用第一个Python代码文件的文件主名作为spec文件的名字 |          |
 | -i FILE | --icon=FILE            | 指定可执行程序的文件图标                                     |          |
+
+打包结果
+
+- __pycache__: 存放了Python程序的二进制.pyc文件，.pyc文件是Python程序(后缀.py)编译出来的二进制文件，能够提高加载速度，以及隐藏源代码。
+- build: 存放打包过程中生成的临时文件。
+- dist: 存放打包后的.exe可执行文件。
+- .spec : 打包的配置文件(可以从这个文件中对打包的程序进行相关配置，不过一般不需要) 。
 
 
 

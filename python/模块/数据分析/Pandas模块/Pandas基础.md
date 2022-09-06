@@ -1800,6 +1800,42 @@ df_consume.style.hide_index()\
 
 可以看出，跟共享样式里有些相同的问题，比如隐藏索引、隐藏列、设置数据格式等效果并没有实现。
 
+## 5.15 数据筛选
+
+### 查询函数`query`
+
+query()的第二个参数 inplace 默认 false
+
+- 单一条件
+
+  df.query(条件)	df.query("Quantity == 95")
+
+- 在多个条件
+  - and：回在满足两个条件的所有记录	df.query("Quantity == 95 and UnitPrice == 182")
+  - or（|）：返回满足任意条件的所有记录     df.query("Quantity == 95 or UnitPrice == 182")
+  - not：否定条件   df.query("not(Quantity == 95)")
+
+- 日期过滤
+
+  数据类型`dateTime64 [ns]`
+
+  - 字符串转化日期：pd.to_datetime(df["OrderDate"], format="%Y-%m-%d")
+
+    ```
+    # 获得八月份的所有记录
+    df.query("OrderDate.dt.month == 8")
+    
+    # 提取2021年8月订购日为15或以上的所有订单
+    df.query("OrderDate.dt.month == 8 and OrderDate.dt.year == 2021 and OrderDate.dt.day >=15")
+    
+    # 直接传递一个符合日期格式的字符串，它会自动的转换并且比较
+    df.query("OrderDate >= '2021-08-15' and OrderDate <= '2021-08-31'")
+    ```
+
+    
+
+
+
 ## 六、Pandas 数据分组
 
 利用 groupby() 方法，数据类型为 DataFrameGroupBy

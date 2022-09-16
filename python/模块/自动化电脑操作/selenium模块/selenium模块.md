@@ -243,6 +243,14 @@ from selenium.webdriver.support.select import Select
 >   - text：显示文本
 >   - send_keys：输入内容
 
+## 3.8 iframe处理
+
+切换页面 driver.switch_to.frame(iframe id)
+
+```
+driver.switch_to.frame("page-mainIframereport")
+```
+
 # 4、web自动化
 
 ## 4.1 8种定位方式

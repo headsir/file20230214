@@ -183,10 +183,6 @@ ac.move_to_element(ele).perform()
 from selenium.webdriver.common.keys import Keys
 ```
 
-
-
-
-
 ## 3.5 使用设置
 
 ```python

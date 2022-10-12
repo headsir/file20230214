@@ -47,6 +47,8 @@ http://www.hostbuf.com/t/989.html
 
 1.新建一个连接
 
+![image-20221012142254161](imge/FinalShell.assets/image-20221012142254161.png)
+
 
 
 ![img](https://upload-images.jianshu.io/upload_images/2638478-468c88634503b680.png?imageMogr2/auto-orient/strip|imageView2/2/w/609/format/webp)

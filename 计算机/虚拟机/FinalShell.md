@@ -101,6 +101,8 @@ history 显示历史执行命令
 
 Tab键 补全命令
 
+shutdown -r 重启电脑
+
 ### 创建、删除
 
 mkdir 创建目录
@@ -177,6 +179,38 @@ ps 显示当前进程状态，参数 -ef
 kill -9 进程号 杀死进程
 
 jps 专门查看java进程
+
+### 服务器基础环境准备
+
+#### 主机名
+
+vim /etc/hostname 修改主机名
+
+cat /etc/hostname 查看主机名
+
+#### Hosts 映射
+
+cat /etc/hosts 查看主机映射
+
+### 防火墙关闭
+
+systemctl stop firewalld.service  关闭防火墙
+
+systemctl disable firewalld.service  禁止防火墙开启自启
+
+systemctl status firewalld.service  防火墙状态
+
+## ssh免密登录（node1执行- node1|node2|node3)
+
+ssh-keygen #4个回车 生成公钥、私钥
+
+ssh-copy-id nodel、ssh-copy-id node2、ssh-copy-id node3、
+
+
+
+
+
+
 
 ## 四、VIM编辑器
 

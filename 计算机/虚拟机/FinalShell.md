@@ -192,7 +192,7 @@ cat /etc/hostname 查看主机名
 
 cat /etc/hosts 查看主机映射
 
-### 防火墙关闭
+#### 防火墙关闭
 
 systemctl stop firewalld.service  关闭防火墙
 
@@ -200,17 +200,99 @@ systemctl disable firewalld.service  禁止防火墙开启自启
 
 systemctl status firewalld.service  防火墙状态
 
-## ssh免密登录（node1执行- node1|node2|node3)
+#### ssh免密登录
+
+（node1执行- node1|node2|node3)
 
 ssh-keygen #4个回车 生成公钥、私钥
 
-ssh-copy-id nodel、ssh-copy-id node2、ssh-copy-id node3、
+ssh-copy-id nodel、ssh-copy-id node2、ssh-copy-id node3 可以把本地主机的公钥复制到远程主机的authorized_keys文件上（推荐）
 
+ scp -r authorized_keys root@hadoop02:/root/.ssh/ 远程传输文件
 
+#### 集群时间同步
 
+yum -y install ntpdate  安装插件
 
+ntpdate ntp5.aliyun.com  阿里云时间授权
 
+#### 创建统一工作目录
 
+mkdir -p /export/server/  软件安装路径
+
+mkdir -p /export/data/  数据储存路径
+
+mkdir -p /export/software/  安装包存放路径
+
+#### 上传、解压 JDK 1.8安装包
+
+tar -zxvf jdk-19_linux-x64_bin.tar.gz 解压文件安装
+
+​	配置环境变量
+
+​	vi /etc/profile 编辑环境变量文件
+
+```
+export JAVA_HOME=/export/server/jdk-19
+export PATH=$PATH:$JAVA_HOME/bin
+export CLASSPATH=.:$JAVA_HOME/lib/dt.jar:$JAVA_HOME/lib/tools.jar
+```
+
+重新加载环境变量文件
+
+ source /etc/profile
+
+检查是否安装成功
+
+java -version
+
+#### 上传、解压 hadoop安装包
+
+#### 安装maven
+
+创建仓库并配置
+
+```powershell
+mkdir repo 创建仓库
+<localRepository>/export/server/apache-maven-3.8.6/repo</localRepository>  settings.xml配置仓库
+```
+
+​	配置环境变量
+
+​	vi /etc/profile 编辑环境变量文件
+
+```
+export MAVEN_HOME=/export/server/apache-maven-3.8.6
+export PATH=$PATH:$MAVEN_HOME/bin
+```
+
+重新加载环境变量文件
+
+ source /etc/profile
+
+检查是否安装成功
+
+mvn -version
+
+#### 安装cmake
+
+解压安装：tar -zxvf /root/cmake-2.8.12.2.tar.gz
+
+编译安装：
+
+进入根目录：cd /root/apps/cmake-2.8.12.2/
+
+依次执行一下命令（比较耗时）：
+
+./bootstrap 
+
+gmake & gmake install
+
+检查安装是否成功：cmake -version
+
+#### 安装findbugs
+
+#### 安装protobuf
 
 ## 四、VIM编辑器
 

@@ -1022,7 +1022,7 @@ df1.reset_index(drop = True)
 
 参数 ascending 默认值为 True ,表示升序，可以省略
 
-举例：df.sort_values(by = ["列名"] , ascending = Flase)
+举例：df.sort_values(by = ["列名"] , ascending = False)
 
 #### 5.2.2 按照有缺失值的列排序
 

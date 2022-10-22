@@ -16,7 +16,7 @@
 
 ```
 # 注册服务，指明配置文件
-mysqld --install MySQL --defaults-file="D:\Program Files\MySQL\my.ini"
+mysqld --install MySQL --defaults-file="D:\Program Files\mysql-8.0.25-winx64\my.ini"
 ```
 
 my.ini
@@ -53,7 +53,7 @@ regedit注册表
 
 ```
 # 注册表配置
-"D:\Program Files\MySQL\mysql-8.0.29-winx64\bin\mysqld" -- defaults-file="D:\Program Files\MySQL\my.ini" MySQL29
+"D:\Program Files\mysql-8.0.25-winx64\mysql-8.0.25-winx64\bin\mysqld" --defaults-file="D:\Program Files\mysql-8.0.25-winx64\my.ini" MySQL
 ```
 
 ![image-20220723161954201](imge/MySQL安装.assets/image-20220723161954201.png)

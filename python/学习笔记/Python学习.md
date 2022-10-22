@@ -1161,6 +1161,19 @@ import xlwings as xw
 from math import factorial as fc
 ```
 
+## 6.3 模块搜索路径
+
+1. 内置模块
+2. 当前模块所在的目录
+3. 环境变量 PYTHONPATH （默认包含python的安装路径）
+4. Python 安装路径下的lib文件夹
+5. lib 文件夹下的site-packages 文件夹（第三方模块）
+6. sys.path.append() 追加的目录
+
+### 6.2.4 追加模块目录
+
+sys.path.append()
+
 # 七、异常处理
 
 参考文章：https://mp.weixin.qq.com/s/8RTGhX8IhzEKROQh819LrA
@@ -1817,9 +1830,42 @@ if __name__ =='__main__':
 
 ## 9.1 新建工程初始文件
 
-工程包含：`__init__.py`、`main.py`、`config.ini`文件
+### 项目文件结构
 
-- `__init__.py`文件:
+project_name
+
+​	|- project_name  # 项目名称
+
+​		|- main.py  # 项目入口文件 
+
+​		|- core/  # 核心代码文件夹
+
+​			|- _ _ init _ _.py
+
+​		|- config.ini  # 项目配置文件
+
+​		|- data/  # 数据文件
+
+​		|- lib/  #函数集合
+
+​			|- _ _ init _ _.py
+
+​		|- utils/  # 组件：功能完善模块
+
+​			|- _ _ init _ _.py
+
+​		|- tests/ # 单元测试
+
+​			|- _ _ init _ _.py
+
+​		|- docs/  # 使用文档
+
+​		|- log/  # 日志文件
+
+​		|- README.md  # 程序说明文件
+
+工程包含：`main.py`、`config.ini`文件
+
 - `main.py`文件：用于脚本代码的编写，是工程的主入口，必须定义一个execute(**kw)函数作为脚本程序的主入口
 - `config.ini`文件：程序配置文件
 
@@ -1835,7 +1881,9 @@ if __name__ =='__main__':
 # @Describe: 
 ```
 
+## 9.3 编程习惯
 
+注释添加 TODO 标注显示
 
 
 

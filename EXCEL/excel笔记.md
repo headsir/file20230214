@@ -21,3 +21,7 @@
 |  ‘=INDEX(A1:C4,1,1)   | 填充A1:C4区域，1行1列内容）  |
 | ‘=MATCH(A10,A1:A7,0） | 提取A1:A7区域，A10内容所在行 |
 | ’=MATCH(A11,A1:E1,0)  | 提取A1:E1区域，A11内容所在列 |
+
+## 4、快捷sheet翻页
+
+Ctrl + PgUp / Ctrl + PgDn

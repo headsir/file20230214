@@ -567,4 +567,20 @@ Hadoop提供了文件系统的shell命令行客户端：hadoop fs [generic optio
 
 ![image-20221023205809883](imge/3Hadoop学习.assets/image-20221023205809883.png)
 
-## 三、YARN分布式资源管理、任务分配
+## 三、YARN分布式管理系统
+
+资源管理、任务分配
+
+- 调度器策略
+
+  - 先进先出调度器（FIFO Scheduler）：
+
+    先提交的应用先运行，不考虑优先级和范围，适用于负载较低的小规模集群，不使用大型共享集群。
+
+  - 容量调度器（Capacity Scheduler）,默认调度策略
+
+    允许多个组织共享整个集群资源， 通过为每个组织分配专门的队列，再为每个队列分配一定的集群资源。
+
+  - 公平调度器（Fair Scheduler）
+
+    配置方法：yarn-site.xml 中 yarn.resourcemanager.scheduler.class

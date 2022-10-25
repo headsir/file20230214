@@ -44,6 +44,38 @@
 
 - 重启服务 sudo systemctl restart network / service network restart
 
+```
+centos7.2设置静态ip不生效
+
+一、检查/etc/sysconfig/network-scripts目录下配置文件
+1、看到了一个陌生的配置文件 ifcfg-Wired_connection_1，度娘查询了一下这个配置文件是系统启动调用的网卡配置文件和NetworkManager服务相关。
+在这里插入图片描述
+2、在CentOS系统上，目前有NetworkManager和network两种网络管理工具。如果两种都配置会引起冲突，而且NetworkManager在网络断开的时候，会清理路由，如果一些自定义的路由，没有加入到NetworkManager的配置文件中，路由就被清理掉，网络连接后需要自定义添加上去。
+
+二、解决方法
+1、停掉NetworkManager服务
+systemctl stop NetworkManager.service
+2、设置开机不自动启动
+systemctl disable NetworkManager.service
+----------------------输出信息---------------------------
+Removed /etc/systemd/system/multi-user.target.wants/NetworkManager.service.
+Removed /etc/systemd/system/dbus-org.freedesktop.NetworkManager.service.
+Removed /etc/systemd/system/dbus-org.freedesktop.nm-dispatcher.service.
+3、systemctl is-enabled NetworkManager #查看是否禁用
+4、设置network服务开机自启动
+systemctl enable network.service
+----------------------输出信息---------------------------
+network.service is not a native service, redirecting to /sbin/chkconfig.
+Executing /sbin/chkconfig network on
+5、输出的大概意思就是需要执行一下 chkconfig network on
+6、以上执行完成后配置你的物理网卡信息
+vim /etc/sysconfig/network-scripts/ifcfg-ens32
+
+7、配置完成后重启服务器即可
+```
+
+
+
 ## 1.3 Hosts 映射
 
 - 修改配置文件hosts 命令 vi /etc/hosts
@@ -79,9 +111,23 @@
 
   >  集群时间同步 ==推荐==
   >
-  > yum -y install ntpdate  安装插件
+  >  yum -y install ntpdate  安装插件
   >
-  > ntpdate ntp5.aliyun.com  阿里云时间授权
+  >  ntpdate ntp5.aliyun.com  阿里云时间授权
+  >
+  >  ```
+  >  硬件时间和系统时间之间同步
+  >  
+  >      hwclock --systohc  #将系统时间写入硬件时间
+  >      hwclock --hctosys  #将硬件时间写入系统时间
+  >  
+  >  强制系统时间写入CMOS中防止重启失效
+  >  
+  >  　　hwclock -w
+  >  　　或clock -w
+  >  ```
+  >
+  >  
 
 - vim :编辑器
 

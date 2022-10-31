@@ -314,6 +314,16 @@ SELECT ==CONCAT('姓名：',name,'的地址是江西')== AS '地址信息' FROM 
 
 分组（透视）	SELECT 分组列 FROM 表名 GROUP BY 分组列;
 
+### 3.7.6 字段排序 -ORDER By 
+
+desc 降序
+
+ase 升序，默认
+
+
+
+
+
 ## 3.8 触发器
 
 ### 3.8.1 触发器语法

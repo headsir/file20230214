@@ -543,6 +543,16 @@ pd.read_excel(io, sheet_name=0, header=0, names=None, index_col=None,
 - 其它
 
   涉及行、列索引设置及指定导入某列，设定方法与导入 .xlsx 文件一致。
+  
+  **low_memory**
+  
+  ```
+  low_memory : boolean, default True
+  
+  # 分块加载到内存，再低内存消耗中解析，但是可能出现类型混淆。
+  # 确保类型不被混淆需要设置为False，或者使用dtype 参数指定类型。
+  # 注意使用chunksize 或者iterator 参数分块读入会将整个文件读入到一个Dataframe，而忽略类型（只能在C解析器中有效）
+  ```
 
 #### 2.1.3 导入 .txt 文件
 

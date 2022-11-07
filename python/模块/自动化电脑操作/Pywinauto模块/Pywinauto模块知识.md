@@ -371,3 +371,12 @@ task.click()
 app["通知溢出"].print_control_identifiers()
 app["通知溢出"]["小智桌面"].click()
 ```
+
+# 十六、报错
+
+## 1、DLL load failed while importing win32ui
+
+```
+python D:/ProgramData/Anaconda3/Scripts/pywin32_postinstall.py -install
+```
+

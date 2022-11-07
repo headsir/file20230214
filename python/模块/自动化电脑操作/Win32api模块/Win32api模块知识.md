@@ -5,7 +5,7 @@
 pywin32：包含 win32gui、win32api、win32con 3个子模块，用于窗口管理（定位窗口、显示和关闭窗口、获取窗口位置等）
 
 ```
-mport win32api, win32con, win32gui  # pypiwin32
+import win32api, win32con, win32gui  # pypiwin32
 import time
 
 # 文字对应的键盘值

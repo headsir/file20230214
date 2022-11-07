@@ -4,7 +4,7 @@
 
 ```
 # coding = utf-8
-# 模块及版本要求：pywin32==227
+# 模块及版本要求：pywin32==304
 
 import win32com.client
 

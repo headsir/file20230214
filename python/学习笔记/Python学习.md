@@ -75,6 +75,39 @@ D:\ProgramData\anaconda3\Library\mingw-w64\bin;
 D:\ProgramData\anaconda3\Library\usr\bin;
 D:\ProgramData\anaconda3\Library\bin;
 D:\ProgramData\anaconda3\Scripts;
+
+
+D:\ProgramData\anaconda3;
+D:\ProgramData\anaconda3\Library;
+D:\ProgramData\anaconda3\Scripts;
+```
+
+## 2.3 PyCharm 配置
+
+### 2.3.1 外部工具-QT5 配置
+
+![image-20221108143736646](imge/Python学习.assets/image-20221108143736646.png)
+
+![image-20221108143918719](imge/Python学习.assets/image-20221108143918719.png)
+
+```
+实参：    -o $FileNameWithoutExtension$.py $FileName$
+```
+
+### 2.3.2 文件代码模板
+
+```
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+# @File    : ${NAME}.py
+# @Time    : ${DATE} ${TIME}
+# @Author  : 978345836@qq.com
+# @Software: win11 python3.9
+# @Describe: 
+
+
+if __name__ == '__main__':
+    pass
 ```
 
 

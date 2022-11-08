@@ -105,9 +105,15 @@ D:\ProgramData\anaconda3\Scripts;
 # @Software: win11 python3.9
 # @Describe: 
 
-
-if __name__ == '__main__':
+def execute(**kw):
+    """
+    脚本程序主入口
+    :param kw: 参数
+    :return: 运行结果
+    """
     pass
+if __name__ == '__main__':
+    execute()
 ```
 
 
@@ -1912,6 +1918,16 @@ project_name
 # @Author  : 978345836@qq.com
 # @Software: win11 python3.9
 # @Describe: 
+
+def execute(**kw):
+    """
+    脚本程序主入口
+    :param kw: 参数
+    :return: 运行结果
+    """
+    pass
+if __name__ == '__main__':
+    execute()
 ```
 
 ## 9.3 编程习惯

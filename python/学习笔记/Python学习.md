@@ -800,6 +800,8 @@ print(sum.__doc__)  # 打印函数说明文档
 
 ## 5.8 匿名函数
 
+[参考](https://mp.weixin.qq.com/s/Qh-L2nL12jSd2GJ-XZr7Fg)
+
 使用` lambda `来创建匿名函数
 
 语法：
@@ -817,6 +819,85 @@ sum = lambda arg1, arg2: arg1 + arg2
 print "相加后的值为 : ", sum( 10, 20 )
 print "相加后的值为 : ", sum( 20, 20 )
 ```
+
+### 5.8.1 普通用法
+
+```
+lambda x: 2 * x
+说明：x 参数 ，2 * x 返回值
+```
+
+> 无参形式
+
+```
+f1 = lambda: "f1"
+等价于普通函数：
+def f1():
+	return "f1"
+```
+
+> 有参形式
+
+```
+f2 = lambda x,y,z: print(x,y,z)
+等价于普通函数：
+def f2(x,y,z):
+	print(x,y,z)
+```
+
+> 有分支条件形式
+
+```
+f3 = lambda x: print("偶数") if x % 2 == 0 else print("奇数")
+等价于普通函数：
+def f3(x):
+	if x % 2 == 0:
+		print("偶数")
+	else:
+		print("奇数")
+```
+
+### 5.8.2  配合高阶函数使用
+
+配合map函数计算两数平方和
+
+```
+s = lambda x,y : x**2 + y**2
+
+array1 = [1,3,5,7,9]
+array2 = [2,4,6,8,10]
+
+print(list(map(s, array1, array2)))
+```
+
+配合filter函数筛选从数组中筛选偶数
+
+```
+array3 = [1,2,3,4,5,6,7,8,9,10]
+
+even = lambda x: x if x % 2 == 0 else None
+ 
+print(list(filter(even, array3)))
+```
+
+配合reduce函数实现数组中的数俩俩相乘
+
+```
+from functools import reduce
+
+array4 = [1,2,3,4,5,6,7,8,9,10]
+
+m = lambda x, y: x * y
+
+print(reduce(m, array4))
+```
+
+### 5.8.3 使用建议
+
+- lambda是函数式编程的利器；
+- lambda函数与普通函数相比，不会提高程序运行效率的提高；
+- 不建议在lambda函数内写太复杂的条件语句，不易读；
+- 如果要使用循环，老老实实用def去定义函数
 
 ## 5.9 装饰器
 
@@ -1074,11 +1155,87 @@ run()
 
 从上到下调用，先是调用slow，然后slow去调用timer，然后timer去调用run
 
-## 5.10 偏函数
+## 5.10 高阶函数
 
+> 高阶函数定义
 
+​	Python的高阶函数其实就是接受函数为参数，或者把函数作为结果返回的函数是高阶函数(higher-order function)。
 
+> 案例：
 
+1、写个`abs_add`函数，求两个数值的绝对值之和
+
+```
+# 普通写法
+def abs_add(v1, v2):
+  return abs(v1) + abs(v2)
+
+r = abs_add(-5, 6)
+print(r)
+
+# 高阶函数写法
+def abs_add(v1, v2, func):
+  return func(v1) + func(v2)
+
+r = abs_add(-5, 6, abs)
+print(r)
+```
+
+**把abs这个内置函数作为参数传进abs_add函数中，那么此时abs_add就成了高阶函数。**
+
+2、**用于自定义排序中**
+
+```
+cars = ['Toyota', 'GM', 'Volkswagen', 'Honda', 'Tesla', 'Benz']
+
+print(sorted(cars, key=len)) # 根据字符串长度进行排序
+```
+
+输出结果：
+
+```
+['gm', 'benz', 'honda', 'tesla', 'toyota', 'volkswagen']
+```
+
+根据字符串长度排序（sorted和len都是内置函数）。
+
+假如我现在想按照列表中的最后一个字符串的字母进行排序，那么我怎么怎么去写key呢？
+
+> Toyota的最后一个字符是a，gm则是m，正常字符串排序出来都是按照首字符的字母abc...顺序。
+
+==先实现字符串翻转==
+
+```
+def reverse(string):
+    return string[::-1]
+
+print(reverse('BMW'))
+```
+
+输出结果
+
+```
+WMB
+```
+
+==再把这个函数作为key参数传入sorted函数==
+
+```
+cars = ['toyota', 'gm', 'volkswagen', 'honda', 'tesla', 'benz']
+
+def reverse(string):
+    return string[::-1]
+
+print(sorted(cars))                # 非翻转排序
+print(sorted(cars, key=reverse))   # 翻转排序
+```
+
+输出结果：
+
+```
+['benz', 'gm', 'honda', 'tesla', 'toyota', 'volkswagen']
+['honda', 'tesla', 'toyota', 'gm', 'volkswagen', 'benz']
+```
 
 # 六、模块
 

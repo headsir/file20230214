@@ -1565,6 +1565,8 @@ except Exception as result:
 
 # 八、面向对象
 
+==先**「将具体事物抽象成类」**，再将**「类具象化具体事物」**==
+
 推荐结构顺序
 
 > 1. 类变量
@@ -1753,7 +1755,131 @@ graph LR
 
 
 
+### 举例介绍
 
+[参考](https://mp.weixin.qq.com/s/URCVWCTNC_X5PJLu751toA)
+
+#### 将具体事物抽象成类
+
+`动物`是一个很大的类，再细分下去还能分为`胎生动物`和`卵生动物`，`胎生动物`还能再细分下去...我们暂不做解释...
+
+但凡是动物都离不开**「呼吸、吃、喝、生娃」**， 这些共同点我们都可以直接写进动物类，因为这四个都是动物的基本行为且只有`实例化`（从抽象到实体）才能展现，所以写成**「实例方法」**。
+
+```
+class Animal:
+
+    def eat(self):
+        print("我会吃")
+
+    def breath(self):
+        print("我会呼吸")
+
+    def drink(self):
+        print("我会喝")
+    
+    def give_a_baby(self):
+        print("生娃")
+```
+
+接下来是`胎生动物`和`卵生动物`，胎生宝宝生下来就就是动物的模样与`卵生动物`所生的蛋是有差别的，所以我们需要在两个子类中重写父类（Animal类）的`give_a_baby`方法。
+
+```
+# 胎生动物
+class Vivipara(Animal):
+
+    def give_a_baby(self):
+        print("生了一个小宝宝")
+
+# 卵生动物
+class Vipara(Animal):
+    
+    def give_a_baby(self):
+        print("生了一个蛋")
+```
+
+接下来，我们使用上面两个类创造实例。
+
+#### 将类具象出具体事物
+
+我先将胎生动物这个类具象化出一个“人”来，这个人会吃 会喝 会呼吸 会生娃。
+
+```
+human = Vivipara() # 类的实例化操作
+human.eat()
+human.breath()
+human.drink()
+human.give_a_baby()
+```
+
+执行代码：
+
+```
+我会吃
+我会呼吸      
+我会喝        
+生了一个小宝宝
+```
+
+同理，我们将卵生动物也具象化出一个“乌龟”来。
+
+```
+tortoise = Vipara()
+tortoise.eat()
+tortoise.breath()
+tortoise.drink()
+tortoise.give_a_baby()
+```
+
+执行代码：
+
+```
+我会吃
+我会呼吸
+我会喝
+生了一个蛋
+```
+
+对了，感觉是不是少了点什么东西？
+
+**「怎么具象化出来的“人”和“乌龟”怎么都没有名字甚至性别呢？你让雄性生物生个娃试试」**
+
+我马上改写下代码，让具象化出来的实例拥有名字和性别（属性）。
+
+> 如果要为具象化出的实例拥有属性，就需要使用`构造函数__init__`为实例传入所需的属性值。
+
+```
+# 胎生动物
+class Vivipara(Animal):
+    def __init__(self, name, sex):
+        self.name = name
+        self.sex = sex
+
+    def give_a_baby(self):
+        print(f"我是{self.name}")
+        if self.sex == "母":
+            print("生了一个小宝宝")
+        else:
+            print("我不会生娃")
+```
+
+此后我们如果要实例化这个类，就需要带上名字和性别两个参数才行。
+
+```
+xiaoming = Vivipara("小明","公") # 带上参数实例化
+xiaohong = Vivipara("小红","母") # 带上参数实例化
+
+xiaoming.give_a_baby()
+xiaohong.give_a_baby()
+```
+
+执行结果:
+
+```
+我是小明
+我不会生娃
+我是小红
+生了一个小宝宝
+```
 
 
 

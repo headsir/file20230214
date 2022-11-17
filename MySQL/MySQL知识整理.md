@@ -719,3 +719,43 @@ SELECT col_1
 43、SQL命令行修改数据，养成begin + commit 事务的习惯(SQL后悔药)
 ```
 
+## 6.1 建表规范
+
+表规范
+
+```
+临时库表必须以tmp为前缀并以日期为后缀（tmp_）
+备份库和库必须以bak为前缀并以日期为后缀(bak_)
+```
+
+字段规范
+
+```
+主键索引名为 pk_ 字段名；
+唯一索引名为 uk _字段名 ；
+普通索引名则为 idx _字段名；
+```
+
+必有字段
+
+```
+pk_id 				int	主键索引,自增
+created_time		timestamp（CURRENT_TIMESTAMP）	创建日期，自动添加
+updated_time		timestamp（CURRENT_TIMESTAMP）	更新日期，自动更新
+delete_flag			tinyint	逻辑删除标识，0表示未删除，1表示已删除
+```
+
+操作习惯
+
+```
+避免使用ENUM数据类型
+字段定义为NOT NULL
+采用decimal类型（不丢失精度，禁止使用 float 和 double）
+
+单表索引不超过5个
+begin + commit 事务的习惯
+尽量使用 union all 代替 union
+写完SQL先explain查看执行计划（SQL性能优化）
+使用 ISNULL()来判断是否为 NULL 值
+```
+

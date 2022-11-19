@@ -483,6 +483,14 @@ UPDATE `表名` SET
 WHERE `字段3` IN ('值1', '值2', '值3');
 ```
 
+### 3.7.14 自动获取日期
+
+括号中为当天时间的前一天，如果统计前几天就将括号中的 '1' 改成相应的天数。如果要算月或年，直接将day改为month或year即可
+
+```date_sub(curdate(),interval 1 day)
+date_sub(curdate(),interval 1 day)
+```
+
 ## 14.查询命令
 
 ## 3.8 触发器

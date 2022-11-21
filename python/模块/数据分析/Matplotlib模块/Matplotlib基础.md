@@ -48,6 +48,11 @@ fig = plt.figure()
 
 # ax1 = fig.add_subplot(横向数量, 纵向数量, 坐标系序号)
 ax1 = fig.add_subplot(1, 1, 1)
+
+# 标签旋转45度
+plt.xticks(rotation=45)
+
+plt.close(fig)
 ```
 
 
@@ -88,6 +93,9 @@ plt.plot(x,y)
 plt.subplot2grid((2, 2), (1, 1))
 # 绘制条形图
 plt.bar(x,y)
+
+plt.savefig(f"{file_name}.png")
+plt.clf()  # 需要重新更新画布，否则会出现同一张画布上绘制多张图片```
 
 ```
 
@@ -149,7 +157,7 @@ axes[1, 0].bar(x, y)
 # 设置 x 轴刻度
 plt.xticks(x, [9, 6, 7, 7, 8, 9], fontsize="6",color = "red")
 
-# 设置 x 轴刻度
+# 设置 y 轴刻度
 plt.yticks(y, [9, 6, 7, 7, 8, 9])
 
 # 设置 x 轴标题

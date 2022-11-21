@@ -1874,6 +1874,20 @@ df.groupby("列名").aggregate( {"列3" : "count" , "列5" : "sum"})
 
 将 DataFrameGroupBy 类型转换为 DataFrame 形式，利用重置索引 reset_index() 方法
 
+### 6.5 分组后表头获取
+
+```
+# 获取表头
+df_Nc_group_columns = []
+for i in df.columns:
+    for j in i:
+    if j != "" and j != '流量(GB)':
+    df_Nc_group_columns.append(j)
+df.columns = df_Nc_group_columns
+```
+
+
+
 ## 七、Pandas 数据透视
 
 利用 pivot_table() 方法，pd.pivot_table(*data*, *values=None*, *index=None*, *columns=None*, *aggfunc='mean'*, *fill_value=None*, *margins=False*, *dropna=True*, *margins_name='All'*)，参数如下：

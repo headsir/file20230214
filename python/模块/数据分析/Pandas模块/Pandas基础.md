@@ -1886,6 +1886,23 @@ for i in df.columns:
 df.columns = df_Nc_group_columns
 ```
 
+### 6.6 笔记
+
+- 参数说明
+
+```
+DataFrame.sum(axis = None,skipna = None,level = None,numeric_only = None,min_count = 0,**kwargs)
+
+参数说明:
+    axis：axis = 1表示行，axis = 0表示列，默认为None（无）
+    skipna：布尔型，表示计算结果是否排除NaN/Null值，默认值为None
+    level：表示索引层级，默认为None
+    numeric_only：仅数字，布尔型，默认值为None
+    min_count：表示执行操作所需的数目，整型，默认为0
+    **kwargs：要传递给函数的附加关键字参数。
+    返回值：返回Series对象或DataFrame对象。行或列求和数据
+```
+
 
 
 ## 七、Pandas 数据透视

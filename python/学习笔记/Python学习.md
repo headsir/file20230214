@@ -367,6 +367,10 @@ print(queue)  # Remaining queue in order of arrival
 deque(['Michael', 'Terry', 'Graham'])
 ```
 
+####  列表推导式
+
+
+
 
 
 ### 3.4.2 字典

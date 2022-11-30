@@ -797,8 +797,6 @@ def f(a, L=None):
     return L
 ```
 
-
-
 ## 5.5 关键参数
 
 通过参数名来为部分参数赋值
@@ -823,7 +821,12 @@ a is 100 and b is 5 and c is 50
 > 主要形式：
 >
 > - *parameter 【列表】
+>
+>   参数为==值==的形式
+>
 > - **parameter  【字典】
+>
+>   参数为==键值对==的形式
 
 举例：*parameter
 
@@ -839,14 +842,12 @@ playerlist = ['C罗','梅西']
 player(*playerlist)
 ```
 
-
-
 举例：**parameter
 
 ```python
 def Fruits(**MyFruits):
     print("我买的水果价格：\n")
-    for key,vslue in MyFruits.items():
+    for key,vlue in MyFruits.items():
         print('{0}:{1}'.format(key,vlue))
         
 Fruits(Apple = 3.24, Grape = 3.35, Lemon = 3.67)
@@ -854,6 +855,39 @@ Fruits(Apple = 3.24, Grape = 3.35, Lemon = 3.67)
 # 字典调用
 dict1 = {'Apple' :'3.24', 'Grape' :' 3.35', 'Lemon' :'3.67'}
 Fruits(**dict1)
+```
+
+## 特殊参数
+
+- 仅位置参数 ：/ 前面参数，仅限位置参数
+- 仅限关键字参数：* 后面参数，仅限关键字参数
+
+```
+def standard_arg(arg):
+    print(arg)
+
+def pos_only_arg(arg, /, fg):
+    print(arg)
+    print("===================")
+    print(fg)
+
+def kwd_only_arg(fg, *, arg):
+    print(arg)
+    print("===================")
+    print(fg)
+
+kwd_only_arg(fg=3,arg=1)
+```
+
+以下用例决定哪些形参可以用于函数定义：
+
+```
+def f(pos1, pos2, /, pos_or_kwd, *, kwd1, kwd2):
+说明：
+    • 使用仅限位置形参，可以让用户无法使用形参名。形参名没有实际意义时，强制调用函数的实参顺
+    序时，或同时接收位置形参和关键字时，这种方式很有用。
+    • 当形参名有实际意义，且显式名称可以让函数定义更易理解时，阻止用户依赖传递实参的位置时，才使用关键字。
+    • 对于 API，使用仅限位置形参，可以防止未来修改形参名时造成破坏性的 API 变动。
 ```
 
 

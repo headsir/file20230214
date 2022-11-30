@@ -387,9 +387,47 @@ while 条件：
 for 变量 in 序列：
 ```
 
+遍历集合时修改集合的内容，会很容易生成错误的结果。因此不能直接进行循环，而是应遍历该集合的 副本或创建新的集合：
+
+```
+# 遍历副本
+# Create a sample collection
+users = {'Hans': 'active', 'Éléonore': 'inactive', '景 太 郎': 'active'}
+# Strategy: Iterate over a copy
+for user, status in users.copy().items():
+    if status == 'inactive':
+    	del users[user]
+
+# 创建新集合    	
+# Strategy: Create a new collection
+active_users = {}
+for user, status in users.items():
+    if status == 'active':
+    	active_users[user] = status
+```
+
+
+
 ### 3.7.4 break语句
 
-break语句是用来 终止 循环语句的，即哪怕循环条件没有称为False或序列还没有被完全递归， 也停止执行循环语句。
+break语句是用来 终止 循环语句的，即哪怕循环条件没有成为False或序列还没有被完全递归， 也停止执行循环语句。
+
+```
+for n in range(2, 10):
+    for x in range(2, n):
+        if n % x == 0:
+            print(n, 'equals', x, '*', n//x)
+            break
+    else:
+        # loop fell through without finding a factor
+        print(n, 'is a prime number')
+        
+# 说明
+"""
+与 if 语句相比，循环的 else 子句更像 try 的 else 子句：try 的 else 子句在未触发异常时执行，循
+环的 else 子句则在未运行 break 时执行。
+"""
+```
 
 ### 3.7.5 continue语句
 
@@ -623,7 +661,36 @@ getattr(object, name[, default])
   3
   ```
 
-  
+
+## 4.17 print 函数
+
+- 字符串中将自动包括行结束符，但也可以在换行的地方添加一个 \ 来避免此情况。参见以下示例：
+
+```
+print("""\
+Usage: thingy [OPTIONS]
+-h Display this usage message
+-H hostname Hostname to connect to
+""")
+```
+
+-  取消 print 函数换行符 `print(“====”,end=' ')`
+
+## 4.18 enumerate() 函数
+
+遍历列表下标及值
+
+```
+list = ["1", "2", "3"]
+for i, j in enumerate(list):
+    print(i, j)
+===================================    
+0 1
+1 2
+2 3    
+```
+
+
 
 # 五、自定义函数
 
@@ -706,6 +773,31 @@ def say(message, times = 1):  # 参数time为默认参数
 say('Hello')
 say('World', 5)
 ```
+
+==重要警告：==默认值只计算一次。默认值为列表、字典或类实例等可变对象时，会产生与该规则不同的结 果。例如，下面的函数会累积后续调用时传递的参数：
+
+```python
+def f(a, L=[]):
+    L.append(a)
+    return L
+print(f(1))
+print(f(2))
+print(f(3))
+=============================
+[1]
+[1, 2]
+[1, 2, 3]
++++++++++++++++++++++++++++++++++++++++++++++
+不想在后续调用之间共享默认值时，应以如下方式编写函数：
++++++++++++++++++++++++++++++++++++++++++++++
+def f(a, L=None):
+    if L is None:
+        L = []
+        L.append(a)
+    return L
+```
+
+
 
 ## 5.5 关键参数
 

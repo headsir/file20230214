@@ -1048,6 +1048,6 @@ set global max_allowed_packet=1024*1024*28;
 
 "D:\Program Files\mysql-8.0.25-winx64\mysql-8.0.25-winx64\bin\mysqld" -- deaults-file="D:\Program Files\mysql-8.0.25-winx64\my.ini" MySQL
 # 指定文件
-mysqld  --defaults-file="D:\Program Files\mysql-8.0.25-winx64\my.ini"
+mysqld --defaults-file="D:\Program Files\mysql-8.0.25-winx64\my.ini"
 ```
 

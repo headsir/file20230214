@@ -44,6 +44,8 @@ my.ini
 	max_allowed_packet=1G
 	wait_timeout=2880000
 	interactive_timeout = 2880000
+	# 导出文件
+	secure_file_priv =
 
 ```
 

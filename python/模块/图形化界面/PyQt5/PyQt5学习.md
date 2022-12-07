@@ -141,8 +141,9 @@ if __name__ == '__main__':
     QPushButton 按钮
     QLineEdit 输入框
     QTableWidget 表格
-    QTableWidgetItem
+    QTableWidgetItem 单元格对象
     QLabel 标签
+    QT 属性设置
 """
 import sys  # 导入系统模块
 
@@ -150,7 +151,7 @@ import sys  # 导入系统模块
 from PyQt5.QtWidgets import QApplication, QWidget, QDesktopWidget
 from PyQt5.QtWidgets import QHBoxLayout, QVBoxLayout
 from PyQt5.QtWidgets import QPushButton, QLineEdit, QTableWidget, QTableWidgetItem, QLabel
-
+from PyQt5.QtCore import Qt
 
 class MainWindow(QWidget):  # 类继承父类QWidget
     def __init__(self):  # 类初始化
@@ -275,3 +276,35 @@ if __name__ == '__main__':
 ![image-20221206145040199](imge/PyQt5学习.assets/image-20221206145040199.png)
 
 ## 4.3 表格数据初始化
+
+- 有数据
+
+- 表格中展示
+
+  ```python
+  # 3.2 初始化表格数据
+  # 读取数据文件
+  import json
+  file_path = "db.json"
+  with open(file_path, mode='r', encoding='utf-8') as f:
+      data = f.read()
+      data_list = json.loads(data)['RECORDS']  # 根据文件设置
+  
+      current_roe_count = table_widget.rowCount()  # 当前表格有多少行
+      for row_list in data_list:
+          table_widget.insertRow(current_roe_count)  # 添加行
+  
+          # 写数据
+          # cell = QTableWidgetItem(row_list["日期"])  # 获取内容
+          # table_widget.setItem(current_roe_count, 0, cell)  # 参数：行、列、内容
+          # current_roe_count += 1
+          for i, ele in enumerate(row_list):
+              cell = QTableWidgetItem(row_list[str(ele)])  # 获取内容
+              if i in [0, 4, 6, 7]:
+                  # 设置不可修改
+                  cell.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
+                  table_widget.setItem(current_roe_count, i, cell)  # 参数：行、列、内容
+                  current_roe_count += 1
+  ```
+
+  

@@ -307,4 +307,152 @@ if __name__ == '__main__':
                   current_roe_count += 1
   ```
 
-  
+
+# 五、学习笔记
+
+## 5.1 PyQt5第一个程序
+
+```python
+import sys
+from PyQt5.QtWidgets import QApplication, QWidget
+
+if __name__ == '__main__':
+    # 固定的，PyQt5程序都需要QApplication对象，sys.argv是命令行参数列表，确保程序可以双击运行
+    app = QApplication(sys.argv)
+    # 实类初始化
+    w = QWidget()
+    # 设置窗口标题
+    w.setWindowTitle("第一个PyQt5")
+    # 将窗口控件显示在屏幕上
+    w.show()
+    # 程序进行循环等待状态
+    app.exec_()
+
+```
+
+程序解释说明：
+
+![image-20221208160006311](imge/PyQt5学习.assets/image-20221208160006311.png)
+
+## 5.2 模块介绍
+
+PyQt中有非常多的功能模块，开发中最常用的功能模块主要有三个：
+
+- QtCore：包含了核心的非GUI的功能，主要和时间、文件与文件夹、各种数据、流、URLs、mime类文件、进程与线程一起使用
+- QtGui：包含了窗口系统、事件处理、2D图像、基本绘图、字体和文字类
+- QtWidgets：包含了一些创建桌面应用的UI元素
+
+可以参考PyQt官网的所有模块，地址：
+
+C++具体实现的API文档，地址：
+
+**用到什么功能就它相关的api或者别人分享的使用心得，这是学习最快的方式**
+
+## 5.3 基本UI
+
+窗口内的所有控件，若想在窗口显示，都需要表示它的父亲是谁，而不是直接使用 show 函数显示
+
+### 1、按钮
+
+按钮对应的控件名称为 QPushButton , 位于 PyQt5.QtWidgets 里面
+
+```
+import sys
+from PyQt5.QtWidgets import QApplication, QWidget, QPushButton
+
+if __name__ == '__main__':
+    # 固定的，PyQt5程序都需要QApplication对象，sys.argv是命令行参数列表，确保程序可以双击运行
+    app = QApplication(sys.argv)
+    # 实类初始化
+    w = QWidget()
+    # 设置窗口标题
+    w.setWindowTitle("第一个PyQt5")
+
+    # ============================创建按钮=============================
+    # 在窗口里面添加按钮
+    btn = QPushButton("按钮")
+    # 设置按钮的父亲是当前窗口，等于添加到窗口显示
+    btn.setParent(w)
+    # ===============================================================
+    # 将窗口控件显示在屏幕上
+    w.show()
+    # 程序进行循环等待状态
+    app.exec_()
+```
+
+运行效果：
+
+![image-20221208164902425](imge/PyQt5学习.assets/image-20221208164902425.png)
+
+### 2、文本
+
+纯文本控件名称为：QLabel ，位于 PyQt5.QtWidgets 里面
+
+纯文本控件仅仅作为标识显示而已，类似输入内容前的一段标签提示（账号、密码）
+
+```python
+import sys
+from PyQt5.QtWidgets import QApplication, QWidget, QLabel
+
+if __name__ == '__main__':
+    # 固定的，PyQt5程序都需要QApplication对象，sys.argv是命令行参数列表，确保程序可以双击运行
+    app = QApplication(sys.argv)
+    # 实类初始化
+    w = QWidget()
+    # 设置窗口标题
+    w.setWindowTitle("第一个PyQt5")
+    # ============================创建纯文本=============================
+    # 下面创建一个Label(纯文本)，在创建的时候指定了父亲
+    label = QLabel("账号", w)
+    # 显示位置与大小：x, y, w, h
+    label.setGeometry(20, 20, 30, 30)
+    # ===============================================================
+    # 将窗口控件显示在屏幕上
+    w.show()
+    # 程序进行循环等待状态
+    app.exec_()
+```
+
+运行效果：
+
+![image-20221208170300367](imge/PyQt5学习.assets/image-20221208170300367.png)
+
+### 3、输入框
+
+输入框的控件名为：QlineEdit ，位于 PyQt5.QtWidgets 里面
+
+```python
+import sys
+from PyQt5.QtWidgets import QApplication, QWidget, QLineEdit, QLabel, QPushButton
+
+if __name__ == '__main__':
+    # 固定的，PyQt5程序都需要QApplication对象，sys.argv是命令行参数列表，确保程序可以双击运行
+    app = QApplication(sys.argv)
+    # 实类初始化
+    w = QWidget()
+    # 设置窗口标题
+    w.setWindowTitle("第一个PyQt5")
+    # ============================创建纯文本============================
+    # 下面创建一个Label(纯文本)，在创建的时候指定了父亲
+    label = QLabel("账号", w)
+    # 显示位置与大小：x, y, w, h
+    label.setGeometry(20, 20, 30, 20)
+    # =============================创建文本框===========================
+    # 文本框
+    edit = QLineEdit(w)
+    edit.setPlaceholderText("请输入账号")
+    edit.setGeometry(55, 20, 200, 20)
+    # =============================创建按钮===========================
+    # 在窗口里面添加控件
+    btn = QPushButton("注册", w)
+    btn.setGeometry(50, 80, 70, 30)
+    # ================================================================
+    # 将窗口控件显示在屏幕上
+    w.show()
+    # 程序进行循环等待状态
+    app.exec_()
+```
+
+运行效果：
+
+![image-20221208171748923](imge/PyQt5学习.assets/image-20221208171748923.png)

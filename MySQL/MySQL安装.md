@@ -62,7 +62,7 @@ regedit注册表
 
 ## 5、获取初始密码，以管理员的身份打开cmd命令窗口
 
-使用mysqld --initialize --console命令，生成随机密码  qazwsx W;o1DHh*!wL,  29 oB/pCfK4E8q2
+使用mysqld --initialize --console命令，生成随机密码  qazwsx
 
 ## 6、启动服务 **net start mysql**	net stop mysql(停止服务)  sc delete mysql删除服务
 

@@ -226,11 +226,11 @@ INSERT INTo dayworkplan(基站类型,站号小区标识,站名,cellname) SELECT 
 
 ```SQL
 1、复制表结构及数据到新表
-CREATE TABLE 新表SELECT * FROM 旧表
+CREATE TABLE 新表 SELECT * FROM 旧表
 新表中没有了旧表的primary key、Extra（auto_increment）等属性
 2、只复制表结构到新表
-CREATE TABLE 新表SELECT * FROM 旧表WHERE 1=2
-或CREATE TABLE 新表LIKE 旧表
+CREATE TABLE 新表 SELECT * FROM 旧表 WHERE 1=2
+或CREATE TABLE 新表 LIKE 旧表
 3、复制旧表的数据到新表(假设两个表结构一样)
 INSERT INTO 新表SELECT * FROM 旧表
 4、复制旧表的数据到新表(假设两个表结构不一样)

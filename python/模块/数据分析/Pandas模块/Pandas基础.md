@@ -960,7 +960,7 @@ df1.reset_index(drop = True)
 
 #### 4.1.1 选择某一列/某几列
 
-- 普通索引：通过传入==列名==选择数据，举例：df[["列1" , "列2"]],推荐使用：df。loc[:,["列1" , "列2"]]
+- 普通索引：通过传入==列名==选择数据，举例：df[["列1" , "列2"]],推荐使用：df.loc[:,["列1" , "列2"]]
 
 - 位置索引：通过传入==具体位置==来选择数据，利用 iloc 方法，举例：df.iloc[: , [0,2]] ，逗号前是行，后是列
 
@@ -1810,9 +1810,9 @@ df_consume.style.hide_index()\
 
 可以看出，跟共享样式里有些相同的问题，比如隐藏索引、隐藏列、设置数据格式等效果并没有实现。
 
-## 5.15 数据筛选
+### 5.15 数据筛选
 
-### 查询函数`query`
+#### 查询函数`query`
 
 query()的第二个参数 inplace 默认 false
 
@@ -1842,9 +1842,18 @@ query()的第二个参数 inplace 默认 false
     df.query("OrderDate >= '2021-08-15' and OrderDate <= '2021-08-31'")
     ```
 
-    
 
+### 5.16 获取最大值索引
 
+```
+# 获取最大值和最小值的索引
+idxmax = df['market_cap'].idxmax()
+idxmin = df['market_cap'].idxmin()
+```
+
+### 5.17 获取每列的最大值
+
+df.max()
 
 ## 六、Pandas 数据分组
 
@@ -2166,6 +2175,27 @@ with pd.ExcelWriter(path_file, engine="openpyxl") as writer:
 ### 10.3 pandas 行数、列数
 
 pd.shape 返回元组(行数，列数)
+
+### 10.4 计算两行数值的差
+
+DataFrame.diff(periods=1, axis=0)
+
+参数：
+
+- periods：移动的幅度，int类型，默认值为1。
+- axis：移动的方向，{0 or ‘index’, 1 or ‘columns’}，如果为0或者’index’，则上下移动，如果为1或者’columns’，则左右移动。
+
+返回值
+
+- diffed：DataFrame类型
+
+### 10.5 列绝对值
+
+```
+diff_df["汇总/TB"].abs()
+```
+
+
 
 [^1]: inplace参数：是否改变原始表数据
 [^2]: np.NaN:对缺失值的一种表示方法

@@ -344,7 +344,7 @@ PyQt中有非常多的功能模块，开发中最常用的功能模块主要有�
 
 可以参考PyQt官网的所有模块，地址：
 
-C++具体实现的API文档，地址：
+C++具体实现的API文档，地址：https://doc.qt.io/qt-5/classes.html
 
 **用到什么功能就它相关的api或者别人分享的使用心得，这是学习最快的方式**
 
@@ -456,3 +456,292 @@ if __name__ == '__main__':
 运行效果：
 
 ![image-20221208171748923](imge/PyQt5学习.assets/image-20221208171748923.png)
+
+### 4、窗口大小
+
+```
+    # =============================设置窗口大小===========================
+    w.resize(500, 500)
+```
+
+### 5、窗口位置
+
+```
+import sys
+from PyQt5.QtWidgets import QApplication, QWidget
+from PyQt5.QtWidgets import QDesktopWidget
+
+if __name__ == '__main__':
+    # 固定的，PyQt5程序都需要QApplication对象，sys.argv是命令行参数列表，确保程序可以双击运行
+    app = QApplication(sys.argv)
+    # 实类初始化
+    w = QWidget()
+    # 设置窗口标题
+    w.setWindowTitle("第一个PyQt5")
+    # =============================设置窗口大小===========================
+    w.resize(500, 500)
+    # =============================窗口设置在屏幕的左上角===========================
+    w.move(0, 0)
+    # =============================窗口设置在屏幕的中间位置===========================
+    # QDesktopWidget 屏幕组件  availableGeometry 可用区域  center 中心位置
+    center_pointer = QDesktopWidget().availableGeometry().center()
+    x = center_pointer.x()
+    y = center_pointer.y()
+    # frameGeometry().getRect() 返回窗口坐标 x,y，width,height
+    old_x, old_y, width, height = w.frameGeometry().getRect()
+    w.move(int(x - width / 2), int(y - height / 2))
+
+    # 将窗口控件显示在屏幕上
+    w.show()
+    # 程序进行循环等待状态
+    app.exec_()
+```
+
+### 6、设置窗口icon
+
+可以下载icon图标网站：https://www.easyicon.net
+
+```
+import sys
+from PyQt5.QtWidgets import QApplication, QWidget
+from PyQt5.QtGui import QIcon
+
+if __name__ == '__main__':
+    # 固定的，PyQt5程序都需要QApplication对象，sys.argv是命令行参数列表，确保程序可以双击运行
+    app = QApplication(sys.argv)
+    # 实类初始化
+    w = QWidget()
+    # 设置窗口标题
+    w.setWindowTitle("第一个PyQt5")
+    # =============================设置图标===========================
+    w.setWindowIcon(QIcon("img.png"))
+
+    # 将窗口控件显示在屏幕上
+    w.show()
+    # 程序进行循环等待状态
+    app.exec_()
+
+```
+
+## 5.4 布局
+
+在Qt里面布局分为四个大类：
+
+- QBoxLayout	盒子布局
+- QGridLayout   网格布局
+- QFormLayout  表单布局
+- QStackedLayout  抽拉式布局
+
+### 1、QBoxLayout
+
+直译为：盒子布局
+
+一般使用它的两个子类 QHBoxLayout 和 QVBoxLayout 负责水平和垂直布局
+
+#### 1.1 垂直布局示例：
+
+```
+import sys  # 导入系统模块
+# 导入pyQT5模块
+from PyQt5.QtWidgets import QApplication, QWidget, QDesktopWidget
+from PyQt5.QtWidgets import QHBoxLayout, QVBoxLayout
+from PyQt5.QtWidgets import QPushButton, QLineEdit, QTableWidget, QTableWidgetItem, QLabel
+
+
+class MainWindow(QWidget):  # 类继承父类QWidget
+    def __init__(self):  # 类初始化
+        # 切记一定要调用父类的__init__方法，因为它里面有很多对UI空间的初始化操作
+        super().__init__()
+        # 窗体标题
+        self.setWindowTitle("垂直布局")
+        # 窗体的尺寸
+        self.resize(300, 300)
+
+        # 垂直布局
+        layout = QVBoxLayout()
+
+        # 作用是在布局器中增加一个伸缩量，里面的参数表示QSpacerItem的个数，默认值为零
+        # 会将你放在layout中的空间压缩成默认的大小
+        layout.addStretch(1)
+
+        # 按钮1
+        btn1 = QPushButton("按钮1")
+        # 添加到布局器中
+        layout.addWidget(btn1)
+
+        layout.addStretch(1)
+
+        # 按钮2
+        btn2 = QPushButton("按钮2")
+        # 添加到布局器中
+        layout.addWidget(btn2)
+
+        layout.addStretch(1)
+
+        # 按钮3
+        btn3 = QPushButton("按钮3")
+        # 添加到布局器中
+        layout.addWidget(btn3)
+
+        layout.addStretch(2)
+
+        # 让当前的窗口使用这个排列的布局器
+        self.setLayout(layout)
+
+
+if __name__ == '__main__':
+    # 固定的，PyQt5程序都需要QApplication对象，sys.argv是命令行参数列表，确保程序可以双击运行
+    app = QApplication(sys.argv)
+    mywin = MainWindow()  # 实类初始化
+    mywin.show()  # 将窗口控件显示在屏幕上
+    app.exec()  # 程序运行，sys.exit方法确保程序完整退出
+```
+
+运行效果：
+
+![image-20221214144714912](imge/PyQt5学习.assets/image-20221214144714912.png)
+
+#### 1.2 水平布局示例：
+
+```
+import sys  # 导入系统模块
+
+# 导入pyQT5模块
+from PyQt5.QtWidgets import QApplication, QWidget, QDesktopWidget
+from PyQt5.QtWidgets import QHBoxLayout, QVBoxLayout
+from PyQt5.QtWidgets import QGroupBox, QRadioButton
+from PyQt5.QtWidgets import QPushButton, QLineEdit, QTableWidget, QTableWidgetItem, QLabel
+
+
+class MainWindow(QWidget):  # 类继承父类QWidget
+    def __init__(self):  # 类初始化
+        # 切记一定要调用父类的__init__方法，因为它里面有很多对UI空间的初始化操作
+        super().__init__()
+        self.init_ui()
+
+    def init_ui(self):
+        # 最外层的垂直布局器，包含两部分：爱好和性别
+        container = QVBoxLayout()
+        # 最外层的水平布局器
+        # container = QHBoxLayout()
+
+        # --------------创建第一个组，添加多个组件-------------------
+        # hobby 主要是保证他们是一个组
+        hobby_box = QGroupBox("爱好")
+        # v_layout 保证三个爱好是垂直摆放
+        v_layout = QVBoxLayout()
+        btn1 = QRadioButton("抽烟")
+        btn2 = QRadioButton("喝酒")
+        btn3 = QRadioButton("烫头")
+        # 添加到v_layout中
+        v_layout.addWidget(btn1)
+        v_layout.addWidget(btn2)
+        v_layout.addWidget(btn3)
+        # 把v_layout 添加到hobby_box中
+        hobby_box.setLayout(v_layout)
+
+        # --------------创建第二个组，添加多个组件-------------------
+        # 性别组
+        gender_box = QGroupBox("性别")
+        # 性别容器
+        h_layout = QHBoxLayout()
+        # 性别选项
+        btn4 = QRadioButton("男")
+        btn5 = QRadioButton("女")
+        # 追加到性别容器中
+        h_layout.addWidget(btn4)
+        h_layout.addWidget(btn5)
+
+        # 添加到box中
+        gender_box.setLayout(h_layout)
+
+        # 把爱好的内容添加到容器中
+        container.addWidget(hobby_box)
+        # 把性别的内容添加到容器中
+        container.addWidget(gender_box)
+
+        # 让当前的窗口使用这个排列的布局器
+        self.setLayout(container)
+
+
+if __name__ == '__main__':
+    # 固定的，PyQt5程序都需要QApplication对象，sys.argv是命令行参数列表，确保程序可以双击运行
+    app = QApplication(sys.argv)
+    mywin = MainWindow()  # 实类初始化
+    mywin.show()  # 将窗口控件显示在屏幕上
+    app.exec()  # 程序运行，sys.exit方法确保程序完整退出
+```
+
+运行效果：
+
+![image-20221214151317002](imge/PyQt5学习.assets/image-20221214151317002.png)
+
+### 2、QGridLayout
+
+网格布局，又称为九宫格布局
+
+```
+import sys  # 导入系统模块
+
+# 导入pyQT5模块
+from PyQt5.QtWidgets import QApplication, QWidget, QDesktopWidget
+from PyQt5.QtWidgets import QHBoxLayout, QVBoxLayout, QGridLayout
+from PyQt5.QtWidgets import QPushButton, QLineEdit, QTableWidget, QTableWidgetItem, QLabel
+
+
+class MainWindow(QWidget):  # 类继承父类QWidget
+    def __init__(self):  # 类初始化
+        # 切记一定要调用父类的__init__方法，因为它里面有很多对UI空间的初始化操作
+        super().__init__()
+        self.init_ui()
+
+    def init_ui(self):
+        # 窗体标题
+        self.setWindowTitle("计算器")
+        # 准备数据
+        data = {
+            0: ["7", "8", "9", "+", "("],
+            1: ["4", "5", "6", "-", ")"],
+            2: ["1", "2", "3", "*", "<-"],
+            3: ["0", ".", "=", "/", "C"]
+        }
+
+        # 整体垂直布局
+        layout = QVBoxLayout()
+
+        # 输入框
+        edit = QLineEdit()
+        edit.setPlaceholderText("请输入内容")
+        # 把输入框添加到容器中（addWidget添加普通控件）
+        layout.addWidget(edit)
+
+        # 网格布局
+        grid = QGridLayout()
+
+        # 循环创建追加进去
+        for line_number, line_data in data.items():
+            # 此时line_number是第几行，line_data是当前行数据
+            for col_number, number in enumerate(line_data):
+                # 此时col_number是第几列，number是要显示的符号
+                btn = QPushButton(number)
+                # grid.addWidget(btn)
+                grid.addWidget(btn, line_number, col_number)
+
+        # 把网格布局追加到容器中（addLayout添加容器）
+        layout.addLayout(grid)
+
+        # 让当前的窗口使用这个排列的布局器
+        self.setLayout(layout)
+
+
+if __name__ == '__main__':
+    # 固定的，PyQt5程序都需要QApplication对象，sys.argv是命令行参数列表，确保程序可以双击运行
+    app = QApplication(sys.argv)
+    mywin = MainWindow()  # 实类初始化
+    mywin.show()  # 将窗口控件显示在屏幕上
+    app.exec()  # 程序运行，sys.exit方法确保程序完整退出
+```
+
+运行效果：
+
+![image-20221214155958087](imge/PyQt5学习.assets/image-20221214155958087.png)

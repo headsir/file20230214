@@ -745,3 +745,203 @@ if __name__ == '__main__':
 运行效果：
 
 ![image-20221214155958087](imge/PyQt5学习.assets/image-20221214155958087.png)
+
+### 3、QFormLayout
+
+一般适用于提交数据form表单，比如：登录、注册类的场景
+
+```
+import sys  # 导入系统模块
+
+# 导入pyQT5模块
+from PyQt5.QtWidgets import QApplication, QWidget, QDesktopWidget
+from PyQt5.QtWidgets import QHBoxLayout, QVBoxLayout, QGridLayout, QFormLayout
+from PyQt5.QtWidgets import QPushButton, QLineEdit, QTableWidget, QTableWidgetItem, QLabel
+from PyQt5.QtCore import Qt
+
+
+class MainWindow(QWidget):  # 类继承父类QWidget
+    def __init__(self):  # 类初始化
+        # 切记一定要调用父类的__init__方法，因为它里面有很多对UI空间的初始化操作
+        super().__init__()
+        self.init_ui()
+
+    def init_ui(self):
+        # 设定当前widget的宽高（可以拉伸大小）
+        self.resize(300, 160)
+        # 禁止改变宽高（不可以拉伸）
+        # self.setFixedSize(300, 160)
+
+        # 外层容器
+        container = QVBoxLayout()
+
+        # 表单容器
+        form_layout = QFormLayout()
+
+        # 创建1个输入框
+        edit = QLineEdit()
+        edit.setPlaceholderText("请输入账号")
+        form_layout.addRow("账号：", edit)
+
+        # 创建另外1个输入框
+        edit2 = QLineEdit()
+        edit2.setPlaceholderText("请输入密码")
+        form_layout.addRow("密码：", edit2)
+        # 将from_layout 添加到垂直布局中
+        container.addLayout(form_layout)
+
+        # 按钮
+        login_btn = QPushButton("登录")
+        login_btn.setFixedSize(100, 30)
+
+        # 把按钮添加到容器中，并且指定它的对齐方式
+        container.addWidget(login_btn, alignment=Qt.AlignRight)
+
+        # 让当前的窗口使用这个排列的布局器
+        self.setLayout(container)
+
+
+if __name__ == '__main__':
+    # 固定的，PyQt5程序都需要QApplication对象，sys.argv是命令行参数列表，确保程序可以双击运行
+    app = QApplication(sys.argv)
+    mywin = MainWindow()  # 实类初始化
+    mywin.show()  # 将窗口控件显示在屏幕上
+    app.exec()  # 程序运行，sys.exit方法确保程序完整退出
+```
+
+运行效果：
+
+![image-20221214162134821](imge/PyQt5学习.assets/image-20221214162134821.png)
+
+### 4、QStackedLayout
+
+提供了多页面切换的布局，一次只能看到一个界面，抽屉布局
+
+```
+import sys  # 导入系统模块
+
+# 导入pyQT5模块
+from PyQt5.QtWidgets import QApplication, QWidget, QDesktopWidget
+from PyQt5.QtWidgets import QHBoxLayout, QVBoxLayout, QGridLayout, QFormLayout, QStackedLayout
+from PyQt5.QtWidgets import QPushButton, QLineEdit, QTableWidget, QTableWidgetItem, QLabel
+from PyQt5.QtCore import Qt
+
+
+class Window1(QWidget):
+    def __init__(self):
+        super().__init__()
+        QLabel("我是抽屉1要显示的内容", self)
+        self.setStyleSheet("background-color:green;")
+
+class Window2(QWidget):
+    def __init__(self):
+        super().__init__()
+        QLabel("我是抽屉2要显示的内容", self)
+        self.setStyleSheet("background-color:red;")
+
+
+class MainWindow(QWidget):  # 类继承父类QWidget
+    def __init__(self):  # 类初始化
+        # 切记一定要调用父类的__init__方法，因为它里面有很多对UI空间的初始化操作
+        super().__init__()
+        self.create_stacked_layout()
+        self.init_ui()
+
+    def create_stacked_layout(self):
+        # 创建堆叠（抽屉）布局
+        self.stacked_layout = QStackedLayout()
+        # 创建单独的widget
+        win1 = Window1()
+        win2 = Window2()
+        # 将创建的2个Widget添加到抽屉布局中
+        self.stacked_layout.addWidget(win1)
+        self.stacked_layout.addWidget(win2)
+
+    def init_ui(self):
+        # 设置Widget大小以及固定宽高（不可以拉伸）
+        self.setFixedSize(300, 270)
+
+        # 1. 创建整体的布局器
+        container = QVBoxLayout()
+
+        # 2. 创建1个要显示具体内容的子Widget
+        widget = QWidget()
+        widget.setLayout(self.stacked_layout)
+        widget.setStyleSheet("background-color:grey;")
+
+        # 3. 创建2个按钮，用来点击进行切换抽屉布局器中的widget
+        btn_press1 = QPushButton("抽屉1")
+        btn_press2 = QPushButton("抽屉2")
+        # 给按钮添加事件（即点击后要调用的函数）
+        btn_press1.clicked.connect(self.btn_press1_clicked)
+        btn_press2.clicked.connect(self.btn_press2_clicked)
+
+        # 4. 将需要显示的控件添加到布局器中
+        container.addWidget(widget)
+        container.addWidget(btn_press1)
+        container.addWidget(btn_press2)
+
+        # 5. 设置当前要显示的widget,从而能够显示这个布局器中的控件
+        self.setLayout(container)
+
+    def btn_press1_clicked(self):
+        # 设置抽屉布局器的当前索引值，即可切换显示哪个Widget
+        self.stacked_layout.setCurrentIndex(0)
+
+    def btn_press2_clicked(self):
+        # 设置抽屉布局器的当前索引值，即可切换显示哪个Widget
+        self.stacked_layout.setCurrentIndex(1)
+
+
+if __name__ == '__main__':
+    # 固定的，PyQt5程序都需要QApplication对象，sys.argv是命令行参数列表，确保程序可以双击运行
+    app = QApplication(sys.argv)
+    mywin = MainWindow()  # 实类初始化
+    mywin.show()  # 将窗口控件显示在屏幕上
+    sys.exit(app.exec())  # 程序运行，sys.exit方法确保程序完整退出
+```
+
+运行效果：
+
+![image-20221214174736480](imge/PyQt5学习.assets/image-20221214174736480.png)
+
+## 5.5 窗口
+
+### 1、分类
+
+在Qt中，生成窗口有三种方式：
+
+- QWidget : 控件和窗口的父类，自由度高（什么东西都没有），没有划分菜单、工具栏、状态栏、主窗口等区域
+- QMainWindow : 是 QWidget 的子类，包含菜单栏、工具栏、状态栏、标题栏等，中间部分则为主窗口区域
+- QDialog : 对话窗口的基类
+
+### 2、QWidget 
+
+```
+import sys  # 导入系统模块
+
+# 导入pyQT5模块
+from PyQt5.QtWidgets import QApplication, QWidget, QLabel
+
+class MainWindow(QWidget):  # 类继承父类QWidget
+    def __init__(self):  # 类初始化
+        # 切记一定要调用父类的__init__方法，因为它里面有很多对UI空间的初始化操作
+        super().__init__()
+        self.init_ui()
+
+    def init_ui(self):
+        label = QLabel("这是文字~~~")
+        label.setStyleSheet("font-size:30px;color:red")
+        label.setParent(self)
+
+if __name__ == '__main__':
+    # 固定的，PyQt5程序都需要QApplication对象，sys.argv是命令行参数列表，确保程序可以双击运行
+    app = QApplication(sys.argv)
+    mywin = MainWindow()  # 实类初始化
+    mywin.show()  # 将窗口控件显示在屏幕上
+    sys.exit(app.exec())  # 程序运行，sys.exit方法确保程序完整退出
+```
+
+运行效果：
+
+![image-20221214180243059](imge/PyQt5学习.assets/image-20221214180243059.png)

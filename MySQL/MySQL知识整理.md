@@ -204,8 +204,6 @@ WHERE d.pci is null and d.`经度` is null
 
 ## 3.4 添加数据
 
-
-
 ```SQL
 #插入一行数据
  INSERT INTO  表名 ( 列名 ) VALUES(列对应的值)
@@ -220,6 +218,8 @@ alter table TABLE_NAME add column NEW_COLUMN_NAME varchar(20) not null first;
 #多表插入数据
 -- INSERT INTO  表名 ( 列名 ) VALUES(列对应的值)
 INSERT INTo dayworkplan(基站类型,站号小区标识,站名,cellname) SELECT  CONCAT(b.制式,b.`站型`),b.`站号小区号`,b.`站名`,b.`小区名`   FROM basworkpro as b WHERE b.单验日期='未开始安排';
+# 插入数据
+replace into
 ```
 
 ### 3.4.1 复制表

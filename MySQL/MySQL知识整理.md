@@ -1051,3 +1051,9 @@ set global max_allowed_packet=1024*1024*28;
 mysqld --defaults-file="D:\Program Files\mysql-8.0.25-winx64\my.ini"
 ```
 
+## 8. 本地文件导入
+
+```
+LOAD DATA local INFILE '//tsclient/D/1out/1.1yuanbiaodaoru/lte_out.csv' INTO TABLE `91.1.14G小区明细`
+```
+

@@ -1,5 +1,7 @@
 Python ==**官方文档**== https://docs.python.org/zh-cn/3.11/archives/python-3.11.0-docs-pdf-a4.zip
 
+==简明== Python 教程http://home.ustc.edu.cn/~hyx/bak/python/index.html
+
 # 一、安装Python
 
 网上教程很多，可以自行百度。

@@ -59,6 +59,8 @@ ssh-keygen -t rsa -C "你的邮箱"
 
 
 
+![image-20221228103254726](imge/github 公钥配置.assets/image-20221228103254726.png)
+
 ![image-20221228103131144](imge/github 公钥配置.assets/image-20221228103131144.png)
 
 ![image-20221228103002724](imge/github 公钥配置.assets/image-20221228103002724.png)

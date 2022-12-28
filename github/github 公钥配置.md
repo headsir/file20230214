@@ -28,6 +28,29 @@ ssh-keygen -t rsa -C "你的邮箱"
 
 ![image-20220207150928858](D:\用户\文档\GitHub\file\github\imge\github 公钥配置.assets\image-20220207150928858.png)
 
+```
+[core]
+	repositoryformatversion = 0
+	filemode = false
+	bare = false
+	logallrefupdates = true
+	symlinks = false
+	ignorecase = true
+[submodule]
+	active = .
+[remote "origin"]
+	url = git@gitee.com:disguisor/study-notes.git
+	fetch = +refs/heads/*:refs/remotes/origin/*
+[branch "master"]
+	remote = origin
+	merge = refs/heads/master
+[lfs]
+	repositoryformatversion = 0
+
+```
+
+
+
 ### 5、.gitconfig 文件配置
 
 ![image-20220207151519509](D:\用户\文档\GitHub\file\github\imge\github 公钥配置.assets\image-20220207151519509.png)

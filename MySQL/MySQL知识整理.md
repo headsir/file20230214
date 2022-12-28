@@ -1051,6 +1051,20 @@ set global max_allowed_packet=1024*1024*28;
 mysqld --defaults-file="D:\Program Files\mysql-8.0.25-winx64\my.ini"
 ```
 
+### 7.4 查看当前数据库的默认编码：
+
+```
+show variables where Variable_name like 'collation%';
+```
+
+查看各表编码：
+
+```
+show create table ‘table_name’;
+```
+
+
+
 ## 8. 本地文件导入
 
 ```

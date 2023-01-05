@@ -1219,20 +1219,20 @@ df1.reset_index(drop = True)
 df.melt(id_vars = ["Company" ,"Name"],var_name = "Year" , value_name = "Sale")
 ```
 
-|      |  Company | Name |     Year | Sale |
-| ---: | -------: | ---: | -------: | ---: |
-|    0 |    Apple | 苹果 | Sate2013 | 5000 |
-|    1 |   Google | 谷歌 | Sate2013 | 3500 |
-|    2 | Facebook | 脸书 | Sate2013 | 2300 |
-|    3 |    Apple | 苹果 | Sate2014 | 5050 |
-|    4 |   Google | 谷歌 | Sate2014 | 3800 |
-|    5 | Facebook | 脸书 | Sate2014 | 2900 |
-|    6 |    Apple | 苹果 | Sate2015 | 5050 |
-|    7 |   Google | 谷歌 | Sate2015 | 3800 |
-|    8 | Facebook | 脸书 | Sate2015 | 2900 |
-|    9 |    Apple | 苹果 | Sate2016 | 5050 |
-|   10 |   Google | 谷歌 | Sate2016 | 3800 |
-|   11 | Facebook | 脸书 | Sate2016 | 2900 |
+|      | Company  | Name |   Year   | Sale |
+| :--: | :------: | :--: | :------: | :--: |
+|  0   |  Apple   | 苹果 | Sate2013 | 5000 |
+|  1   |  Google  | 谷歌 | Sate2013 | 3500 |
+|  2   | Facebook | 脸书 | Sate2013 | 2300 |
+|  3   |  Apple   | 苹果 | Sate2014 | 5050 |
+|  4   |  Google  | 谷歌 | Sate2014 | 3800 |
+|  5   | Facebook | 脸书 | Sate2014 | 2900 |
+|  6   |  Apple   | 苹果 | Sate2015 | 5050 |
+|  7   |  Google  | 谷歌 | Sate2015 | 3800 |
+|  8   | Facebook | 脸书 | Sate2015 | 2900 |
+|  9   |  Apple   | 苹果 | Sate2016 | 5050 |
+|  10  |  Google  | 谷歌 | Sate2016 | 3800 |
+|  11  | Facebook | 脸书 | Sate2016 | 2900 |
 
 ### 5.13 apply() 与 applymap() 函数
 

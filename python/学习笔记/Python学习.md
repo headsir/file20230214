@@ -117,7 +117,17 @@ if __name__ == '__main__':
     execute()
 ```
 
+## 2.4 VScode 使用
 
+### 2.4.1 界面汉化
+
+![image-20230128114714232](imge/Python学习.assets/image-20230128114714232.png)
+
+### 2.4.1 python 配置
+
+#### 1、安装python 插件
+
+![image-20230128115209292](imge/Python学习.assets/image-20230128115209292.png)
 
 # 三、基本概念
 

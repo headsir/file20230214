@@ -6,6 +6,7 @@ PyQt5学习 2022.12.6
 
 ```python
 pip install pyqt5
+pip install PyQt5-tools(designer)
 ```
 
 <font color = red size =5>注意事项：PyQt5安装路径不能包含中文字符</font>

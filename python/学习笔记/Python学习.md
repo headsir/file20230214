@@ -154,9 +154,24 @@ if __name__ == '__main__':
 			"$0"
 ```
 
+#### 3、常用插件
 
+vscode-icons 设置文件图标主题
 
+autoDocstring 实现函数注释
 
+Todo Tree 实现TODO 标签功能
+
+Markdown Preview Enhanced 实现Markdown的一些功能
+
+indent-rainbow 缩进渲染
+
+```
+// 取消插件indent-Rainbow缩进渲染报错
+"indentRainbow.ignoreErrorLanguages": [
+"python"
+]
+```
 
 # 三、基本概念
 

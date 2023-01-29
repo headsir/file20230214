@@ -6,7 +6,7 @@ python程序中使用 import XXX 时，python解析器会在当前目录、已�
 
 ```python
 import sys
-sys.path.append('..')  # 表示导入当前文件的上层目录到搜索路径中
+sys.path.append('./')  # 表示导入当前文件的上层目录到搜索路径中
 sys.path.append(sys.path[1] + '\\neighbours_planning') # sys.path[1] 当前文件的上层目录
 sys.path.append('/home/model')  # 绝对路径
 ```

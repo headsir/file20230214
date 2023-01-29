@@ -129,6 +129,35 @@ if __name__ == '__main__':
 
 ![image-20230128115209292](imge/Python学习.assets/image-20230128115209292.png)
 
+#### 2、python 文件头设置
+
+2种方式：本项目设置、全局设置
+
+![image-20230129092140224](imge/Python学习.assets/image-20230129092140224.png)
+
+![image-20230129092215407](imge/Python学习.assets/image-20230129092215407.png)
+
+```
+	// python 文件头模板
+	"HEADER": {
+		"prefix": "header",
+		"body": [
+			"#!/usr/bin/env python",
+			"# -*- encoding: utf-8 -*-",
+			"# @File    :   $TM_FILENAME",
+			"# @Time    :   $CURRENT_YEAR/$CURRENT_MONTH/$CURRENT_DATE $CURRENT_HOUR:$CURRENT_MINUTE:$CURRENT_SECOND",
+			"# @Author  :   978345836@qq.com",
+			"# @Version :   1.0",
+			"# @Describe:   None",
+			"",
+			"# here put the import lib",
+			"$0"
+```
+
+
+
+
+
 # 三、基本概念
 
 ## 3.1 常量

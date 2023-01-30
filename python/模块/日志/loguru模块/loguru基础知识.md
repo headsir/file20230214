@@ -35,14 +35,16 @@ logger.add('hello.log')
 ## 3.1 指定文件中日志输出的格式、级别
 
 ```
-# leve 日志级别 （低于级别日志不会记录），message 日志信息
-log = logger.add('world.log', format="{time} | {level} | {message}", level="INFO")
+# leve 日志级别 （低于级别日志不会记录），message 日志信息，file 文件名，line 行号
+logger.add('world.log', rotation="200 MB",
+            format=" {time} | {level} | {file} | {line} | {message}", level="INFO")
 
 logger.debug('i am debug message')
 logger.info('i am info message')
 
 # 日志文件名称加信息
-logger.add('hello_{time}.log'
+logger.add('hello_{time}.log')
+logger.add('hello_{time:YYYY-MM-DD}.log')
 
 # 停止写入文件
 logger.remove(id)

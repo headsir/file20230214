@@ -1225,3 +1225,49 @@ if __name__ == '__main__':
 运行效果：
 
 ![image-20221228173040438](imge/PyQt5学习.assets/image-20221228173040438.png)
+
+
+
+## 5.7 开发环境配置-PyCharm
+
+
+
+![img](imge/PyCharm-PyQt5开发环境配置.assets/2405210-20210522191810963-608942593.png)
+
+![img](imge/PyCharm-PyQt5开发环境配置.assets/2405210-20210522192028146-1224320417.png)
+
+![img](imge/PyCharm-PyQt5开发环境配置.assets/2405210-20210522192415943-1127380908.png)
+
+## 5.8 开发环境配置-vscode
+
+https://blog.csdn.net/qq_37080185/article/details/121616507
+
+### 下载并安装PYQT Integration
+
+![image-20230202112704950](imge/PyQt5学习.assets/image-20230202112704950.png)
+
+### 配置pyqt integration
+
+点击拓展设置
+
+![image-20230202112801233](imge/PyQt5学习.assets/image-20230202112801233.png)
+
+配置Pyuic:Cmd与Qtdesigner:Path路径
+
+1.Pyuic:Cmd路径一般是在你安装的python环境下的 \Scripts\pyuic5.exe
+
+2.Qtdesigner:Path
+
+一般是在你安装的python环境下的\Lib\site-packages\qt5_applications\Qt\bin\designer.exe
+
+注意新版designer.exe不是在目录pyqt5_tools下而是qt5_applications目录下
+
+![image-20230202113346211](imge/PyQt5学习.assets/image-20230202113346211.png)
+
+### 创建pyqt文件，显示界面
+
+在资源管理器空白处右键，然后点击PYQT：New Form就会出现qtdesigner界面了
+
+![image-20230202113541264](imge/PyQt5学习.assets/image-20230202113541264.png)
+
+右键该文件并点击Compile Form

@@ -7,6 +7,8 @@ PyQt5学习 2022.12.6
 ```python
 pip install pyqt5
 pip install PyQt5-tools(designer)
+
+目前仅支持到python 3.9版本
 ```
 
 <font color = red size =5>注意事项：PyQt5安装路径不能包含中文字符</font>
@@ -1271,3 +1273,102 @@ https://blog.csdn.net/qq_37080185/article/details/121616507
 ![image-20230202113541264](imge/PyQt5学习.assets/image-20230202113541264.png)
 
 右键该文件并点击Compile Form
+
+## 5.9 python 调用ui文件显示界面
+
+```
+import sys
+sys.path.append("./")
+from PyQt5.QtWidgets import QApplication ,QMainWindow
+from PyQt5 import uic
+
+if __name__ =="__main__":
+    app = QApplication(sys.argv)
+    # 加载窗口
+    ui = uic.loadUi("ui/Logn.ui")
+    # 显示窗口
+    ui.show()
+    app.exec()
+```
+
+运行效果：
+
+![image-20230202145553305](imge/PyQt5学习.assets/image-20230202145553305.png)
+
+## 5.10 调用ui文件案例
+
+```
+import sys
+
+# sys.path.append("./")
+from PyQt5.QtWidgets import QApplication, QWidget
+from PyQt5 import uic
+
+
+class MyWindow(QWidget):
+    def __init__(self):
+        super().__init__()  # 初始化父类
+        self.init_ui()
+
+    def init_ui(self):
+        # 加载窗口
+        self.ui = uic.loadUi("../ui/Logn.ui")  # 第一种方法
+        # uic.loadUi("ui/Logn.ui",self)  # 第二种方法
+        # print(self.ui.__dict__)
+        # print()
+        self.user_name = self.ui.lineEdit  # 用户名输入框
+        self.password = self.ui.lineEdit_2  # 密码输入框
+        login_btn = self.ui.pushButton  # 登录按钮
+        forget_btn = self.ui.pushButton_2  # 忘记密码按钮
+        self.text_browser = self.ui.textBrowser  # 忘记密码按钮
+        
+        """
+            EchoMode 回显模式
+            4种回显模式
+            1 Normal 正常模式
+            2 NoEcho 不显示密码
+            3 Password  实现QlineEdit输入密码显示成圆点的方法
+            4 PasswordEchoOnEdit    输入时显示数字，失去焦点时显示圆点
+        """
+        # 实现QlineEdit输入密码显示成圆点的方法
+        self.password.setEchoMode(QLineEdit.Password)
+
+        # 给登录按钮被点击绑定槽函数
+        login_btn.clicked.connect(self.login)
+
+    def login(self):
+        """
+        实现登录的逻辑
+        """
+        # print(self.user_name.text())
+        # print(self.password.text())
+        # print("正在登录。。。。")
+        user_name = self.user_name.text()
+        password = self.password.text()
+        if user_name == "admin" and password == "123456":
+            self.text_browser.setText("欢迎%s" % user_name)
+            # 重置输入框
+            self.text_browser.repaint()
+        else:
+            self.text_browser.setText("用户名或密码错误...请重试")
+            self.text_browser.repaint()
+
+
+if __name__ == "__main__":
+    app = QApplication(sys.argv)
+
+    # 实例化类
+    w = MyWindow()
+    # 显示窗口
+    w.ui.show()
+    # w.show()
+
+    app.exec()
+
+```
+
+运行效果：
+
+![image-20230202174324819](imge/PyQt5学习.assets/image-20230202174324819.png)
+
+## 5.11 PyQt引入多线程

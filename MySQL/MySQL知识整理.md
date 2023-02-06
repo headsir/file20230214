@@ -519,6 +519,35 @@ date_sub(curdate(),interval 1 day)
 
 ![图片](imge/MySQL知识整理.assets/640-16734237420849.png)
 
+### 3.7.16 数据的导入
+
+#### **第一种情况：导入部分不包含中文字体**
+
+```
+load data infile "文件绝对路径" 	导入文件
+into table "表名" 			   目标表
+fields terminated by ',' 		每个具体字段内容之间是以逗号隔开的
+optionally enclosed by '"' 		描述的是字段的括起字符，就是说字段中如果有引号，就当做是字段的一部分
+escaped by '"'					描述的是转义字符。默认的是反斜杠
+lines terminated by '\r\n'		对每行进行分割，这里要注意一个问题，如果csv文件是在windows下生成，那分割用 ‘rn’，linux下								  用 ‘n’
+IGNORE 1 LINES					是忽略第一行，因为第一行往往是字段名
+(Id,@dummy,DayOfWeek,PdDistrict,Address,X,Y); 括号中有个字段很特别 @dummy，它是说如果csv文件中有个字段我不想插进去，那													就把对应字段名变成@dummy。
+想顺便插入导入时间，就在最后加上set update_time=current_timestamp；
+```
+
+#### **第二种情况：导入数据包含中文字体**
+
+```
+load data infile "文件绝对路径" into table "表名" 
+character set gb2312 -- 设置编码格式 UTF8
+fields terminated by ',' 
+optionally enclosed by '"' 
+escaped by '"'
+lines terminated by '\r\n';
+```
+
+
+
 ## 3.8 触发器
 
 ### 3.8.1 触发器语法
@@ -1097,11 +1126,6 @@ show create table ‘table_name’;
 # 导入文件
 local-infile=1
 
-LOAD DATA local INFILE 'D:/student.csv' INTO TABLE `student`
-CHARACTER SET UTF8 
-FIELDS TERMINATED BY ',' 
-OPTIONALLY ENCLOSED by '"' 
-LINES TERMINATED BY '\r\n' 
-IGNORE 1 LINES;
+参考：3.7.16
 ```
 

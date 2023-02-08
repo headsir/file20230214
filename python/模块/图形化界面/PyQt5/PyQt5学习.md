@@ -1295,7 +1295,7 @@ if __name__ =="__main__":
 
 ![image-20230202145553305](imge/PyQt5学习.assets/image-20230202145553305.png)
 
-## 5.10 调用ui文件案例
+## 5.10 调用ui文件案例-登录窗口
 
 ```
 import sys

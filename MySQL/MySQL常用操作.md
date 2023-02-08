@@ -154,8 +154,7 @@ SHOW TRIGGERS [FROM schema_name];
 
 DROP TRIGGER [IF EXISTS] [schema_name.]trigger_name
 
-**触发器的执行顺序
-**
+**触发器的执行顺序**
 
 我们建立的数据库一般都是 InnoDB 数据库，其上建立的表是事务性表，也就是事务安全的。这时，若SQL语句或触发器执行失败，MySQL  会回滚事务，有：
 

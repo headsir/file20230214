@@ -462,11 +462,13 @@ select  (@n := @n + 1) as usid ,id,company_id,department_code from sys_user ;
   substring(字符串, -4, 2)
   ```
 
-### 3.7.13 13.批量更新数据
+### 3.7.13 13.批量更新（查询）数据-CASE
 
 CASE...WHEN语句的涵义与一般高级语言中的SWITCH...CASE语句类似，
 
 如下所示，即：在`表名`表中，当字段`字段3`的值为'值X'时，修改`字段1`与`字段2`的值为'结果X'和'结果X'。
+
+第一种方式
 
 ```
 UPDATE `表名` SET
@@ -481,6 +483,28 @@ UPDATE `表名` SET
         WHEN '值3' THEN '结果6'
     END
 WHERE `字段3` IN ('值1', '值2', '值3');
+```
+
+第二种方式
+
+```
+UPDATE `表名` SET
+        `字段1` = CASE 
+        WHEN `字段3` = '值1' THEN '结果1'
+        WHEN `字段3` = '值2' THEN '结果2'
+        WHEN `字段3` = '值3' THEN '结果3'
+    END;
+```
+
+```
+SELECT 字段2，字段3，
+	`字段1` = CASE 
+        WHEN `字段3` = '值1' THEN '结果1'
+        WHEN `字段3` = '值2' THEN '结果2'
+        WHEN `字段3` = '值3' THEN '结果3'
+        ELSE '--'
+    END
+FROM `表名`;
 ```
 
 ### 3.7.14 自动获取日期

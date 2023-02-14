@@ -1077,7 +1077,7 @@ graph LR
 
 
 
-### 2、案例1
+### 2、案例1-接收信号
 
 功能：接收信号
 
@@ -1125,7 +1125,7 @@ if __name__ == '__main__':
 
 ![image-20221228160736967](imge/PyQt5学习.assets/image-20221228160736967.png)
 
-### 3、案例2
+### 3、案例2-自定义信号
 
 自定义信号【重点】
 
@@ -1371,4 +1371,280 @@ if __name__ == "__main__":
 
 ![image-20230202174324819](imge/PyQt5学习.assets/image-20230202174324819.png)
 
-## 5.11 PyQt引入多线程
+## 5.11 PyQt多线程
+
+```
+import sys
+import time
+
+# sys.path.append("./")
+from PyQt5.Qt import QApplication, QWidget, QThread
+from PyQt5 import uic
+
+
+# 创建多线程类
+class MyThread(QThread):
+    def __init__(self):
+        super().__init__()  # 初始化父类
+
+    # 线程的运行入口
+    def run(self):
+        for i in range(10):
+            print("是MyThread线程中执行.....%d" % (i + 1))
+            time.sleep(1)
+
+
+class MyWindow(QWidget):
+    def __init__(self):
+        super().__init__()  # 初始化父类
+        self.init_ui()
+
+    def init_ui(self):
+        # 加载窗口
+        self.ui = uic.loadUi("thread-1.ui")  # 第一种方法
+        # uic.loadUi("ui/Logn.ui",self)  # 第二种方法
+        # print(self.ui.__dict__)
+        # print()
+
+        # 从ui文件中加载控件
+        lineedit = self.ui.lineEdit  # 提示框
+
+        login_btn1 = self.ui.pushButton_1  # 登录按钮
+        login_btn2 = self.ui.pushButton_2  # 忘记密码按钮
+
+        # 给按钮绑定槽函数
+        login_btn1.clicked.connect(self.click_1)
+        login_btn2.clicked.connect(self.click_2)
+
+    def click_1(self):
+        for i in range(10):
+            print("是UI线程中执行...%d" % (i + 1))
+            time.sleep(1)
+
+    def click_2(self):
+        self.my_thread = MyThread()  # 创建线程
+        self.my_thread.start()  # 开始线程
+		"""
+		备注：为什么要使用self.my_thread而不使用my_thread
+		因为my_thread会在函数执行结束时被销毁，导致子线程意外结束，
+		self.my_thread是属于主线程的属性，不会因函数结束而销毁
+		"""
+
+if __name__ == "__main__":
+    app = QApplication(sys.argv)
+
+    # 实例化类
+    w = MyWindow()
+    # 显示窗口
+    w.ui.show()
+    # w.show()
+
+    app.exec()
+```
+
+## 5.12 给子线程发信号
+
+核心：利用json 字典转字符串，字符串反转字典
+
+```
+import json
+import sys
+import time
+
+from PyQt5.QtCore import QThread, pyqtSignal
+from PyQt5.QtWidgets import *
+from PyQt5 import uic
+
+"""
+pyqtSignal 创建自定义信号
+"""
+
+
+# 创建多线程类
+class LoginThread(QThread):
+    # 创建自定义信号，只能放在函数的外面
+    start_login_signal = pyqtSignal(str)
+
+    def __init__(self):
+        super().__init__()  # 初始化父类
+
+    def login_by_requests(self, user_password_json):
+        # 将json字符串，转换为自定，从而实现传递了用户名以及密码
+        user_password_json = json.loads(user_password_json)
+        print(user_password_json.get("user_name"))
+        print(user_password_json.get("password"))
+
+    # 线程的运行入口
+    def run(self):
+        while True:
+            print("子线程正在执行....")
+            time.sleep(1)
+
+
+class MyWindow(QWidget):
+    def __init__(self):
+        super().__init__()  # 初始化父类
+        self.init_ui()
+
+    def init_ui(self):
+        # 加载窗口
+        self.ui = uic.loadUi("Logn.ui")  # 第一种方法
+        # uic.loadUi("ui/Logn.ui",self)  # 第二种方法
+        # print(self.ui.__dict__)
+        # print()
+
+        # 从ui文件中加载控件
+        self.user_name_qwidget = self.ui.lineEdit  # 用户名输入框
+        self.password_qwidget = self.ui.lineEdit_2  # 密码输入框
+        self.login_btn = self.ui.pushButton  # 登录按钮
+        self.forget_password_btn = self.ui.pushButton_2  # 忘记密码按钮
+        self.text_browser = self.ui.textBrowser  # 忘记密码按钮
+
+        # 给登录按钮被点击绑定槽函数
+        self.login_btn.clicked.connect(self.login)
+
+        # 创建一个子线程（注意这里要将login_thread变量变为对象的属性，如果不是对象属性，而是一个普通的局部变量的话
+        # 会随着init_ui函数执行结束而被释放此时子线程还没有执行完毕所有会产生问题）
+        self.login_thread = LoginThread()
+        # 将要创建的子线程类中的信号进行绑定
+        self.login_thread.start_login_signal.connect(self.login_thread.login_by_requests)
+        # 让子线程开始工作
+        self.login_thread.start()
+
+    def login(self):
+        """
+        实现登录的逻辑
+        """
+        user_name = self.user_name_qwidget.text()
+        password = self.password_qwidget.text()
+        # 发送信号，让子线程开始登录 json.dumps 转换字典为字符串
+        self.login_thread.start_login_signal.emit(
+            json.dumps({"user_name": user_name, "password": password}))
+
+if __name__ == "__main__":
+    app = QApplication(sys.argv)
+
+    # 实例化类
+    w = MyWindow()
+    # 显示窗口
+    w.ui.show()
+    # w.show()
+
+    app.exec()
+
+```
+
+## 5.13 给主线程发信号
+
+```
+import json
+import sys
+import time
+
+from PyQt5.QtCore import QThread, pyqtSignal
+from PyQt5.QtWidgets import *
+from PyQt5 import uic
+
+"""
+pyqtSignal 创建自定义信号
+"""
+
+# 创建多线程类
+class LoginThread(QThread):
+    # 创建自定义信号，只能放在函数的外面
+    start_login_signal = pyqtSignal(str)
+
+    def __init__(self, signal):
+        super().__init__()  # 初始化父类
+        self.login_complete_signal = signal
+
+    def login_by_requests(self, user_password_json):
+        # 将json字符串，转换为自定，从而实现传递了用户名以及密码
+        user_password_json = json.loads(user_password_json)
+        print(user_password_json.get("user_name"))
+        print(user_password_json.get("password"))
+        ############################################################
+        # 登录结果
+        ret = {"errmsg":"登陆成功2"}
+
+        print("这里要发送信号给UI线程....")
+        self.login_complete_signal.emit(json.dumps(ret))
+        ############################################################
+
+    # 线程的运行入口
+    def run(self):
+        while True:
+            print("子线程正在执行....")
+            time.sleep(1)
+
+
+class MyWindow(QWidget):
+    ############################################################
+    # 创建自定义信号，只能放在函数的外面
+    login_status_signal = pyqtSignal(str)
+    ############################################################
+
+    def __init__(self):
+        super().__init__()  # 初始化父类
+        self.init_ui()
+
+    def init_ui(self):
+        # 加载窗口
+        self.ui = uic.loadUi("Logn.ui")  # 第一种方法
+        # uic.loadUi("ui/Logn.ui",self)  # 第二种方法
+        # print(self.ui.__dict__)
+        # print()
+
+        # 从ui文件中加载控件
+        self.user_name_qwidget = self.ui.lineEdit  # 用户名输入框
+        self.password_qwidget = self.ui.lineEdit_2  # 密码输入框
+        self.login_btn = self.ui.pushButton  # 登录按钮
+        self.forget_password_btn = self.ui.pushButton_2  # 忘记密码按钮
+        self.text_browser = self.ui.textBrowser  # 忘记密码按钮
+
+        # 给登录按钮被点击绑定槽函数
+        self.login_btn.clicked.connect(self.login)
+
+        ############################################################
+        # 创建一个信号，用来让子线程登录成功之后向主线程发送
+        self.login_status_signal.connect(self.login_status)
+        ############################################################
+
+        # 创建一个子线程（注意这里要将login_thread变量变为对象的属性，如果不是对象属性，而是一个普通的局部变量的话
+        # 会随着init_ui函数执行结束而被释放此时子线程还没有执行完毕所有会产生问题）
+        self.login_thread = LoginThread(self.login_status_signal)
+        # 将要创建的子线程类中的信号进行绑定
+        self.login_thread.start_login_signal.connect(self.login_thread.login_by_requests)
+        # 让子线程开始工作
+        self.login_thread.start()
+
+    def login(self):
+        """
+        实现登录的逻辑
+        """
+        user_name = self.user_name_qwidget.text()
+        password = self.password_qwidget.text()
+        # 发送信号，让子线程开始登录 json.dumps 转换字典为字符串
+        self.login_thread.start_login_signal.emit(
+            json.dumps({"user_name": user_name, "password": password}))
+
+    def login_status(self, status):
+        print("status.....", status)
+        status_dict = json.loads(status)
+        self.text_browser.setText(status_dict.get('errmsg'))
+        self.text_browser.repaint()
+
+
+if __name__ == "__main__":
+    app = QApplication(sys.argv)
+
+    # 实例化类
+    w = MyWindow()
+    # 显示窗口
+    w.ui.show()
+    # w.show()
+
+    app.exec()
+
+```
+

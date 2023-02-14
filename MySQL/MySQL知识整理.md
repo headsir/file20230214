@@ -124,10 +124,6 @@ UTF8MB4支持4字节，常见就是Emoji表情的存储；
 *DESC <表名> 【查看表结构】 http://c.biancheng.net/view/7199.html
 ```
 
-
-
-
-
 ## 3.1 表连接
 
 INNER JOIN（内连接,或等值连接）：获取两个表中字段匹配关系的记录。同WHERE表关联
@@ -139,8 +135,6 @@ RIGHT JOIN（右连接）： 与 LEFT JOIN 相反，用于获取右表所有记�
 select * from 左表 as left_table left join 右表 as right_table on left_table.dept_id = right_table.id
 
 WHERE表关联 select * from person as left_table,dept as right_table where left_table.dept_id = right_table.id;
-
-
 
 ## 3.2 查询
 
@@ -171,8 +165,6 @@ from tble;
 ```
 
 ## 3.3 更新
-
-
 
 ```SQL
 *更新数据 	UPDATE 表名 SET 更新列名=更新值
@@ -570,8 +562,6 @@ escaped by '"'
 lines terminated by '\r\n';
 ```
 
-
-
 ## 3.8 触发器
 
 ### 3.8.1 触发器语法
@@ -628,9 +618,6 @@ delimiter ;
       INSERT INTO student_copy1(`stu_id`, `stu_name`, `stu_gender`, `stu_age`) VALUES (new.`stu_id`, new.`stu_name`, new.`stu_gender`, new.`stu_age`);
   end
   ```
-
-  
-
 
 
 # 四、SQL中的流程控制

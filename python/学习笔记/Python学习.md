@@ -104,7 +104,14 @@ D:\ProgramData\anaconda3\Scripts;
 # @Time    : ${DATE} ${TIME}
 # @Author  : 978345836@qq.com
 # @Software: win11 python3.9
-# @Describe: 
+# @Version : 1.0
+# @Describe: None
+
+"""
+程序说明：
+    功能：
+"""
+# here put the import lib
 
 def execute(**kw):
     """

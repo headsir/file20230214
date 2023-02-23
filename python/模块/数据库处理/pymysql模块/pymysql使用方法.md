@@ -141,9 +141,9 @@ class Model(object):
             print(error)
 
     # 增删改的方法
-    def change(self, sql):
+    def change(self, sql,data=None):
         try:
-            self.__execute(sql)
+            self.__execute(sql,data)
             self.connection.commit()
             return "执行成功"
         except Exception as error:

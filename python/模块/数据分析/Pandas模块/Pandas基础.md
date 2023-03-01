@@ -1349,8 +1349,6 @@ df_consume.dtypes
   data..apply(lambda x: format(x, '.2%'))
   ```
 
-  
-
 - 对于==时间==类型，经常会需要转换为字符串类型进行显示；
 
 - 对于==空值==，可以通过 `na_rep` 参数来设置显示内容；

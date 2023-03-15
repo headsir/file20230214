@@ -261,7 +261,6 @@ DROP TABLE 表名  【删除数据表】
 ```SQL
 *创建数据表 CREATE TABLE IF NOT EXISTS (相关设置)
 
-
 CREATE TABLE IF NOT EXISTS 表名(
 id INT UNSIGNED AUTO_INCREMENT(自增) COMMENT '主键id',
 列名 字符类型(大小) 是否为空（NOT NULL) COMMENT (注释),

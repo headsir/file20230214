@@ -16,7 +16,8 @@
 
 ```
 import requests
-
+import random
+import time
 
 import re
 
@@ -37,6 +38,11 @@ for png_name, png1 in result:
     print(png_name, png)
     with open('D:/桌面/1/'+ png_name + '.png', 'wb') as v:
         try:
+        	# ===随机生产爬虫时间间隔==
+        	a = random.uniform(0.01, 0.1)
+            print(a)
+            time.sleep(a)
+            # =====================
             v.write(requests.get(url = png, headers=headers).content)
 
         except Exception as e:

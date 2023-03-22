@@ -195,12 +195,6 @@ def data_export_mysql(data, mysql, msql_sheet):
 
 
 
-
-
-
-
-
-
 ```
 # 构造SQL语句列
 traffic_columns = "`,`".join(list(traffic.columns))

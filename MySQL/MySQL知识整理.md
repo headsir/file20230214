@@ -561,6 +561,21 @@ escaped by '"'
 lines terminated by '\r\n';
 ```
 
+### 3.7.17 分组排序-row_number() over (）
+
+```
+SELECT*,row_number() over ( PARTITION BY t.`站址所属地市` ORDER BY t.`产品服务费合计（出账费用）（不含税）` DESC ) AS rn 
+	FROM
+		`铁塔费用_原始数据v1` AS t 
+	WHERE
+		t.`账期月份` = "202212"
+
+/*
+row_number() OVER (PARTITION BY COL1 ORDER BY COL2 DESC) 
+表示根据COL1分组，在分组内部根据 COL2排序，而此函数计算的值就表示每组内部排序后的顺序编号（组内连续的唯一的)
+*/
+```
+
 ## 3.8 触发器
 
 ### 3.8.1 触发器语法
@@ -617,23 +632,6 @@ delimiter ;
       INSERT INTO student_copy1(`stu_id`, `stu_name`, `stu_gender`, `stu_age`) VALUES (new.`stu_id`, new.`stu_name`, new.`stu_gender`, new.`stu_age`);
   end
   ```
-
-## 3.9 分组排序-row_number() over (）
-
-```
-SELECT*,row_number() over ( PARTITION BY t.`站址所属地市` ORDER BY t.`产品服务费合计（出账费用）（不含税）` DESC ) AS rn 
-	FROM
-		`铁塔费用_原始数据v1` AS t 
-	WHERE
-		t.`账期月份` = "202212"
-
-/*
-row_number() OVER (PARTITION BY COL1 ORDER BY COL2 DESC) 
-表示根据COL1分组，在分组内部根据 COL2排序，而此函数计算的值就表示每组内部排序后的顺序编号（组内连续的唯一的)
-*/
-```
-
-
 
 # 四、SQL中的流程控制
 

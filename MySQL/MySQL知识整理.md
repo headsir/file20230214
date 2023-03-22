@@ -618,6 +618,22 @@ delimiter ;
   end
   ```
 
+## 3.9 分组排序-row_number() over (）
+
+```
+SELECT*,row_number() over ( PARTITION BY t.`站址所属地市` ORDER BY t.`产品服务费合计（出账费用）（不含税）` DESC ) AS rn 
+	FROM
+		`铁塔费用_原始数据v1` AS t 
+	WHERE
+		t.`账期月份` = "202212"
+
+/*
+row_number() OVER (PARTITION BY COL1 ORDER BY COL2 DESC) 
+表示根据COL1分组，在分组内部根据 COL2排序，而此函数计算的值就表示每组内部排序后的顺序编号（组内连续的唯一的)
+*/
+```
+
+
 
 # 四、SQL中的流程控制
 

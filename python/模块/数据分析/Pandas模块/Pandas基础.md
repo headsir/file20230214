@@ -1856,9 +1856,18 @@ query()的第二个参数 inplace 默认 false
     # 提取2021年8月订购日为15或以上的所有订单
     df.query("OrderDate.dt.month == 8 and OrderDate.dt.year == 2021 and OrderDate.dt.day >=15")
     
-    # 直接传递一个符合日期格式的字符串，它会自动的转换并且比较
+    # 直接传递一个符合日期格式的字符串，它会自动的转换并且比较，日期格式必须为 XXXX-XX-XX
     df.query("OrderDate >= '2021-08-15' and OrderDate <= '2021-08-31'")
     ```
+
+笔记：
+
+@变量 、 notna() 非空、isna()空值
+
+```
+df = df_01.query("日期>=@date1  and 日期<=@date2  and 客服口径 == 1 and 业务地市.notna()")
+```
+
 
 
 ### 5.16 获取最大值索引

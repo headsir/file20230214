@@ -576,6 +576,25 @@ row_number() OVER (PARTITION BY COL1 ORDER BY COL2 DESC)
 */
 ```
 
+### 3.7.18 行列转置
+
+```
+SELECT 
+	SUM(CASE xs.`系数类型` WHEN '成本加成率' THEN xs.系数   END) AS '成本加成率',
+	SUM(CASE xs.`系数类型` WHEN '折损率' THEN xs.系数	  END)  AS '折损率'	,	
+	SUM(CASE xs.`系数类型` WHEN '存量折扣' THEN xs.系数	  END)  AS '存量折扣'	,	
+	SUM(CASE xs.`系数类型` WHEN '续签优惠' THEN xs.系数	  END)  AS '续签优惠'	
+FROM `铁塔费用_折扣系数表v1` AS xs
+```
+
+转置前：
+
+![image-20230403172123045](imge/MySQL知识整理.assets/image-20230403172123045.png)
+
+转置后：
+
+![image-20230403172022388](imge/MySQL知识整理.assets/image-20230403172022388.png)
+
 ## 3.8 触发器
 
 ### 3.8.1 触发器语法

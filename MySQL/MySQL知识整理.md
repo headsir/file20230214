@@ -578,7 +578,7 @@ row_number() OVER (PARTITION BY COL1 ORDER BY COL2 DESC)
 
 ### 3.7.18 行列转置
 
-```
+```mysql
 SELECT 
 	SUM(CASE xs.`系数类型` WHEN '成本加成率' THEN xs.系数   END) AS '成本加成率',
 	SUM(CASE xs.`系数类型` WHEN '折损率' THEN xs.系数	  END)  AS '折损率'	,	

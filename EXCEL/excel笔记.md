@@ -29,3 +29,5 @@ Ctrl + PgUp / Ctrl + PgDn
 ### 5、根据指标线性排名
 
 ![image-20230417182050087](imge/excel笔记.assets/image-20230417182050087.png)
+
+![image-20230417183521185](imge/excel笔记.assets/image-20230417183521185.png)

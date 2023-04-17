@@ -22,6 +22,10 @@
 | ‘=MATCH(A10,A1:A7,0） | 提取A1:A7区域，A10内容所在行 |
 | ’=MATCH(A11,A1:E1,0)  | 提取A1:E1区域，A11内容所在列 |
 
-## 4、快捷sheet翻页
+### 4、快捷sheet翻页
 
 Ctrl + PgUp / Ctrl + PgDn
+
+### 5、根据指标线性排名
+
+![image-20230417182050087](imge/excel笔记.assets/image-20230417182050087.png)

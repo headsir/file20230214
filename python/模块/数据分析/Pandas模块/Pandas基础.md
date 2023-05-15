@@ -2169,7 +2169,7 @@ df2.to_excel(writer,sheet_name = "df7",index = False)
 df3.to_excel(writer,sheet_name = "df6",index = False)
 writer.save()
 
-# 推进使用：
+# 推荐使用：
 book = load_workbook(path_file)  # 保存Excel表原始数据
 with pd.ExcelWriter(path_file, engine="openpyxl") as writer:
     writer.book = book

@@ -31,7 +31,7 @@ pipenv --python 3.7  # 也可指定具体版本
 pipenv install -e . "" # 安装本地包到虚拟环境
 pipenv install 模块  # 模块安装
 pipenv install --dev  # 安装所有依赖
-pipenv install -r requirements.txt  # 导入requirements.txt
+pipenv install -r requirements.txt  # 导入requirements.txt 需要转码为UTF-8
 
 华为镜像源  https://mirrors.huaweicloud.com/
 阿里云 http://mirrors.aliyun.com/pypi/simple/

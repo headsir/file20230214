@@ -1,5 +1,19 @@
 # Datetime 基础
 
+Datetime子模块
+
+```
+import time as _time
+import math as _math
+import sys
+```
+
+time模块介绍：
+
+[ee]<./../../底层模块/Datetime_time.md>
+
+
+
 # 一、获取当前时刻的时间
 
 ## 1.1、返回当前时刻的日期和时间

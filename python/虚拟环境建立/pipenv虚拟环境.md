@@ -16,12 +16,12 @@
 
 ```
 # 创建虚拟环境
-pipenv install
+pipenv install 
 
 pipenv --python 3.7  # 也可指定具体版本
 ```
 
-说明：会自动更新配置文件
+说明：会自动更新配置文件(安装pipfile里面的模块)
 
 ### 3、虚拟环境包管理
 
@@ -68,7 +68,7 @@ pipenv  uninstall --all  # 卸载全部包
 方法1：pipenv run pip freeze > requirements.txt # 相当于【pipenv run pip freeze】
 方法2：pipenv lock -r > requirements.txt
 
-导出开发用的包：pipenv lock -r --dev
+导出开发用的包：pipenv lock -r --dev > requirements.txt
 ```
 
 #### 3.5 其它

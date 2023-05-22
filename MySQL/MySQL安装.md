@@ -60,6 +60,8 @@ regedit注册表
 
 ![image-20220723161954201](imge/MySQL安装.assets/image-20220723161954201.png)
 
+![image-20230522111653426](imge/MySQL安装.assets/image-20230522111653426.png)
+
 ## 5、获取初始密码，以管理员的身份打开cmd命令窗口
 
 使用mysqld --initialize --console命令，生成随机密码  qazwsx

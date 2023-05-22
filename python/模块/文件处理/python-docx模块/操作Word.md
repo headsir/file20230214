@@ -2,6 +2,8 @@
 
 来源：https://www.bilibili.com/video/BV1FC4y1Y7QC?p=2
 
+来源：https://zhuanlan.zhihu.com/p/423704887
+
 安装模块
 
 ```
@@ -9,6 +11,10 @@ pip install python-docx
 ```
 
 # 基础知识
+
+- `Document`：是一个 Word 文档 对象，是独立的，打开不同的 Word 文档，就会有不同的 Document 对象，相互之间没有影响
+- `Paragraph`：是段落，一个 Word 文档由多个段落组成，当在文档中输入一个回车键，就会成为新的段落，输入 shift + 回车，不会分段
+- `Run` 表示一个节段，每个段落由多个 节段 组成，一个段落中具有相同样式的连续文本，组成一个节段，所以一个 段落 对象有个 Run 列表
 
 ```
 from docx import Document

@@ -197,7 +197,7 @@ WHERE d.pci is null and d.`经度` is null
 ## 3.4 添加数据
 
 两者的主要区别为：
- **select into from \**： 要求\**目标表不存在**。
+ **select into from ： 要求目标表不存在**。
 
 即，查询出来结果-->复制一张同结构的空表-->将数据拷贝进去。
 

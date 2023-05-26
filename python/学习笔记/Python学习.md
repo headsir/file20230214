@@ -2,7 +2,9 @@ Python ==**官方文档**== https://docs.python.org/zh-cn/3.11/archives/python-3
 
 ==简明== Python 教程http://home.ustc.edu.cn/~hyx/bak/python/index.html
 
-孙兴华==办公自动化==https://www.bilibili.com/video/BV1gt4y1D7W8?p=2&vd_source=d6c3edd9a4f6205095ccfba6b2a61eec
+孙兴华==办公自动化视频==https://www.bilibili.com/video/BV1gt4y1D7W8?p=2&vd_source=d6c3edd9a4f6205095ccfba6b2a61eec
+
+孙兴华==课件==http://721p.ysepan.com/
 
 # 一、安装Python
 
@@ -853,8 +855,10 @@ Usage: thingy [OPTIONS]
 """)
 ```
 
--  取消 print 函数换行符 `print(“====”,end=' ')`
--  print 函数字符连接符 `print(“====”,"ddd",sep=';')`
+-   print 函数结束符，默认end = “\n” ,`print(“====”,end='\n')`
+-  print 函数字符分割符，默认sep=“ ”, `print(“====”,"ddd",sep=';')`
+-  连接符：+
+-  复制符：*
 
 ## 4.18 enumerate() 函数
 

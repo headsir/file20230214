@@ -8,6 +8,9 @@
 
 ```
 pip install python-docx
+
+安装测试
+python -c 'import docx'
 ```
 
 # 基础知识

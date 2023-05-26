@@ -24,7 +24,7 @@ my.ini
 ```
 [client]
 	# 设置mysql客户端默认字符集
-	default-character-set=utf8mb4
+	default-character-set=utf8mb4_general_ci
 [mysqld]
 	# 解除group_conca长度限制
 	group_concat_max_len=888888
@@ -38,6 +38,8 @@ my.ini
 	max_connections=200
 	# 服务端使用的字符集默认为8比特编码的latin1字符集
 	character-set-server=utf8mb4
+	collation-server=utf8mb4_general_ci
+	# init-connect='SET NAMES utf8mb4 COLLATE utf8mb4_general_ci '  无效
 	# 创建新表时将使用的默认存储引擎
 	default-storage-engine=INNODB
 	# BLOB配置
@@ -46,6 +48,11 @@ my.ini
 	interactive_timeout = 2880000
 	# 导出文件
 	secure_file_priv =
+	# 导入文件
+	local-infile=1
+	# 临时表的内存缓存大小设置
+	tmp_table_size = 10G
+	max_heap_table_size = 10G
 
 ```
 

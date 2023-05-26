@@ -606,6 +606,16 @@ FROM `铁塔费用_折扣系数表v1` AS xs
 
 ### 3.7.19 动态数据透视列创建数据透视表
 
+<font color="red">**数据太大，容易报错**</font>【The table 'C:\WINDOWS\TEMP\#sql5878_a_10' is full】
+
+ini文件配置：
+
+```
+# 临时表的内存缓存大小设置
+tmp_table_size = 10G
+max_heap_table_size = 10G
+```
+
 案例：
 
 1、创建表

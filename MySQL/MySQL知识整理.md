@@ -604,6 +604,51 @@ FROM `铁塔费用_折扣系数表v1` AS xs
 
 ![image-20230403172022388](imge/MySQL知识整理.assets/image-20230403172022388.png)
 
+### 3.7.19 动态数据透视列创建数据透视表
+
+案例：
+
+1、创建表
+
+```
+create table student(name varchar(20),subjectid int(10),marks int(10));
+```
+
+2、插入数据
+
+```
+insert into student values('Sam',1,70);
+insert into student values('Sam',2,77);
+insert into student values('Sam',3,71);
+insert into student values('Sam',4,70);
+insert into student values('Sam',1,99);
+insert into student values('John',1,89);
+insert into student values('John',2,87);
+insert into student values('John',3,88);
+insert into student values('John',4,89);
+insert into student values('Martin',1,60);
+insert into student values('Martin',2,47);
+insert into student values('Martin',3,68);
+insert into student values('Martin',4,39);
+```
+
+3、创建透视表
+
+```
+SET @sql = NULL;
+SELECT
+GROUP_CONCAT(DISTINCT 
+				CONCAT(
+ 					' MAX(CASE WHEN subjectid = ', subjectid, ' THEN marks ELSE 0 END)
+ 				AS "', subjectid, '"')
+			)
+INTO @sql FROM student;
+SET @sql = CONCAT('SELECT name, ', @sql, ' FROM student GROUP BY name');
+PREPARE stmt FROM @sql;
+EXECUTE stmt;
+DEALLOCATE PREPARE stmt;
+```
+
 ## 3.8 触发器
 
 ### 3.8.1 触发器语法

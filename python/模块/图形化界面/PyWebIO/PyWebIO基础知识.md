@@ -240,3 +240,120 @@ password = output.put_text("Input password")
 `pywebio.platform.tornado.start_server`(*applications*, *port=0*, *host=''*, *debug=False*, *cdn=True*, *static_dir=None*, *remote_access=False*, *reconnect_timeout=0*, *allowed_origins=None*, *check_origin=None*, *auto_open_webbrowser=False*, *max_payload_size='200M'*, ***tornado_app_settings*)
 
 # 六、持续性输入
+
+# 案例：
+
+```
+from pywebio.input import input, FLOAT
+from pywebio.output import put_text
+
+def bmi():
+    height = input("请输入你的身高(cm)：", type=FLOAT)
+    weight = input("请输入你的体重(kg)：", type=FLOAT)
+
+    BMI = weight / (height / 100) ** 2
+
+    top_status = [(14.9, '极瘦'), (18.4, '偏瘦'),
+                  (22.9, '正常'), (27.5, '过重'),
+                  (40.0, '肥胖'), (float('inf'), '非常肥胖')]
+
+    for top, status in top_status:
+        if BMI <= top:
+            put_text('你的 BMI 值: %.1f，身体状态：%s' % (BMI, status))
+            break
+
+if __name__ == '__main__':
+    bmi()
+```
+
+```
+import pywebio
+from pywebio.input import *
+from pywebio.output import *
+from pywebio import start_server
+import pywebio.pin as pin
+from pywebio.session import hold
+import pandas as pd
+from functools import partial
+
+
+def read_file(filename):
+
+    if filename.endswith('xlsx'):
+        df = pd.read_excel(filename)
+
+    elif filename.endswith('csv'):
+        df = pd.read_csv(filename)
+    return df
+
+
+def chongfu(df, res_table):
+    df1 = df[df.国家奥委会.duplicated() == True]
+
+    put_scrollable(res_table,horizon_scroll=True)
+    res_table.reset(put_html(df1.to_html(border=0)))
+
+def chongfuchuli(df, res_table):
+
+    df1 = df.drop_duplicates()
+
+    put_scrollable(res_table,horizon_scroll=True,height=450)
+    res_table.reset(put_html(df1.to_html(border=0)))
+
+def chaxun(res_table,df, key):
+
+
+    res_table.reset()
+    put_scrollable(res_table,horizon_scroll=True,height=450)
+
+    df1 = df[df['国家奥委会'] == key]
+    res_table.reset(put_html(df1.to_html(border=0)))
+
+def other():
+    popup('功能未开发', [
+
+        put_html(f'啊哦，这个按钮的功能还没有开发，你可以仿照上面代码补充该功能'),
+        put_text('\n'),
+        put_buttons(['关闭'], onclick=lambda _: close_popup())
+    ])
+
+
+def dataquery():
+    '''
+    数据查询系统 - 早起Python    '''
+
+    put_markdown('# xx数据查询系统 - 早起Python')
+    file = file_upload('请选择需要加载的数据')
+    df = read_file(file['filename'])
+
+
+    put_markdown('## 数据处理')
+    put_markdown('下面是一些常见的数据处理操作，点击对应按钮实现不同操作')
+
+    res_table = output()
+
+    put_buttons(['检查重复值','删除重复值','检查缺失值','删除缺失值','检查异常值','删除异常值'], onclick=[
+        lambda: chongfu(
+                df,
+                res_table),
+        lambda: chongfuchuli(
+            df,
+            res_table),
+        lambda: other(),
+        lambda: other(),
+        lambda: other(),
+        lambda: other()])
+
+    put_markdown('## 数据查询')
+    pin.put_input('res', label='请在下方输入框要查询的关键字', type=TEXT)
+    put_buttons(['提交查询'], lambda _: chaxun(res_table,df,pin.pin['res']))
+    put_scrollable(res_table, horizon_scroll=True,height=450)
+    res_table.reset(put_html(df.to_html(border=0)))
+
+
+
+if __name__ == '__main__':
+
+    start_server(dataquery, port=9999,auto_open_webbrowser=True)
+```
+

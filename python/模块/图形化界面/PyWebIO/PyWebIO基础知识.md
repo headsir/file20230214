@@ -117,13 +117,15 @@ age = input("How old are you?", type="number", validate=check_age)
 
 - **help_text** (*str*) – 输入框的帮助文本。帮助文本会以小号字体显示在输入框下方
 
-- **other_html_attrs** – 在输入框上附加的额外html属性。参考： [https://developer.mozilla.org/zh-CN/docs/Web/HTML/Element/input#%E5%B1%9E%E6%80%A7](https://developer.mozilla.org/zh-CN/docs/Web/HTML/Element/input#属性)
+- **other_html_attrs** – 在输入框上附加的额外html属性。参考： [参考](https://developer.mozilla.org/zh-CN/docs/Web/HTML/Element/input#属性)
 
 ## 2.2 其它参考官方文档
 
 # 三、输出函数
 
 模块：pywebio.output.对应功能
+
+[教程](https://blog.csdn.net/heianduck/article/details/121745458)
 
 ```
 # 文本输出

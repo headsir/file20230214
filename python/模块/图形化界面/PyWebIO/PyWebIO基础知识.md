@@ -616,6 +616,16 @@ password = output.put_text("Input password")
 
 `pywebio.platform.tornado.start_server`(*applications*, *port=0*, *host=''*, *debug=False*, *cdn=True*, *static_dir=None*, *remote_access=False*, *reconnect_timeout=0*, *allowed_origins=None*, *check_origin=None*, *auto_open_webbrowser=False*, *max_payload_size='200M'*, ***tornado_app_settings*)
 
+## 5.3 启动服务
+
+```
+# 通过局域网连接网页
+# remote_access,否启用远程访问,reconnect_timeout=1 服务器异常停止可以自动启动,
+# auto_open_webbrowser=False   开启服务时，是否自动打开浏览器。默认false
+# max_payload_size 设置Web框架允许上传的最大文件大小
+web.start_server(bmi, debug=True, port=1122, remote_access=True, auto_open_webbrowser=True, max_payload_size="2G")
+```
+
 # 六、持续性输入
 
 

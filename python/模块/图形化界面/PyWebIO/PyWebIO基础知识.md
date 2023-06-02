@@ -431,6 +431,65 @@ for img in imgs:
 
 - *label, name, help_text, other_html_attrs (-)* – 与 *`input`* 输入函数的同名参数含义一致
 
+## 2.9 input_group 输入组
+
+- label (str) – 输入组标签
+
+- inputs (list) – 输入项列表。列表的内容为对单项输入函数的调用，并在单项输入函数中传入 name 参数。
+
+- validate (callable) – 输入组校验函数。
+
+- 函数签名：callback(data) -> (name, error_msg) validate 接收整个表单的值为参数，当校验表单值有效时，返回 *`None`* ，当某项输入值无效时，返回出错输入项的 *`name`* 值和错误提示. 比如:
+
+  ```
+  def check_form(data):
+      if len(data['name']) > 6:
+          return ('name', 'Name to long!')
+      if data['age'] <= 0:
+          return ('age', 'Age cannot be negative!')
+  
+  data = input_group("Basic info", [
+      input('Input your name', name='name'),
+      input('Repeat your age', name='age', type=NUMBER)
+  ], validate=check_form)
+  print(data)
+  ```
+
+  ![image-20230602172233918](imge/PyWebIO基础知识.assets/image-20230602172233918.png)
+
+- cancelable - 表单是否可以取消。若 *`cancelable=True`* 则会在表单底部显示一个“取消”按钮，默认为 *`False`* 。 
+
+注意：若 *`inputs`* 中最后一项输入为 *`actions()`*，则忽略 `*cancelable*。`若用户取消表单，返回 *`None`* ,否则返回一个 *`dict`* , 其键为输入项的 *`name`* 值，字典值为输入项的值。
+
+## 2.10 input_update 更新输入项的属性
+
+本函数仅能在输入函数的 *`onchange`* 回调中使用。
+
+- name (str) – 目标输入项的 `name` 。可选，默认为当前触发 *`onchange`* 回调的输入项
+
+- spec – 需要更新的输入项参数。注意一下参数无法被更新：*`type`, `name`, `validate`, `action`, `code`, `onchange`, `multiple`*
+
+- 一个具有依赖关系的输入项的示例：
+
+  ```
+  country2city = {
+      'China': ['Beijing', 'Shanghai', 'Hong Kong'],
+      'USA': ['New York', 'Los Angeles', 'San Francisco'],
+  }
+  countries = list(country2city.keys())
+  location = input_group("Select a location", [
+      select('Country', options=countries, name='country',
+             onchange=lambda c: input_update('city', options=country2city[c])),
+      select('City', options=country2city[countries[0]], name='city'),
+  ])
+  
+  print(location)
+  ```
+
+  ![image-20230602172730208](imge/PyWebIO基础知识.assets/image-20230602172730208.png)
+
+
+
 
 
 
@@ -558,6 +617,14 @@ password = output.put_text("Input password")
 `pywebio.platform.tornado.start_server`(*applications*, *port=0*, *host=''*, *debug=False*, *cdn=True*, *static_dir=None*, *remote_access=False*, *reconnect_timeout=0*, *allowed_origins=None*, *check_origin=None*, *auto_open_webbrowser=False*, *max_payload_size='200M'*, ***tornado_app_settings*)
 
 # 六、持续性输入
+
+
+
+
+
+
+
+
 
 # 案例：
 

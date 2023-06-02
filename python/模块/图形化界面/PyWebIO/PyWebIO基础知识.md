@@ -2,6 +2,8 @@
 
 [使用手册]<https://pywebio.readthedocs.io/zh_CN/latest/index.html>
 
+[学习参考](https://blog.csdn.net/heianduck/category_11524086.html?spm=1001.2014.3001.5482)
+
 # 一、模块安装
 
 稳定版:

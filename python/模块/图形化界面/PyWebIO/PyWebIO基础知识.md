@@ -42,7 +42,7 @@ password = input("Input password", type=PASSWORD)
 | `input_group`  | 输入组       | `pywebio.input.input_group`(*label=''*, *inputs=None*, *validate=None*, *cancelable=False*) |
 | `input_update` | 更新输入项   | `pywebio.input.input_update`(*name=None*, ***spec*)          |
 
-## 2.1 input参数
+## 2.1 input-文本输入
 
 - **label** (*str*) – 输入框标签
 
@@ -61,12 +61,22 @@ def check_age(p):  # return None when the check passes, otherwise return the err
     if p > 60:
         return 'Too old!!'
 
-age = input("How old are you?", type="number", validate=check_age)
+age = input("How old are you?", type=NUMBER, validate=check_age)
 ```
+
+![image-20230602143349846](imge/PyWebIO基础知识.assets/image-20230602143349846.png)
+
+![image-20230602143440273](imge/PyWebIO基础知识.assets/image-20230602143440273.png)
 
 - **name** (*str*) – 输入框的名字。与 [`input_group`](about:reader?url=https%3A%2F%2Fpywebio.readthedocs.io%2Fzh_CN%2Flatest%2Finput.html#pywebio.input.input_group) 配合使用，用于在输入组的结果中标识不同输入项。  **在单个输入中，不可以设置该参数！**
 
 - **value** (*str*) – 输入框的初始值
+
+  ```
+  age = input("Input your age", value="请输入你的年龄")
+  ```
+
+  ![image-20230602143650766](imge/PyWebIO基础知识.assets/image-20230602143650766.png)
 
 - **action** (*tuple**(**label:str**,* *callback:callable**)*) –在输入框右侧显示一个按钮，用户可通过点击按钮为输入框设置值。
 
@@ -76,32 +86,43 @@ age = input("How old are you?", type="number", validate=check_age)
 
   单参数调用时，签名为 `set_value(value:str)` ，调用set_value即可将表单项的值设置为传入的 `value` 参数。
 
-  双参数调用时，签名为 `set_value(value:any, label:str)` ，其中：
-
-  > - `value` 参数为最终输入项的返回值，可以为任意Python对象，并不会传递给用户浏览器
-  > - `label` 参数用于显示在用户表单项上
-
-  使用双参数调用 `set_value` 后，用户表单项会变为只读状态。
-
-  双参数调用的使用场景为：表单项的值通过回调动态生成，同时希望用户表单显示的和实际提交的数据不同(例如表单项上可以显示更人性化的内容，而表单项的值则可以保存更方便被处理的对象)
-
   ```
   import time
   def set_now_ts(set_value):
-      set_value(int(time.time()))
+      set_value(time.strftime("%Y-%M-%D %H:%S:%M",time.localtime()))
   
-  ts = input('Timestamp', type="number", action=('Now', set_now_ts))
-  from datetime import date,timedelta
-  def select_date(set_value):
-      with popup('Select Date'):
-          put_buttons(['Today'], onclick=[lambda: set_value(date.today(), 'Today')])
-          put_buttons(['Yesterday'], onclick=[lambda: set_value(date.today() - timedelta(days=1), 'Yesterday')])
-  
-  d = input('Date', action=('Select', select_date), readonly=True)
-  put_text(type(d), d)
+  ts = input('Timestamp', type=TEXT, action=('Now', set_now_ts))
   ```
 
-  Note: 当使用 [基于协程的会话实现](https://pywebio.readthedocs.io/zh_CN/latest/advanced.html#coroutine-based-session) 时，回调函数 `callback` 可以为协程函数.
+  ![image-20230602144615321](imge/PyWebIO基础知识.assets/image-20230602144615321.png)
+
+> 点击==Now==,获取当前时间
+>
+> 点击==提交==，当前字符串赋值给ts变量
+
+双参数调用时，签名为 `set_value(value:any, label:str)` ，其中：
+
+> - `value` 参数为最终输入项的返回值，可以为任意Python对象，并不会传递给用户浏览器
+> - `label` 参数用于显示在用户表单项上
+
+使用双参数调用 `set_value` 后，用户表单项会变为只读状态。
+
+双参数调用的使用场景为：表单项的值通过回调动态生成，同时希望用户表单显示的和实际提交的数据不同(例如表单项上可以显示更人性化的内容，而表单项的值则可以保存更方便被处理的对象)
+
+```
+from datetime import date,timedelta
+def select_date(set_value):
+    with popup('Select Date'):
+        put_buttons(['Today'], onclick=[lambda: set_value(date.today(), 'Today')])
+        put_buttons(['Yesterday'], onclick=[lambda: set_value(date.today() - timedelta(days=1), 'Yesterday')])
+
+d = input('Date', action=('Select', select_date), readonly=True)
+put_text(type(d), d)
+```
+
+![image-20230602145735173](imge/PyWebIO基础知识.assets/image-20230602145735173.png)
+
+Note: 当使用 [基于协程的会话实现](https://pywebio.readthedocs.io/zh_CN/latest/advanced.html#coroutine-based-session) 时，回调函数 `callback` 可以为协程函数.
 
 - **onchange** (*callable*) – 
 
@@ -110,6 +131,18 @@ age = input("How old are you?", type="number", validate=check_age)
   `onchange` 回调函数接收一个参数——输入项改变后的值。 `onchange` 的典型用途是配合 [`input_update()`](about:reader?url=https%3A%2F%2Fpywebio.readthedocs.io%2Fzh_CN%2Flatest%2Finput.html#pywebio.input.input_update) 来在一个表单中实现相互依赖的输入。
 
 - **placeholder** (*str*) – 输入框的提示内容。提示内容会在输入框未输入值时以浅色字体显示在输入框中
+
+  ```
+  import time
+  
+  def set_now_ts(set_value):
+      set_value(time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()))
+  
+  ts = input('Timestamp', type=TEXT, action=('Now', set_now_ts), 
+  			placeholder="点击右边就能看到现在时间哦~",help_text="小鲁班,哒哒哒")
+  ```
+
+  ![image-20230602151346565](imge/PyWebIO基础知识.assets/image-20230602151346565.png)
 
 - **required** (*bool*) – 当前输入是否为必填项，默认为 `False`
 
@@ -120,6 +153,287 @@ age = input("How old are you?", type="number", validate=check_age)
 - **help_text** (*str*) – 输入框的帮助文本。帮助文本会以小号字体显示在输入框下方
 
 - **other_html_attrs** – 在输入框上附加的额外html属性。参考： [参考](https://developer.mozilla.org/zh-CN/docs/Web/HTML/Element/input#属性)
+
+## 2.2 textarea-多行文本输入
+
+- rows (*int* ) – 输入框的最多可显示的文本的行数，内容超出时会显示滚动条
+
+- maxlength (*int* ) – 最大允许用户输入的字符长度 (Unicode) 。未指定表示无限长度
+
+- minlength (*int* ) – 最少需要用户输入的字符长度(Unicode)
+
+- code (*dict/bool* ) – 通过提供 Codemirror 参数让文本输入域具有代码编辑器样式:
+
+  ```
+  可以直接使用 code={} 或 code=True 开启代码编辑样式。代码编辑区支持使用 Esc 或 F11 切换全屏。
+    label, validate, name, value, onchange, placeholder, required, readonly, help_text, other_html_attrs (-) – 与 input 输入函数的同名参数含义一致。
+  ```
+
+  ```
+  res = textarea('Text area', code={
+      'mode': "python",
+      'theme': 'darcula'
+  })
+  ```
+
+  
+
+  ![image-20230602152313154](imge/PyWebIO基础知识.assets/image-20230602152313154.png)
+
+## 2.3 select-下拉选择框
+
+options (*list* ) – 可选项列表。列表项的可用形式有：   
+
+字典
+
+```
+    {
+    "label":(str) 选项标签,
+    "value":(object) 选项值,
+    "selected":(bool, optional) 是否默认选中,
+    "disabled":(bool, optional) 是否禁止选中
+    }
+```
+
+tuple or list: (label, value, [selected,] [disabled])
+
+- 单值: 此时*label*和*value*使用相同的值
+
+  ```
+  res = select("看你的选择：", ["A", "B"])
+  A
+  ```
+
+  ![image-20230602153624983](imge/PyWebIO基础知识.assets/image-20230602153624983.png)
+
+  ```
+  # # 列表
+  # res = select(label="dda", 
+  # options=[['dd', 'dd', True, True],['ee', 'ee', False, False],['ff', 'ff', False, True]])
+  # 
+  # # 元组
+  # res = select(label="dda", 
+  # options=[('dd', 'dd', True, True),('ee', 'ee', False, False),('ff', 'ff', False, True)])
+  # 字典
+  res = select(label="dda", options=[
+  {"label": 'dd', "value": 'dd', "selected": True, "disabled": True},
+  {"label": 'ee', "value": 'ee', "selected": False, "disabled": False},
+  {"label": 'ff', "value": 'ff', "selected": False, "disabled": True}
+  ])
+  ```
+
+  ![image-20230602154700280](imge/PyWebIO基础知识.assets/image-20230602154700280.png)
+
+- 多值
+
+  multiple (bool) – 是否可以多选. 默认单选 
+
+  value (list or str) – 下拉选择框初始选中项的值。当 *multiple=True* 时， *value* 需为*list*，否则为单个选项的值。 你也可以通过设置 *options* 列表项中的 *selected* 字段来设置默认选中选项。 最终选中项为 *value* 参数和 *options* 中设置的并集。
+
+  required (bool) – 是否至少选择一项，仅在 *multiple=True* 时可用
+
+  *label, validate, name, onchange, help_text, other_html_attrs (-)* – 与 *input* 输入函数的同名参数含义一致
+
+```
+res = select("我是多选：", ["A", "B", "C"], multiple=True, value=["A", "B"])
+```
+
+![image-20230602155555122](imge/PyWebIO基础知识.assets/image-20230602155555122.png)
+
+## 2.4 checkbox-勾选选项
+
+- options (list) – 可选项列表。格式与同 *select()* 函数的 *options* 参数
+
+- inline (bool) – 是否将选项显示在一行上。默认每个选项单独占一行
+
+  ```
+  check = checkbox("请大佬选择：",["小鲁班","小背包","哒哒哒","小火箭"])
+  
+  print(check)
+  ```
+
+  ![image-20230602155829993](imge/PyWebIO基础知识.assets/image-20230602155829993.png)
+
+- value (list) – 勾选选项初始选中项。为选项值的列表。你也可以通过设置 *options* 列表项中的 *selected* 字段来设置默认选中选项。
+
+  ```
+  check = checkbox("请大佬选择：",["小鲁班","小背包","哒哒哒","小火箭"],inline=True,value=['小鲁班'])
+  ```
+
+  ![image-20230602155945342](imge/PyWebIO基础知识.assets/image-20230602155945342.png)
+
+- *label, validate, name, onchange, help_text, other_html_attrs* (-) – 与 *input* 输入函数的同名参数含义一致
+
+## 2.5 radio 单项选择
+
+- options (list) – 可选项列表。格式与同 *select()* 函数的 *options* 参数
+- inline (bool) – 是否将选项显示在一行上。默认每个选项单独占一行
+- value (str) – 可选项列表。格式与同 *select()* 函数的 *options* 参数
+- required (bool) – 是否一定要选择一项（默认条件下用户可以不选择任何选项）
+- *label, validate, name, onchange, help_text, other_html_attrs (-)* – 与 *input* 输入函数的同名参数含义一致
+
+```
+check = radio("请大佬选择：", ["小鲁班", "小背包", "哒哒哒", "小火箭"], inline=True, value="小背包")
+print(check)
+```
+
+![image-20230602161252651](imge/PyWebIO基础知识.assets/image-20230602161252651.png)
+
+## 2.6 slider 滑块输入
+
+- value (int/float) – 滑块的初始值
+- min_value (int/float) – 滑块最小允许的值
+- max_value (int/float) – 滑块最大允许的值
+- step (int) – 滑动的步长。仅当 *value、 min_value* 和 *max_value* 全为*int*时有效
+- *label, name, validate, onchange, required, help_text, other_html_attrs (-)* – 与 *input* 输入函数的同名参数含义一致
+
+- 若 *value, min_value* 和 *max_value* 中含有*float*类型，则返回值为*float*，否则返回值为*int*类型
+
+  ```
+  check = slider(label="请选择数值：",value=5, min_value=1, max_value=100, step=1)
+  print(check)
+  ```
+
+  ![image-20230602161610187](imge/PyWebIO基础知识.assets/image-20230602161610187.png)
+
+## 2.7 actions 按钮选项
+
+在表单上显示为一组按钮，用户点击按钮后依据按钮类型的不同有不同的表现。
+
+buttons(list) - 按钮列表。列表项的可用形式有：
+
+字典
+
+```
+# 若 type = 'reset' / 'cancel' 或 disabled = True 可省略 value
+{
+"label":(str) button label,
+"value":(object) button value,
+"type":(str, optional) button type,
+"disabled":(bool, optional) whether the button is disabled,
+"color":(str, optional) button color
+}
+```
+
+ tuple or list: (label, value, [type], [disabled])
+
+- 单值: 此时*label*和*value*使用相同的值， 其中， *value* 可以为任意可*JSON*序列化的对象。
+
+  ```
+  # 简单的操作
+  check = actions('Confirm to delete file?', ['confirm', 'cancel'],
+                  help_text='Unrecoverable after file deletion')
+  
+  put_markdown('You clicked the `%s` button' % check).show()
+  ```
+
+  ![image-20230602162911751](imge/PyWebIO基础知识.assets/image-20230602162911751.png)
+
+  ![image-20230602162931650](imge/PyWebIO基础知识.assets/image-20230602162931650.png)
+
+  ```
+  type 可选值为:
+  'submit' : 点击按钮后，立即将整个表单提交，最终表单中本项的值为被点击按钮的 value 值。 'submit' 为 type 的默认值
+  'cancel' : 取消输入。点击按钮后，立即将整个表单提交，表单值返回 None
+  'reset' : 点击按钮后，将整个表单重置，输入项将变为初始状态。 注意：点击 type=reset 的按钮后，并不会提交表单， actions() 调用也不会返回
+  The color of button can be one of: primary, secondary, success, danger, warning, info, light, dark.
+  ```
+
+- *label, name, help_text (-)* – 与 *input* 输入函数的同名参数含义一致
+
+```
+info = input_group('Add user', [
+    input('username', type=TEXT, name='username', required=True),
+    input('password', type=PASSWORD, name='password', required=True),
+    actions('actions', [
+        {'label': 'Save', 'value': 'save'},
+        {'label': 'Save and add next', 'value': 'save_and_continue'},
+        {'label': 'Reset', 'type': 'reset', 'color': 'warning'},
+        {'label': 'Cancel', 'type': 'cancel', 'color': 'danger'},
+    ], name='action', help_text='actions'),
+])
+
+put_code('info = ' + json.dumps(info, indent=4))
+if info is not None:
+    if info['action'] == 'save_and_continue':
+        print(info)
+```
+
+![image-20230602163851524](imge/PyWebIO基础知识.assets/image-20230602163851524.png)
+
+## 2.8 file_upload 文件上传
+
+### 上传excel文件
+
+```
+# # 上传文件 multiple 指定文件数量
+# file = web.input.file_upload('请选择需要加载的数据', accept=['.xlsx', '.xls'], multiple=True)
+# # 读取excel数据
+# df = pd.read_excel(file[0]['content'])
+# # heml页面显示
+# web.output.put_html(df.head(10).to_html())
+```
+
+### 上传txt文件,逐行读取
+
+```
+txtFile = file_upload("Select some txtFile:")
+with open(txtFile['filename'],'r',encoding='utf-8') as FA:
+    for line in FA:
+    	print(line)
+```
+
+### 上传图片
+
+```
+# 上传并保存
+f = file_upload("Upload a image")                  
+open(f['filename'], 'wb').write(f['content'])  
+# 上传并网页显示
+imgs = file_upload("Select some pictures:", accept="image/*", multiple=True)
+for img in imgs:
+    put_image(img['content'])
+```
+
+![image-20230602171627687](imge/PyWebIO基础知识.assets/image-20230602171627687.png)
+
+- accept（str or list）- 单值或列表, 表示可接受的文件类型。文件类型的可用形式有：   
+
+  -  以"."字符开始的文件扩展名。*`例如：.jpg, .png, .doc`*
+  -  一个有效的MIME类型。例如：*`application/pdf、audio/\*`* 表示音频文件、*`video/\*`* 表示视频文件、*`image/\*`*表示图片文件
+
+- placeholder（str）- 未上传文件时，文件上传框显示的文本
+
+- multiple（bool）- 是否允许多文件上传，默认关闭，返回dict
+
+  ```
+  {
+      'filename': 文件名，
+      'content'：文件二进制数据(bytes object),
+      'mime_type': 文件的MIME类型,
+      'last_modified': 文件上次修改时间(时间戳)
+  }
+  
+  若用户没有上传文件，返回None
+  multiple=True时，返回列表；若用户没有上传文件，返回空列表
+  ```
+
+- max_size（int/str）- 单个文件的最大大小，超过限制将会禁止上传。0代表不限制
+
+  ```
+  max_size 值可以为数字表示的字节数，或以 K / M / G 结尾表示的字符串(分别表示 千字节、兆字节、吉字节，大小写不敏感)。
+  例如: max_size=500 , max_size='40K' , max_size='3M'
+  ```
+
+- max_total_size (int/str) – 所有文件的最大大小，超过限制将会禁止上传。仅在 *`multiple=True`* 时可用，默认不限制上传文件的大小。 格式同 *`max_size`* 参数
+
+- required (bool) – 是否必须要上传文件。默认为 *`False`*
+
+- *label, name, help_text, other_html_attrs (-)* – 与 *`input`* 输入函数的同名参数含义一致
+
+
+
+
 
 ## 2.2 其它参考官方文档
 

@@ -67,6 +67,7 @@ selenium的脚本可以控制浏览器进行操作，可以实现多个浏览器
 from selenium.webdriver.common.by import By
 
 driver.find_element(by=By.ID,value='BIZ_hq_historySearch')
+driver.find_element(by=By.XPATH, value='//*[@id="search-key"]')
 ```
 
 ### 常用属性：
@@ -321,6 +322,36 @@ document对象：整个文档对象
 > ele.属性名称 = 值
 >
 > ele.setAttribute(属性名称)
+
+### 滑动滚动条
+
+```
+# 滑动至浏览器底部
+# 方法一：
+# 循环滑动滚动条
+for i in range(10000):
+    driver.execute_script(f'document.documentElement.scrollTop={(i + 1) * 100}')
+
+# 方法二：
+# 将滚动条滑动到底部
+driver.execute_script("window.scrollTo(0,document.body.scrollHeight)")
+# 方法三
+# 定义初始值
+temp_height = 0
+while True:
+    # 将滚动条下拉
+    driver.execute_script("window.scrollBy(0,1000)")
+    time.sleep(1)
+    # 获取当前滚动条距离页面顶部距离
+    check_height = driver.execute_script(
+            "return document.documentElement.scrollTop || window.pageYOffset || document.body.scrollTop;")
+    # 判断页面滚动前和滚动后距离顶部是否一致
+    if check_height == temp_height:
+        break
+    temp_height = check_height
+```
+
+
 
 ## 4.3 文件上传
 

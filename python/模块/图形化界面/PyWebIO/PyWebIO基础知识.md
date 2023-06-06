@@ -502,11 +502,6 @@ for img in imgs:
 
 [教程](https://blog.csdn.net/heianduck/article/details/121745458)
 
-```
-# 文本输出
-password = output.put_text("Input password")
-```
-
 |             | 函数                                                         | 简介                                              | 参数                                                         |
 | ----------- | ------------------------------------------------------------ | ------------------------------------------------- | ------------------------------------------------------------ |
 | 输出域Scope | `put_scope`                                                  | 创建一个新的scope.                                | `pywebio.output.put_scope`(*name*, *content=[]*, *scope=None*, *position=- 1*) |
@@ -515,7 +510,7 @@ password = output.put_text("Input password")
 |             | `clear`                                                      | 清空scope内容                                     | `pywebio.output.clear`(*scope=None*)                         |
 |             | `remove`                                                     | 移除Scope                                         | `pywebio.output.remove`(*scope=None*)                        |
 |             | `scroll_to`                                                  | 将页面滚动到 scope Scope处                        | `pywebio.output.scroll_to`(*scope=None*, *position='top'*)   |
-| 内容输出    | `put_text`                                                   | 输出文本                                          | `pywebio.output.``put_text`(**texts*, *sep=' '*, *inline=False*, *scope=None*, *position=- 1*) |
+| 内容输出    | `put_text`                                                   | 输出文本                                          | `pywebio.output.put_text`(**texts*, *sep=' '*, *inline=False*, *scope=None*, *position=- 1*) |
 |             | `put_markdown`                                               | 输出Markdown                                      | `pywebio.output.put_markdown`(*mdcontent*, *lstrip=True*, *options=None*, *sanitize=True*, *scope=None*, *position=- 1*, ***kwargs*) |
 |             | `put_info`*† <br>`put_success`*† <br>`put_warning`*† <br>`put_error`*† | 输出通知消息                                      | `pywebio.output.put_info`(**contents*, *closable=False*, *scope=None*, *position=- 1*) <br>其它同理 |
 |             | `put_html`                                                   | 输出Html                                          | `pywebio.output.put_html`(*html*, *sanitize=False*, *scope=None*, *position=- 1*) |
@@ -539,6 +534,312 @@ password = output.put_text("Input password")
 |             | `put_grid`*                                                  | 使用网格布局输出内容                              | `pywebio.output.put_grid`(*content*, *cell_width='auto'*, *cell_height='auto'*, *cell_widths=None*, *cell_heights=None*, *direction='row'*, *scope=None*, *position=- 1*) |
 |             | `span`                                                       | 在 `put_table()`和 `put_grid()`中设置内容跨单元格 | `pywebio.output.span`(*content*, *row=1*, *col=1*)           |
 |             | `style`*                                                     | 自定义输出内容的css样式                           | `pywebio.output.``style`(*outputs*, *css_style*)             |
+
+## output 基本输出
+
+### 输出文本
+
+```
+output.put_text("Input password")
+```
+
+![image-20230606152355607](imge/PyWebIO基础知识.assets/image-20230606152355607.png)
+
+### 输出Markdown
+
+```
+output.put_markdown('~~Hello word!~~')
+```
+
+![image-20230606152726182](imge/PyWebIO基础知识.assets/image-20230606152726182.png)
+
+### 显示弹窗,  显示弹窗
+
+```
+output.popup('弹窗标题', '弹窗内容')
+output.toast("显示一条通知消息 🔔")
+```
+
+![image-20230606153236831](imge/PyWebIO基础知识.assets/image-20230606153236831.png)
+
+
+
+### 输出表格
+
+```
+output.put_table([
+    ['Name', 'Gender', 'Address'],
+    ['Wang', 'M', 'China'],
+    ['Liu', 'W', 'America']
+])
+```
+
+![image-20230606153806787](imge/PyWebIO基础知识.assets/image-20230606153806787.png)
+
+### 输出图片
+
+```
+output.put_image("https://t7.baidu.com/it/u=963301259,1982396977&fm=193&f=GIF")
+```
+
+![image-20230606154236878](imge/PyWebIO基础知识.assets/image-20230606154236878.png)
+
+### 显示一个文件下载链接
+
+```
+output.put_file("hello_word.txt", b'文件内容')
+```
+
+![image-20230606154507685](imge/PyWebIO基础知识.assets/image-20230606154507685.png)
+
+## output 组合输出
+
+函数名以 put_ 开始的输出函数，可以与一些输出函数组合使用，作为最终输出的一部分：`put_table()`支持以 `put_xxx()` 调用作为单元
+
+```
+put_table([
+    ['Type', 'Content'],
+    ['html', put_html('X<sup>2</sup>')],
+    ['text', '<hr/>'],
+    ['buttons', put_buttons(['A', 'B'], onclick=...)],  
+    ['markdown', put_markdown('`Awesome PyWebIO!`')],
+    ['file', put_file('hello.text', b'hello world')],
+    ['table', put_table([['A', 'B'], ['C', 'D']])]
+])
+```
+
+![image-20230606154851228](imge/PyWebIO基础知识.assets/image-20230606154851228.png)
+
+## output 输出域Scope
+
+#### use_scope()
+
+```
+# 可以使用 use_scope() 开启并进入一个新的输出域，或进入一个已经存在的输出域
+with use_scope('scope1'):  # 创建并进入scope 'scope1'  
+    put_text('text1 in scope1') # 输出内容到 scope1 
+put_text('text in parent scope of scope1')  # 输出内容到 ROOT scope
+with use_scope('scope1'):  # 进入之前创建的scope 'scope1'
+    put_text('text2 in scope1')  # 输出内容到 scope1
+```
+
+![image-20230606155349751](imge/PyWebIO基础知识.assets/image-20230606155349751.png)
+
+#### clear()
+
+```
+# use_scope() 使用 clear 参数将scope中原有的内容清空
+with use_scope('scope2'):  # 创建并进入scope 'scope2'
+    put_text('create scope2')  # 输出内容到 scope2
+put_text('text in parent scope of scope2')  # 输出内容到 ROOT scope
+with use_scope('scope2', clear=True):  # 进入之前的“scope2”，清楚之前的内容
+    put_text('I have replace content of scope2!!')  # 重新输出内容到 scope2
+```
+
+![image-20230606160317209](imge/PyWebIO基础知识.assets/image-20230606160317209.png)
+
+#### use_scope装饰器 + clear()
+
+```
+import time
+from datetime import datetime
+
+@use_scope('time', clear=True)
+def show_time():
+    put_text(datetime.now())
+
+while True:
+    show_time()
+    time.sleep(3)
+# 第一次调用 show_time 时，将会创建 time 输出域并在其中输出当前时间，之后每次调用 show_time() ，输出域都会被新的内容覆盖
+```
+
+![image-20230606161723355](imge/PyWebIO基础知识.assets/image-20230606161723355.png)
+
+#### scope 嵌套
+
+下面代码的布局如下：
+
+![image-20230606161753091](imge/PyWebIO基础知识.assets/image-20230606161753091.png)
+
+```
+# pyWebIO应用只有一个 ROOT scope。
+with use_scope('A'):
+    put_text('Text in scope A')
+    with use_scope('B'):
+        put_text('Text in scope B')
+with use_scope('C'):
+    put_text('Text in scope C')
+put_html("""<style>                                        
+#pywebio-scope-A {border: 1px solid red;}                   
+#pywebio-scope-B {border: 1px solid blue;margin:2px}        
+#pywebio-scope-C {border: 1px solid green;margin-top:2px}   
+</style>""")
+put_text()
+put_buttons([('Put text to %s' % i, i) for i in ('A', 'B', 'C')], lambda s: put_text(s, scope=s)).show()
+```
+
+1、初始运行结果：
+
+![img](imge/PyWebIO基础知识.assets/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAaGVpYW5kdWNr,size_20,color_FFFFFF,t_70,g_se,x_16-16860401886416.png)
+
+ 2、单击'Put text to A'
+
+![img](imge/PyWebIO基础知识.assets/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAaGVpYW5kdWNr,size_20,color_FFFFFF,t_70,g_se,x_16-16860401833323.png)
+
+ 3、再单击'Put text to B'
+
+![img](imge/PyWebIO基础知识.assets/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAaGVpYW5kdWNr,size_20,color_FFFFFF,t_70,g_se,x_16.png)
+
+ 4、最后单击两次'Put text to C'
+
+![image-20230606162929370](imge/PyWebIO基础知识.assets/image-20230606162929370.png)
+
+#### 将页面滚动到 Scope处
+
+```
+# 重新建A+B/C/D，3个scope
+with use_scope('A'):
+    put_text('Text in scope A')
+    with use_scope('B'):
+        put_text('Text in scope B')
+with use_scope('C'):
+    put_text('Text in scope C')
+with use_scope('D'):
+    put_text('Text in scope D')
+put_html("""<style>                                         
+#pywebio-scope-A {border: 1px solid red;}                   
+#pywebio-scope-B {border: 1px solid blue;margin:2px}        
+#pywebio-scope-C {border: 1px solid green;margin-top:502px}   
+#pywebio-scope-D {border: 1px solid orange;margin-top:502px}
+</style>""").show()
+# 可对’C‘分别进行测试滚动
+scroll_to(scope='C', position='top')
+scroll_to(scope='C', position='middle')
+scroll_to(scope='C', position='bottom')
+```
+
+## output 内容输出
+
+### put_text 输入文本
+
+```
+pywebio.output.put_text(*texts, sep=' ', inline=False, scope=None, position=- 1)
+```
+
+> 参数
+>
+> - texts – 要输出的内容。类型可以为任意对象，对非字符串对象会应用 str() 函数作为输出值。
+> - sep (str) – 输出分隔符
+> - inline (bool) – 将文本作为行内元素(连续输出的文本显示在相同的段落中)。默认每次输出的文本都作为一个独立的段落
+> - scope (str) – 内容输出的目标scope，若scope不存在，则不进行任何输出操作。可以直接指定目标Scope名，或者使用int通过索引Scope栈来确定Scope
+> - position (int) – 在scope中输出的位置
+
+```
+#sep
+put_text('我是谁','我在哪','我在干嘛',sep='-',inline=True).show()
+#inline 当两个put_text连续使用true时，才会显示同一行
+put_text("小鲁班",inline=False).show()
+put_text("小背包",inline=True).show()
+put_text("小火箭",inline=True).show()
+put_text("哒哒哒",inline=False).show()
+put_text("嘟嘟嘟",inline=True).show()
+put_text("hehehe",inline=False).show()
+#position 按索引插入位置。
+```
+
+![image-20230606170535072](imge/PyWebIO基础知识.assets/image-20230606170535072.png)
+
+![img](https://img-blog.csdnimg.cn/e873c5b4666d4648be9f7c69cfe9129a.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAaGVpYW5kdWNr,size_7,color_FFFFFF,t_70,g_se,x_16)
+
+###  put_markdown 输出Markdown
+
+```
+pywebio.output.put_markdown(mdcontent, lstrip=True, options=None,sanitize=True, scope=None, position=-1,
+ **kwargs)
+```
+
+> 参数
+>
+> - mdcontent (str) – Markdown文本
+> - lstrip (bool) – 是否自动移除 mdcontent 每一行的前导空白锁进
+> - sanitize (bool) – 是否使用 DOMPurify 对内容进行过滤来防止XSS攻击。
+
+```
+put_markdown(r""" # H1
+This is H1 first content.
+dd""").show()
+# Using lstrip to get beautiful indent
+
+put_markdown(r""" # H2
+    This is H2 second content.
+    dd""", lstrip=False).show()
+put_markdown(r""" # H2
+    This is H2 second content.
+    dd""").show()
+```
+
+![image-20230606173117616](imge/PyWebIO基础知识.assets/image-20230606173117616.png)
+
+### put_link 输出链接到其他网页或PyWebIO App的超链接
+
+```
+pywebio.output.put_link(name, url=None, app=None, new_window=False,\
+                     scope=None, position=- 1)
+```
+
+>  参数
+>
+> - name (str) – 链接名称
+> - url (str) – 链接到的页面地址
+> - app (str) – 链接到的PyWebIO应用名。参见 Server模式
+> - new_window (bool) – 是否在新窗口打开链接
+> - scope, position (int) – 与 put_text 函数的同名参数含义一致
+>   `url` 和 `app` 参数必须指定一个但不可以同时指定
+
+```
+put_link("你再百度一下试试？","https://www.baidu.com/",new_window=True).show()
+```
+
+![image-20230606173515572](imge/PyWebIO基础知识.assets/image-20230606173515572.png)
+
+### put_processbar 输出进度条
+
+```
+pywebio.output.put_processbar(name, init=0, label=None, auto_close=False, \
+                scope=None, position=- 1)
+```
+
+> 参数
+>
+> - name (str) – 进度条名称，为进度条的唯一标识
+> - init (float) – 进度条初始值. 进度条的值在 0 ~ 1 之间
+> - label (str) – 进度条显示的标签. 默认为当前进度的百分比
+> - auto_close (bool) – 是否在进度完成后关闭进度条
+
+```
+put_processbar(name="process",init=0.35,label="我就是个进度条：").show()
+```
+
+![image-20230606173658866](imge/PyWebIO基础知识.assets/image-20230606173658866.png)
+
+测试程序
+
+```
+import time
+put_processbar('bar')
+for i in range(1, 11):
+    set_processbar('bar', i / 10)
+    time.sleep(0.1)
+```
+
+
+
+
+
+
+
+
 
 举例：
 

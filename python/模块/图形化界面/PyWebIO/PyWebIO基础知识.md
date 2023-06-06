@@ -833,9 +833,180 @@ for i in range(1, 11):
     time.sleep(0.1)
 ```
 
+### put_table 输出表格
+
+```
+pywebio.output.put_table(tdata, header=None, scope=None, position=- 1)
+```
+
+> 参数
+>
+> - tdata (list) – 表格数据。列表项可以为 `list` 或者 `dict` , 单元格的内容可以为字符串或 `put_xxx` 类型的输出函数。 数组项可以使用 `span()` 函数来设定单元格跨度。
+> - header (list) –表头。当 `tdata` 的列表项为 `list` 类型时，若省略 `header` 参数，则使用 `tdata` 的第一项作为表头。表头项可以使用 `span()` 函数来设定单元格跨度。
+
+当 `tdata` 为字典列表时，使用 `header` 指定表头顺序，不可省略。此时， `header` 格式可以为 <字典键>列表 或者 (`<显示文本>, <字典键>`) 列表。
+
+```
+# 'Name' cell across 2 rows, 'Address' cell across 2 columns
+put_table([
+    [span('Name',row=2), span('Address', col=2)],
+    ['City', 'Country'],
+    ['Wang', 'Beijing', 'China'],
+    ['Liu', 'New York', 'America'],
+])
+```
+
+![image-20230606174226805](imge/PyWebIO基础知识.assets/image-20230606174226805.png)
+
+```
+put_table([
+    ['Type', 'Content'],
+    ['html', put_html('X<sup>2</sup>')],
+    ['text', '<hr/>'],
+    ['buttons', put_buttons(['A', 'B'], onclick=...)],  
+    ['markdown', put_markdown('`Awesome PyWebIO!`')],
+    ['file', put_file('hello.text', b'hello world')],
+    ['table', put_table([['A', 'B'], ['C', 'D']])]
+])
+```
+
+![image-20230606154851228](imge/PyWebIO基础知识.assets/image-20230606154851228.png)
+
+```
+# Set table header
+put_table([
+    ['Wang', 'M', 'China'],
+    ['Liu', 'W', 'America'],
+], header=['Name', 'Gender', 'Address'])
+```
+
+![image-20230606174420617](imge/PyWebIO基础知识.assets/image-20230606174420617.png)
+
+```
+# When ``tdata`` is list of dict
+put_table([
+    {"Course":"OS", "Score": "80"},
+    {"Course":"DB", "Score": "93"},
+], header=["Course", "Score"])  # or header=[(put_markdown("*Course*"), "Course"), (put_markdown("*Score*") ,"Score")]
+```
+
+![image-20230606174512073](imge/PyWebIO基础知识.assets/image-20230606174512073.png)
+
+###  span 设置内容跨单元格
+
+```
+pywebio.output.span(content, row=1, col=1)
+```
+
+ 用于在 `put_table()` 和 `put_grid()` 中设置内容跨单元格
+
+> 参数
+>
+> - content – 单元格内容。可以为字符串或 put_xxx() 调用。
+> - row (int) – 竖直方向跨度, 即：跨行的数目
+> - col (int) – 水平方向跨度, 即：跨列的数目
+
+```
+put_table([
+    ['C'],
+    [span('E', col=2)],  # 'E' across 2 columns
+], header=[span('A', row=2), 'B']).show()  # 'A' across 2 rows
+```
+
+![image-20230606174808631](imge/PyWebIO基础知识.assets/image-20230606174808631.png)
+
+```
+put_grid([
+    [put_text('A'), put_text('B')],
+    [span(put_text('A'), col=2)],  # 'A' across 2 columns
+]).show()
+```
+
+![image-20230606174854862](imge/PyWebIO基础知识.assets/image-20230606174854862.png)
+
+###  put_buttons 输出按钮，并绑定点击事件
+
+```
+pywebio.output.put_button(label, onclick, color=None, small=None,\
+                link_style=False, outline=False, disabled=False,
+                scope=None, position=- 1)
+```
+
+> 参数
+>
+> - label (str) - Button label
+> - onclick (callable/list) - 按钮点击回调函数. `onclick` 可以是函数或者函数组成的列表.
+>   `onclick` 为函数时， 签名为 `onclick(btn_value)`. `btn_value` 为被点击的按钮的 `value` 值
+>   `onclick` 为列表时，列表内函数的签名为 `func()`. 此时，回调函数与 `buttons` 一一对应
+>    Tip: 可以使用 `functools.partial` 来在 `onclick` 中保存更多上下文信息.
+> - small (bool) – 是否使用小号按钮，默认为False
+> - link_style (bool) – 是否将按钮显示为链接样式，默认为False
+> - outline (bool) – 是否将按钮显示为镂空样式，默认为False
+> - group (bool) – 是否将按钮合并在一起，默认为False
+> - color (str) – 按钮颜色。可选值为 `primary` 、`secondary` 、 `success` 、 `danger` 、 `warning` 、 `info` 、 `light` 、 `dark` .
+> - disabled (bool) – Whether the button is disabled
+> - scope, position (int) – 与 put_text 函数的同名参数含义一致
+
+```
+put_buttons([  
+    dict(label=i, value="I'm "+i, color=i)  
+    for i in ['primary', 'secondary', 'success', 'danger', 'warning', 'info', 'light', 'dark']  
+], onclick=put_text).show()
+```
+
+![image-20230606180010530](imge/PyWebIO基础知识.assets/image-20230606180010530.png)
+
+```
+put_buttons([{'label': 'success', 'value': "I'm success", 'color': "success"},
+             {'label': 'danger', 'value': "I'm danger", 'color': "danger"}], onclick=put_text).show()
+             
+# small
+put_text("----------small-----------")
+put_buttons([{'label': 'success', 'value': "I'm success", 'color': "success"},
+{'label': 'danger', 'value': "I'm danger", 'color': "danger"}], onclick=put_text, small=True).show()
+
+# link_style
+put_text("----------link_style-----------")
+put_buttons([{'label': 'success', 'value': "I'm success", 'color': "success"},
+ {'label': 'danger', 'value': "I'm danger", 'color': "danger"}], onclick=put_text, link_style=True).show()
+ 
+# outline
+put_text("----------outline-----------")
+put_buttons([{'label': 'success', 'value': "I'm success", 'color': "success"},
+{'label': 'danger', 'value': "I'm danger", 'color': "danger"}], onclick=put_text, outline=True).show()
+
+# group
+put_text("----------group-----------")
+put_buttons([{'label': 'success', 'value': "I'm success", 'color': "success"},
+{'label': 'danger', 'value': "I'm danger", 'color': "danger"}], onclick=put_text, group=True).show()
+```
+
+![image-20230606180559430](imge/PyWebIO基础知识.assets/image-20230606180559430.png)
+
+```
+from functools import partial
+
+def row_action(choice, id):
+    put_text("You click %s button with id: %s" % (choice, id))
+put_buttons(['edit', 'delete'], onclick=partial(row_action, id=1)).show()
+# 依次点击"edit","delete"
+```
+
+![image-20230606181134645](imge/PyWebIO基础知识.assets/image-20230606181134645.png)
+
+```
+def edit():
+    put_text("You click edit button")
 
 
+def delete():
+    put_text("You click delete button")
 
+put_buttons(['edit', 'delete'], onclick=[edit, delete]).show()
+# 依次点击"edit","delete"
+```
+
+![image-20230606181230727](imge/PyWebIO基础知识.assets/image-20230606181230727.png)
 
 
 

@@ -659,6 +659,16 @@ EXECUTE stmt;
 DEALLOCATE PREPARE stmt;
 ```
 
+### 3.7.20 获取数据库字段
+
+```
+# 获取数据库字段
+select COLUMN_NAME from information_schema.COLUMNS 
+where table_name="5g小区共享统计查询_(xxxx)"
+```
+
+
+
 ## 3.8 触发器
 
 ### 3.8.1 触发器语法

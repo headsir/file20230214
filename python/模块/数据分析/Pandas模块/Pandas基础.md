@@ -998,6 +998,12 @@ df1.reset_index(drop = True)
 
 布尔索引：通过传入一个或多个==判断条件==来选择数据，举例：df[(df["年龄"] < 200) & (df["列2"] < 102)]
 
+- isin(列表)，包含在列表的行
+
+  ```
+  df=df[df["GCI"].isin(df_3["GCI"].tolist())]
+  ```
+
 ### 4.3 行列同时选择
 
 #### 4.3.1 普通索引 + 普通索引
@@ -1868,8 +1874,6 @@ query()的第二个参数 inplace 默认 false
 df = df_01.query("日期>=@date1  and 日期<=@date2  and 客服口径 == 1 and 业务地市.notna()")
 ```
 
-
-
 ### 5.16 获取最大值索引
 
 ```
@@ -1917,8 +1921,8 @@ df.groupby("列名").aggregate( {"列3" : "count" , "列5" : "sum"})
 df_Nc_group_columns = []
 for i in df.columns:
     for j in i:
-    if j != "" and j != '流量(GB)':
-    df_Nc_group_columns.append(j)
+        if j != "" and j != '流量(GB)':
+        	df_Nc_group_columns.append(j)
 df.columns = df_Nc_group_columns
 ```
 
@@ -1926,20 +1930,34 @@ df.columns = df_Nc_group_columns
 
 - 参数说明
 
-```
-DataFrame.sum(axis = None,skipna = None,level = None,numeric_only = None,min_count = 0,**kwargs)
+  ```
+  DataFrame.sum(axis = None,skipna = None,level = None,numeric_only = None,min_count = 0,**kwargs)
+  
+  参数说明:
+      axis：axis = 1表示行，axis = 0表示列，默认为None（无）
+      skipna：布尔型，表示计算结果是否排除NaN/Null值，默认值为None
+      level：表示索引层级，默认为None
+      numeric_only：仅数字，布尔型，默认值为None
+      min_count：表示执行操作所需的数目，整型，默认为0
+      **kwargs：要传递给函数的附加关键字参数。
+      返回值：返回Series对象或DataFrame对象。行或列求和数据
+  ```
 
-参数说明:
-    axis：axis = 1表示行，axis = 0表示列，默认为None（无）
-    skipna：布尔型，表示计算结果是否排除NaN/Null值，默认值为None
-    level：表示索引层级，默认为None
-    numeric_only：仅数字，布尔型，默认值为None
-    min_count：表示执行操作所需的数目，整型，默认为0
-    **kwargs：要传递给函数的附加关键字参数。
-    返回值：返回Series对象或DataFrame对象。行或列求和数据
-```
+- 分组筛选最大值行
 
+  ```
+  import pandas as pd
+  data = {'year':[2016,2016,2017,2017,2017,2018,2018],
+          'num':[2,5,4,7,8,90,78],
+          'name':['a','b','c','d','e','f','g']}
+  df = pd.DataFrame(data)
+  #  筛选最大值所在的行
+  df_groupby = df[['year','num']].groupby(by='year',as_index=False).max()
+  #  对原始数据合并
+  df_merge = pd.merge(df_groupby,df,on=['year','num'],how='left')
+  ```
 
+  
 
 ## 七、Pandas 数据透视
 

@@ -1119,15 +1119,91 @@ put_collapse('Collapse title', [
 
 ### put_scrollable 固定高度内容输出区域，内容超出则显示滚动条
 
+```python
+pywebio.output.put_scrollable(content=[], height=400, \
+                keep_bottom=False, border=True, scope=None, \
+                position=- 1, **kwargs)
+```
 
+> 参数
+>
+> - content (list/str/put_xxx()) – 内容可以为字符串或 `put_xxx` 类输出函数的返回值，或者由它们组成的列表。
+> - height (int/tuple) – 区域的高度（像素），内容超出此高度则使用滚动条。可以传入 (min_height, max_height)  来表示高度的范围，比如 (100, 200) 表示区域高度最小100像素、最高200像素。若不想限制高度，则传入 `None`
+> - keep_bottom (bool) – Whether to keep the content area scrolled to the bottom when updated.
+> - border (bool) – 是否显示边框
+> - scope, position (int) – 与 `put_text` 函数的同名参数含义一致
 
+### **put_row 行布局输出内容**
 
+```
+# Two code blocks of equal width, separated by 10 pixels
+put_row([put_code('A'), None, put_code('B')]).show()
+```
 
+![image-20230619170709489](imge/PyWebIO基础知识.assets/image-20230619170709489.png)
 
+```
+# The width ratio of the left and right code blocks is 2:3, which is equivalent to size='2fr 10px 3fr'
+put_row([put_code('A'), None, put_code('B')], size='40% 50px 60%').show()
+```
 
+![image-20230619171011115](imge/PyWebIO基础知识.assets/image-20230619171011115.png)
 
+### **put_column 列布局输出内容**
 
+```
+原理同上
+```
 
+### **put_grid 网格布局输出内容**
+
+```
+pywebio.output.put_grid(content, cell_width='auto', cell_height='auto',\
+    cell_widths=None, cell_heights=None, direction='row', \
+    scope=None, position=- 1)
+```
+
+> 参数
+>
+> - content – 输出内容. `put_xxx()` / None 组成的二维数组, None 表示空白. 数组项可以使用 span() 函数设置元素在网格的跨度.
+> - cell_width (str) – 网格元素的宽度.
+> - cell_height (str) – 网格元素的高度.
+> - cell_widths (str) – 网格每一列的宽度. 宽度值用空格分隔. 不可以和 `cell_width` 参数同时使用.
+> - cell_heights (str) – 网格每一行的高度. 高度值用空格分隔. 不可以和 `cell_height` 参数同时使用.
+> - direction (str) - 排列方向. 为 'row' 或 'column'
+>   - `'row'` 时表示，content中的每一个子数组代表网格的一行;
+>   - `'column'` 时表示，content中的每一个子数组代表网格的一列.
+> - scope, position (int) – 与 put_text 函数的同名参数含义一致
+
+`cell_width`,`cell_height`,`cell_widths`,`cell_heights` 参数中的宽度/高度值格式参考 `put_row()`函数的 `size` 参数注释.
+
+```
+put_grid([
+    [put_text('A'), put_text('B'), put_text('C')],
+    [None, span(put_text('D'), col=2, row=1)],
+    [put_text('E'), put_text('F'), put_text('G')],
+], cell_width='100px', cell_height='100px').show()
+```
+
+![image-20230619171555295](imge/PyWebIO基础知识.assets/image-20230619171555295.png)
+
+### **style 样式**
+
+```
+put_text('hello').style('color: red; font-size: 20px').show()
+```
+
+![image-20230619171838107](imge/PyWebIO基础知识.assets/image-20230619171838107.png)
+
+```
+# in combined output
+put_row([
+    put_text('hello').style('color: red'),
+    put_markdown('markdown')
+]).style('margin-top: 20px').show()
+```
+
+![image-20230619171919601](imge/PyWebIO基础知识.assets/image-20230619171919601.png)
 
 
 

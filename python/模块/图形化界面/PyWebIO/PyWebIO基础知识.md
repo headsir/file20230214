@@ -1008,6 +1008,129 @@ put_buttons(['edit', 'delete'], onclick=[edit, delete]).show()
 
 ![image-20230606181230727](imge/PyWebIO基础知识.assets/image-20230606181230727.png)
 
+### put_image 图片
+
+```
+pywebio.output.put_image(src, format=None, title='', width=None, height=None, \
+                    scope=None, position=- 1)
+```
+
+> 参数
+> src – 图片内容. 可以为: 字符串类型的URL, bytes-like object 表示的图片二进制内容, PIL.Image.Image 实例
+> title (str) – 图片描述
+> width (str) – 图像的宽度，可以是CSS像素(数字px)或者百分比(数字%)
+> height (str) – 图像的高度，可以是CSS像素(数字px)或者百分比(数字%)。可以只指定 width 和 height 中的一个值，浏览器会根据原始图像进行缩放。
+> format (str) – 图片格式，非必须。如 png , jpeg , gif 等, 仅在 src 为非URL时有效
+> scope, position (int) – 与 put_text 函数的同名参数含义一致
+
+```
+# 读取本地图片
+from pywebio import STATIC_PATH
+
+img = open('testPic.jpg', 'rb').read()
+put_image(img, width='50px').show()
+```
+
+![image-20230619162422413](imge/PyWebIO基础知识.assets/image-20230619162422413.png)
+
+```
+# 读取网络图片
+put_image('https://www.python.org/static/img/python-logo.png').show()
+```
+
+![image-20230619162515055](imge/PyWebIO基础知识.assets/image-20230619162515055.png)
+
+### **put_file 文件下载**
+
+```
+pywebio.output.put_file(name, content, label=None, scope=None, position=- 1)
+```
+
+在浏览器上的显示为一个以文件名为名的链接，点击链接后浏览器自动下载文件。
+
+> 参数
+>
+> - name (str) – 下载保存为的文件名
+> - content – 文件内容. 类型为 bytes-like object
+> - label (str) – 下载链接的显示文本，默认和文件名相同
+> - scope, position (int) – 与 `put_text` 函数的同名参数含义一致
+
+```
+content = open('TXT测试文件.txt', 'rb').read()
+put_file('hello-world.txt', content, 'download me').show()
+```
+
+![image-20230619162912343](imge/PyWebIO基础知识.assets/image-20230619162912343.png)
+
+### **put_tabs 横向标签栏**
+
+```
+pywebio.output.put_tabs(tabs, scope=None, position=- 1)
+```
+
+> 参数
+>
+> - tabs (list) – 标签列表，列表项为一个 dict: `{"title": "Title", "content": ...}` ，其中 `content` 表示标签内容，可以为字符串、 `put_xxx()` 调用或由它们组成的列表。
+> - scope, position (int) – 与 `put_text` 函数的同名参数含义一致
+
+```
+put_tabs([
+    {'title': 'Text', 'content': 'Hello world'},
+    {'title': 'Markdown', 'content': put_markdown('~~Strikethrough~~')},
+    {'title': 'More content', 'content': [
+        put_table([
+            ['Commodity', 'Price'],
+            ['Apple', '5.5'],
+            ['Banana', '7'],
+        ]),
+        put_link('pywebio', 'https://github.com/wang0618/PyWebIO')
+    ]},
+]).show()
+#3个标签里面都有内容
+```
+
+![image-20230619165113145](imge/PyWebIO基础知识.assets/image-20230619165113145.png)
+
+### **put_collapse 输出可折叠的内容**
+
+```
+pywebio.output.put_collapse(title, content=[], open=False, scope=None, position=- 1)
+```
+
+>  参数
+>
+> - title (str) – 内容标题
+> - content (list/str/put_xxx()) – 内容可以为字符串或 `put_xxx` 类输出函数的返回值，或者由它们组成的列表。
+> - open (bool) – 是否默认展开折叠内容。默认不展开内容
+> - scope, position (int) – 与 `put_text` 函数的同名参数含义一致
+
+```
+put_collapse('Collapse title', [
+    'text',
+    put_markdown('~~Strikethrough~~'),
+    put_table([
+        ['Commodity', 'Price'],
+        ['Apple', '5.5'],
+    ])
+], open=True).show()
+```
+
+![image-20230619165545310](imge/PyWebIO基础知识.assets/image-20230619165545310.png)
+
+### put_scrollable 固定高度内容输出区域，内容超出则显示滚动条
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

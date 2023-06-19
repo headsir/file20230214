@@ -24,6 +24,8 @@ pip3 install -U https://code.aliyun.com/wang0618/pywebio/repository/archive.zip
 
 模块：pywebio.input.对应功能
 
+[教程](https://blog.csdn.net/heianduck/article/details/121561398)
+
 ```
 # 文本输入
 password = input("Input password", type=PASSWORD)
@@ -1271,6 +1273,12 @@ password = output.put_text("Input password")
 | `run_async`                  | 异步运行协程对象。协程中依然可以调用 PyWebIO 交互函数。      | `pywebio.session.run_async`(*coro_obj*)                      |
 | `run_asyncio_coroutine`      | 若会话线程和运行asyncio事件循环的线程不是同一个线程，需要用 [`run_asyncio_coroutine()`](https://pywebio.readthedocs.io/zh_CN/latest/session.html#pywebio.session.run_asyncio_coroutine) 来运行asyncio中的协程。 | `pywebio.session.run_asyncio_coroutine`(*coro_obj*)          |
 
+
+
+
+
+
+
 # 五、应用部署
 
 ## 5.1 路径中部署PyWebIO应用
@@ -1299,9 +1307,50 @@ web.start_server(bmi, debug=True, port=1122, remote_access=True, auto_open_webbr
 
 # 六、持续性输入
 
+模块：pywebio.pin.对应功能
 
+[教程](https://blog.csdn.net/heianduck/article/details/121772638)
 
+## Overview
 
+我们已经知道，PyWebIO中的输入函数是阻塞式的，输入表单会在成功提交后被销毁。在大多数场景下，使用这种方式接收用户输入已经够用了。但在一些场景下，你或许希望输入表单在提交后不消失，并且可以继续接收输入。
+ 所以，PyWebIO提供了 `pin` 模块来实现持续性输入。
+`pin` 模块主要有3部分内容:
+
+- pin 组件(widgets)
+- pin_wait_change()
+- pin_update()
+
+## Pin widgets
+
+### pin_input
+
+每个pin组件函数都对应一个 `input` 模块中的输入函数。(出于性能原因，没有提供 `file_upload()`函数对应的pin组件)
+
+Pin组件函数支持大多数对应的输入函数的参数。这里列举了两者之间的一些不同：
+
+- Pin组件函数的第一个参数始终是Pin组件的 `name` ，且当输出了同名的pin组件时，旧的pin组件会不可用。
+- Pin组件函数不支持 `on_change` 、 `validate` 回调，也不支持 `required` 参数。
+- Pin组件函数多了用于输出控制的 `scope` 和 `position` 参数。
+
+组件都有：
+
+> put_input -- 文本输入组件
+>  put_textarea -- 文本域输入组件
+>  put_select -- 下拉选择输入组件
+>  put_checkbox -- 多选框组件
+>  put_radio -- 单选按钮组件
+>  put_slider -- 滑块输入组件
+>  put_actions -- action按钮
+>  以上组件参数，可见input相对应的参数。
+
+### 最基本的文本框pin组件
+
+```
+#这里要和前面的input区分开来。
+put_input('input2', label='This is a input widget').show()
+put_select('select', options=['A', 'B', 'C']).show()
+```
 
 
 

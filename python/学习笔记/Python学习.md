@@ -230,6 +230,20 @@ graph LR
 
   - 百分数设置：`print('中国男性占总人口的比例：{:.2%}亿'.format(0.122))`，说明：.2%[^注2]
 
+#### 编码介绍
+
+```
+encode：编码
+decode：解码
+python内部编码方式为unicode，decode将其他编码方式转换成unicode编码方式，encode将unicode转换成其他编码方式。
+因此unicode相当于一个中转:
+(1)decode->unicode->encode 
+(2)encode->unicode->decode 
+
+isinstance(s,unicode)#用来判断是否为unicode
+```
+
+
 
 #### 字符串前缀
 

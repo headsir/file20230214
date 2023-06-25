@@ -1,12 +1,39 @@
 .ini配置文件使用
 
+配置文件读取
+
+```
+import configparser
+# 方法一：
+with open(configDir, encoding="utf8") as f:
+	w = f.read()
+configparser.ConfigParser().read_string(w)
+# 方法二：
+configparser.ConfigParser().read("Config.ini", encoding="utf-8")
+```
+
+配置文件设置
+
+```
+# config.add_section("redis")  # 添加section节点
+# config.set("redis", "name", "redis_admin")  # 设置指定section 的options
+#
+# config.remove_section("redis")  # 整个section下的所有内容都将删除
+# config.remove_option("mysql", 'time')  # 删除section下的指定options
+#
+# config.write(open("Config", "w"))  # 保存config
+```
+
+
+
+
+
 ```
 # -*- coding: utf-8 -*-
 
 
 import configparser
 import os
-
 
 class ReadConfig():
     def __init__(self, configDir):

@@ -855,8 +855,8 @@ Usage: thingy [OPTIONS]
 """)
 ```
 
--   print 函数结束符，默认end = “\n” ,`print(“====”,end='\n')`
--  print 函数字符分割符，默认sep=“ ”, `print(“====”,"ddd",sep=';')`
+-   print 函数结束符，默认end = “\n” ,`print("====",end='\n')`
+-  print 函数字符分割符，默认sep=“ ”, `print("====","ddd",sep=';')`
 -  连接符：+
 -  复制符：*
 

@@ -68,7 +68,7 @@ ___粗斜体文本___
 
 举例：
 
-<font face="华文彩云">华文彩云</font>
+**<font color="#b00eed" size=6 face="华文彩云">华文彩云</font>**
 
 <font face="楷体">楷体</font>
 

@@ -6,6 +6,10 @@ Python ==**官方文档**== https://docs.python.org/zh-cn/3.11/archives/python-3
 
 孙兴华==课件==http://721p.ysepan.com/
 
+白月黑羽教程https://www.byhy.net/
+
+【Python Qt 图形界面程序开发项目实战】https://www.bilibili.com/video/BV19A411H7dS?p=6&vd_source=d6c3edd9a4f6205095ccfba6b2a61eec
+
 # 一、安装Python
 
 网上教程很多，可以自行百度。

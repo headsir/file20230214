@@ -193,6 +193,8 @@ scp -r authorized_keys root@hadoop02:/root/.ssh/
 
 ## 2.2 常用命令
 
+sudo su 获取超级管理员权限
+
 ls 显示指定目录下内容
 
 -  -a 显示所有文件及目录

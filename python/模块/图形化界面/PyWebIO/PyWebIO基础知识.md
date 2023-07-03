@@ -1352,6 +1352,91 @@ put_input('input2', label='This is a input widget').show()
 put_select('select', options=['A', 'B', 'C']).show()
 ```
 
+![1247736c7744454daa914fa86cc116dd](imge/PyWebIO基础知识.assets/1247736c7744454daa914fa86cc116dd.gif)
+
+```python
+with use_scope('search-area'):
+    put_input('search', placeholder='Search')
+        
+put_row([
+    put_input('input'),
+    put_select('select', options=['A', 'B', 'C'])
+])
+
+with use_scope('search-area'):
+    put_input('search_2', placeholder='Search-2')
+    put_row([
+    put_input('input_2'),
+    put_select('select_2', options=['D', 'E', 'F'])
+])
+```
+
+
+
+![image-20230703171004117](imge/PyWebIO基础知识.assets/image-20230703171004117.png)
+
+### 获取pin组件的值
+
+```
+# 通过使用pin对象来获取pin组件的值
+put_input('pin_name')
+put_buttons(['Get pin Value'], lambda _: put_text(pin.pin_name))
+# pin组件函数的第一个参数为pin组件的name
+# pin['pin_name'] == pin.pin_name
+# 同时name只能包含字母、数字和下划线，否则:
+# AssertionError: pin name' can only contain letters, digits and underscore
+```
+
+![img](imge/PyWebIO基础知识.assets/99e03dea1ff9492aaa1ca3b1c249c021.gif)
+
+## pin_wait_change 监听pin组件的变化
+
+```
+pywebio.pin.pin_wait_change(*names, timeout=None)
+```
+
+`pin_wait_change()` 监听一组pin组件，当其中任意一个的值发生变化后，函数返回发生变化的组件的 `name` 和值。
+
+> 参数
+>
+> - names(str) - pin组件`name`列表
+> - timeout(int/None) - 当 `timeout` 为正数时， `pin_wait_change()` 会最多阻塞 `timeout` 秒然后返回 `None` 如果这段时间内监听的pin组件的值没有发生变化的话。 将 `timeout` 设置为 `None` （默认）来关闭超时
+
+{"name": 发生变化的pin组件的name, "value": 发生变化的pin组件的当前值}， 当超时发生后，返回 None
+
+```
+put_input('a', type='number', value="0")
+put_input('b', type='number', value="0")
+
+while True:
+    changed = pin_wait_change('a', 'b')
+    with use_scope('res', clear=True):
+        put_code(changed)
+        put_text("a + b = %s" % (pin.a + pin.b))
+```
+
+![img](imge/PyWebIO基础知识.assets/5add6bedccd449fab392563a8d523a41.gif)
+
+## pin_update 更新pin组件的输出属性
+
+```
+pywebio.pin.pin_update(name, **spec)
+```
+
+>  参数
+>
+> - name(str) - 目标pin组件的`name`
+> - spec - 需要被更新的pin组件的参数。注意以下参数无法被更新： `type`, `name`, `code`, `multiple`
+
+```
+put_input('c', type='number', value="0", help_text="你动我试试？").show()
+put_text(pin.c)
+pin_update('c', value=1, help_text="试试就试试！")
+put_text(pin.c)
+```
+
+![image-20230703180602020](imge/PyWebIO基础知识.assets/image-20230703180602020.png)
+
 
 
 

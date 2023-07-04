@@ -1897,8 +1897,8 @@ df.max()
 
 ### 6.2 分组键是 Series
 
-- 单列分组：df.groupby(df["列名"]).count()，举例：`df1.groupby(df["Year"]).sum()`
-- 多列分组：df.groupby([df["列名1"] ,df["列名2"]  ]).count()，举例：`df1.groupby([df["Name"] ,df["Year"]]).sum()`
+- 单列分组：df.groupby(df["列名"]).count()，举例：`df.groupby(df["Year"]).sum()`
+- 多列分组：df.groupby([df["列名1"] ,df["列名2"]  ]).count()，举例：`df.groupby([df["Name"] ,df["Year"]]).sum()`
 
 ### 6.3 aggregate 方法
 

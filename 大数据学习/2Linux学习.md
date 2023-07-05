@@ -295,3 +295,9 @@ ps 显示当前进程状态，参数 -ef
 kill -9 进程号 杀死进程
 
 jps 专门查看java进程
+
+## 2.11 软件包安装
+
+安装tools工具：apt install open-vm-tools-desktop fuse
+
+apt update  同步包的索引文件，检查软件的最新版本

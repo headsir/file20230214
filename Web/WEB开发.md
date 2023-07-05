@@ -1,4 +1,9 @@
+[TOC]
+
+【web开发全家桶】https://www.bilibili.com/video/BV1rT4y1v7uQ?p=5&vd_source=d6c3edd9a4f6205095ccfba6b2a61eec
+
 目的：开发一个平台（网站）
+
 - 前端开发：HTML、CSS、JavaScript
 - Web框架：接收请求并处理
 

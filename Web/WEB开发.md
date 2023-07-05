@@ -107,8 +107,6 @@ a【行内标签】
 <a href="/get/news">点击跳转到http://127.0.0.1:5000/get/news</a>
 ```
 
-
-
 ```html
 <!-- 当前页面打开-->
 <a href="https://image.baidu.com/search/index"">
@@ -116,8 +114,6 @@ a【行内标签】
 <!-- 新的Tab页面打开-->
 <a href="https://image.baidu.com/search/index" target="_blank">
 ```
-
-
 
 #### 1.2.6 图片
 
@@ -143,13 +139,54 @@ img【行内标签】
 <img  src="/static/images/美女01.png" style="width: 300px" />
 ```
 
+#### 1.2.7 列表
+
+- 无序列表
+
+```html
+<ul>
+    <li>中国移动</li>
+    <li>中国联通</li>
+    <li>中国电信</li>
+    <li>中国广电</li>
+</ul>
+```
+
+![image-20230706004110225](imge/WEB开发.assets/image-20230706004110225.png)
+
+- 有序列表
+
+```html
+<ol>
+    <li>中国移动</li>
+    <li>中国联通</li>
+    <li>中国电信</li>
+    <li>中国广电</li>
+</ol>
+```
 
 
 
+![image-20230706004244599](imge/WEB开发.assets/image-20230706004244599.png)
 
-**注意：** 图像的名称和尺寸是以属性的形式提供的。
+- 表格
 
+```html
+<table  style="border: 1px solid gray;">表格
+    <thead>
+        <tr> <th style="border: 1px solid gray">ID</th>	<th>姓名</th>	<th>年龄</th> </tr>
+    </thead>
+    <tbody>
+        <tr> <td style="border: 1px solid gray">10</td> <td>张三</td> <td>10</td> </tr>
+        <tr> <td>11</td> <td>李四</td> <td>10</td> </tr>
+        <tr> <td>12</td> <td>王五</td> <td>10</td> </tr>
+        <tr> <td>13</td> <td>王麻子</td> <td>10</td> </tr>
+        <tr> <td>14</td> <td>张器</td> <td>10</td> </tr>
+    </tbody>
+</table>
+```
 
+![image-20230706010403130](imge/WEB开发.assets/image-20230706010403130.png)
 
 # 二、Mysql
 

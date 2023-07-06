@@ -169,10 +169,10 @@ img【行内标签】
 
 ![image-20230706004244599](imge/WEB开发.assets/image-20230706004244599.png)
 
-- 表格
+#### 1.2.8 表格
 
 ```html
-<table  style="border: 1px solid gray;">表格
+<table  border="1">表格
     <thead>
         <tr> <th style="border: 1px solid gray">ID</th>	<th>姓名</th>	<th>年龄</th> </tr>
     </thead>
@@ -187,6 +187,121 @@ img【行内标签】
 ```
 
 ![image-20230706010403130](imge/WEB开发.assets/image-20230706010403130.png)
+
+#### 1.2.9 input系列
+
+```html
+<!-- 文本输入-->
+<input type="text"/>
+<!--密码输入-->
+<input type="password"/>
+<!-- 文件选择-->
+<input type="file"/>
+<!-- 单选框-->
+<input type="radio" name="n1"/>男
+<input type="radio" name="n1"/>女
+<!-- 复选框-->
+<input type="checkbox" />乒乓球
+<input type="checkbox"/>篮球
+<--普通按钮-->
+<input type="button" value="提交"/>
+<--提交表单按钮,POST请求-->
+<input type="submit" value="提交2"/>
+```
+
+#### 2.4.10 下拉框
+
+```html
+<!--单选下拉框-->
+<select>
+    <option>北京</option>
+    <option>上海</option>
+    <option>深圳</option>
+</select>
+
+<!--多选下拉框-->
+<select multiple>
+    <option>北京</option>
+    <option>上海</option>
+    <option>深圳</option>
+</select>
+```
+
+#### 2.4.11 多行文本
+
+```html
+<!--默认3行-->
+<textarea rows="3"></textarea>
+```
+
+#### 案例：用户注册
+
+```
+<body>
+<h1>用户注册</h1>
+<div>
+    用户名：<input type="text"/>
+</div>
+<div>
+    密码：<input type="password"/>
+</div>
+<div>
+    性别：
+    <input type="radio" name="w"/>男
+    <input type="radio" name="w"/>女
+</div>
+<div>
+    爱好：
+    <input type="checkbox"/>篮球
+    <input type="checkbox"/>乒乓球
+    <input type="checkbox"/>羽毛球
+</div>
+<div>
+    城市：
+    <select>
+        <option>北京</option>
+        <option>上海</option>
+        <option>深圳</option>
+    </select>
+</div>
+<div>
+    擅长领域：
+    <select multiple>
+        <option>游戏</option>
+        <option>睡觉</option>
+        <option>刷抖音</option>
+        <option>吃饭</option>
+    </select>
+</div>
+<div>
+    备注：<textarea></textarea>
+</div>
+<div>
+    <input type="button" value="button按钮">
+    <input type="submit" value="submit按钮">
+</div>
+</body>
+```
+
+![](imge/WEB开发.assets/image-20230706171930082.png)
+
+#### form表单和提交
+
+- form标签
+  - 提交方式(post/get)：`method="get" ` 
+  - 提交地址：`action="xxx/xxx/xx/xx"`
+  - 提交按钮：`<input type="submit" value="submit按钮">`
+
+- 数据标签
+  - 数据标签必须有`name`属性
+
+- 后台数据获取
+  - get方式：`request.args`
+  - post方式：`request.form`
+    - 单值获取：`request.form.get("username")`
+    - 多值获取：`request.form.getlist("hobby")`
+
+
 
 # 二、Mysql
 

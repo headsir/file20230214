@@ -560,6 +560,223 @@ img【行内标签】
 </html>
 ```
 
+##### 浮动
+
+注意：浮动会使标签脱离文档流。
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <style>
+        .item {
+            /*左边浮动*/
+            float: left;
+            /*宽度*/
+            width: 200px;
+            /*高度*/
+            height: 170px;
+            /*红色边框*/
+            border: 1px solid red;
+        }
+    </style>
+</head>
+<body>
+<div>
+    <span>左边</span>
+    <!--    右边浮动-->
+    <span style="float:right">右边</span>
+</div>
+<!--添加蓝色底色-->
+<div style="background-color: dodgerblue">
+    <div class="item">一</div>
+    <div class="item">二</div>
+    <div class="item">三</div>
+    <div class="item">四</div>
+    <div class="item">五</div>
+    <div class="item">六</div>
+    <!-- 解除浮动脱离文档流-->
+    <div style="clear: both"></div>
+</div>
+<div>您好</div>
+</body>
+</html>
+```
+
+![image-20230707152448562](imge/WEB开发.assets/image-20230707152448562.png)
+
+##### 内边距
+
+内边距，标签内部距离
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <style>
+        .outer {
+            border: 1px solid red;
+            height: 200px;
+            width: 200px;
+            /*内边距：标签内部距离*/
+            /*padding-top: 20px;*/
+            /*padding-left: 20px;*/
+            /*padding-right: 20px;*/
+            /*padding-bottom: 20px;*/
+            /*代表上下左右*/
+            /*padding: 20px;*/
+            /*分别代表 上 右 下 左（顺时针）*/
+            padding: 20px 10px 5px 3px;
+        }
+    </style>
+</head>
+<body>
+<div class="outer">
+    <div style="background-color: gold">听妈妈的话</div>
+    <div>小朋友是否下水</div>
+</div>
+</body>
+</html>
+```
+
+##### 外边距
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<div style="height: 200px;background-color: dodgerblue;"></div>
+<!--外边距：外部距离 margin-top: 20px-->
+<div style="background-color: red;height: 100px;margin-top: 20px;"></div>
+</body>
+</html>
+```
+
+#### 1.3.5 CSS案例
+
+##### 小米商城顶部
+
+- body标签，默认有一个边距
+
+  ```css
+  /*去除边距*/
+  body {
+      /*外边距为0*/
+      margin: 0;
+  }
+  ```
+
+- 内容居中
+
+  - 文本居中
+
+    ```css
+    <div style="
+    /*外边距*/
+    margin-top: 30px;
+    /*标签宽度*/
+    width:800px;
+    /*文本居中*/
+    text-align: center;
+    /*添加红色边框*/
+    border: 1px solid red
+    ">文本居中</div>
+    ```
+
+    ![image-20230707180554815](imge/WEB开发.assets/image-20230707180554815.png)
+
+  - 区域局中
+
+    自己有宽度，左右自动
+
+    ```CSS
+    .container {
+        width: 980px;
+        /*外边距：上下0 左右 自动*/
+        margin: 0 auto;
+    }
+    ```
+
+![image-20230707174955698](imge/WEB开发.assets/image-20230707174955698.png)
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>小米商城 - Xiaomi 13、Redmi K60、MIX FOLD 2，小米电视官方网站</title>
+    <style>
+        body {
+            /*外边距为0*/
+            margin: 0;
+        }
+
+        .header {
+            /*背景色：#333*/
+            background-color: #333;
+        }
+
+        .container {
+            width: 980px;
+            /*外边距：上下0 左右 自动*/
+            margin: 0 auto;
+        }
+
+        .header .menu {
+            /*设置标签浮动*/
+            float: left;
+            /*标签颜色*/
+            color: white;
+        }
+
+        .header .account {
+            float: right;
+            color: white;
+        }
+
+        .header a {
+            color: #b0b0b0;
+            /*标签高度*/
+            line-height: 40px;
+            display: inline-block;
+            font-size: 12px;
+            margin-right: 10px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="header">
+    <div class="container">
+        <div class="menu">
+            <a>小米商城</a>
+            <a>MIUI</a>
+            <a>云服务</a>
+            <a>有品</a>
+            <a>开放平台</a>
+        </div>
+        <div class="account">
+            <a href="">登录</a>
+            <a href="">注册</a>
+            <a href="">消息</a>
+            <a href="">通知</a>
+        </div>
+        <!--解除浮动-->
+        <div style="clear: both"></div>
+    </div>
+</div>
+</body>
+</html>
+```
+
 
 
 

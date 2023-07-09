@@ -777,6 +777,136 @@ img【行内标签】
 </html>
 ```
 
+##### 小米商城二级菜单
+
+```
+a标签，默认有下划线
+/*取消下划线*/
+text-decoration: none;
+
+鼠标放上面变格式
+/*鼠标放到上面显示样式设置*/
+ a:hover {
+color: #ff6788;
+}
+```
+
+1、 划分区域
+
+2、搭建框架
+
+3、设置样式
+
+模板：
+
+![image-20230709160423123](imge/WEB开发.assets/image-20230709160423123.png)
+
+代码：
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <style>
+        body {
+            margin: 0;
+        }
+
+        .sub-header {
+            height: 100px;
+            /*background-color: #b0b0b0;*/
+        }
+
+        .container {
+            width: 1128px;
+            margin: 0 auto;
+            /*border: 1px solid red;*/
+        }
+
+        .sub-header .height {
+            height: 100px
+        }
+
+        .sub-header .log {
+            width: 234px;
+            float: left;
+            /*border: 1px solid red;*/
+        }
+
+        .sub-header .log a {
+            margin-top: 22px;
+            display: inline-block;
+        }
+
+        .sub-header .log a img {
+            height: 56px;
+            width: 56px;
+        }
+
+        .sub-header .menu-list {
+            float: left;
+            line-height: 100px;
+            /*border: 1px solid red;*/
+        }
+
+        .sub-header .menu-list a {
+            padding: 0 10px;
+            display: inline-block;
+            color: #333333;
+            font-size: 16px;
+            /*取消下划线*/
+            text-decoration: none;
+        }
+        /*鼠标放到上面显示样式设置*/
+        .sub-header .menu-list a:hover{
+            color:#ff6788;
+        }
+
+        .sub-header .search {
+            float: right;
+            display: inline-block;
+            line-height: 100px;
+            /*border: 1px solid red;*/
+
+        }
+    </style>
+</head>
+<body>
+<div class="sub-header">
+    <div class="container">
+        <div class="log height">
+            <a href="https://www.mi.com">
+                <img src="images/log.png" alt="">
+            </a>
+        </div>
+        <div class="menu-list height">
+            <a href="https://www.mi.com">Xiaomi手机</a>
+            <a href="https://www.mi.com">Redmi手机</a>
+            <a href="https://www.mi.com">电视</a>
+            <a href="https://www.mi.com">笔记本</a>
+            <a href="https://www.mi.com">平板</a>
+            <a href="https://www.mi.com">家电</a>
+            <a href="https://www.mi.com">路由器</a>
+            <a href="https://www.mi.com">服务中心</a>
+            <a href="https://www.mi.com">社区</a>
+        </div>
+        <div class="search height">搜索框暂时先不做</div>
+        <div style="clear: both"></div>
+    </div>
+</div>
+
+</body>
+</html>
+```
+
+显示：
+
+![image-20230709170231747](imge/WEB开发.assets/image-20230709170231747.png)
+
+
+
 
 
 

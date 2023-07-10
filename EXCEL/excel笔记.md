@@ -31,3 +31,19 @@ Ctrl + PgUp / Ctrl + PgDn
 ![image-20230417182050087](imge/excel笔记.assets/image-20230417182050087.png)
 
 ![image-20230417183521185](imge/excel笔记.assets/image-20230417183521185.png)
+
+### 6、求和SUM应用
+
+#### SUM
+
+日常应用，不做介绍
+
+SUM（数据1，数据2，数据3，...）
+
+#### SUMIF
+
+SUMIF(条件区域，条件，求和区域）
+
+
+
+#### SUMIFS

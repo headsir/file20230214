@@ -907,13 +907,308 @@ color: #ff6788;
 
 ##### 小米商城推荐区域：
 
+透明度
+
+```
+/*透明度*/
+opacity: 0.7;
+```
+
 
 
 模板：
 
 ![image-20230709172243714](imge/WEB开发.assets/image-20230709172243714.png)
 
+代码：
 
+```HTML
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>小米商城 - Xiaomi 13、Redmi K60、MIX FOLD 2，小米电视官方网站</title>
+    <style>
+        body {
+            /*外边距为0*/
+            margin: 0;
+        }
+
+        img {
+            width: 100%;
+            height: 100%;
+        }
+
+        .left {
+            float: left;
+        }
+
+        .header {
+            /*背景色：#333*/
+            background-color: #333;
+        }
+
+        .container {
+            width: 1226px;
+            /*外边距：上下0 左右 自动*/
+            margin: 0 auto;
+        }
+
+        .header .menu {
+            /*设置标签浮动*/
+            float: left;
+            /*标签颜色*/
+            color: white;
+        }
+
+        .header .account {
+            float: right;
+            color: white;
+        }
+
+        .header a {
+            color: #b0b0b0;
+            /*标签高度*/
+            line-height: 40px;
+            /*转换 行、块*/
+            display: inline-block;
+            /*字体大小*/
+            font-size: 12px;
+            /*外边距*/
+            margin-right: 10px;
+            /*取消下划线*/
+            text-decoration: none;
+
+        }
+
+        .header a:hover {
+            color: white;
+            /*取消下划线*/
+            text-decoration: none;
+        }
+
+        .sub-header {
+            height: 100px;
+            /*background-color: #b0b0b0;*/
+        }
+
+        .sub-header .height {
+            height: 100px
+        }
+
+        .sub-header .log {
+            width: 234px;
+            float: left;
+            /*border: 1px solid red;*/
+        }
+
+        .sub-header .log a {
+            margin-top: 22px;
+            display: inline-block;
+        }
+
+        .sub-header .log a img {
+            height: 56px;
+            width: 56px;
+        }
+
+        .sub-header .menu-list {
+            float: left;
+            line-height: 100px;
+            /*border: 1px solid red;*/
+        }
+
+        .sub-header .menu-list a {
+            /*内边距,上下0 左右10px*/
+            padding: 0 10px;
+            display: inline-block;
+            color: #333333;
+            font-size: 16px;
+            /*取消下划线*/
+            text-decoration: none;
+            /*border: 1px solid red;*/
+        }
+
+        /*鼠标放到上面显示样式设置*/
+        .sub-header .menu-list a:hover {
+            color: #ff6788;
+        }
+
+        .sub-header .search {
+            float: right;
+            display: inline-block;
+            line-height: 100px;
+            /*border: 1px solid red;*/
+
+        }
+
+        .slider .sd-img {
+            /*width: 1226px;*/
+            height: 460px;
+        }
+
+        .news {
+            padding-top: 14px;
+        }
+
+        .news .channel {
+            width: 228px;
+            height: 164px;
+            background-color: #5f5750;
+            padding: 3px;
+        }
+
+        .news .channel .item {
+            height: 86px;
+            width: 76px;
+            /*border: 1px solid royalblue;*/
+            float: left;
+            text-align: center;
+        }
+
+        .news .channel .item a {
+            display: inline-block;
+            font-size: 12px;
+            padding-top: 18px;
+            color: white;
+            text-decoration: none;
+            /*透明度*/
+            opacity: 0.7;
+        }
+
+        .news .channel .item a:hover {
+            opacity: 1;
+        }
+
+        .news .channel img {
+            height: 24px;
+            width: 24px;
+            display: block;
+            /*上0 左右自动 下4*/
+            margin: 0 auto 4px;
+
+        }
+
+        .news .list-item {
+            width: 316px;
+            height: 170px;
+        }
+
+    </style>
+</head>
+<body>
+
+<div class="header">
+    <div class="container">
+        <div class="menu">
+            <a href="https://www.mi.com">小米商城</a>
+            <a href="https://www.mi.com">MIUI</a>
+            <a href="https://www.mi.com">云服务</a>
+            <a href="https://www.mi.com">有品</a>
+            <a href="https://www.mi.com">开放平台</a>
+        </div>
+        <div class="account">
+            <a href="https://www.mi.com">登录</a>
+            <a href="https://www.mi.com">注册</a>
+            <a href="https://www.mi.com">消息</a>
+            <a href="https://www.mi.com">通知</a>
+        </div>
+        <!--解除浮动-->
+        <div style="clear: both"></div>
+    </div>
+</div>
+<div class="sub-header">
+    <div class="container">
+        <div class="log height">
+            <a href="https://www.mi.com">
+                <img src="images/log.png" alt="">
+            </a>
+        </div>
+        <div class="menu-list height">
+            <a href="https://www.mi.com">Xiaomi手机</a>
+            <a href="https://www.mi.com">Redmi手机</a>
+            <a href="https://www.mi.com">电视</a>
+            <a href="https://www.mi.com">笔记本</a>
+            <a href="https://www.mi.com">平板</a>
+            <a href="https://www.mi.com">家电</a>
+            <a href="https://www.mi.com">路由器</a>
+            <a href="https://www.mi.com">服务中心</a>
+            <a href="https://www.mi.com">社区</a>
+        </div>
+        <div class="search height">搜索框暂时先不做</div>
+        <div style="clear: both"></div>
+    </div>
+</div>
+<div class="slider">
+    <div class="container">
+        <div class="sd-img">
+            <img src="images/Note12T%20Pro.jpeg" alt="">
+        </div>
+    </div>
+
+</div>
+<div class="news">
+    <div class="container">
+        <div class="channel left">
+            <div class="item">
+                <a href="https://www.mi.com">
+                    <img src="images/保障服务.png" alt="">
+                    <span>保障服务</span>
+                </a>
+            </div>
+            <div class="item">
+                <a href="https://www.mi.com">
+                    <img src="images/企业团购.png" alt="">
+                    <span>企业团购</span>
+                </a>
+            </div>
+            <div class="item">
+                <a href="https://www.mi.com">
+                    <img src="images/F码通道.png" alt="">
+                    <span>F码通道</span>
+                </a>
+            </div>
+            <div class="item">
+                <a href="https://www.mi.com">
+                    <img src="images/米粉卡.png" alt="">
+                    <span>米粉卡</span>
+                </a>
+            </div>
+            <div class="item">
+                <a href="https://www.mi.com">
+                    <img src="images/以旧换新.png" alt="">
+                    <span>以旧换新</span>
+                </a>
+            </div>
+            <div class="item">
+                <a href="https://www.mi.com">
+                    <img src="images/话费充值.png" alt="">
+                    <span>话费充值</span>
+                </a>
+            </div>
+            <!--            <div class="clear:both"></div>-->
+        </div>
+        <div class="list-item left" style="margin-left: 14px">
+            <img src="images/Note12%20Turbo.jpg" alt="">
+        </div>
+        <div class="list-item left" style="margin-left: 15px">
+            <img src="images/xlaoml 13系列.jpg" alt="">
+        </div>
+        <div class="list-item left" style="margin-left: 15px">
+            <img src="images/K60.jpg" alt="">
+        </div>
+        <!--        <div class="clear: both"></div>-->
+    </div>
+</div>
+</body>
+</html>
+```
+
+
+
+显示：
+
+![image-20230712234442438](imge/WEB开发.assets/image-20230712234442438.png)
 
 
 

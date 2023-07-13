@@ -905,7 +905,7 @@ color: #ff6788;
 
 ![image-20230709170231747](imge/WEB开发.assets/image-20230709170231747.png)
 
-##### 小米商城推荐区域：
+##### 小米商城推荐区域
 
 透明度
 
@@ -1209,6 +1209,291 @@ opacity: 0.7;
 显示：
 
 ![image-20230712234442438](imge/WEB开发.assets/image-20230712234442438.png)
+
+#### 1.3.6 CSS知识点
+
+##### hover(伪类)
+
+```css
+.download{
+    /*隐藏*/
+    display: none;
+}
+
+.app:hover .download{
+    /*显示*/
+    display: block;
+}
+```
+
+
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <style>
+        .c1 {
+            color: red;
+            font-size: 18px;
+        }
+
+        .c1:hover {
+            color: green;
+            font-size: 50px;
+        }
+
+        .c2 {
+            height: 300px;
+            width: 500px;
+            border: 1px solid red;
+        }
+
+        .c2:hover {
+            border: 5px solid green;
+        }
+
+        .download{
+            /*隐藏*/
+            display: none;
+        }
+
+        .app:hover .download{
+            /*显示*/
+            display: block;
+        }
+        .app:hover .title{
+            color: red;
+        }
+    </style>
+</head>
+<body>
+    <div class="c1">联通</div>
+    <div class="c2">广西</div>
+    
+    <div class="app">
+        <div class="title">下载AAP</div>
+        <div class="download">
+            <img src="images/APP二维码.png" alt="">
+        </div>
+    </div>
+</body>
+</html>
+```
+
+效果：
+
+![20230713-214623](imge/WEB开发.assets/20230713-214623.gif)
+
+##### after(伪类)
+
+```css
+/*标签尾部添加东西*/
+.c1:after {
+    content: "大帅哥";
+}
+```
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <style>
+
+        /*标签尾部添加东西*/
+        .c1:after {
+            content: "大帅哥";
+        }
+        .clearfix{
+            background-color: #ff6788;
+        }
+        .clearfix:after {
+            /*标签后面填充字符为空*/
+            content: "";
+            /*div 变块级标签*/
+            display: block;
+            /*清除浮动*/
+            clear: both;
+        }
+        .item{
+            float: left;
+            border: 1px solid red;
+        }
+    </style>
+</head>
+<body>
+    <div class="c1">武阳郡</div>
+    <div class="clearfix">
+        <div class="item">1</div>
+        <div class="item">2</div>
+        <div class="item">3</div>
+        <div class="clear:both"></div>
+    </div>
+</body>
+</html>
+```
+
+效果：
+
+![image-20230713220832945](imge/WEB开发.assets/image-20230713220832945.png)
+
+##### position（窗口位置）
+
+- fixed 固定在窗口的某个位置
+
+- > 设置相对位置 relative absolute
+
+###### fixed
+
+固定在窗口的某个位置
+
+###### 案例：返回顶部
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+  <style>
+    .back{
+      /*固定在窗口的某个位置*/
+      position: fixed;
+
+      width: 68px;
+      height: 60px;
+      border: 1px solid red;
+
+      /*右边*/
+      right: 0;
+      /*底部*/
+      bottom:0;
+    }
+  </style>
+</head>
+<body>
+<!--高度1000px,底色灰色-->
+<div style="height: 1000px;background-color: #b0b0b0"></div>
+  <div class="back">返回顶部</div>
+</body>
+</html>
+```
+
+效果：
+
+![image-20230713223328786](imge/WEB开发.assets/image-20230713223328786.png)
+
+###### 案例：对话框
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <style>
+        .mask{
+            background-color: black;
+            position: fixed;
+            left: 0;
+            right: 0;
+            top: 0;
+            bottom: 0;
+            opacity: 0.7;
+            z-index: 999;
+        }
+        .dialog {
+            /*固定在窗口的某个位置*/
+            position: fixed;
+
+            width: 280px;
+            height: 200px;
+            background-color: white;
+
+            left: 0;
+            right: 0;
+            margin: 0 auto;
+
+            top: 200px;
+            /*谁的值大谁在上面*/
+            z-index: 1000;
+        }
+    </style>
+</head>
+<body>
+
+
+<!--高度1000px,底色灰色-->
+<div style="height: 1000px;">gggggggg</div>
+<div class="dialog">对话框</div>
+<div class="mask"></div>
+
+
+</body>
+</html>
+```
+
+###### relative和absolute
+
+设置相对位置
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <style>
+        .c1{
+            height: 300px;
+            width: 500px;
+            border: 1px solid red;
+            margin: 100px;
+
+            position: relative;
+        }
+
+        .c1 .c2{
+            height: 59px;
+            width: 59px;
+            background-color: #00FF7F;
+
+            position: absolute;
+            /*相对c1的位置*/
+            right: 20px;
+            bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+<div class="c1">
+    <div class="c2"></div>
+    <div class="c2"></div>
+    <div class="c2"></div>
+    <div class="c2"></div>
+</div>
+</body>
+</html>
+```
+
+##### border（边框）
+
+```css
+/*线条宽度 实线 颜色*/
+border: 1px solid red;
+
+transparent 透明色
+```
+
+##### background-color（背景色）
+
+参见上面案例
+
+#### 1.3.7 CSS模板
 
 
 

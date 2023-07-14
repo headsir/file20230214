@@ -1493,7 +1493,93 @@ transparent 透明色
 
 参见上面案例
 
-#### 1.3.7 CSS模板
+### 1.4 BootStrap 模板
+
+#### 下载
+
+官网：https://v3.bootcss.com/
+
+![image-20230714162958760](imge/WEB开发.assets/image-20230714162958760.png)
+
+#### 使用
+
+![image-20230714163507137](imge/WEB开发.assets/image-20230714163507137.png)
+
+##### 1.4.1 CSS样式
+
+###### 初识bootstrap
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <!--  开发版本  -->
+    <link rel="stylesheet" href="static/plugins/bootstrap-3.4.1/css/bootstrap.css">
+    <!--  生产版本（开发版本压缩后的文件，占用空间小）  -->
+<!--    <link rel="stylesheet" href="static/plugins/bootstrap-3.4.1/css/bootstrap.min.css">-->
+</head>
+<body>
+    <input type="button" value="提交" />
+    <input type="button" value="提交" class="btn btn-primary"/>
+    <input type="button" value="提交" class="btn btn-success" />
+    <input type="button" value="提交" class="btn btn-danger" />
+    <input type="button" value="提交" class="btn btn-danger btn-xs" />
+</body>
+</html>
+```
+
+效果：
+
+![image-20230714164815300](imge/WEB开发.assets/image-20230714164815300.png)
+
+###### 导航条
+
+可以对模板里面的样式重写
+
+```CSS
+<style>
+    .navbar {
+        border-radius: 0;
+    }
+</style>
+```
+
+![image-20230714170816659](imge/WEB开发.assets/image-20230714170816659.png)
+
+###### 栅格系统
+
+把整体划分为12格
+
+分类
+
+- 响应式
+
+  ```css
+  <div class="col-lg-5" style="background-color: #00FF7F">5</div>
+  <div class="col-lg-6" style="background-color: red">6</div>
+  ```
+
+  
+
+- 非响应式
+
+  ```html
+      <!--    非响应式-->
+      <div class="col-xs-4" style="background-color: #00FF7F">4</div>
+      <div class="col-xs-5" style="background-color: red">4</div>
+  ```
+
+  
+
+![image-20230714171255480](imge/WEB开发.assets/image-20230714171255480.png)
+
+
+
+
+
+
 
 
 

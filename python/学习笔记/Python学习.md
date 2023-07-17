@@ -1582,6 +1582,12 @@ print(sorted(cars, key=reverse))   # 翻转排序
 ['honda', 'tesla', 'toyota', 'gm', 'volkswagen', 'benz']
 ```
 
+## 5.11 repr() 方法
+
+repr() 方法可以将读取到的格式字符，比如换行符、制表符，转化为其相应的转义字符。
+
+
+
 # 六、模块
 
 ## 6.1 模块来源

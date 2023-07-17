@@ -262,7 +262,262 @@ for sibling in soup.div.previous_siblings:
     print(repr(sibling))
 ```
 
+## 5.9 前后节点
 
+在所有节点，不分层次
+
+next_element 和previous_element 属性
+
+## 5.10 所有前后节点
+
+next_elements 和previous_elements 属性
+
+```python
+for element in soup.div.next_elements:
+    print(repr(element))
+```
+
+# 六、搜索文档树
+
+## 6.1 find_all( ）
+
+搜索当前 tag 的所有 tag 子节点，并判断是否符合过滤器的条件
+
+参数：name , attrs , recursive , text , **kwargs
+
+### 6.1.1 name 参数
+
+name 参数可以查找所有名字为 name 的 tag, 字符串对象会被自动忽略掉
+
+- 传字符串
+
+  最简单的过滤器是字符串。在搜索方法中传入一个字符串参数，Beautiful Soup 会查找与字符串完整匹配的内容。
+
+  下面的例子用于查找文档中所有的 img 标签
+
+  ```python
+  soup.find_all("img")
+  ```
+
+- 传正则表达式
+
+  如果传入正则表达式作为参数，Beautiful Soup 会通过正则表达式的 match () 来匹配内容。
+
+  下面例子中找出所有以 b 开头的标签，这表示 b 开头标签都应该被找到
+
+  ```python
+  import re
+  for tag in soup.find_all(re.compile("^b")):
+      print(tag.name)
+  ```
+
+- 传列表
+
+  如果传入列表参数，Beautiful Soup 会将与列表中任一元素匹配的内容返回。
+
+  下面代码找到文档中所有 a 标签和 b 标签
+
+  ```python
+  soup.find_all(["b", "img"])
+  ```
+
+- 传 True
+
+  True 可以匹配任何值
+
+  下面代码查找到所有的 tag, 但是不会返回字符串节点
+
+  ```
+  for tag in soup.find_all(True):
+      print(tag.name)
+  ```
+
+- 传方法
+
+  如果没有合适过滤器，那么还可以定义一个方法，方法只接受一个元素参数 , 如果这个方法返回 True 表示当前元素匹配并且被找到，如果不是则反回 False 
+
+  下面方法校验了当前元素，如果包含 class 属性却不包含 id 属性，那么将返回 True
+
+  自定义方法:
+
+  校验当前元素,如果包含 `class` 属性却不包含 `id` 属性,那么将返回 `True`
+
+  ```
+  def has_class_but_no_id(tag):
+      return tag.has_attr('class') and not tag.has_attr('id')
+  ```
+
+  ```
+  [tag.attrs for tag in soup.find_all(has_class_but_no_id)]
+  ```
+
+### 6.1.2 keyword 参数
+
+注意：如果一个指定名字的参数不是搜索内置的参数名，搜索时会把该参数当作指定名字 tag 的属性来搜索，如果包含一个名字为 id 的参数，Beautiful Soup 会搜索每个 tag 的”id” 属性
+
+```
+soup.find_all(id="sugarea")
+```
+
+- 如果传入 href 参数，Beautiful Soup 会搜索每个 tag 的”href” 属性
+
+```
+soup.find_all(href=re.compile("id=1771629833664382922"))
+
+[<a href="https://baijiahao.baidu.com/s?id=1771629833664382922" mon="a=9" target="_blank">华为加入“百模大战”，好戏才刚刚开始！</a>]
+```
+
+- 使用多个指定名字的参数可以同时过滤 tag 的多个属性
+
+```
+soup.find_all(href=re.compile("baidu"),style="top: 29px;")
+```
+
+-  class 过滤， class 是 python 的关键词，加个下划线
+
+```
+soup.find_all(href=re.compile("baidu"),class_="img")
+```
+
+- 有些 tag 属性在搜索不能使用，比如 HTML5 中的 data- 属性
+
+  可以通过 find_all () 方法的 attrs 参数定义一个字典参数来搜索包含特殊属性的 tag
+
+  根据属性查找标签`soup.select("*[data-control]")`
+
+```
+soup.find_all(attrs={"data-control": "pane-news"})
+
+[<a data-control="pane-news" href="javascript:void(0);">热点要闻</a>]
+```
+
+### 6.1.2 text 参数
+
+通过 text 参数可以搜搜文档中的字符串内容。与 name 参数的可选值一样，text 参数接受字符串，正则表达式，列表，True
+
+```
+soup.find_all(text=" Elsie ")
+soup.find_all(text=["百度新闻——海量中文资讯平台", " Elsie ", "我的主页"])
+soup.find_all(text=re.compile("新闻$"))
+```
+
+### 6.1.3 limit 参数
+
+limit 参数限制返回结果的数量。效果与 SQL 中的 limit 关键字类似
+
+```
+soup.find_all("a", limit=4)
+```
+
+### 6.1.4 recursive 参数
+
+调用 tag 的 find_all () 方法时，Beautiful Soup 会检索当前 tag 的所有子孙节点，如果只想搜索 tag 的直接子节点，可以使用参数 recursive=False 
+
+```
+soup.body.find_all("a",recursive=False)
+```
+
+## 6.2 find()
+
+( name , attrs , recursive , text , \*\*kwargs )  
+
+它与 find_all () 方法唯一的区别是 find_all () 方法的返回结果是值包含一个元素的列表，而 find () 方法直接返回结果 
+
+## 6.3 find_parents() 和find_parent()
+
+ find_all () 和 find () 只搜索当前节点的所有子节点，孙子节点等. find_parents () 和 find_parent () 用来搜索当前节点的父辈节点，搜索方法与普通 tag 的搜索方法相同，搜索文档搜索文档包含的内容
+
+## 6.4 find_next_siblings() 和find_next_sibling()
+
+这 2 个方法通过 .next_siblings 属性对当 tag 的所有后面解析的兄弟 tag  节点进行迭代，
+
+- find_next_siblings () 方法返回所有符合条件的后面的兄弟节点
+
+- find_next_sibling ()  只返回符合条件的后面的第一个 tag 节点  
+
+## 6.5 find_previous_siblings() 和find_previous_sibling()
+
+这 2 个方法通过 .previous_siblings 属性对当前 tag 的前面解析的兄弟 tag  节点进行迭代
+
+- find_previous_siblings ()  方法返回所有符合条件的前面的兄弟节点
+
+- find_previous_sibling () 方法返回第一个符合条件的前面的兄弟节点 
+
+## 6.6 find_all_next() 和find_next()
+
+ 这 2 个方法通过 .next_elements 属性对当前 tag 的之后的 tag 和字符串进行迭代，
+
+- find_all_next () 方法返回所有符合条件的节点，
+
+- find_next () 方法返回第一个符合条件的节点
+
+## 6.7 find_all_previous () 和 find_previous ()
+
+这 2 个方法通过 .previous_elements 属性对当前节点前面的 tag 和字符串进行迭代
+
+- find_all_previous () 方法返回所有符合条件的节点
+
+- find_previous () 方法返回第一个符合条件的节点 
+
+注：以上（2）（3）（4）（5）（6）（7）方法参数用法与 find_all () 完全相同，原理均类似，在此不再赘述。           
+
+## 6.8 CSS 选择器
+
+soup.select()，返回类型是 list
+
+### 6.8.1 通过标签名查找
+
+```
+soup.select('a')
+```
+
+### 6.8.2 通过类名查找
+
+```
+soup.select('.img-link')
+
+[<a class="img-link img-link1" href="https://cn.china.cn/" target="_blank"> </a>,
+ <a class="img-link img-link2" href="http://cyberpolice.mps.gov.cn/wfjb/" target="_blank"> </a>,
+ <a class="img-link img-link3" href="http://www.bjjubao.org/" target="_blank"> </a>]
+```
+
+### 6.8.3 通过 id 名查找
+
+```
+soup.select('#app_tooltip')
+
+[<a href="javascript:void(0)" id="app_tooltip" mon="target=appLink" style="margin-right:20px;">百度新闻客户端
+ <div id="app_tooltip_qrcode">
+ <img src="%E7%99%BE%E5%BA%A6%E6%96%B0%E9%97%BB%E2%80%94%E2%80%94%E6%B5%B7%E9%87%8F%E4%B8%AD%E6%96%87%E8%B5%84%E8%AE%AF%E5%B9%B3%E5%8F%B0_files/newErweima_9fa03e0.png"/>
+ </div>
+ </a>]
+```
+
+### 6.8.4 组合查找
+
+组合查找即和写 class 文件时，标签名与类名、id 名进行的组合原理是一样的，例如查找 body 标签中，id 等于 app_tooltip 的内容，二者需要用空格分开
+
+```
+soup.select('body #app_tooltip')
+```
+
+直接子标签查找
+
+```
+soup.select("head > title")
+```
+
+### 6.8.5 属性查找
+
+​		查找时还可以加入属性元素，属性需要用中括号括起来，注意属性和标签属于同一节点，所以中间不能加空格，否则会无法匹配到。
+
+```
+soup.select('a[class="tab-login tab-enter-recommend"]')
+```
+
+```
+soup.select('a[href="https://news.baidu.com/guoji"]')
+```
 
 
 

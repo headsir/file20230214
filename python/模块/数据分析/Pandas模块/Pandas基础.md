@@ -1918,7 +1918,7 @@ df["汇总"] = df.sum(axis=1)
 df.loc["合计"] = df.sum(axis=0)
 ```
 
-
+### 5.20 数据转换
 
 ## 六、Pandas 数据分组
 

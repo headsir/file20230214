@@ -1920,6 +1920,16 @@ df.loc["合计"] = df.sum(axis=0)
 
 ### 5.20 数据转换
 
+#### 转换成字典：to_dict
+
+```python
+mysql_WCR_df.to_dict('records')[0]
+```
+
+
+
+
+
 ## 六、Pandas 数据分组
 
 利用 groupby() 方法，数据类型为 DataFrameGroupBy

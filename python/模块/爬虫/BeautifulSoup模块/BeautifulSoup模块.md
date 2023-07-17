@@ -519,9 +519,43 @@ soup.select('a[class="tab-login tab-enter-recommend"]')
 soup.select('a[href="https://news.baidu.com/guoji"]')
 ```
 
+属性可以与上述查找方式组合，不在同一节点的空格隔开，同一节点的不加空格
+
+```
+soup.select('div a[href="https://news.baidu.com/guoji]')
+```
+
+select 方法返回的结果都是列表形式，可以遍历形式输出，然后用 get_text () 方法来获取它的内容。
+
+```
+for title in soup.select('a'):
+    print(title.get_text())
+```
 
 
 
+# 笔记：
+
+## 获取标签文本的方法
+
+```
+soup.select('title')[0].text
+
+soup.select('title')[0].getText()
+
+soup.select('title')[0].get_text()
+
+soup.select('title')[0].string
+```
+
+## 获取标签的属性值
+
+get(key, default = None),key 是标签的属性名。
+
+```
+for i in soup.find_all("a"):
+    print(i.get("id"))
+```
 
 
 

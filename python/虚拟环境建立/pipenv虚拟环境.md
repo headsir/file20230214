@@ -43,6 +43,7 @@ pipenv install -r requirements.txt  # 导入requirements.txt 需要转码为UTF-
 豆瓣 https://pypi.douban.com/simple/
 网易开源镜像站    https://mirrors.163.com/
 搜狐开源镜像    https://mirrors.sohu.com/
+大连东软镜像				http://mirrors.neusoft.edu.cn/pypi/web/simple/
 ```
 
 #### 3.2 更新包

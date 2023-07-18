@@ -4,6 +4,8 @@
 
 [官方文档]https://www.pypandas.cn/docs/
 
+[C语言中文网]http://c.biancheng.net/pandas/
+
 # Pandas 基础
 
 ## 一、Pandas 数据结构

@@ -1,3 +1,5 @@
+https://blog.51cto.com/python3/2950664
+
 # python-pptx操作PPT
 
 安装模块

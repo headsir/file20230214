@@ -583,6 +583,22 @@ pd.read_excel(io, sheet_name=0, header=0, names=None, index_col=None,
 
 ```
 from sqlalchemy import create_engine
+# 创建数据库连接,mysql用户名是root，密码是qazwsx，本地的数据库服务是localhost,数据库的名称试验库,数据库编码utf8
+engine = create_engine('mysql+pymysql://root:qazwsx@localhost/试验库?charset=utf8')
+```
+
+利用 pymysql模块连接数据库
+
+```
+# 创建数据库连接,mysql用户名是root，密码是qazwsx，本地的数据库服务是localhost,数据库的名称试验库,数据库编码utf8
+import pymysql
+con = pymysql.connect(host=localhost, user=username, password=password, database=dbname, charset=‘utf8’, use_unicode=True)
+```
+
+
+
+```
+from sqlalchemy import create_engine
 import pandas as pd
 
 # 创建数据库连接,mysql用户名是root，密码是qazwsx，本地的数据库服务是localhost,数据库的名称试验库,数据库编码utf8
@@ -2236,7 +2252,7 @@ DataFrame.to_excel(excel_writer, sheet_name='Sheet1', na_rep='', float_format=No
 
 通过参数 encoding 设置，默认为 UTF-8 ，中文会乱码，一般使用 utf-8-sig 、gbk
 
-#### 9.3 在新建文件中添加多个Sheet
+#### 9.2.3 在新建文件中添加多个Sheet
 
 利用 ExcelWriter() 函数，参数 engine 设置所使用的包，举例：
 
@@ -2248,7 +2264,7 @@ df3.to_excel(writer,sheet_name = "df3",index = False)
 writer.save()
 ```
 
-#### 9.4 在已存在文件中添加Sheet
+#### 9.2.4 在已存在文件中添加Sheet
 
 利用 openpyxl 模块
 
@@ -2272,6 +2288,88 @@ with pd.ExcelWriter(path_file, engine="openpyxl") as writer:
     data.to_excel(excel_writer=writer, sheet_name=sheeetname, index=False)  # index=False,忽略行标签
     writer.save()
 ```
+
+## 9.3 导出mysql数据库
+
+语法：
+
+```
+DataFrame.to_sql(name, con, schema=None, if_exists='fail', index=True, index_label=None, chunksize=None, dtype=None)
+```
+
+### 1.name
+
+该name为SQL表的名字，这是必须输入的参数，指定写入的表。
+
+### 2.con:
+
+con为python连接sql的sqlalchemy.engine，该参数也为必须输入的参数，可以使用SQLAlchemy数据库支持的连接引擎。该引擎可以引入：
+
+```
+from sqlalchemy import create_engine
+import pymysql
+
+#创建引擎
+engine=create_engine('mysql+pymysql://用户名:密码@主机名/数据库?charset=utf8')
+```
+
+### 3.schema
+
+​		指定架构（如果database flavor支持此功能）。如果没有，则使用默认架构。pandas中get_schema()方法是可以编写sql的写入框架的，没用传入的话就是普通的Dataframe读入形式。
+
+### 4.if_exists
+
+该参数为当存在表格时我们应该选择数据以怎样的方式写入到这张表格之中，共有三种方式选择：
+
+- fail：当存在表格时候自动弹出错误ValueError
+- replace：将原表里面的数据给替换掉
+- append：将数据插入到原表的后面
+
+###  5.index
+
+默认为True等于存在第一行，列名为index的列，也可以先设定好行索引为哪一列防止插入的时报错
+
+### 6.index_label
+
+索引列的列标签。如果未给定任何值（默认值）且index为True，则使用索引名称。如果数据帧使用多索引，则应给出序列。也就是如果设定的index为True，可以给index设定列名。
+
+### 7.chunksize
+
+ 一次将按此大小成批写入行。默认情况下，将一次写入所有行。可以设定一次写入的数量，避免一次写入数据量过大导致数据库崩溃。
+
+### 8.dtype
+
+指定列的数据类型。键是列名，值是sqlite3模式的SQLAlchemy类型或字符串。可以去 sqlalchemy 的官方文档查看所有的sql数据类型：
+
+```
+from sqlalchemy import create_engine
+import sqlalchemy
+import pymysql
+import pandas as pd
+import datetime
+from sqlalchemy.types import INT,FLOAT,DATETIME,BIGINT
+date_now=datetime.datetime.now()
+data={'id':[888,889],
+                       'code':[1003,1004],
+                        'value':[2000,2001],
+                        'time':[20220609,20220610],
+                        'create_time':[date_now,date_now],
+                        'update_time':[date_now,date_now],
+                         'source':['python','python']}
+insert_df=pd.DataFrame(data)
+schema_sql={ 'id':INT,
+             'code': INT,
+             'value': FLOAT(20),
+             'time': BIGINT,
+             'create_time':  DATETIME(50),
+             'update_time':  DATETIME(50)
+                 }
+insert_df.to_sql('create_two',engine,if_exists='replace',index=False,dtype=schema_sql)
+```
+
+
+
+
 
 ## 十、日常笔记
 

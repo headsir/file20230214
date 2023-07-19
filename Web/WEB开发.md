@@ -1579,7 +1579,6 @@ transparent 透明色
   <div class="col-xs-5" style="background-color: red">4</div>
   ```
   
-
 - 列偏移
 
   ```
@@ -1766,6 +1765,67 @@ transparent 透明色
 ![image-20230718234521783](imge/WEB开发.assets/image-20230718234521783.png)
 
 ###### 案例：登录
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link rel="stylesheet" href="static/plugins/bootstrap-3.4.1/css/bootstrap.css">
+    <style>
+        .account{
+            /*宽度*/
+            width: 400px;
+            /*height: 350px;*/
+            /*框*/
+            border: 1px solid #dddddd;
+            /*圆角*/
+            border-radius: 10px;
+            /*阴影 水平方向 垂直方向 模糊距离 颜色*/
+            box-shadow: 5px 5px 5px #aaaaaa;
+            
+            /*页面布局*/
+            /*margin-left: auto;*/
+            margin: 200px auto;
+            /*内边距*/
+            padding: 20px 40px;
+        }
+
+        .account h1{
+            margin-top: 0;
+            margin-bottom: 20px;
+            /*字体居中*/
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+<div class="account">
+    <h1>用户登录</h1>
+    <form>
+        <div class="form-group">
+            <label for="exampleInputUsername">用户名或手机号</label>
+            <input type="text" name="username" class="form-control" id="exampleInputUsername" placeholder="用户名或手机号">
+        </div>
+        <div class="form-group">
+            <label for="exampleInputPassword">密码</label>
+            <input type="password" name="password" class="form-control" id="exampleInputPassword" placeholder="密码">
+        </div>
+         <button type="submit" class="btn btn-primary">登  录</button>
+    </form>
+</div>
+</body>
+</html>
+```
+
+效果：
+
+![image-20230719224447911](imge/WEB开发.assets/image-20230719224447911.png)
+
+###### 案例：后台管理
+
+
 
 
 

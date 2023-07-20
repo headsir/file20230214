@@ -1491,6 +1491,10 @@ transparent 透明色
 
 ##### background-color（背景色）
 
+```
+background-color: #00FF7F;
+```
+
 参见上面案例
 
 ### 1.4 BootStrap 模板
@@ -2046,7 +2050,27 @@ transparent 透明色
 
 ###### 图标
 
+图标类型较少，建议使用Font Awesome图标模板
 
+## 1.5  Font Awesome（字体图标）模板
+
+- 下载
+
+  网址：https://fontawesome.dashgame.com/
+
+- 引入
+
+  ```css
+  <link rel="stylesheet" href="static/plugins/font-awesome-4.7.0/css/font-awesome.css">
+  ```
+
+- 使用
+
+  ```html
+  <i class="fa fa-pencil-square" aria-hidden="true"></i>
+  ```
+
+  ![image-20230720204306056](imge/WEB开发.assets/image-20230720204306056.png)
 
 
 

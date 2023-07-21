@@ -1505,6 +1505,27 @@ background-color: #00FF7F;
 
 ![image-20230714162958760](imge/WEB开发.assets/image-20230714162958760.png)
 
+#### 依赖
+
+依赖JavaScript的类库，jQuery。
+
+- 下载jQuery，在页面上应用jQuery
+
+  ```
+  https://releases.jquery.com/jquer
+  ```
+
+- 在页面上应用BootStrap的JavaScript类库
+
+  ```
+  <script src="static/js/jquery-3.6.0.min.js"></script>
+  <script src="static/plugins/bootstrap-3.4.1/js/bootstrap.min.js"></script>
+  ```
+
+  
+
+
+
 #### 使用
 
 ![image-20230714163507137](imge/WEB开发.assets/image-20230714163507137.png)
@@ -2072,9 +2093,12 @@ background-color: #00FF7F;
 
   ![image-20230720204306056](imge/WEB开发.assets/image-20230720204306056.png)
 
+## 1.6 JavaScript
 
+-  编程语言
 
-
+- 类库（模块）
+  - jQuery
 
 
 

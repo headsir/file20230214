@@ -18,6 +18,28 @@
 
 ## 1 前端开发
 
+注释
+
+- HTML注释
+
+  ```html
+  <!-- 注释内容-->
+  ```
+
+- CSS注释
+
+  ```css
+  /* 注释内容*/
+  ```
+
+- JavaScript注释
+
+  ```js
+  // 注释内容
+  
+  /* 注释内容 */
+  ```
+
 ### 1.1 快速开发网站（Flask）
 
 - 规定有些文件必须放到指定文件夹
@@ -2095,11 +2117,142 @@ background-color: #00FF7F;
 
 ## 1.6 JavaScript
 
--  编程语言
-
-- 类库（模块）
+-  编程语言，浏览器是解释器
+-  DOM和BOM（内置模块）
+- 类库（第三方模块）
   - jQuery
 
+```Html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <style>
+        .menus {
+            width: 200px;
+            border: 1px solid red
+        }
+
+        .menus .header {
+            background-color: gold;
+            padding: 20px 10px;
+        }
+    </style>
+</head>
+<body>
+<div class="menus">
+    <!--    绑定JS函数-->
+    <div class="header" onclick="myFunc()">大标题</div>
+    <div class="item">内容</div>
+</div>
+<!--JS函数-->
+<script type="text/javascript">
+    function myFunc() {
+        alert("Hello Word")
+    }
+</script>
+</body>
+</html>
+```
+
+效果图：
+
+![image-20230721154844747](imge/WEB开发.assets/image-20230721154844747.png)
+
+### 1.6.1 JavaScript代码位置
+
+![image-20230721155703721](imge/WEB开发.assets/image-20230721155703721.png)
+
+#### JS代码存在形式
+
+- 当前HTML中
+
+- JS文件中,导入使用
+
+  ```html
+  <script src="static/js/jquery-3.6.0.min.js"></script>
+  <script src="static/plugins/bootstrap-3.4.1/js/bootstrap.min.js"></script>
+  ```
+
+### 1.6.2 变量
+
+变量定义：
+
+```js
+var name = "高倩"
+```
+
+变量打印：
+
+```js
+<script type="text/javascript">
+    // 定义变量
+    var name = "高倩"
+    // 打印变量
+    console.log(name);
+</script>
+```
+
+![image-20230721161802798](imge/WEB开发.assets/image-20230721161802798.png)
+
+### 1.6.3 数据类型
+
+#### 1、字符串
+
+```js
+// 声明
+var name = "高倩"
+var name = String("高倩")
+
+// 常见功能
+var v1 = name.length;  // 获取字符串长度
+var v2 = name[0];  // 字符串索引，name.charAt(0)
+var v3 = name.trim();  // 去除首尾空白
+var v3 = name.substring(1, 2)  // 切片，前取后不取
+```
+
+#### 2、数组
+
+```js
+// 定义
+var v1 = [11,22,33,44];
+var v2 = Array([11,22,33,44])
+```
+
+```js
+// 定义
+var v1 = [11,22,33,44]
+// 获取值
+v1[1]
+// 修改值
+v1[0] = "高倩"
+// 尾部追加
+v1.push("联通")
+// 头部追加
+v1.unshift("电信")
+// 指定位置追加,第二个参数固定为0
+v1.splice(3, 0, "中国")
+v1.pop()  // 尾部删除
+v1.pop()  // 头部删除
+v1.splice(3, 1)  // 索引为3的元素删除
+
+// idx 是数组索引
+for (var idx in v1) {
+    data = v1[idx]
+}
+```
+
+```js
+for (var i= 0; i<v1.length; i++) {
+    data = v1[i]
+}
+```
+
+- for 循环开始时，初始化一个变量 i 为 0,然后在每次循环迭代之前检查条件 i < v1.length,即 i 是否小于数组 v1 的长度。如果条件为真，则执行循环体中的代码。
+- 在循环体中，将数组 v1 中索引为 i 的元素赋值给变量 data。这里的 i 是循环变量，用于指定要访问数组元素的位置。
+
+#### 3、对象（字典）
 
 
 
@@ -2107,6 +2260,75 @@ background-color: #00FF7F;
 
 
 
+
+
+### 案例：跑马灯（字符串）
+
+![20230721-165239](imge/WEB开发.assets/20230721-165239.gif)
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>跑马灯</title>
+</head>
+<body>
+<span id="txt">欢迎中国联通领导莅临指导</span>
+<script type="text/javascript">
+    // 定义函数
+    function show() {
+        // 1.去HTML中找到某个标签并获取它的位置（DOM）
+        var tag = document.getElementById("txt");
+        var dataSting = tag.innerText;
+
+        // 2.动态起来，把文本中的第一个字符放在字符串最后面
+        var firstChar = dataSting[0]
+        var otherString = dataSting.substring(1, dataSting.length)
+        var newText = otherString + firstChar
+
+        // 3.在HTML标签中更新内容
+        tag.innerText = newText
+    }
+
+    // 定时器，定时执行函数1000ms
+    setInterval(show, 1000)
+</script>
+</body>
+</html>
+```
+
+### 案例：动态数据
+
+![image-20230721174856746](imge/WEB开发.assets/image-20230721174856746.png)
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>跑马灯</title>
+</head>
+<body>
+<ul id="city">
+    <!--    <li>北京</li>-->
+</ul>
+<script type="text/javascript">
+    var cityList = ["北京", "上海", "深圳"];
+    for (var idx in cityList) {
+        var text = cityList[idx]
+        // 创建 li标签
+        var tag = document.createElement("li");
+        // 在li标签添加内容
+        tag.innerText = text;
+        // 添加到id=city 标签里面，DOM
+        var parenTag = document.getElementById("city")
+        parenTag.appendChild(tag)
+    }
+</script>
+</body>
+</html>
+```
 
 
 

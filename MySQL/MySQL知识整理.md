@@ -110,7 +110,9 @@ UTF8MB4支持4字节，常见就是Emoji表情的存储；
 
 ![image-20210819220421399](imge/MySQL知识整理.assets/image-20210819220421399.png)
 
+## 2.2 用户权限配置
 
+![image-20230721091549355](imge/MySQL知识整理.assets/image-20230721091549355.png)
 
 
 

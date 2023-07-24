@@ -1372,7 +1372,7 @@ df_consume.dtypes
 - 对于==数字==类型，是格式设置用的最多的，包括设置小数的位数、千分位、百分数形式、金额类型等；
 
   ```
-  data..apply(lambda x: format(x, '.2%'))
+  data.apply(lambda x: format(x, '.2%'))
   ```
 
 - 对于==时间==类型，经常会需要转换为字符串类型进行显示；
@@ -1843,13 +1843,9 @@ DataFrames 使用 `OpenPyXL` 或`XlsxWriter` 引擎可以将样式导出到 Exce
 来看一个案例：
 
 ```javascript
-df_consume.style.hide_index()\
-                .hide_columns(['性别','基金经理','上任日期',])\
-                .format(format_dict)\
-                .highlight_min(axis=1,subset=['2018','2019','2020','2021'],props='color:black;background-color:#99ff66')\
-                .highlight_max(axis=1,subset=['2018','2019','2020','2021'],props='color:black;background-color:#ee7621')\
-                .highlight_null(props='color:white;background-color:darkblue')\
-                .to_excel('style_export.xlsx',engine = 'openpyxl')
+df_consume.style.hide_index().hide_columns(['性别','基金经理','上任日期',]
+ ).format(format_dict).highlight_min(axis=1,subset='2018','2019','2020','2021'],props='color:black;background-color:#99ff66'
+     ).highlight_max(axis=1,subset=['2018','2019','2020','2021'],props='color:black;background-color:#ee7621').highlight_null(props='color:white;background-color:darkblue').to_excel('style_export.xlsx',engine = 'openpyxl')
 ```
 
 可以看出，跟共享样式里有些相同的问题，比如隐藏索引、隐藏列、设置数据格式等效果并没有实现。

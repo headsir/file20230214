@@ -2254,6 +2254,39 @@ for (var i= 0; i<v1.length; i++) {
 
 #### 3、对象（字典）
 
+```javascript
+// 定义字典
+info = {
+    "name": "高倩",
+    "age": 18
+}
+
+info1 = {
+    name: "高倩",
+    age: 20
+}
+```
+
+```javascript
+// 读取字典
+console.log(info.age)
+console.log(info1["name"])
+
+// 修改字典
+info1["name"] = "郭子豪"
+console.log(info1)
+
+// 删除字典元素
+delete info1["name"]
+console.log(info1)
+
+// 字典循环
+for (var key in info){
+    data = info[key]
+    console.log(data)
+}
+```
+
 
 
 
@@ -2329,6 +2362,68 @@ for (var i= 0; i<v1.length; i++) {
 </body>
 </html>
 ```
+
+### 案例：动态表格
+
+![image-20230725153802815](imge/WEB开发.assets/image-20230725153802815.png)
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>动态数据</title>
+</head>
+<body>
+<table border="1">
+    <thead>
+    <tr>
+        <th>ID</th>
+        <th>姓名</th>
+        <th>年龄</th>
+    </tr>
+    </thead>
+    <tbody id="body">
+
+    </tbody>
+</table>
+<script type="text/javascript">
+    var dataList = [
+        {id: 1, name: "墎值1", age: 19},
+        {id: 2, name: "墎值2", age: 19},
+        {id: 3, name: "墎值3", age: 19},
+        {id: 4, name: "墎值4", age: 19},
+        {id: 5, name: "墎值5", age: 19}
+    ]
+    for (var idx in dataList) {
+        var info = dataList[idx];
+        var tr = document.createElement("tr");
+        for (var key in info) {
+            var text = info[key];
+            // 创建 td标签
+            var td = document.createElement('td');
+            // 在td标签添加内容
+            td.innerText = text;
+            // td标签添加到tr标签里面
+            tr.appendChild(td)
+        }
+        // 添加到id=body 标签里面，DOM
+        var bodyTag = document.getElementById("body")
+        bodyTag.appendChild(tr)
+    }
+
+</script>
+</body>
+</html>
+```
+
+
+
+
+
+
+
+
 
 
 

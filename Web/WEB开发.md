@@ -2179,13 +2179,13 @@ background-color: #00FF7F;
 
 变量定义：
 
-```js
+```javascript
 var name = "高倩"
 ```
 
 变量打印：
 
-```js
+```javascript
 <script type="text/javascript">
     // 定义变量
     var name = "高倩"
@@ -2200,7 +2200,7 @@ var name = "高倩"
 
 #### 1、字符串
 
-```js
+```javascript
 // 声明
 var name = "高倩"
 var name = String("高倩")
@@ -2212,15 +2212,53 @@ var v3 = name.trim();  // 去除首尾空白
 var v3 = name.substring(1, 2)  // 切片，前取后不取
 ```
 
+
+
+##### 案例：跑马灯（字符串）
+
+![20230721-165239](imge/WEB开发.assets/20230721-165239.gif)
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>跑马灯</title>
+</head>
+<body>
+<span id="txt">欢迎中国联通领导莅临指导</span>
+<script type="text/javascript">
+    // 定义函数
+    function show() {
+        // 1.去HTML中找到某个标签并获取它的位置（DOM）
+        var tag = document.getElementById("txt");
+        var dataSting = tag.innerText;
+
+        // 2.动态起来，把文本中的第一个字符放在字符串最后面
+        var firstChar = dataSting[0]
+        var otherString = dataSting.substring(1, dataSting.length)
+        var newText = otherString + firstChar
+
+        // 3.在HTML标签中更新内容
+        tag.innerText = newText
+    }
+
+    // 定时器，定时执行函数1000ms
+    setInterval(show, 1000)
+</script>
+</body>
+</html>
+```
+
 #### 2、数组
 
-```js
+```javascript
 // 定义
 var v1 = [11,22,33,44];
 var v2 = Array([11,22,33,44])
 ```
 
-```js
+```javascript
 // 定义
 var v1 = [11,22,33,44]
 // 获取值
@@ -2243,7 +2281,7 @@ for (var idx in v1) {
 }
 ```
 
-```js
+```javascript
 for (var i= 0; i<v1.length; i++) {
     data = v1[i]
 }
@@ -2251,6 +2289,38 @@ for (var i= 0; i<v1.length; i++) {
 
 - for 循环开始时，初始化一个变量 i 为 0,然后在每次循环迭代之前检查条件 i < v1.length,即 i 是否小于数组 v1 的长度。如果条件为真，则执行循环体中的代码。
 - 在循环体中，将数组 v1 中索引为 i 的元素赋值给变量 data。这里的 i 是循环变量，用于指定要访问数组元素的位置。
+
+##### 案例：动态数据
+
+![image-20230721174856746](imge/WEB开发.assets/image-20230721174856746.png)
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>跑马灯</title>
+</head>
+<body>
+<ul id="city">
+    <!--    <li>北京</li>-->
+</ul>
+<script type="text/javascript">
+    var cityList = ["北京", "上海", "深圳"];
+    for (var idx in cityList) {
+        var text = cityList[idx]
+        // 创建 li标签
+        var tag = document.createElement("li");
+        // 在li标签添加内容
+        tag.innerText = text;
+        // 添加到id=city 标签里面，DOM
+        var parenTag = document.getElementById("city")
+        parenTag.appendChild(tag)
+    }
+</script>
+</body>
+</html>
+```
 
 #### 3、对象（字典）
 
@@ -2287,83 +2357,7 @@ for (var key in info){
 }
 ```
 
-
-
-
-
-
-
-
-
-### 案例：跑马灯（字符串）
-
-![20230721-165239](imge/WEB开发.assets/20230721-165239.gif)
-
-```html
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>跑马灯</title>
-</head>
-<body>
-<span id="txt">欢迎中国联通领导莅临指导</span>
-<script type="text/javascript">
-    // 定义函数
-    function show() {
-        // 1.去HTML中找到某个标签并获取它的位置（DOM）
-        var tag = document.getElementById("txt");
-        var dataSting = tag.innerText;
-
-        // 2.动态起来，把文本中的第一个字符放在字符串最后面
-        var firstChar = dataSting[0]
-        var otherString = dataSting.substring(1, dataSting.length)
-        var newText = otherString + firstChar
-
-        // 3.在HTML标签中更新内容
-        tag.innerText = newText
-    }
-
-    // 定时器，定时执行函数1000ms
-    setInterval(show, 1000)
-</script>
-</body>
-</html>
-```
-
-### 案例：动态数据
-
-![image-20230721174856746](imge/WEB开发.assets/image-20230721174856746.png)
-
-```html
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>跑马灯</title>
-</head>
-<body>
-<ul id="city">
-    <!--    <li>北京</li>-->
-</ul>
-<script type="text/javascript">
-    var cityList = ["北京", "上海", "深圳"];
-    for (var idx in cityList) {
-        var text = cityList[idx]
-        // 创建 li标签
-        var tag = document.createElement("li");
-        // 在li标签添加内容
-        tag.innerText = text;
-        // 添加到id=city 标签里面，DOM
-        var parenTag = document.getElementById("city")
-        parenTag.appendChild(tag)
-    }
-</script>
-</body>
-</html>
-```
-
-### 案例：动态表格
+##### 案例：动态表格
 
 ![image-20230725153802815](imge/WEB开发.assets/image-20230725153802815.png)
 
@@ -2394,7 +2388,7 @@ for (var key in info){
         {id: 3, name: "墎值3", age: 19},
         {id: 4, name: "墎值4", age: 19},
         {id: 5, name: "墎值5", age: 19}
-    ]
+    ];
     for (var idx in dataList) {
         var info = dataList[idx];
         var tr = document.createElement("tr");
@@ -2405,7 +2399,7 @@ for (var key in info){
             // 在td标签添加内容
             td.innerText = text;
             // td标签添加到tr标签里面
-            tr.appendChild(td)
+            tr.appendChild(td);
         }
         // 添加到id=body 标签里面，DOM
         var bodyTag = document.getElementById("body")

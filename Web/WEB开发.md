@@ -2095,7 +2095,7 @@ background-color: #00FF7F;
 
 图标类型较少，建议使用Font Awesome图标模板
 
-## 1.5  Font Awesome（字体图标）模板
+### 1.5  Font Awesome（字体图标）模板
 
 - 下载
 
@@ -2115,7 +2115,7 @@ background-color: #00FF7F;
 
   ![image-20230720204306056](imge/WEB开发.assets/image-20230720204306056.png)
 
-## 1.6 JavaScript
+### 1.6 JavaScript
 
 -  编程语言，浏览器是解释器
 -  DOM和BOM（内置模块）
@@ -2160,11 +2160,11 @@ background-color: #00FF7F;
 
 ![image-20230721154844747](imge/WEB开发.assets/image-20230721154844747.png)
 
-### 1.6.1 JavaScript代码位置
+#### 1.6.1 JavaScript代码位置
 
 ![image-20230721155703721](imge/WEB开发.assets/image-20230721155703721.png)
 
-#### JS代码存在形式
+##### JS代码存在形式
 
 - 当前HTML中
 
@@ -2175,7 +2175,7 @@ background-color: #00FF7F;
   <script src="static/plugins/bootstrap-3.4.1/js/bootstrap.min.js"></script>
   ```
 
-### 1.6.2 变量
+#### 1.6.2 变量
 
 变量定义：
 
@@ -2196,9 +2196,9 @@ var name = "高倩"
 
 ![image-20230721161802798](imge/WEB开发.assets/image-20230721161802798.png)
 
-### 1.6.3 数据类型
+#### 1.6.3 数据类型
 
-#### 1、字符串
+##### 1、字符串
 
 ```javascript
 // 声明
@@ -2214,7 +2214,7 @@ var v3 = name.substring(1, 2)  // 切片，前取后不取
 
 
 
-##### 案例：跑马灯（字符串）
+###### 案例：跑马灯（字符串）
 
 ![20230721-165239](imge/WEB开发.assets/20230721-165239.gif)
 
@@ -2250,7 +2250,7 @@ var v3 = name.substring(1, 2)  // 切片，前取后不取
 </html>
 ```
 
-#### 2、数组
+##### 2、数组
 
 ```javascript
 // 定义
@@ -2290,7 +2290,7 @@ for (var i= 0; i<v1.length; i++) {
 - for 循环开始时，初始化一个变量 i 为 0,然后在每次循环迭代之前检查条件 i < v1.length,即 i 是否小于数组 v1 的长度。如果条件为真，则执行循环体中的代码。
 - 在循环体中，将数组 v1 中索引为 i 的元素赋值给变量 data。这里的 i 是循环变量，用于指定要访问数组元素的位置。
 
-##### 案例：动态数据
+###### 案例：动态数据
 
 ![image-20230721174856746](imge/WEB开发.assets/image-20230721174856746.png)
 
@@ -2322,7 +2322,7 @@ for (var i= 0; i<v1.length; i++) {
 </html>
 ```
 
-#### 3、对象（字典）
+##### 3、对象（字典）
 
 ```javascript
 // 定义字典
@@ -2357,7 +2357,7 @@ for (var key in info){
 }
 ```
 
-##### 案例：动态表格
+###### 案例：动态表格
 
 ![image-20230725153802815](imge/WEB开发.assets/image-20230725153802815.png)
 
@@ -2411,7 +2411,7 @@ for (var key in info){
 </html>
 ```
 
-### 1.6.4 条件语句
+#### 1.6.4 条件语句
 
 ```javascript
 //=======================
@@ -2433,7 +2433,7 @@ else{
 }
 ```
 
-### 1.6.5 函数
+#### 1.6.5 函数
 
 ```javascript
 // 定义函数
@@ -2442,6 +2442,81 @@ function func(){
 }
 // 执行函数
 func()
+```
+
+### 1.7 DOM
+
+DOM模块可以对HTML页面种的标签进行操作。
+
+```javascript
+// 根据ID获取标签
+var tag = docunebt.getElementById("xxx");
+
+// 获取标签中的文本
+tag.innerText
+
+// 修改标签中的文本
+tag.innerText = "哈哈哈哈";
+```
+
+```javascript
+// 创建div标签 <div>哈哈哈哈</div>
+var tag = document.createElement('div');
+// 在div标签添加内容
+td.innerText = "哈哈哈哈";
+```
+
+案例：参见1.6
+
+#### 1.7. 1 事件绑定
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>事件</title>
+</head>
+<body>
+<input type="text" placeholder="请输入内容" id="txtUser">
+<!--onclick 单击  ondblclick 双击-->
+<input type="button" value="点击添加" onclick="addCityInfo()">
+<ul id="city">
+
+</ul>
+<script type="text/javascript">
+    function addCityInfo() {
+        // 添加到id="city"标签
+        var parentTag = document.getElementById("city")
+
+        // 1.找到输入标签
+        var txtTag = document.getElementById("txtUser");
+        // 2.先获取输入框中用户输入的内容
+        var newString = txtTag.value;
+
+        // 判断用户输入是否为空
+        if (newString.trimStart().length > 0) {
+            // 3.创建li标签
+            var newTag = document.createElement('li');
+            newTag.innerText = newString;
+
+
+            // 4.将输入框内容清空
+            txtTag.value = "";
+
+            // 添加li标签
+            parentTag.appendChild(newTag);
+        } else {
+            // 将输入框内容清空
+            txtTag.value = "";
+            alert("输入不能为空")
+        }
+
+    }
+
+</script>
+</body>
+</html>
 ```
 
 

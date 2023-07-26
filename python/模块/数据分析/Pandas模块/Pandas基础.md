@@ -849,6 +849,48 @@ df3["ENodeBID"] = df3["ENodeBID"].astype("string")
 Name: ENodeBID, Length: 43503, dtype: string
 ```
 
+##### 日期格式转换
+
+参考资料：
+
+2种方法对比：https://zhuanlan.zhihu.com/p/602225179
+
+```
+HTML/Pandas中的时间日期转换.html
+```
+
+只取日期中的部分信息：
+
+```
+HTML/pandas的to_datetime只取日期或时刻_pandas获取当前日期.html
+```
+
+字符串转换日期有2种：
+
+- astype("datetime64")
+
+  优点
+
+  - 可以一次转换多列
+  - 更高的性能
+
+  缺点
+
+  - 无法灵活的自定义日期时间格式
+  - 错误处理不灵活，碰到无法转化的日期，只能选择raise和ignore
+
+- to_datetime
+
+  优点
+
+  - 更灵活的时间日期的格式化
+  - 更灵活的错误处理
+
+  缺点
+
+  - 性能不如astype
+  - 无法一次转换多列类型
+
 ### 3.5 索引设置
 
 索引是查找数据的依据，设置索引的目的是便于我们查找数据。
@@ -1974,8 +2016,6 @@ Name: col2, dtype: float64}
 
 
 
-
-
 ## 六、Pandas 数据分组
 
 利用 groupby() 方法，数据类型为 DataFrameGroupBy
@@ -2424,3 +2464,16 @@ diff_df["汇总/TB"].abs()
 
 冒泡排序是一种简单的排序算法，它也是一种稳定排序算法。其实现原理是重复扫描待排序序列，并比较每一对相邻的元素，当该对元素顺序不正确时进行交换。一直重复这个过程，直到没有任何两个相邻元素可以交换，就表明完成了排序
 
+
+
+[HTML/pandas的to_datetime只取日期或时刻_pandas获取当前日期.html]:
+
+[HTML/pandas的to_datetime只取日期或时刻_pandas获取当前日期.html]:
+
+[HTML/pandas的to_datetime只取日期或时刻_pandas获取当前日期.html]:
+
+[HTML/pandas的to_datetime只取日期或时刻_pandas获取当前日期.html]:
+
+[HTML/pandas的to_datetime只取日期或时刻_pandas获取当前日期.html]:
+
+[HTML/pandas的to_datetime只取日期或时刻_pandas获取当前日期.html]:

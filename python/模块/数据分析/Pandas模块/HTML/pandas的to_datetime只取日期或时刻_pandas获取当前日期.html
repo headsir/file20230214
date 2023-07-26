@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<!-- saved from url=(0229)./pandas%E7%9A%84to_datetime%E5%8F%AA%E5%8F%96%E6%97%A5%E6%9C%9F%E6%88%96%E6%97%B6%E5%88%BB_pandas%E8%8E%B7%E5%8F%96%E5%BD%93%E5%89%8D%E6%97%A5%E6%9C%9F%20-%20%E5%89%AF%E6%9C%AC.html -->
+<html lang="zh-CN"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta name="renderer" content="webkit">
+    <meta name="force-rendering" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="report" content="{&quot;spm&quot;:&quot;1001.2101&quot;,&quot;extra&quot;:{&quot;tsab&quot;:&quot;t_1&quot;,&quot;lvab&quot;:&quot;t_1&quot;},&quot;pid&quot;:&quot;blog&quot;}">
+    <meta name="referrer" content="always">
+    <meta http-equiv="Cache-Control" content="no-siteapp">
+    <meta name="shenma-site-verification" content="5a59773ab8077d4a62bf469ab966a63b_1497598848">
+    <meta name="applicable-device" content="pc">
+    
+    <title>pandas的to_datetime只取日期或时刻_pandas获取当前日期_清木!的博客-CSDN博客</title>
+    <link rel="stylesheet" type="text/css" href="./pandas的to_datetime只取日期或时刻_pandas获取当前日期_files/detail_enter-93075f9cc5.min.css">    
+</head>
+  <body class="nodata " style="">
+  <div class="main_father clearfix d-flex justify-content-center" style="height: auto !important;">
+          <div class="container clearfix" id="mainBox" style="height: auto !important;">
+          
+          <main>
+
+<div class="blog-content-box">
+    <div class="article-header-box">
+        <div class="article-header">
+            <div class="article-title-box">
+                <h1 class="title-article" id="articleContentId">pandas的to_datetime只取日期或时刻</h1>
+            </div>
+            <div class="article-info-box">
+                <div class="article-bar-top">
+                    <img class="article-type-img" src="./pandas的to_datetime只取日期或时刻_pandas获取当前日期_files/original.png" alt="">
+                    <div class="bar-content">
+                      <a class="follow-nickName " href="https://blog.csdn.net/QMU111" target="_blank" rel="noopener" title="清木!">清木!</a>
+                    <img class="article-time-img article-heard-img" src="./pandas的to_datetime只取日期或时刻_pandas获取当前日期_files/newUpTime2.png" alt="">
+                    <span class="time">已于&nbsp;2023-07-04 16:13:55&nbsp;修改</span>
+                    <img class="article-read-img article-heard-img" src="./pandas的to_datetime只取日期或时刻_pandas获取当前日期_files/articleReadEyes2.png" alt="">
+                    <span class="read-count">783</span>
+                    <a id="blog_detail_zk_collection" class="un-collection" data-report-click="{&quot;mod&quot;:&quot;popu_823&quot;,&quot;spm&quot;:&quot;1001.2101.3001.4232&quot;,&quot;ab&quot;:&quot;new&quot;}">
+                        <img class="article-collect-img article-heard-img un-collect-status isdefault" style="display:inline-block" src="./pandas的to_datetime只取日期或时刻_pandas获取当前日期_files/tobarCollect2.png" alt="">
+                        <img class="article-collect-img article-heard-img collect-status isactive" style="display:none" src="./pandas的to_datetime只取日期或时刻_pandas获取当前日期_files/tobarCollectionActive2.png" alt="">
+                        <span class="name">收藏</span>
+                        <span class="get-collection">
+                            4
+                        </span>
+                    </a>
+                    </div>
+                </div>
+                <div class="blog-tags-box">
+                    <div class="tags-box artic-tag-box">
+                            <span class="label">分类专栏：</span>
+                                <a class="tag-link" href="https://blog.csdn.net/qmu111/category_12278007.html" target="_blank" rel="noopener"># Python补充</a>
+                            <span class="label">文章标签：</span>
+                                <a rel="nofollow" data-report-click="{&quot;mod&quot;:&quot;popu_626&quot;,&quot;spm&quot;:&quot;1001.2101.3001.4223&quot;,&quot;strategy&quot;:&quot;pandas&quot;,&quot;ab&quot;:&quot;new&quot;,&quot;extra&quot;:&quot;{\&quot;searchword\&quot;:\&quot;pandas\&quot;}&quot;}" class="tag-link" href="https://so.csdn.net/so/search/s.do?q=pandas&amp;t=all&amp;o=vip&amp;s=&amp;l=&amp;f=&amp;viparticle=" target="_blank">pandas</a>
+                                <a rel="nofollow" data-report-click="{&quot;mod&quot;:&quot;popu_626&quot;,&quot;spm&quot;:&quot;1001.2101.3001.4223&quot;,&quot;strategy&quot;:&quot;python&quot;,&quot;ab&quot;:&quot;new&quot;,&quot;extra&quot;:&quot;{\&quot;searchword\&quot;:\&quot;python\&quot;}&quot;}" class="tag-link" href="https://so.csdn.net/so/search/s.do?q=python&amp;t=all&amp;o=vip&amp;s=&amp;l=&amp;f=&amp;viparticle=" target="_blank">python</a>
+                                <a rel="nofollow" data-report-click="{&quot;mod&quot;:&quot;popu_626&quot;,&quot;spm&quot;:&quot;1001.2101.3001.4223&quot;,&quot;strategy&quot;:&quot;开发语言&quot;,&quot;ab&quot;:&quot;new&quot;,&quot;extra&quot;:&quot;{\&quot;searchword\&quot;:\&quot;开发语言\&quot;}&quot;}" class="tag-link" href="https://so.csdn.net/so/search/s.do?q=%E5%BC%80%E5%8F%91%E8%AF%AD%E8%A8%80&amp;t=all&amp;o=vip&amp;s=&amp;l=&amp;f=&amp;viparticle=" target="_blank">开发语言</a>
+                    </div>
+                </div>
+                <div class="up-time" style="left: 99.8833px; display: none;"><span>于&nbsp;2023-05-12 17:27:21&nbsp;首次发布</span></div>
+                <div class="slide-content-box">
+                    <div class="article-copyright">
+                        <div class="creativecommons">
+                            版权声明：本文为博主原创文章，遵循<a href="http://creativecommons.org/licenses/by-sa/4.0/" target="_blank" rel="noopener"> CC 4.0 BY-SA </a>版权协议，转载请附上原文出处链接和本声明。
+                        </div>
+                        <div class="article-source-link">
+                            本文链接：<a href="https://blog.csdn.net/QMU111/article/details/130632147" target="_blank">https://blog.csdn.net/QMU111/article/details/130632147</a>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="operating">
+                    <a class="href-article-edit slide-toggle">版权</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+        
+    <article class="baidu_pl">
+        <div id="article_content" class="article_content clearfix">
+        
+        
+                <div id="content_views" class="markdown_views prism-atom-one-dark">
+                    
+                    <h1><a name="t0"></a><a id="pandasto_datetime_0"></a>一、pandas提供了<a href="https://so.csdn.net/so/search?q=to_datetime&amp;spm=1001.2101.3001.7020" target="_blank" class="hl hl-1" data-report-click="{&quot;spm&quot;:&quot;1001.2101.3001.7020&quot;,&quot;dest&quot;:&quot;https://so.csdn.net/so/search?q=to_datetime&amp;spm=1001.2101.3001.7020&quot;,&quot;extra&quot;:&quot;{\&quot;searchword\&quot;:\&quot;to_datetime\&quot;}&quot;}" data-tit="to_datetime" data-pretit="to_datetime">to_datetime</a>函数，可以把时间数据（年月日时分秒）转换成时间格式。</h1> 
+<p>具体转换格式参考<a href="https://blog.csdn.net/QMU111/article/details/130230320">转换字符串时间为标准时间</a>。</p> 
+<pre data-index="0" class="prettyprint"><code class="prism language-bash has-numbering" onclick="mdcp.signin(event)" style="position: unset;"><span class="token function">import</span> datetime
+<span class="token function">import</span> pandas as pd
+from pandas <span class="token function">import</span> DataFrame
+<span class="token comment"># 获取当前时间</span>
+now <span class="token operator">=</span> datetime.datetime.now<span class="token punctuation">(</span><span class="token punctuation">)</span>
+print<span class="token punctuation">(</span>now<span class="token punctuation">)</span>
+print<span class="token punctuation">(</span>now.strftime<span class="token punctuation">(</span><span class="token string">"%Y-%m-%d %H:%M:%S"</span><span class="token punctuation">))</span>
+<span class="token comment"># 把字符串转换成标准时间</span>
+arr <span class="token operator">=</span> <span class="token punctuation">{<!-- --></span><span class="token string">'date'</span><span class="token builtin class-name">:</span> <span class="token punctuation">[</span><span class="token string">'20210512083010'</span>, <span class="token string">'20220613094020'</span>, <span class="token string">'20230714105030'</span><span class="token punctuation">]</span><span class="token punctuation">}</span>
+print<span class="token punctuation">(</span>arr<span class="token punctuation">)</span>
+arr <span class="token operator">=</span> DataFrame<span class="token punctuation">(</span>arr, <span class="token assign-left variable">columns</span><span class="token operator">=</span><span class="token punctuation">[</span><span class="token string">'date'</span><span class="token punctuation">]</span><span class="token punctuation">)</span>
+print<span class="token punctuation">(</span>arr<span class="token punctuation">)</span>
+print<span class="token punctuation">(</span><span class="token string">"前:"</span>, arr<span class="token punctuation">[</span><span class="token string">'date'</span><span class="token punctuation">]</span>.dtypes<span class="token punctuation">)</span>
+arr<span class="token punctuation">[</span><span class="token string">'date'</span><span class="token punctuation">]</span> <span class="token operator">=</span> pd.to_datetime<span class="token punctuation">(</span>arr<span class="token punctuation">[</span><span class="token string">'date'</span><span class="token punctuation">]</span><span class="token punctuation">)</span>
+print<span class="token punctuation">(</span><span class="token string">"后:"</span>, arr<span class="token punctuation">[</span><span class="token string">'date'</span><span class="token punctuation">]</span>.dtypes<span class="token punctuation">)</span>
+<div class="hljs-button signin" data-title="登录后复制" data-report-click="{&quot;spm&quot;:&quot;1001.2101.3001.4334&quot;}"></div></code></pre> 
+<p><img src="./pandas的to_datetime只取日期或时刻_pandas获取当前日期_files/9da6e94f8e104741b61cec07a818815b.png" alt="在这里插入图片描述"></p> 
+<p>但是to_datetime默认会有（年/月/日/时/分/秒）六个属性，有时这些是没用的，比如我只想要得到一天中的时刻信息，并不想要年月日。这时就要用到一个函数：dt.XXXX (XXXX= date、time、hour、year、month、day)</p> 
+<h1><a name="t1"></a><a id="dtXXXX_XXXX_datetimehouryearmonthday_23"></a>二、只取日期中的某些信息：dt.XXXX (XXXX= date、time、hour、year、month、day)</h1> 
+<pre data-index="1" class="prettyprint"><code class="prism language-bash has-numbering" onclick="mdcp.signin(event)" style="position: unset;"><span class="token comment"># 只想要得到日期中的某些信息</span>
+<span class="token comment"># dt.XXXX (XXXX= date、time、hour、year、month、day)</span>
+print<span class="token punctuation">(</span><span class="token string">"只要日期:<span class="token entity" title="\n">\n</span>"</span>, arr<span class="token punctuation">[</span><span class="token string">'date'</span><span class="token punctuation">]</span>.dt.date<span class="token punctuation">)</span>
+print<span class="token punctuation">(</span><span class="token string">"只要时分秒:<span class="token entity" title="\n">\n</span>"</span>, arr<span class="token punctuation">[</span><span class="token string">'date'</span><span class="token punctuation">]</span>.dt.time<span class="token punctuation">)</span>
+print<span class="token punctuation">(</span><span class="token string">"只要小时:<span class="token entity" title="\n">\n</span>"</span>, arr<span class="token punctuation">[</span><span class="token string">'date'</span><span class="token punctuation">]</span>.dt.hour<span class="token punctuation">)</span>
+print<span class="token punctuation">(</span><span class="token string">"只要分钟:<span class="token entity" title="\n">\n</span>"</span>, arr<span class="token punctuation">[</span><span class="token string">'date'</span><span class="token punctuation">]</span>.dt.minute<span class="token punctuation">)</span>
+print<span class="token punctuation">(</span><span class="token string">"只要秒:<span class="token entity" title="\n">\n</span>"</span>, arr<span class="token punctuation">[</span><span class="token string">'date'</span><span class="token punctuation">]</span>.dt.second<span class="token punctuation">)</span>
+print<span class="token punctuation">(</span><span class="token string">"只要年:<span class="token entity" title="\n">\n</span>"</span>, arr<span class="token punctuation">[</span><span class="token string">'date'</span><span class="token punctuation">]</span>.dt.year<span class="token punctuation">)</span>
+print<span class="token punctuation">(</span><span class="token string">"只要月:<span class="token entity" title="\n">\n</span>"</span>, arr<span class="token punctuation">[</span><span class="token string">'date'</span><span class="token punctuation">]</span>.dt.month<span class="token punctuation">)</span>
+print<span class="token punctuation">(</span><span class="token string">"只要日: <span class="token entity" title="\n">\n</span>"</span>, arr<span class="token punctuation">[</span><span class="token string">'date'</span><span class="token punctuation">]</span>.dt.day<span class="token punctuation">)</span>
+<div class="hljs-button signin" data-title="登录后复制" data-report-click="{&quot;spm&quot;:&quot;1001.2101.3001.4334&quot;}"></div></code></pre> 
+<p><img src="./pandas的to_datetime只取日期或时刻_pandas获取当前日期_files/eb591287ed2342ddbb6ae1d54f42c6db.png" alt="在这里插入图片描述"></p>
+                </div>
+                
+                <link href="./pandas的to_datetime只取日期或时刻_pandas获取当前日期_files/style-c216769e99.css" rel="stylesheet">
+        </div>
+        <div id="treeSkill"></div>
+    </article>
+
+</div>
+            
+    
+
+
+
+                
+              
+                
+
+              
+
+
+          </main>
+
+
+
+        </div>
+
+
+
+
+      </div></body></html>

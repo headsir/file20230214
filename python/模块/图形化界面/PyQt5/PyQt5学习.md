@@ -312,8 +312,9 @@ if __name__ == '__main__':
                   current_roe_count += 1
   ```
 
-
 # 五、学习笔记
+
+【PyQt5 快速入门】https://www.bilibili.com/video/BV1LT4y1e72X?p=31&vd_source=d6c3edd9a4f6205095ccfba6b2a61eec
 
 ## 5.1 PyQt5第一个程序
 

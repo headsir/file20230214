@@ -975,7 +975,7 @@ buttons = [{'label': '中兴日报邮件', 'color': 'primary', "value": ""},
 {'label': '检查异常值', 'color': 'success', "value": ""},
 {'label': '删除重复值', 'color': 'primary', "value": ""},
 {'label': '检查缺失值', 'color': 'success', "value": ""},
-{'label': '删除缺失值', 'color': 'primary', "value": "ttttt"}
+{'label': '删除缺失值', 'color': 'primary', "value": ""}
 ]
 web.output.put_buttons(buttons, onclick=[
 lambda: daily_maiSentAutomatically(config_path),

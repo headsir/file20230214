@@ -956,6 +956,42 @@ put_buttons([
 ], onclick=put_text).show()
 ```
 
+```
+put_buttons(['检查重复值','删除重复值','检查缺失值','删除缺失值','检查异常值','删除异常值'], onclick=[
+lambda: chongfu(df,res_table),
+lambda: chongfuchuli(df,res_table),
+lambda: other(),
+lambda: other(),
+lambda: other(),
+lambda: other()])
+```
+
+```
+buttons = [{'label': '中兴日报邮件', 'color': 'primary', "value": ""},
+{'label': '中兴_5g业务量&指标日报', 'color': 'success', "value": ""},
+{'label': '中兴_5g小区可用率日报', 'color': 'primary', "value": ""},
+{'label': '中兴_5g高下切小区查询', 'color': 'success', "value": ""},
+{'label': '中兴_5g小区可用率周报', 'color': 'primary', "value": ""},
+{'label': '检查异常值', 'color': 'success', "value": ""},
+{'label': '删除重复值', 'color': 'primary', "value": ""},
+{'label': '检查缺失值', 'color': 'success', "value": ""},
+{'label': '删除缺失值', 'color': 'primary', "value": "ttttt"}
+]
+web.output.put_buttons(buttons, onclick=[
+lambda: daily_maiSentAutomatically(config_path),
+lambda: traffic_index_Daily(config_path),
+lambda: cell_availability_ratio_Day(config_path),
+lambda: other(),
+lambda: other(),
+lambda: other(),
+lambda: other(),
+lambda: other(),
+lambda: other()
+], small=True)
+```
+
+
+
 ![image-20230606180010530](imge/PyWebIO基础知识.assets/image-20230606180010530.png)
 
 ```
@@ -1529,12 +1565,8 @@ def dataquery():
     res_table = output()
 
     put_buttons(['检查重复值','删除重复值','检查缺失值','删除缺失值','检查异常值','删除异常值'], onclick=[
-        lambda: chongfu(
-                df,
-                res_table),
-        lambda: chongfuchuli(
-            df,
-            res_table),
+        lambda: chongfu(df,res_table),
+        lambda: chongfuchuli(df,res_table),
         lambda: other(),
         lambda: other(),
         lambda: other(),

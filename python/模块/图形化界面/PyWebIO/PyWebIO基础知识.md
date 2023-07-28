@@ -1585,3 +1585,38 @@ if __name__ == '__main__':
     start_server(dataquery, port=9999,auto_open_webbrowser=True)
 ```
 
+登录验证半成品,登录后页面刷新，需要再次登录
+
+```
+user_datas = [
+    ("admin", "admin")
+]
+
+# 登录验证
+def check_form(inputs):
+    pass
+
+    login_bool = True
+    name_bool = None
+    login = None
+    if not login:
+        while login_bool:
+            inputs = web.input.input_group("省公司工作脚本使用登录", [
+                web.input.input('请输入用户名', name='username'),
+                web.input.input('请输入密码：', name='password', type=web.input.PASSWORD)
+            ], validate=check_form, cancelable=True)
+
+            for user, pwd in user_datas:
+                if user == inputs['username'] and pwd == inputs['password']:
+                    web.output.put_text("{} 登录成功!".format(user))
+                    login_bool = False
+                    continue
+                elif user == inputs['username'] and pwd != inputs['password']:
+                    web.output.put_text('密码错误!')
+                    name_bool = False
+                    break
+            if name_bool:
+                web.output.put_text("{} 不存在!".format(inputs['username']))
+        login =False
+```
+

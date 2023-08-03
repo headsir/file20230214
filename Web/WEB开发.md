@@ -682,6 +682,10 @@ img【行内标签】
 </html>
 ```
 
+##### 禁止复制粘贴
+
+在html中，可以利用touch-callout和user-select属性来属性禁止复制粘贴功能，只需要设置“user-select:none;-webkit-touch-callout:none;”样式即可
+
 #### 1.3.5 CSS案例
 
 ##### 小米商城顶部

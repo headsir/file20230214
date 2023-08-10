@@ -2087,6 +2087,12 @@ df.columns = df_Nc_group_columns
   df_merge = pd.merge(df_groupby,df,on=['year','num'],how='left')
   ```
 
+- 筛选最小值
+
+  ```
+  df1['辅助'] = df.groupby(["账期月份","业务确认单号"])['产品服务费合计（出账费用）（不含税）'].transform('min')
+  ```
+
   
 
 ## 七、Pandas 数据透视

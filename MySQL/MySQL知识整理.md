@@ -1295,7 +1295,7 @@ CURRENT_TIMESTAMP
 ```
 跳过密码认证
 1、停止MySQL服务  net stop MySQL
-2、启动MySQL服务 mysqlld --skip-grant-tables(跳过密码认证表）
+2、启动MySQL服务 mysqlld --skip-grant-tables(跳过密码认证表）  # skip-grant-tables=1[my.ini里面设置免密登录]
 恢复密码认证
 1、查找mysql进程  tasklist |findstr mysql
 2、杀死MySQL进程  taskkill /F /PID 8920(进程ID)

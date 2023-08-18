@@ -217,31 +217,73 @@ graph LR
 - 三引号(“”“ ”“”)
 - 转义字符(反斜杠+想要实现的转义功能首字母)，如：\n
 - 字符串是不可变的
-- 按字面意义级连字符串
-- 输出格式设置
-
-  - 一对一填充：`print('我在学习:{}'.format('python 基础知识'))`
-
-  - 多对多填充：`print('我在学习:{0}中的{1}'.format('python数据分析','python 基础知识'))`
-
-  - 浮点数设置：`print('{}约{:.2f}亿'.format('python数据分析',2))`，说明：.2f[^注1]
-
-  - 百分数设置：`print('中国男性占总人口的比例：{:.2%}亿'.format(0.122))`，说明：.2%[^注2]
+- 按字面意义级连字符串 +
 
 #### 编码介绍
 
+文件存储时，使用某种编码，打开时就需要使用相同的编码，否则就会乱码。
+
+字符底层存储时本质上都是0101010101010101。
+
+字符和二进制的对应关系 (编码)：
+
+- ascli编码,256种对应关系
+
+- gb2312、gbk，中文和亚洲一些国家【中文是用2个字节】
+
+- unicode、ucs2/ucs4，包括现在发现的所有文明
+
+- utf-8编码，【中文是用3个字节】
+
+  ```python
+  data = "中"
+  res = data.encode("utf-8")
+  print(res)  # b'\xe4\xb8\xab'  3个字节
+  
+  # 16进制转二进制，10进制跳板
+  int("e4",base=16)  # 228
+  bin(228)  # 0b11100100
+  ```
+
+- 编码、解码
+
+  ```
+  encode：编码
+  decode：解码
+  python内部编码方式为unicode，decode将其他编码方式转换成unicode编码方式，encode将unicode转换成其他编码方式。
+  因此unicode相当于一个中转:
+  (1)decode->unicode->encode 
+  (2)encode->unicode->decode 
+  
+  isinstance(s,unicode)#用来判断是否为unicode
+  ```
+
+#### 计算机单位
+
 ```
-encode：编码
-decode：解码
-python内部编码方式为unicode，decode将其他编码方式转换成unicode编码方式，encode将unicode转换成其他编码方式。
-因此unicode相当于一个中转:
-(1)decode->unicode->encode 
-(2)encode->unicode->decode 
-
-isinstance(s,unicode)#用来判断是否为unicode
+位/字节/KB/M/G/T/...
 ```
 
+#### 字符串格式化（三种）
 
+输出格式设置
+
+- 一对一填充：`print('我在学习:{}'.format('python 基础知识'))`
+
+- 多对多填充：`print('我在学习:{0}中的{1}'.format('python数据分析','python 基础知识'))`
+
+- 浮点数设置：`print('{}约{:.2f}亿'.format('python数据分析',2))`，说明：.2f[^注1]
+
+- 百分数设置：`print('中国男性占总人口的比例：{:.2%}亿'.format(0.122))`，说明：.2%[^注2]
+
+```
+v1 = "我是{},今年{}岁".format("武沛齐",77)
+v2 = "我是%s,今年%d岁" %("武沛齐",77)
+
+name = "武沛齐"
+age = 19
+v3 = f"我是{name},今年{age}岁"
+```
 
 #### 字符串前缀
 
@@ -304,8 +346,8 @@ Python3.6新加特性，前缀f用来格式化字符串。可以看出f前缀可
 
 ```mermaid
 graph LR
-	id1[布尔值] -.-> id2["True：大部分对象"]
-	id1[布尔值] -.-> id3["False：None（没有值）、False、0、空数据类型"]
+	id1["布尔值(bool)"] -.-> id2["True：大部分对象"]
+	id1["布尔值(bool)"] -.-> id3["False：None（没有值）、False、0、空数据类型"]
 ```
 
 
@@ -766,7 +808,7 @@ a = a.replace('<em>', '')
 
 ```python
 lst = [1, 2, 3]
-	for i in iter(lst):
+for i in iter(lst):
     print(i)  # 1	2	3
 ```
 

@@ -2679,9 +2679,13 @@ jQuery是一个JavaScript第三方模块(第三方类库)
 
 
 
+##### 操作样式
 
+- addClass 添加属性
+- removeClass 移除属性
+- hasClass  检查属性是否存在
 
-
+##### 操作值
 
 
 

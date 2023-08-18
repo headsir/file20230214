@@ -2486,7 +2486,7 @@ jQuery是一个JavaScript第三方模块(第三方类库)
 </html>
 ```
 
-##### 寻找标签
+##### 直接寻找标签
 
 - ID选择器`$("#id")`
 
@@ -2494,7 +2494,196 @@ jQuery是一个JavaScript第三方模块(第三方类库)
 
 - 标签选择器`$("h1")`
 
+- 层级选择器`$(".c1 .c2 a")`
+
+  ```html
+  <h1 class="c1">中国联通1</h1>
+  <hl class="cl>
+  	<div class="c2">
+  	<span></span>
+  	<a></a>
+  </div>
+  </h1>
+  <h1 class="c2">中国联通3</h1>
+  ```
+
+- 多选择器`$(".c1, .c2, a")`
+- 属性选择器`$("input[name='n1']")`
+
+##### 间接寻找标签
+
+- 找兄弟标签
+
+  ```html
+  <div>
+      <div>北京</div>
+      <div id='c1'>上海</div>
+      <div>深圳</div>
+      <div>广州</div>
+  </div>
+  ```
+
+  ```javascript
+  $("#c1").prev()  // 上一个
+  $("#c1")
+  $("#c1").next()  // 下一个
+  $("#c1").next().next()  // 下一个下一个
   
+  $("#c1").siblings()  // 所有兄弟
+  ```
+
+- 找父子
+
+  ```html
+  <div>
+      <div>
+          <div>北京</div>
+          <div id='c1'>上海
+              <ul>
+                  <li>青浦区</li>
+                  <li class="p">宝山区</li>
+                  <li>浦东新区</li>
+              </ul>
+          </div>
+          <div>深圳</div>
+          <div>广州</div>
+      </div>
+      <div>
+          <div>河南1</div>
+          <div>河南2</div>
+          <div>河南3</div>
+          <div>河南4</div>
+          <div>河南5</div>
+      </div>
+  </div>
+  ```
+
+  ```javascript
+  $('#c1').parent()  // 父亲
+  $('#c1').parent().parent()  // 父亲 父亲
+    
+  $('#c1').childrem()  // 所有儿子
+  $('#c1').childrem(".p10")  // 所有儿子中寻找 class = p10
+  
+  $('#c1').find(".p10"")  // 所有子孙中寻找 class = p10
+  $('#c1').find("div"")  // 所有子孙中寻找 div
+  ```
+
+##### 案例：菜单切换
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <style>
+        .menus {
+            width: 200px;
+            height: 800px;
+            /*边框*/
+            border: 2px dashed red;
+        }
+
+        .menus .header {
+            background-color: gold;
+            padding: 10px 5px;
+            border-bottom: 3px dotted black;
+            
+            /*鼠标变小手*/
+            cursor: pointer;
+        }
+
+        /*鼠标放到上面显示样式设置*/
+        .header:hover {
+            color: orchid;
+            font-size: 50px;
+        }
+
+        .menus .content a {
+            display: block;
+            padding: 5px 5px;
+            /*下划线 点线 灰色*/
+            border-bottom: 3px dotted green;
+        }
+
+        .hide {
+            /*隐藏*/
+            display: none;
+        }
+
+
+    </style>
+</head>
+<body>
+<div>
+    <div class="menus">
+        <div class="item">
+            <!-- clickMe(this)  this代表本标签 -->
+            <div class="header" onclick="clickMe(this)">上海</div>
+            <div class="content">
+                <a href="">宝山区</a>
+                <a href="">青浦区</a>
+                <a href="">浦东区</a>
+                <a href="">普陀区</a>
+            </div>
+        </div>
+
+        <div class="item">
+            <div class="header" onclick="clickMe(this)">北京</div>
+            <div class="content hide">
+                <a href="">海淀区</a>
+                <a href="">朝阳区</a>
+                <a href="">大兴区</a>
+                <a href="">昌平区</a>
+            </div>
+        </div>
+
+        <div class="item">
+            <div class="header" onclick="clickMe(this)">北京1</div>
+            <div class="content hide">
+                <a href="">海淀区</a>
+                <a href="">朝阳区</a>
+                <a href="">大兴区</a>
+                <a href="">昌平区</a>
+            </div>
+        </div>
+
+        <div class="item">
+            <div class="header" onclick="clickMe(this)">北京2</div>
+            <div class="content hide">
+                <a href="">海淀区</a>
+                <a href="">朝阳区</a>
+                <a href="">大兴区</a>
+                <a href="">昌平区</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="static/jquery-3.6.0.min.js"></script>
+<script>
+    function clickMe(self) {
+        // $(self) 表示当前的标签
+        $(self).next().removeClass("hide")
+        $(self).parent().siblings().find(".content").addClass("hide")
+    }
+</script>
+</body>
+</html>
+```
+
+效果
+
+![20230818-174557](imge/WEB开发.assets/20230818-174557.gif)
+
+
+
+
+
+
+
+
 
 
 

@@ -2448,6 +2448,56 @@ function func(){
 func()
 ```
 
+#### 1.6.6 jQuery模块
+
+jQuery是一个JavaScript第三方模块(第三方类库)
+
+- 基于jQuery，自己开发一个功能。
+- 现成的工具依赖jQuery，例如: BootStrap动态效果。
+
+##### 下载
+
+最新版本：https://jquery.com
+
+历史版本：https://releases.jquery.com/jquer
+
+##### 应用
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+
+</head>
+<body>
+<h1 id="txt">中国联通</h1>
+<script src="static/jquery-3.6.0.min.js"></script>
+<script type="text/javascript">
+    // 利用jQuery中的功能实现某些效果
+    // 找到id=txt的标签，修改内容
+    $("#txt").text("广西移动");
+    // document.getElementById("txt").innerText="广西移动"
+
+</script>
+
+</body>
+</html>
+```
+
+##### 寻找标签
+
+- ID选择器`$("#id")`
+
+- 样式选择器`$(".class")`
+
+- 标签选择器`$("h1")`
+
+  
+
+
+
 ### 1.7 DOM
 
 DOM模块可以对HTML页面种的标签进行操作。

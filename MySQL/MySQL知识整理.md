@@ -320,7 +320,11 @@ SELECT ==CONCAT('姓名：',name,'的地址是江西')== AS '地址信息' FROM 
 
 desc 降序
 
-ase 升序，默认
+asc 升序，默认
+
+```
+ORDER BY  nr_zb.`日期` Asc
+```
 
 ### 3.7.7 关联表删除特定行-DELETE
 

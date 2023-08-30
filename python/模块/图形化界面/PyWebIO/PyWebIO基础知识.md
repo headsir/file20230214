@@ -1620,3 +1620,8 @@ def check_form(inputs):
         login =False
 ```
 
+# 报错：
+
+1、解决方法：使用Navicat 连接数据库即可
+
+![image-20230830091315593](imge/PyWebIO基础知识.assets/image-20230830091315593.png)

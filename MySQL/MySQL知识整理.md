@@ -312,7 +312,7 @@ SELECT ==CONCAT('姓名：',name,'的地址是江西')== AS '地址信息' FROM 
 
 ==IFNULL()== 函数用于判断第一个表达式是否为 NULL，如果为 NULL 则返回第二个参数的值，如果不为 NULL 则返回第一个参数的值
 
-### 3.7.5 分组（透视）-GROUP BY 
+### 3.7.5 分组（透视）-GROUP BY
 
 分组（透视）	SELECT 分组列 FROM 表名 GROUP BY 分组列;
 

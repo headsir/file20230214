@@ -1401,3 +1401,12 @@ local-infile=1
 参考：3.7.16
 ```
 
+## 9.修改视图【定义者】
+
+来源：https://blog.csdn.net/qinghuidu/article/details/118992949
+
+```mysql
+SELECT CONCAT ("alter DEFINER=`wlanlink`@`%` SQL SECURITY DEFINER VIEW ",TABLE_SCHEMA,".",TABLE_NAME," as ",VIEW_DEFINITION,";") from information_schema.VIEWS where DEFINER = "gaoxiao_baozhang@%";
+-- 其中gaoxiao_baozhang@%为原视图定义者，wlanlink@%为需要修改的新的视图定义者
+```
+

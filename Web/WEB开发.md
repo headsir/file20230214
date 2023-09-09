@@ -2687,6 +2687,76 @@ jQuery是一个JavaScript第三方模块(第三方类库)
 
 ##### 操作值
 
+```html
+<div id='c1'>内容</div>
+```
+
+```javascript
+$("#c1").text()  // 获取文本内容
+$("#c1").text("休息")  // 设置文本内容
+```
+
+
+
+```html
+<input type='text' id='c2' />
+```
+
+```javascript
+$('#c2').val()  // 获取用户输入值
+$('#c2').val("哈哈哈")  // 设置值
+```
+
+##### 案例：动态创建数据
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<input type="text" id="txtUser" placeholder="用户名">
+<input type="text" id="txtEmail" placeholder="邮箱">
+<input type="button" value="提交" onclick="getInfo()"/>
+
+<ul id="view">
+</ul>
+<script src="static/jquery-3.6.0.min.js"></script>
+<script>
+    function getInfo() {
+        // 1.获取用户输入的用户名和密码
+        var username = $("#txtUser").val();
+        var email = $("#txtEmail").val();
+        // 拼接内容
+        var dataString = username + "-" +email
+
+        // 2.创建li标签,在li标签内部写入内容 $("<li>")
+        var newLI = $("<li>").text(dataString);
+
+        // 3.把新创建的li标签添加到ul里面
+        $("#view").append(newLI)
+    }
+</script>
+</body>
+</html>
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

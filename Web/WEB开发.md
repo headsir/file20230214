@@ -2743,7 +2743,64 @@ $('#c2').val("哈哈哈")  // 设置值
 </html>
 ```
 
+##### 事件绑定
 
+DOM方法
+
+```html
+<input type="button" value="提交" onclick="getInfo()"/>
+
+<script>
+    function getInfo() {
+
+    }
+</script>
+```
+
+jQuery方法
+
+```html
+<ul>
+    <li>百度</li>
+    <li>谷歌</li>
+    <li>搜狗</li>
+</ul>
+<script>
+    $("li").click(function(){
+        // 点击li标签时，自动执行这个函数；
+        // $(this) 当前点击的是那个标签。
+    });
+</script>
+```
+
+案例：绑定事件
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<ul>
+    <li>百度</li>
+    <li>谷歌</li>
+    <li>搜狗</li>
+</ul>
+<script src="static/jquery-3.6.0.min.js"></script>
+<script>
+    $("li").click(function () {
+        // 点击li标签时，自动执行这个函数；
+        // $(this) 当前点击的是那个标签。
+        var text = $(this).text();
+        // 打印
+        console.log(text);
+    });
+</script>
+</body>
+</html>
+```
 
 
 

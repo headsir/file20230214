@@ -523,13 +523,15 @@ date_sub(curdate(),interval 1 day)
 
 ### 3.7.15 避免插入重复数据
 
+参考：https://blog.csdn.net/m0_52217130/article/details/128724926
+
 最常见的方式就是为字段设置主键或唯一索引，当插入重复数据时，抛出错误，程序终止，但这会给后续处理带来麻烦，因此需要对插入语句做特殊处理，尽量避开或忽略异常
 
 #### insert ignore into
 
 即插入数据时，如果数据存在，则忽略此次插入，前提条件是插入的数据字段设置了主键或唯一索引，测试SQL语句如下，当插入本条数据时，MySQL数据库会首先检索已有数据（也就是idx_username索引），如果存在，则忽略本次插入，如果不存在，则正常插入数据：
 
-![图片](imge/MySQL知识整理.assets/640.jpeg)
+![image-20230914100645447](imge/MySQL知识整理.assets/image-20230914100645447.png)
 
 #### on duplicate key update
 
@@ -1254,6 +1256,61 @@ b）不能有效的利用覆盖索引
 - 《阿里巴巴java开发手册》
 
 *来源：juejin.im/post/6871969929365553165*
+
+## 6.3 使用 explain 查询 SQL 的执行计划
+
+来源：https://my.oschina.net/ruoli/blog/1807394
+
+### 1、什么是 MySQL 执行计划
+
+要对执行计划有个比较好的理解，需要先对 MySQL 的基础结构及查询基本原理有简单的了解。
+
+​    MySQL 本身的功能架构分为三个部分，分别是 应用层、逻辑层、物理层，不只是 MySQL ，其他大多数数据库产品都是按这种架构来进行划分的。
+
+- 应用层，主要负责与客户端进行交互，建立链接，记住链接状态，返回数据，响应请求，这一层是和客户端打交道的。
+
+- 逻辑层，主要负责查询处理、事务管理等其他数据库功能处理，以查询为例。
+
+  >    首先接收到查询 SQL 之后，数据库会立即分配一个线程对其进行处理，第一步查询处理器会对 SQL 查询进行优化，优化后会生成执行计划，然后交由计划执行器来执行。
+  >
+  > ​    计划执行器需要访问更底层的事务管理器，存储管理器来操作数据，他们各自的分工各有不同，最终通过调用物理层的文件获取到查询结构信息，将最终结果响应给应用层。
+
+- 物理层，实际物理磁盘上存储的文件，主要有分文数据文件，日志文件。
+
+  >   通过上面的描述，生成执行计划是执行一条 SQL 必不可少的步骤，一条 SQL 性能的好坏，可以通过查看执行计划很直观的看出来，执行计划提供了各种查询类型与级别，方面我们进行查看以及为作为性能分析的依据。
+
+### 2、如何分析执行计划
+
+   MySQL 为我们提供了 explain 关键字来直观的查看一条 SQL 的执行计划。
+
+   explain 显示了 MySQL 如何使用索引来处理 select 语句以及连接表，可以帮助选择更好的索引和写出更优化的查询语句。
+
+![image-20230914100030506](imge/MySQL知识整理.assets/image-20230914100030506-16946568359943.png)
+
+ 查询结构中有 12 列，理解每一列的含义，对理解执行计划至关重要，下面用一个表格的形式进行说明。
+
+| 列名              | 说明                                                         |
+| ----------------- | ------------------------------------------------------------ |
+| **id**            | SELECT 识别符，这是 SELECT 的查询序列号。                    |
+| **select_type**   | SELECT 类型，可以为以下任何一种: <br/> **SIMPLE**: 简单 SELECT (不使用 UNION 或子查询)  <br/> **PRIMARY**: 最外面的 SELECT    <br/>**UNION**:UNION 中的第二个或后面的 SELECT 语句     <br/> **DEPENDENT UNION**:UNION 中的第二个或后面的 SELECT 语句，取决于外面的查询      <br/>**UNION RESULT**:UNION 的结果      <br/>**SUBQUERY**: 子查询中的第一个 SELECT      <br/>**DEPENDENT SUBQUERY**: 子查询中的第一个 SELECT, 取决于外面的查询      <br/>**DERIVED**: 导出表的 SELECT (FROM 子句的子查询) |
+| **table**         | 输出的行所引用的表                                           |
+| **partitions**    | 如果查询是基于分区表的话，显示查询将访问的分区。             |
+| **type**          | 联接类型。下面给出各种联接类型，按照从最佳类型到最坏类型进行排序:           <br/>**system**: 表仅有一行 (= 系统表)。这是 const 联接类型的一个特例。      <br/>**const**: 表最多有一个匹配行，它将在查询开始时被读取。因为仅有一行，在这行的列值可被优化器剩余部分认为是常数。const 表很快，因为它们只读取一次！      <br/>**eq_ref**: 对于每个来自于前面的表的行组合，从该表中读取一行。这可能是最好的联接类型，除了 const 类型。   <br/>**ref**: 对于每个来自于前面的表的行组合，所有有匹配索引值的行将从这张表中读取。      <br/>**ref_or_null**: 该联接类型如同 ref, 但是添加了 MySQL 可以专门搜索包含 NULL 值的行。     <br/> **index_merge**: 该联接类型表示使用了索引合并优化方法。      <br/>**unique_subquery**: 该类型替换了下面形式的 IN 子查询的 ref:  value IN (SELECT primary_key FROM single_table WHERE some_expr)  unique_subquery 是一个索引查找函数，可以完全替换子查询，效率更高。      <br/>**index_subquery**: 该联接类型类似于 unique_subquery。可以替换 IN 子查询，但只适合下列形式的子查询中的非唯一索引: value IN (SELECT key_column FROM single_table WHERE some_expr)      <br/>**range**: 只检索给定范围的行，使用一个索引来选择行。      <br/>**index**: 该联接类型与 ALL 相同，除了只有索引树被扫描。这通常比 ALL 快，因为索引文件通常比数据文件小。      <br/>**ALL**: 对于每个来自于先前的表的行组合，进行完整的表扫描，说明查询就需要优化了。      一般来说，得保证查询至少达到 range 级别，最好能达到 ref。 |
+| **possible_keys** | 指出 MySQL 能使用哪个索引在该表中找到行                      |
+| **key**           | 显示 MySQL 实际决定使用的键 (索引)。如果没有选择索引，键是 NULL。 |
+| **key_len**       | 显示 MySQL 决定使用的键长度。如果键是 NULL, 则长度为 NULL。在不损失精确性的情况下，长度越短越好 |
+| **ref**           | 显示使用哪个列或常数与 key 一起从表中选择行。                |
+| **rows**          | 显示 MySQL 认为它执行查询时必须检查的行数。多行之间的数据相乘可以估算要处理的行数。 |
+| **filtered**      | 显示了通过条件过滤出的行数的百分比估计值。                   |
+| **Extra**         | 该列包含 MySQL 解决查询的详细信息           <br/>**Distinct**:MySQL 发现第 1 个匹配行后，停止为当前的行组合搜索更多的行。      <br/>**Select tables optimized away** MySQL 根本没有遍历表或索引就返回数据了，表示已经优化到不能再优化了      <br/>**Not exists**:MySQL 能够对查询进行 LEFT JOIN 优化，发现 1 个匹配 LEFT JOIN 标准的行后，不再为前面的的行组合在该表内检查更多的行。      <br/>**range checked for each record (index map: #)**:MySQL 没有发现好的可以使用的索引，但发现如果来自前面的表的列值已知，可能部分索引可以使用。      <br/>**Using filesort**:MySQL 需要额外的一次传递，以找出如何按排序顺序检索行，说明查询就需要优化了。      <br/>**Using index**: 从只使用索引树中的信息而不需要进一步搜索读取实际的行来检索表中的列信息。      <br/>**Using temporary**: 为了解决查询，MySQL 需要创建一个临时表来容纳结果，说明查询就需要优化了。      <br/>**Using where**:WHERE 子句用于限制哪一个行匹配下一个表或发送到客户。      <br/>**Using sort_union(...), Using union(...), Using intersect(...)**: 这些函数说明如何为 index_merge 联接类型合并索引扫描。      <br/>**Using index for group-by**: 类似于访问表的 Using index 方式，Using index for group-by 表示 MySQL 发现了一个索引，可以用来查 询 GROUP BY 或 DISTINCT 查询的所有列，而不要额外搜索硬盘访问实际的表。 |
+
+
+
+
+
+
+
+
 
 # 七、日常笔记
 

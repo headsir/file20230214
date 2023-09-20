@@ -2773,7 +2773,7 @@ jQuery方法
 </script>
 ```
 
-案例：绑定事件
+##### 案例：绑定事件
 
 ```html
 <!DOCTYPE html>
@@ -2783,32 +2783,143 @@ jQuery方法
     <title>Title</title>
 </head>
 <body>
-<ul>
+<ul id="log">
+    <li>百度</li>
+    <li>谷歌</li>
+    <li>搜狗</li>
+</ul>
+
+<ul id="remove">
     <li>百度</li>
     <li>谷歌</li>
     <li>搜狗</li>
 </ul>
 <script src="static/jquery-3.6.0.min.js"></script>
 <script>
-    $("li").click(function () {
+    // ==============点击标签打印标签===============
+    $('#log').find("li").click(function () {
         // 点击li标签时，自动执行这个函数；
         // $(this) 当前点击的是那个标签。
         var text = $(this).text();
         // 打印
         console.log(text);
+        // 弹窗
+        alert(text)
+    });
+
+    // ==============点击标签删除标签===============
+    $("#remove").find("li").click(function () {
+        // 点击li标签时，自动执行这个函数；
+        // $(this) 当前点击的是那个标签。
+        $(this).remove();
     });
 </script>
 </body>
 </html>
 ```
 
-P16:37
+##### 删除标签
+
+```html
+<div id='c1'>内容</div>
+
+$("#c1").remove();
+```
+
+案例：参见：绑定事件
 
 
 
+> 当页面框架加载完成之后执行代码：
+>
+> ```
+> $(function () {
+>     // ==============点击标签删除标签===============
+>     $("#remove").find("li").click(function () {
+>     // 点击li标签时，自动执行这个函数；
+>     // $(this) 当前点击的是那个标签。
+>     $(this).remove();
+> });
+> ```
 
+##### 案例：表格删除行
 
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <style>
+        th, td {
+            border: 1px solid;
 
+        }
+        input{
+            width: 50px;
+            color: #ff2424;
+            background-color:gold;
+            /*border: 10px  red;*/
+        }
+    </style>
+</head>
+<body>
+<table>
+    <thead>
+    <tr>
+        <th>ID</th>
+        <th style="width: 50px;">name</th>
+        <th style="width: 50px;">操作</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr>
+        <td>1</td>
+        <td>吴佩其</td>
+        <td>
+            <input type="button" value="删除"/>
+        </td>
+    </tr>
+    <tr>
+        <td>2</td>
+        <td>吴佩其</td>
+        <td>
+            <input type="button" value="删除"/>
+        </td>
+
+    </tr>
+    <tr>
+        <td>3</td>
+        <td>吴佩其</td>
+        <td>
+            <input type="button" value="删除"/>
+        </td>
+    </tr>
+    </tbody>
+</table>
+<script src="static/jquery-3.6.0.min.js"></script>
+<script>
+    // input 标签添加delete属性
+    $("input").addClass("delete")
+    // 删除表格行
+    $(function () {
+        $(".delete").click(function () {
+            $(this).parent().parent().remove();
+        })
+    })
+</script>
+
+</body>
+</html>
+```
+
+效果：
+
+![20230920-183417](imge/WEB开发.assets/20230920-183417.gif)
+
+钱钱钱
+
+P24 26:47
 
 
 

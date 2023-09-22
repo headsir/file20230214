@@ -2454,6 +2454,7 @@ jQuery是一个JavaScript第三方模块(第三方类库)
 
 - 基于jQuery，自己开发一个功能。
 - 现成的工具依赖jQuery，例如: BootStrap动态效果。
+- 在线参考手册：https://www.jq22.com/chm/jquery/remove.html
 
 ##### 下载
 
@@ -2917,9 +2918,7 @@ $("#c1").remove();
 
 ![20230920-183417](imge/WEB开发.assets/20230920-183417.gif)
 
-钱钱钱
 
-P24 26:47
 
 
 
@@ -3006,9 +3005,23 @@ td.innerText = "哈哈哈哈";
 
 DOM可以实现很多功能，但是比较繁琐，页面上的效果可以用jQuerry等类库或框架来实现
 
+### 1.8 前端总结
 
+- HTML
 
+- CSS
 
+- JavaScript、jQuery
+
+- BootStrap(动态效果依赖 jQuery)
+
+  P25 20:00
+
+bootstrap-datepicker(日期选择器插件)下载源：
+
+- github：https://github.com/uxsolutions/bootstrap-datepicker
+
+- gitee:https://gitee.com/mirrors/bootstrap-datepicker/tree/master
 
 # 二、Mysql
 

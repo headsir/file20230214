@@ -2056,6 +2056,26 @@ for i in df.columns:
 df.columns = df_Nc_group_columns
 ```
 
+案例：透视后数据整理
+
+```
+df1 = pd.pivot_table(df, index="业务地市", columns="日期", aggfunc={'业务地市': 'count'})
+# 获取表头
+df_Nc_group_columns = []
+for i in df1.columns:
+    print(i)
+    for j in i:
+        if j != "" and j != "业务地市":
+            # print(j)
+            df_Nc_group_columns.append(j)
+df1.columns=df_Nc_group_columns
+df1.reset_index()
+```
+
+
+
+
+
 ### 6.6 笔记
 
 - 参数说明

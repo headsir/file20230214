@@ -2683,7 +2683,16 @@ jQuery是一个JavaScript第三方模块(第三方类库)
 ##### 操作样式
 
 - addClass 添加属性
+
+  ```javascript
+      // th标签添加属性
+      $("th").addClass("text-center")
+  ```
+
+  
+
 - removeClass 移除属性
+
 - hasClass  检查属性是否存在
 
 ##### 操作值
@@ -3142,6 +3151,96 @@ Mysql安装及使用，参见：mysql教程
 python操作Mysql，参见：python教程
 
 ## 案例：
+
+mysql数据库表结构：
+
+- admin
+
+  ```mysql
+  CREATE TABLE `website`.`website`  (
+    `id` int NOT NULL AUTO_INCREMENT,
+    `username` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL,
+    `password` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL,
+    `mobile` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL,
+    PRIMARY KEY (`id`) USING BTREE
+  ) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = Dynamic;
+  ```
+
+
+
+### 1 新增用户
+
+app.py
+
+```python
+"""
+程序说明：
+    功能：网站入口
+模块说明：
+    1、flask:WEB框架模块
+        模块安装 pip install Flask
+"""
+
+# here put the import lib
+from flask import Flask, render_template, request
+
+app = Flask(__name__)
+
+@app.route("/add/user", methods=["GET", "POST"])
+def add_user():
+    if request.method == "GET":
+        return render_template("add_user.html")
+	
+    username = request.form.get("user")
+    password = request.form.get("pwd")
+    mobile = request.form.get("mobile")
+
+    # 1.连接mysql
+    import pymysql
+    conn = pymysql.connect(host="127.0.0.1", port=3306, user="website", password="website123", charset='utf8',
+                           db='website')
+    cursor = conn.cursor(cursor=pymysql.cursors.DictCursor)
+    # 2.执行SQL
+    sql = "insert into admin(username,password,mobile) values (%s,%s,%s)"
+    cursor.execute(sql, [username, password, mobile])
+    conn.commit()
+    # 3.关闭连接
+    cursor.close()
+    conn.close()
+    return "添加成功"
+if __name__ == '__main__':
+    app.run(debug=True)
+
+```
+
+add_user.html
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<h1>添加用户</h1>
+<form method="post" action="/add/user">
+    <input type="text" name="user" placeholder="用户名">
+    <input type="text" name="pwd" placeholder="密码">
+    <input type="text" name="mobile" placeholder="手机号">
+    <input type="submit" value="提 交">
+</form>
+</body>
+</html>
+```
+
+效果：
+
+![20230927-175442](imge/WEB开发.assets/20230927-175442.gif)
+
+
+
+### 2 查询所有用户
 
 
 
@@ -3745,7 +3844,6 @@ if __name__ == '__main__':
          <p>数学分数: <input type ="text" name = "Mathematics" /></p>
          <p><input type = "submit" value = "提交" /></p>
       </form>
-
    </body>
 </html>
 ```

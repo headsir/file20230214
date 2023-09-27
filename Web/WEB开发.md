@@ -3883,3 +3883,645 @@ if __name__ == '__main__':
 
 重读cookie的输出如下所示 -
 ![img](imge/WEB开发.assets/399150525_35352.png)
+
+## 13 Sessions会话
+
+与Cookie不同，会话数据存储在服务器上。 会话是客户端登录到服务器并注销的时间间隔。 需要在此会话中进行的数据存储在服务器上的临时目录中。
+
+与每个客户端的会话分配一个会话ID。 会话数据存储在cookie顶部，服务器以加密方式签名。 对于这种加密，Flask应用程序需要一个定义`SECRET_KEY`。
+
+会话对象也是一个包含会话变量和关联值的键值对的字典对象。
+
+例如，要设置`'username'`会话变量，请使用语句 -
+
+```python
+Session['username'] = 'admin'
+```
+
+要删除会话变量，请使用`pop()`方法。
+
+```python
+session.pop('username', None)
+```
+
+以下代码是Flask中会话如何工作的简单演示。 URL => `'/'` 提示用户登录，因为会话变量`username`没有设置。
+
+```python
+@app.route('/')
+def index():
+   if 'username' in session:
+      username = session['username']
+         return 'Logged in as ' + username + '<br>' + \
+         "<b><a href = '/logout'>click here to log out</a></b>"
+   return "You are not logged in <br><a href = '/login'></b>" + \
+      "click here to log in</b></a>"
+```
+
+当用户浏览到URL=>`'/login'`时，`login()`函数显示视图，因为它是通过GET方法调用的，所以打开一个登录表单。
+
+表单填写后重新提交到URL=> `/login`，现在会话变量被设置。 应用程序被重定向到URL=> `/`。 这时找到会话变量:`username`。
+
+```python
+@app.route('/login', methods = ['GET', 'POST'])
+def login():
+   if request.method == 'POST':
+      session['username'] = request.form['username']
+      return redirect(url_for('index'))
+   return '''
+   <form action = "" method = "post">
+      <p><input type = text name = "username"/></p>
+      <p<<input type = submit value = Login/></p>
+   </form>
+   '''
+```
+
+该应用程序还包含一个`logout()`视图函数，它删除’username’会话变量的值。 再次 URL 跳转到 ‘/‘ 显示开始页面。
+
+```python
+@app.route('/logout')
+def logout():
+   # remove the username from the session if it is there
+   session.pop('username', None)
+   return redirect(url_for('index'))
+```
+
+运行应用程序并访问主页(确保设置应用程序的`secret_key`)。
+
+```python
+from flask import Flask, session, redirect, url_for, escape, request
+app = Flask(__name__)
+app.secret_key = 'any random string’
+```
+
+完整代码如下所示 - 
+
+```python
+from flask import Flask
+from flask import render_template
+from flask import request
+from flask import make_response
+from flask import Flask, session, redirect, url_for, escape, request
+
+
+
+app = Flask(__name__)
+app.secret_key = 'fkdjsafjdkfdlkjfadskjfadskljdsfklj'
+
+@app.route('/')
+def index():
+    if 'username' in session:
+        username = session['username']
+        return '登录用户名是:' + username + '<br>' + \
+                 "<b><a href = '/logout'>点击这里注销</a></b>"
+
+
+    return "您暂未登录， <br><a href = '/login'></b>" + \
+         "点击这里登录</b></a>"
+
+
+
+@app.route('/login', methods = ['GET', 'POST'])
+def login():
+    if request.method == 'POST':
+        session['username'] = request.form['username']
+        return redirect(url_for('index'))
+
+    return '''
+   <form action = "" method = "post">
+      <p><input type ="text" name ="username"/></p>
+      <p><input type ="submit" value ="登录"/></p>
+   </form>
+   '''
+
+@app.route('/logout')
+def logout():
+   # remove the username from the session if it is there
+   session.pop('username', None)
+   return redirect(url_for('index'))
+
+
+if __name__ == '__main__':
+    app.run(debug = True)
+```
+
+输出将显示如下。点击链接“**点击这里登录**”。
+![img](imge/WEB开发.assets/286160524_30991.png)
+
+该链接将被引导至另一个界面。 输入’admin’。
+![img](imge/WEB开发.assets/283160524_14904.png)
+
+屏幕会显示消息“**登录用户名是:admin**”。如下所示 -
+![img](imge/WEB开发.assets/322160525_75618.png)
+
+## 14 重定向和错误
+
+Flask类有重定向`redirect()`函数。调用时，它会返回一个响应对象，并将用户重定向到具有指定状态码的另一个目标位置。
+
+`redirect()`函数的原型如下 -
+
+```python
+Flask.redirect(location, statuscode, response)
+```
+
+在上述函数中 -
+
+- *location* 参数是响应应该被重定向的URL。
+- *statuscode* 参数发送到浏览器的头标，默认为`302`。
+- *response* 参数用于实例化响应。
+
+以下状态代码是标准化的 -
+
+- HTTP_300_MULTIPLE_CHOICES
+- HTTP_301_MOVED_PERMANENTLY
+- HTTP_302_FOUND
+- HTTP_303_SEE_OTHER
+- HTTP_304_NOT_MODIFIED
+- HTTP_305_USE_PROXY
+- HTTP_306_RESERVED
+- HTTP_307_TEMPORARY_REDIRECT
+
+默认状态码是`302`，这是表示’找到’页面。
+
+在以下示例中，`redirect()`函数用于在登录尝试失败时再次显示登录页面。
+
+```python
+from flask import Flask, redirect, url_for, render_template, request
+# Initialize the Flask application
+app = Flask(__name__)
+
+@app.route('/')
+def index():
+    return render_template('log_in.html')
+
+@app.route('/login',methods = ['POST', 'GET'])
+def login():
+    if request.method == 'POST' and
+        request.form['username'] == 'admin' :
+        return redirect(url_for('success'))
+    return redirect(url_for('index'))
+
+@app.route('/success')
+def success():
+    return 'logged in successfully'
+
+if __name__ == '__main__':
+    app.run(debug = True)
+```
+
+Flask类具有带有错误代码的`abort()`函数。
+
+```python
+Flask.abort(code)
+```
+
+`code`参数使用以下值之一 -
+
+- 400 - 对于错误的请求
+- 401 - 用于未经身份验证
+- 403 - 禁止
+- 404 - 未找到
+- 406 - 不可接受
+- 415 - 用于不支持的媒体类型
+- 429 - 请求过多
+
+这里对上面的代码中的`login()`函数进行一些细微的修改。 如果要显示“Unauthourized”页面，而不是重新显示登录页面，请将其替换为中止(401)的调用。
+
+```python
+from flask import Flask, redirect, url_for, render_template, request, abort
+app = Flask(__name__)
+
+@app.route('/')
+def index():
+   return render_template('log_in.html')
+
+@app.route('/login',methods = ['POST', 'GET'])
+def login():
+    if request.method == 'POST':
+        if request.form['username'] == 'admin' :
+            return redirect(url_for('success'))
+        else:
+            abort(401)
+    else:
+        return redirect(url_for('index'))
+
+@app.route('/success')
+def success():
+    return 'logged in successfully'
+
+if __name__ == '__main__':
+    app.run(debug = True)
+```
+
+## 15 消息闪现
+
+一个基于GUI好的应用程序需要向用户提供交互的反馈信息。 例如，桌面应用程序使用对话框或消息框，JavaScript使用`alert()`函数用于类似的目的。
+
+在Flask Web应用程序中生成这样的信息消息很容易。 Flask框架的闪现系统使得可以在一个视图中创建一个消息并将其呈现在名为`next`的视图函数中。
+
+Flask模块包含`flash()`方法。 它将消息传递给下一个请求，该请求通常是一个模板。
+
+```python
+flash(message, category)
+```
+
+在这里 - 
+
+- *message* - 参数是要刷新的实际消息。
+- *category* - 参数是可选的。 它可以是’错误’，’信息’或’警告’。
+
+要从会话中删除消息，模板调用`get_flashed_messages()`函数。
+
+```python
+get_flashed_messages(with_categories, category_filter)
+```
+
+两个参数都是可选的。 如果收到的消息具有类别，则第一个参数是元组。 第二个参数对于仅显示特定消息很有用。
+
+以下闪现模板中收到消息。
+
+```html
+{% with messages = get_flashed_messages() %}
+   {% if messages %}
+      {% for message in messages %}
+         {{ message }}
+      {% endfor %}
+   {% endif %}
+{% endwith %}
+```
+
+现在我们来看一个简单的例子，演示Flask中的闪现机制。 在下面的代码中，URL => “/”显示了到登录页面的链接，没有指定要发送的消息。
+
+```python
+@app.route('/')
+def index():
+    return render_template('index.html')
+```
+
+该链接引导用户显示登录表单的URL => “/login”。 提交时，login()函数验证用户名和密码，并相应地闪现“成功”或“错误”变量消息。
+
+```python
+@app.route('/login', methods = ['GET', 'POST'])
+def login():
+    error = None
+
+    if request.method == 'POST':
+        if request.form['username'] != 'admin' or \
+            request.form['password'] != 'admin':
+            error = 'Invalid username or password. Please try again!'
+        else:
+            flash('You were successfully logged in')
+            return redirect(url_for('index'))
+    return render_template('login.html', error = error)
+```
+
+如有错误，登录模板将重新显示并显示错误消息。
+
+模板文件:*login.html* 代码如下 - 
+
+```html
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>Flask示例</title>
+</head>
+   <body>
+
+     <h1>登录</h1>
+      {% if error %}
+      <p><strong>Error:</strong> {{ error }}
+      {% endif %}
+      <form action = "/login" method ="POST">
+         <dl>
+            <dt>用户名:</dt>
+            <dd>
+               <input type = text name = "username" 
+                  value = "{{request.form.username }}">
+            </dd>
+            <dt>密码:</dt>
+            <dd><input type ="password" name ="password"></dd>
+         </dl>
+         <p><input type = submit value ="登录"></p>
+      </form>
+
+   </body>
+</html>
+```
+
+如果登录成功，则在索引模板上闪现成功消息。以下代码保存在文件(*index.html*) - 
+
+```html
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>Flask消息闪现</title>
+</head>
+   <body>
+
+
+         {% with messages = get_flashed_messages() %}
+          {% if messages %}
+            <ul class=flashes>
+            {% for message in messages %}
+              <li>{{ message }}</li>
+            {% endfor %}
+            </ul>
+          {% endif %}
+        {% endwith %}
+
+      <h1>Flask Message Flashing Example</h1>
+      <p>您想要<a href = "{{ url_for('login') }}">
+         <b>登录?</b></a></p>
+
+   </body>
+</html>
+```
+
+Flask消息闪现示例的完整代码如下所示 -
+
+```python
+from flask import Flask, flash, redirect, render_template, request, url_for
+app = Flask(__name__)
+app.secret_key = 'random string'
+
+@app.route('/')
+def index():
+   return render_template('index.html')
+
+@app.route('/login', methods = ['GET', 'POST'])
+def login():
+    error = None
+    print(request.method)
+    if request.method == 'POST':
+        if request.form['username'] != 'admin' or \
+            request.form['password'] != 'admin':
+            error = 'Invalid username or password. Please try again!'
+        else:
+            #flash('您已成功登录')
+            flash('You were successfully logged in')
+            return redirect(url_for('index'))
+    return render_template('login.html', error = error)
+
+if __name__ == "__main__":
+    app.run(debug = True)
+```
+
+执行上述代码后，您将看到如下所示的屏幕。
+![img](imge/WEB开发.assets/677070507_14970.png)
+
+当点击链接时，将会跳转到登录页面。输入用户名和密码 -
+![img](imge/WEB开发.assets/263070518_87462.png)
+
+点击**登录**按钮。 将显示一条消息“您已成功登录”。
+![img](imge/WEB开发.assets/829070525_22677.png)
+
+## 16 文件上传
+
+在Flask中处理文件上传非常简单。 它需要一个enctype属性设置为`'multipart/form-data'`的HTML表单，将该文提交到指定URL。 URL处理程序从`request.files[]`对象中提取文件并将其保存到所需的位置。
+
+每个上传的文件首先保存在服务器上的临时位置，然后再保存到最终位置。 目标文件的名称可以是硬编码的，也可以从`request.files [file]`对象的`filename`属性中获取。 但是，建议使用`secure_filename()`函数获取它的安全版本。
+
+可以在Flask对象的配置设置中定义默认上传文件夹的路径和上传文件的最大大小。
+
+| 变量                           | 说明                                      |
+| ------------------------------ | ----------------------------------------- |
+| app.config[‘UPLOAD_FOLDER’]    | 定义上传文件夹的路径                      |
+| app.config[‘MAX_CONTENT_PATH’] | 指定要上传的文件的最大大小 - 以字节为单位 |
+
+以下代码具有URL: `/upload` 规则，该规则显示`templates`文件夹中的`upload.html`文件，以及调用`uploader()`函数处理上传过程的URL => `/upload-file`规则。
+
+`upload.html`有一个文件选择器按钮和一个提交按钮。
+
+```html
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>Flask示例</title>
+</head>
+   <body>
+
+     <form action = "http://localhost:5000/upload" method = "POST" 
+         enctype = "multipart/form-data">
+         <input type = "file" name = "file" />
+         <input type = "submit" value="提交"/>
+      </form>
+
+   </body>
+</html>
+```
+
+将看到如下截图所示 -
+![img](imge/WEB开发.assets/442080555_84235.png)
+
+选择文件后点击**提交**。 表单的post方法调用URL=> `/upload_file`。 底层函数`uploader()`执行保存文件操作。
+
+以下是Flask应用程序的Python代码。
+
+```python
+from flask import Flask, render_template, request
+from werkzeug import secure_filename
+app = Flask(__name__)
+
+@app.route('/upload', methods=['GET', 'POST'])
+def upload_file():
+    if request.method == 'POST':
+        f = request.files['file']
+        print(request.files)
+        f.save(secure_filename(f.filename))
+        return 'file uploaded successfully'
+    else:
+        return render_template('upload.html')
+
+
+if __name__ == '__main__':
+    app.run(debug = True)
+```
+
+运行程序后，执行上面代码，选择一个图片文件，然后点击上传，得到以下结果 -
+![img](imge/WEB开发.assets/814080557_38604.png)
+
+## 17 扩展
+
+Flask通常被称为微框架，因为核心功能包括基于Werkzeug的WSGI和路由以及基于Jinja2的模板引擎。 此外，Flask框架还支持cookie和会话以及Web助手，如JSON，静态文件等。显然，这对于开发完整的Web应用程序来说还不够。 这是为什么还要Flask扩展插件。 Flask扩展为Flask框架提供了可扩展性。
+
+Flask有大量的扩展可用。 Flask扩展是一个Python模块，它为Flask应用程序添加了特定类型的支持。 Flask扩展注册表是一个可用扩展的目录。 所需的扩展名可以通过pip实用程序下载。
+
+在本教程中，我们将讨论以下重要的Flask扩展 -
+
+- **Flask Mail** − 为Flask应用程序提供SMTP接口
+- **Flask WTF** − 添加了WTForms的渲染和验证
+- **Flask SQLAlchemy** − 将SQLAlchemy支持添加到Flask应用程序中
+- **Flask Sijax** − Sijax接口 - 使AJAX易于在Web应用程序中使用Python/jQuery库
+
+每种类型的扩展通常提供有关其使用情况的大量文档。 由于扩展是一个Python模块，因此需要导入才能使用它。 Flask扩展名通常命名为`flask-foo`。导入语法如下，
+
+```python
+from flask_foo import [class, function]
+```
+
+对于低于`0.7`的Flask版本，还可以使用语法 -
+
+```python
+from flask.ext import foo
+```
+
+为此，需要激活兼容性模块。 它可以通过运行`flaskext_compat.py`来安装 - 
+
+```python
+import flaskext_compat
+flaskext_compat.activate()
+from flask.ext import foo
+```
+
+### 17.1 发送邮件
+
+### 17.2 WTF
+
+### 17.3 SQLite
+
+### 17.4 QLAlchemy
+
+### 17.5 Sijax
+
+## 18 部署
+
+开发服务器上的Flask应用程序只能在设置了开发环境的计算机上访问。 这是一种默认行为，因为在调试模式下，用户可以在计算机上执行任意代码。
+
+如果禁用了调试，则通过将主机名设置为:`0.0.0.0`，可以使网络上的用户可以使用本地计算机上的开发服务器。
+
+```python
+app.run(host = ’0.0.0.0’)
+Python
+```
+
+这样，您的操作系统会侦听所有公共IP，也就是说，所有请求都会被处理。
+
+### 部署
+
+要从开发环境切换到完整的生产环境，应用程序需要部署在真正的Web服务器上。 根据您的具体情况，可以使用不同的选项来部署Flask Web应用程序。
+
+对于小型应用程序，可以考虑将其部署在以下任何托管平台上，所有这些平台都提供针对小型应用程序的免费计划。
+
+- Heroku
+- dotcloud
+- webfaction
+
+Flask应用程序可以部署在这些云平台上。 另外，可以在Google云平台上部署Flask应用程序。 Localtunnel服务允许您在本地主机上共享您的应用程序，而不会混淆DNS和防火墙设置。
+
+如果您倾向于使用专用Web服务器来代替上述共享平台，则可以使用以下选项。
+
+### mod_wsgi
+
+`mod_wsgi`是一个Apache模块，它提供了一个用于在Apache服务器上托管基于Python的Web应用程序的WSGI兼容接口。
+
+**安装mod_wsgi**
+
+要从PyPi直接安装正式版本，可以运行 -
+
+```python
+pip install mod_wsgi
+```
+
+要验证安装是否成功，使用`start-server`命令运行`mod_wsgi-express`脚本 -
+
+```shell
+mod_wsgi-express start-server
+```
+
+它将在端口:8000上启动*Apache/mod_wsgi*。然后，可以通过将浏览器指向 -
+
+```shell
+http://localhost:8000/
+```
+
+**创建.wsgi文件**
+
+应该有一个*yourapplication.wsgi* 文件。 该文件包含代码`mod_wsgi`，该代码在启动时执行以获取应用程序对象。 对于大多数应用程序，以下文件应该足够 -
+
+```shell
+from yourapplication import app as application
+```
+
+确保`yourapplication`和所有正在使用的库位于python加载路径上。
+
+### **配置Apache**
+
+需要告诉`mod_wsgi`，应用程序的位置。参考以下配置 - 
+
+```shell
+<VirtualHost *>
+   ServerName example.com
+   WSGIScriptAlias / C:\yourdir\yourapp.wsgi
+
+   <Directory C:\yourdir>
+      Order deny,allow
+      Allow from all
+   </Directory>
+
+</VirtualHost>
+```
+
+### 独立的WSGI容器
+
+有许多以Python编写的流行服务器，其中包含WSGI应用程序并提供HTTP服务。
+
+- Gunicorn
+- Tornado
+- Gevent
+- Twisted Web
+
+## 19 FastCGI
+
+FastCGI是Web服务器(如nginix，lighttpd和Cherokee)上Flask应用程序的另一个部署选项。
+
+### 配置FastCGI
+
+首先，需要创建FastCGI服务器文件，例如它的名称为:*yourapplication.fcgiC* 。
+
+```python
+from flup.server.fcgi import WSGIServer
+from yourapplication import app
+
+if __name__ == '__main__':
+    WSGIServer(app).run()
+```
+
+nginx和较早版本的lighttpd需要明确传递一个套接字来与FastCGI服务器进行通信。需要将路径传递给WSGIServer的套接字。
+
+```python
+WSGIServer(application, bindAddress = '/path/to/fcgi.sock').run()
+```
+
+### 配置Apache
+
+对于基本的Apache部署，*.fcgi* 文件将出现在您的应用程序URL中，例如`http://example.com/yourapplication.fcgi/hello/`。 有以下几种方法来配置应用程序，以便`yourapplication.fcgi`不会出现在URL中。
+
+```shell
+<VirtualHost *>
+   ServerName example.com
+   ScriptAlias / /path/to/yourapplication.fcgi/
+</VirtualHost>
+```
+
+### 配置lighttpd
+
+lighttpd的基本配置看起来像这样 -
+
+```shell
+fastcgi.server = ("/yourapplication.fcgi" => ((
+   "socket" => "/tmp/yourapplication-fcgi.sock",
+   "bin-path" => "/var/www/yourapplication/yourapplication.fcgi",
+   "check-local" => "disable",
+   "max-procs" => 1
+)))
+
+alias.url = (
+   "/static/" => "/path/to/your/static"
+)
+
+url.rewrite-once = (
+   "^(/static($|/.*))$" => "$1",
+   "^(/.*)$" => "/yourapplication.fcgi$1"
+)
+```
+
+请记住启用FastCGI，别名和重写模块。 该配置将应用程序绑定到`/yourapplication`。

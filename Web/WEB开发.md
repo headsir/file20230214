@@ -3151,3 +3151,735 @@ python操作Mysql，参见：python教程
 
 # 四、Flask
 
+学习网站
+
+1. https://www.yiibai.com/flask/flask_overview.html
+
+## 1 简介
+
+### 什么是Web框架？
+
+Web应用程序框架或简单的Web框架表示一组库和模块，它们使Web应用程序开发人员能够编写应用程序，而不必担心如协议，线程管理等低层细节。
+
+### 什么是Flask？
+
+Flask是一个用Python编写的Web应用程序框架。 它由Armin Ronacher开发，他领导着一个名为Pocco的Python爱好者的国际组织。 Flask基于Werkzeug WSGI工具包和Jinja2模板引擎。 这两个都是Pocco项目。
+
+### WSGI
+
+Web服务器网关接口(WSGI)已被采纳为Python Web应用程序开发的标准。 WSGI是Web服务器和Web应用程序之间通用接口的规范。
+
+### WERKZEUG
+
+它是一个WSGI工具包，它实现了请求，响应对象和其他实用程序功能。 这可以在其上构建Web框架。 Flask框架使用Werkzeug作为其一个基础模块之一。
+
+### Jinja2
+
+jinja2是Python的流行模板引擎。 网页模板系统将模板与特定的数据源结合起来呈现动态网页。
+
+Flask通常被称为**微框架**。 它旨在保持应用程序的核心简单且可扩展。 Flask没有用于数据库处理的内置抽象层，也没有形成验证支持。 相反，Flask支持扩展以将这些功能添加到应用程序中。
+
+## 2 安装
+
+pip install Flask
+
+## 3 应用程序
+
+要测试Flask安装是否成功，在编辑器中输入以下代码，并保存到文件:`Hello.py` 中。
+
+```python
+from flask import Flask
+app = Flask(__name__)
+
+@app.route('/')
+def hello_world():
+    return 'Hello World'
+
+if __name__ == '__main__':
+    app.run()
+```
+
+在项目中导入`Flask`模块是强制性的。 Flask类的一个对象是WSGI应用程序。
+
+Flask构造函数将当前模块的名称(`__name__`)作为参数。
+
+Flask类的`route()`函数是一个装饰器，它告诉应用程序哪个URL应该调用相关的函数。
+
+```python
+app.route(rule, options)
+```
+
+- *rule* 参数表示与该函数绑定的URL。
+- *options* 是要转发给底层Rule对象的参数列表。
+
+在上面的例子中，`'/'` URL与`hello_world()`方法绑定。 因此，在浏览器中打开Web服务器的主页时，将呈现此函数的输出。
+
+最后，Flask类的`run()`方法在本地开发服务器上运行应用程序。
+
+```python
+app.run(host, port, debug, options)
+```
+
+上面方法中的所有参数都是可选的，作用如下表描述说明 
+
+| 编号 | 参数    | 描述                                                         |
+| ---- | ------- | ------------------------------------------------------------ |
+| 1    | host    | 监听的主机名。默认为`127.0.0.1`(localhost)。 设置为`'0.0.0.0'`使服务器在外部可用 |
+| 2    | port    | 监听端口号，默认为:`5000`                                    |
+| 3    | debug   | 默认为:`false`。 如果设置为:`true`，则提供调试信息           |
+| 4    | options | 被转发到底层的Werkzeug服务器。                               |
+
+### 调试模式
+
+Flask应用程序通过调用`run()`方法来启动。 但是，当应用程序正在开发中时，应该为代码中的每个更改手动重新启动它。 为了避免这种不便，可以启用调试支持。 如果代码改变，服务器将自动重新加载。 它还将提供一个有用的调试器来跟踪应用程序中的错误(如果有的话)。
+
+在运行或将调试参数传递给`run()`方法之前，通过将应用程序对象的调试属性设置为`True`来启用调试模式。
+
+```python
+app.debug = True
+app.run()
+app.run(debug = True)
+```
+
+## 4 路由
+
+现代Web框架使用路由技术来帮助用户记住应用程序URL。 无需从主页导航即可直接访问所需页面。
+
+Flask中的`route()`装饰器用于将URL绑定到函数。 例如 -
+
+```python
+@app.route('/hello')
+def hello_world():
+    return 'hello world'
+```
+
+这里，URL `/hello`规则绑定到`hello_world()`函数。 因此，如果用户访问URL : `http://localhost:5000/hello` ，就会调用`hello_world()`函数，这个函数中的执行的结果输出将在浏览器中呈现。
+
+应用程序对象的`add_url_rule()`函数也可用于将URL与函数绑定，如上例所示，使用`route()`。
+
+```python
+def hello_world():
+    return 'hello world'
+
+app.add_url_rule('/', 'hello', hello_world)
+```
+
+## 5 变量规则
+
+可以通过将可变部分添加到规则参数来动态构建URL。 这个变量部分被标记为`<variable-name>`。 它作为关键字参数传递给规则所关联的函数。
+
+在以下示例中，`route()`装饰器的规则参数包含附加到URL `/hello`的`<name>`变量部分。 因此，如果在浏览器中输入URL: `http://localhost:5000/hello/YiibaiYiibai`，那么 ‘YiibaiYiibai’ 将作为参数提供给`hello()`函数。
+
+参考如下代码 - 
+
+```python
+from flask import Flask
+app = Flask(__name__)
+
+@app.route('/hello/<name>')
+def hello_name(name):
+    return 'Hello %s!' % name
+
+if __name__ == '__main__':
+    app.run(debug = True)
+```
+
+将上面的脚本保存到文件:`hello.py`，并从Python shell运行它。
+![img](imge/WEB开发.assets/895060558_49557.png)
+
+接下来，打开浏览器并输入URL => `http://localhost:5000/hello/YiibaiYiibai`。在浏览器中输出如下所示 -
+![img](imge/WEB开发.assets/539060559_62745.png)
+
+除了默认的字符串变量部分之外，还可以使用以下转换器构造规则 -
+
+| 编号 | 转换器 | 描述                            |
+| ---- | ------ | ------------------------------- |
+| 1    | int    | 接受整数                        |
+| 2    | float  | 对于浮点值                      |
+| 3    | path   | 接受用作目录分隔符的斜杠符(`/`) |
+
+在下面的代码中，使用了所有这些构造函数。
+
+```python
+from flask import Flask
+app = Flask(__name__)
+
+@app.route('/blog/<int:postID>')
+def show_blog(postID):
+    return 'Blog Number %d' % postID
+
+@app.route('/rev/<float:revNo>')
+def revision(revNo):
+    return 'Revision Number %f' % revNo
+
+if __name__ == '__main__':
+    app.run()
+```
+
+从Python Shell运行上述代码。 在浏览器中访问URL => `http:// localhost:5000/blog/11`。
+
+给定的数字值作为:`show_blog()`函数的参数。 浏览器显示以下输出 -
+
+```shell
+Blog Number 11
+```
+
+在浏览器中输入此URL - `http://localhost:5000/rev/1.1`
+
+`revision()`函数将浮点数作为参数。 以下结果出现在浏览器窗口中 -
+
+```shell
+Revision Number 1.100000
+```
+
+Flask的URL规则基于Werkzeug的路由模块。 这确保了形成的URL是唯一的，并且基于Apache制定的先例。
+
+考虑以下脚本中定义的规则 -
+
+```python
+from flask import Flask
+app = Flask(__name__)
+
+@app.route('/flask')
+def hello_flask():
+    return 'Hello Flask'
+
+@app.route('/python/')
+def hello_python():
+    return 'Hello Python'
+
+if __name__ == '__main__':
+    app.run()
+```
+
+两条规则看起来都很相似，但在第二条规则中，使用了尾部斜线(`/`)。 因此，它变成了一个规范的URL。 因此，使用`/python`或`/python/`返回相同的输出。 但是，在第一条规则的情况下， URL:`/flask/`会导致`404 Not Found`页面。
+
+## 6 URL构建
+
+`url_for()`函数对于动态构建特定函数的URL非常有用。 该函数接受函数的名称作为第一个参数，并接受一个或多个关键字参数，每个参数对应于URL的变量部分。
+
+以下脚本演示了使用`url_for()`函数。
+
+```python
+from flask import Flask, redirect, url_for
+app = Flask(__name__)
+
+@app.route('/admin')
+def hello_admin():
+    return 'Hello Admin'
+
+@app.route('/guest/<guest>')
+def hello_guest(guest):
+    return 'Hello %s as Guest' % guest
+
+@app.route('/user/<name>')
+def user(name):
+    if name =='admin':
+        return redirect(url_for('hello_admin'))
+    else:
+        return redirect(url_for('hello_guest',guest = name))
+
+if __name__ == '__main__':
+    app.run(debug = True)
+```
+
+上面的脚本有一个函数用户(名称)，它接受来自URL的参数值。
+
+`User()`函数检查收到的参数是否与’admin’匹配。 如果匹配，则使用`url_for()`将应用程序重定向到`hello_admin()`函数，否则将该接收的参数作为`guest`参数传递给`hello_guest()`函数。
+
+保存上面的代码到一个文件:*hello.py*，并从Python shell运行。
+
+打开浏览器并输入URL - `http://localhost:5000/user/admin`
+
+浏览器中的应用程序响应输出结果是 -
+
+```shell
+Hello Admin
+```
+
+在浏览器中输入以下URL - `http://localhost:5000/user/mvl`
+
+应用程序响应结果现在变为 -
+
+```shell
+Hello mvl as Guest
+```
+
+## 7 HTTP方法
+
+Http协议是万维网数据通信的基础。 它协议定义了从指定URL中检索不同数据的方法。
+
+下表概括了不同的http方法 -
+
+| 编号 | 方法   | 描述                                                         |
+| ---- | ------ | ------------------------------------------------------------ |
+| 1    | GET    | 将数据以未加密的形式发送到服务器，这最常用的方法。           |
+| 2    | HEAD   | 与GET相同，但没有响应主体                                    |
+| 3    | POST   | 用于将HTML表单数据发送到服务器。通过POST方法接收的数据不会被服务器缓存。 |
+| 4    | PUT    | 用上传的内容替换目标资源的所有当前表示。                     |
+| 5    | DELETE | 删除由URL给出的所有目标资源的所有表示                        |
+
+默认情况下，Flask路由响应GET请求。 但是，可以通过为`route()`装饰器提供方法参数来更改此首选项。
+
+为了演示在URL路由中使用POST方法，首先创建一个HTML表单并使用POST方法将表单数据发送到URL。
+
+将以下脚本保存到文件:`login.html`
+
+```html
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <title>Flask HTTP请求方法处理</title>
+</head>
+   <body>
+      <form action = "http://localhost:5000/login" method = "post">
+         <p>输入姓名:</p>
+         <p><input type = "text" name = "name" value=""/></p>
+         <p><input type = "submit" value = "提交" /></p>
+      </form>
+
+   </body>
+</html>
+```
+
+现在在Python shell中输入以下脚本。
+
+```python
+from flask import Flask, redirect, url_for, request
+app = Flask(__name__)
+
+@app.route('/success/<name>')
+def success(name):
+    return 'welcome %s' % name
+
+@app.route('/login',methods = ['POST', 'GET'])
+def login():
+    if request.method == 'POST':
+        user = request.form['name']
+        return redirect(url_for('success',name = user))
+    else:
+        user = request.args.get('name')
+        return redirect(url_for('success',name = user))
+
+if __name__ == '__main__':
+    app.run(debug = True)
+```
+
+开发服务器开始运行后，在浏览器中打开`login.html`，在文本字段中输入名称(如:*maxsu* )并单击**提交**。
+![img](imge/WEB开发.assets/468090526_96803.png)
+
+表单数据被提交到`<form>`标签的`action`属性指定的URL。
+
+`http://localhost:5000/login`被映射到`login()`函数。 由于服务器已通过POST方法接收数据，因此从表单数据获得`'name'`参数的值，通过以下方式-
+
+```python
+user = request.form['name']
+```
+
+它作为可变部分传递给URL:`/success`。 浏览器在窗口中显示欢迎消息。
+![img](imge/WEB开发.assets/948090526_96515.png)
+
+将`login.html`中的方法参数更改为`GET`并在浏览器中再次打开。 在服务器上收到的数据是通过GET方法。 `'name'`参数的值现在通过以下方式获得 -
+
+```python
+User = request.args.get('name')
+```
+
+这里，`args`是字典对象，它包含一系列表单参数及其对应值。 与之前一样，与`'name'`参数对应的值将传递到URL:`/success`。
+
+## 8 模板
+
+```python
+app = Flask(__name__)
+
+@app.route('/')
+def index():
+   return render_template(‘hello.html’)
+
+if __name__ == '__main__':
+   app.run(debug = True)
+```
+
+Flask将尝试在该脚本所在的同一文件夹中查找`templates`文件夹中的HTML文件。使用模板的应用程序目录结构如下所示 - 
+
+```shell
+app.py
+hello.py
+    templates
+        hello.html
+        register.html
+        ....
+```
+
+术语“Web模板系统”是指设计一个HTML脚本，其中可以动态插入变量数据。 Web模板系统由模板引擎，某种数据源和模板处理器组成。
+
+Flask使用jinga2模板引擎。 Web模板包含用于变量和表达式(这些情况下为Python表达式)的HTML语法散布占位符，这些变量和表达式在模板呈现时被替换为值。
+
+以下代码在模板(*templates*)文件夹中保存为:*hello.html*。
+
+```html
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>Flask HTTP请求方法处理</title>
+</head>
+   <body>
+
+      <h1>Hello {{ name }}!</h1>
+
+   </body>
+</html>
+```
+
+接下来，将以下代码保存在*app.py*文件中，并从Python shell运行 - 
+
+```python
+from flask import Flask, render_template
+app = Flask(__name__)
+
+@app.route('/hello/<user>')
+def hello_name(user):
+    return render_template('hello.html', name = user)
+
+if __name__ == '__main__':
+    app.run(debug = True)
+```
+
+在开发服务器开始运行时，打开浏览器并输入URL为 - `http://localhost:5000/hello/maxsu`
+
+URL的可变部分插入`{{name}}`占位符处。
+
+![img](imge/WEB开发.assets/821090558_69765.png)
+
+Jinja2模板引擎使用以下分隔符来从HTML转义。
+
+- `{% ... %}` 用于多行语句
+- `{{ ... }}` 用于将表达式打印输出到模板
+- `{# ... #}` 用于未包含在模板输出中的注释
+- `# ... ##` 用于单行语句
+
+在以下示例中，演示了在模板中使用条件语句。 `hello()`函数的URL规则接受整数参数。 它传递给`hello.html`模板。 在它里面，收到的数字(标记)的值被比较(大于或小于50)，因此在HTML执行了有条件渲染输出。
+
+Python脚本如下 -
+
+```python
+from flask import Flask, render_template
+app = Flask(__name__)
+
+@app.route('/hello/<int:score>')
+def hello_name(score):
+    return render_template('hello.html', marks = score)
+
+if __name__ == '__main__':
+    app.run(debug = True)
+```
+
+模板文件:*hello.html* 的HTML模板脚本如下 -
+
+```html
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>Flask模板示例</title>
+</head>
+   <body>
+
+      {% if marks>50 %}
+      <h1> 通过考试！</h1>
+      {% else %}
+      <h1>未通过考试！</h1>
+      {% endif %}
+
+   </body>
+</html>
+```
+
+请注意，条件语句`if-else`和`endif`包含在分隔符`{%..。%}`中。
+
+运行Python脚本并访问URL=> `http://localhost/hello/60` ，然后访问 `http://localhost/hello/59`，以有条件地查看HTML输出。
+
+Python循环结构也可以在模板内部使用。 在以下脚本中，当在浏览器中打开URL => `http:// localhost:5000/result`时，`result()`函数将字典对象发送到模板文件:*results.html* 。
+
+*result.html* 的模板部分采用for循环将字典对象`result{}`的键和值对呈现为HTML表格的单元格。
+
+从Python shell运行以下代码。
+
+```python
+from flask import Flask, render_template
+app = Flask(__name__)
+
+@app.route('/result')
+def result():
+    dict = {'phy':59,'che':60,'maths':90}
+    return render_template('result.html', result = dict)
+
+if __name__ == '__main__':
+    app.run(debug = True)
+```
+
+将以下HTML脚本保存为模板文件夹(*templates*)中的模板文件:*result.html* 。
+
+```html
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>Flask模板示例</title>
+</head>
+   <body>
+      <table border = 1>
+         {% for key, value in result.items() %}
+            <tr>
+               <th> {{ key }} </th>
+               <td> {{ value }} </td>
+            </tr>
+         {% endfor %}
+      </table>
+   </body>
+</html>
+```
+
+在这里，与For循环相对应的Python语句包含在`{%...%}`中，而表达式键和值放在`{{}}`中。
+
+开发开始运行后，在浏览器中打开`http://localhost:5000/result`以获得以下输出。
+
+![img](imge/WEB开发.assets/671130559_61033.png)
+
+## 9 静态文件
+
+Web应用程序通常需要一个静态文件，例如支持显示网页的JavaScript文件或CSS文件。 通常，可以通过配置Web服务器提供这些服务，但在开发过程中，这些文件将从包中的静态文件夹或模块旁边提供，它将在应用程序的`/static`上提供。
+
+使用特殊的端点“静态”来为静态文件生成URL。
+
+在以下示例中，`index.html`中的HTML按钮的`OnClick`事件调用`hello.js`中定义的javascript函数，该函数在Flask应用程序的URL => `/` 中呈现。
+
+```python
+from flask import Flask, render_template
+app = Flask(__name__)
+
+@app.route("/")
+def index():
+    return render_template("index.html")
+
+if __name__ == '__main__':
+    app.run(debug = True)
+```
+
+*index.html* 中的HTML脚本如下所示。
+
+```html
+<html>
+   <head>
+      <script type = "text/javascript" 
+         src = "{{ url_for('static', filename = 'hello.js') }}" ></script>
+   </head>
+   <body>
+      <input type = "button" onclick = "sayHello()" value = "Say Hello" />
+   </body>
+</html>
+```
+
+文件:*hello.js* 中定义包含 `sayHello()` 函数。
+
+```js
+function sayHello() {
+   alert("Hello World")
+}
+```
+
+## 10 请求对象
+
+来自客户端网页的数据作为全局请求对象发送到服务器。要处理请求数据，请求对旬应该从Flask模块导入。
+
+请求对象的重要属性如下所列 ：
+
+- `form` - 它是包含表单参数及其值的键和值对的字典对象。
+- `args` - 解析问号(`?`)后的URL部分查询字符串的内容。
+- `cookies` - 保存Cookie名称和值的字典对象。
+- `file` - 与上传文件有关的数据。
+- `method` - 当前请求方法。
+
+## 11 表单处理
+
+我们已经看到，可以在URL规则中指定http方法。URL映射的函数接收到的表单数据可以以字典对象的形式收集，并将其转发给模板以在相应的网页上呈现它。
+
+在以下示例中，URL => `/` 呈现具有表单的网页(*student.html*)。填充的数据会提交到触发`result()`函数的URL => `/result` 中。
+
+`results()`函数收集字典对象中`request.form`中存在的表单数据，并将其发送给*result.html* 并显示出来。
+
+该模板动态呈现表单数据的HTML表格。
+
+下面给出的是Python的应用程序代码 -
+
+```python
+from flask import Flask, render_template, request
+app = Flask(__name__)
+
+@app.route('/')
+def student():
+    return render_template('student.html')
+
+@app.route('/result',methods = ['POST', 'GET'])
+def result():
+    if request.method == 'POST':
+        result = request.form
+        return render_template("result.html",result = result)
+
+if __name__ == '__main__':
+    app.run(debug = True)
+```
+
+以下是 *student.html* 的HTML脚本的代码。
+
+```html
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>Flask示例</title>
+</head>
+   <body>
+
+      <form action = "http://localhost:5000/result" method = "POST">
+         <p>姓名 <input type = "text" name = "Name" /></p>
+         <p>物理分数: <input type = "text" name = "Physics" /></p>
+         <p>化学分数: <input type = "text" name = "Chemistry" /></p>
+         <p>数学分数: <input type ="text" name = "Mathematics" /></p>
+         <p><input type = "submit" value = "提交" /></p>
+      </form>
+
+   </body>
+</html>
+```
+
+模板代码(result.html)在下面给出 -
+
+```html
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>Flask示例</title>
+</head>
+   <body>
+
+      <table border = 1>
+         {% for key, value in result.items() %}
+            <tr>
+               <th> {{ key }} </th>
+               <td> {{ value }} </td>
+            </tr>
+         {% endfor %}
+      </table>
+
+   </body>
+</html>
+```
+
+运行Python脚本，并在浏览器中输入URL => `http://localhost:5000/` 。结果如下所示 - 
+
+![img](imge/WEB开发.assets/302150517_77617.png)
+
+当点击**提交**按钮时，表单数据以HTML表格的形式呈现在*result.html* 中，如下所示 - 
+
+![img](imge/WEB开发.assets/441150518_88138.png)
+
+## 12 Cookies处理
+
+Cookie以文本文件的形式存储在客户端计算机上。 其目的是记住和跟踪与客户使用有关的数据，以获得更好的访问体验和网站统计。
+
+Request对象包含一个`cookie`的属性。 它是所有cookie变量及其对应值的字典对象，客户端已发送。 除此之外，cookie还会存储其到期时间，路径和站点的域名。
+
+在Flask中，cookies设置在响应对象上。 使用`make_response()`函数从视图函数的返回值中获取响应对象。 之后，使用响应对象的`set_cookie()`函数来存储cookie。
+
+重读cookie很容易。 可以使用`request.cookies`属性的`get()`方法来读取cookie。
+
+在下面的Flask应用程序中，当访问URL => `/` 时，会打开一个简单的表单。
+
+```python
+@app.route('/')
+def index():
+    return render_template('index.html')
+```
+
+这个HTML页面包含一个文本输入，完整代码如下所示 - 
+
+```html
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>Flask Cookies示例</title>
+</head>
+   <body>
+
+      <form action = "/setcookie" method = "POST">
+         <p><h3>Enter userID</h3></p>
+         <p><input type = 'text' name = 'name'/></p>
+         <p><input type = 'submit' value = '登录'/></p>
+      </form>
+
+   </body>
+</html>
+```
+
+表单提交到URL => `/setcookie`。 关联的视图函数设置一个Cookie名称为:`userID`，并的另一个页面中呈现。
+
+```python
+@app.route('/setcookie', methods = ['POST', 'GET'])
+def setcookie():
+   if request.method == 'POST':
+        user = request.form['name']
+
+        resp = make_response(render_template('readcookie.html'))
+        resp.set_cookie('userID', user)
+
+        return resp
+```
+
+`readcookie.html` 包含超链接到另一个函数`getcookie()`的视图，该函数读回并在浏览器中显示cookie值。
+
+```python
+@app.route('/getcookie')
+def getcookie():
+    name = request.cookies.get('userID')
+    return '<h1>welcome '+name+'</h1>'
+```
+
+完整的应用程序代码如下 - 
+
+```python
+from flask import Flask
+from flask import render_template
+from flask import request
+from flask import make_response
+
+
+app = Flask(__name__)
+
+@app.route('/')
+def index():
+    return render_template('index.html')
+
+@app.route('/setcookie', methods = ['POST', 'GET'])
+def setcookie():
+    if request.method == 'POST':
+        user = request.form['name']
+
+        resp = make_response(render_template('readcookie.html'))
+        resp.set_cookie('userID', user)
+        return resp
+
+@app.route('/getcookie')
+def getcookie():
+    name = request.cookies.get('userID')
+    print (name)
+    return '<h1>welcome, '+name+'</h1>'
+
+if __name__ == '__main__':
+    app.run(debug = True)
+```
+
+运行该应用程序并访问URL => `http://localhost:5000/`
+![img](imge/WEB开发.assets/564150525_69844.png)
+设置cookie的结果如下所示 -
+![img](imge/WEB开发.assets/460150524_58559.png)
+
+重读cookie的输出如下所示 -
+![img](imge/WEB开发.assets/399150525_35352.png)

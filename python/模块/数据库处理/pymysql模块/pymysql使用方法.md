@@ -210,10 +210,6 @@ s_count_traffic = len(traffic_list[0]) * "%s,"
 
 # 二、笔记
 
-参考网站：
-
-1. https://blog.csdn.net/giggle544/article/details/97115278
-
 ## 模块安装
 
 pip install pymysql

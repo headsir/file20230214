@@ -8,6 +8,10 @@
 
 ## 二、使用方法
 
+参考网站：
+
+1. https://blog.csdn.net/giggle544/article/details/97115278
+
 ### 1、安装 pipenv
 
 `pip install pipenv`

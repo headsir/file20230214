@@ -1,6 +1,6 @@
-## 一、pymysql封装
+# 一、pymysql封装
 
-第一版：
+## 第一版：
 
 ```
 # coding = utf-8
@@ -69,7 +69,9 @@ class Model(object):
 
 ```
 
-第二版：优化mysql配置参数及批量添加数据
+## 第二版：
+
+优化mysql配置参数及批量添加数据
 
 ```sql
 # coding = utf-8
@@ -206,3 +208,8 @@ s_count_traffic = len(traffic_list[0]) * "%s,"
 备注：字段出现 % 需使用 %%
 ```
 
+# 二、笔记
+
+## 模块安装
+
+pip install pymysql

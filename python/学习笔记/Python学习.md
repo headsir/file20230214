@@ -1665,7 +1665,7 @@ Python自带模块，如：sys、time、math等
 >   >   > 查看pip的版本，判断pip是否安装
 >   >   > pip --version
 >
->   
+> 
 >
 > - pip使用
 >
@@ -1686,6 +1686,11 @@ Python自带模块，如：sys、time、math等
 >   >   > pip install -U 模块名          #升级模块
 >   >   > pip install pip-review		#批量更新包工具
 >   >   > pip-review --local interactive #批量更新包
+>   >   >
+>   >   > pip cache dir  #pip 缓存路径查看
+>   >   >
+>   >   > pip cache purge   #pip 缓存清理
+>   >   > pip config set global.cache-dir "d:\pythonpipcache"  # 更改pip cache 位置
 
 #### 6.1.2.2 pipenv工具
 

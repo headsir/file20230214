@@ -3382,6 +3382,81 @@ show_user.html
 
 # 三、Django
 
+## 1 安装django
+
+```python
+pip install django
+```
+
+
+
+## 2 创建项目
+
+### 2.1 终端方式
+
+- 打开终端
+
+- 进入项目目录
+
+- 执行命令
+
+  ```
+  "D:\ProgramData\virtual directory\python_learing-uJLLoHwc\Scripts\django-admin.exe" startproject 项目名称
+  ```
+
+### 2.2 Pycharm专业版
+
+略
+
+
+
+默认项目的文件介绍：
+
+```
+mysite_01
+    │  manage.py  【项目的管理，启动项目、创建app、数据管理】【不要动】
+    │
+    └─mysite_01
+    		__init__.py
+            settings.py  【项目配置文件】【****经常操作****】
+            urls.py	 【URL和函数的对应关系】【****经常操作****】
+            wsgi.py  【同步方式，接收网络请求】【不要动】
+            asgi.py  【异步方式，接收网络请求】【不要动】           
+```
+
+## 3 创建app
+
+```python
+python manage.py startapp app01
+```
+
+app目录结构：
+
+```
+│
+├─app01
+│  │  admin.py 【固定，不用动】【django默认提供admin后台管理】
+│  │  apps.py  【固定，不用动】 app启动类
+│  │  models.py 【****重要****】对数据库操作
+│  │  tests.py 【固定，不用动】单元测试
+│  │  views.py 【****重要****】函数
+│  │  __init__.py
+│  │
+│  └─migrations  【固定，不用动】数据库变更记录
+          └─__init__.py
+
+```
+
+## 4 快速上手
+
+
+
+
+
+
+
+
+
 # 四、Flask
 
 学习网站

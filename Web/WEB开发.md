@@ -3242,6 +3242,140 @@ add_user.html
 
 ### 2 查询所有用户
 
+app.py
+
+```python
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+# @File    : app.py
+# @Time    : 2023/9/27 9:35
+# @Author  : 978345836@qq.com
+# @Software: win11 python3.9
+# @Version : 1.0
+# @Describe: 开发网站（python+mysql+flask)
+
+"""
+程序说明：
+    功能：网站入口
+模块说明：
+    1、flask:WEB框架模块
+        模块安装 pip install Flask
+"""
+
+# here put the import lib
+from flask import Flask, render_template, request
+
+app = Flask(__name__)
+
+
+@app.route("/add/user", methods=["GET", "POST"])
+def add_user():
+    if request.method == "GET":
+        return render_template("add_user.html")
+
+    username = request.form.get("user")
+    password = request.form.get("pwd")
+    mobile = request.form.get("mobile")
+
+    # 1.连接mysql
+    import pymysql
+    conn = pymysql.connect(host="127.0.0.1", port=3306, user="website", password="website123", charset='utf8',db='website')
+    cursor = conn.cursor(cursor=pymysql.cursors.DictCursor)
+    # 2.执行SQL
+    sql = "insert into admin(username,password,mobile) values (%s,%s,%s)"
+    cursor.execute(sql, [username, password, mobile])
+    conn.commit()
+    # 3.关闭连接
+    cursor.close()
+    conn.close()
+
+    return "添加成功"
+@app.route("/show/user")
+def show_user():
+    # ==========从数据库获取信息====================
+    # 1.连接mysql
+    import pymysql
+    conn = pymysql.connect(host="127.0.0.1", port=3306, user="website", password="website123", charset='utf8',
+                           db='website')
+    cursor = conn.cursor(cursor=pymysql.cursors.DictCursor)
+    # 2.执行SQL
+    sql = "select * from admin"
+    cursor.execute(sql)
+    data_list = cursor.fetchall()
+    # 3.关闭连接
+    cursor.close()
+    conn.close()
+
+    # 1.找到html文件，读取所有内容
+    # 2.找到内容中 ‘特殊占位符’，将数据替换
+    # 3.将替换完成的字符串返回给用户的浏览器
+    return render_template('show_user.html', data_list=data_list)
+
+
+if __name__ == '__main__':
+    app.run(debug=True)
+```
+
+show_user.html
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link rel="stylesheet" href="/static/plugins/bootstrap-3.4.1/css/bootstrap.css">
+    <link rel="stylesheet" href="/static/plugins/font-awesome-4.7.0/css/font-awesome.css">
+
+
+</head>
+<body>
+<div class="container">
+    <h1>用户列表</h1>
+    <table class="table table-bordered">
+        <thead>
+        <tr>
+            <th>序号</th>
+            <th>姓名</th>
+            <th>密码</th>
+            <th>手机号</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for item in data_list %}
+        <tr>
+            <td>{{item.id}}</td>
+            <td>{{item.username}}</td>
+            <td>{{item.password}}</td>
+            <td>{{item.mobile}}</td>
+
+        </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<!--引入js模板-->
+<script src="/static/js/jquery-3.6.0.min.js"></script>
+<script src="/static/plugins/bootstrap-3.4.1/js/bootstrap.js"></script>
+
+<script>
+    // th标签添加属性
+    $("th").addClass("text-center")
+</script>
+
+</body>
+</html>
+```
+
+效果：
+
+![20231007-155924](imge/WEB开发.assets/20231007-155924.gif)
+
+
+
+
+
 
 
 

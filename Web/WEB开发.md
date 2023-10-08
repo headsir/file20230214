@@ -3449,9 +3449,128 @@ app目录结构：
 
 ## 4 快速上手
 
+- app注册
 
+  ![image-20231008150643218](imge/WEB开发.assets/image-20231008150643218-16967488164601.png)
 
+- 编写URL和视图函数对应关系【urls.py】
 
+![image-20231008151244529](imge/WEB开发.assets/image-20231008151244529.png)
+
+- 编写视图函数
+
+  ![image-20231008151657707](imge/WEB开发.assets/image-20231008151657707.png)
+
+- 启动django项目
+
+  - 命令行启动
+
+    ```
+    python manage.py runserver
+    ```
+
+  - Pycharm
+
+    略
+
+### 4.1 简单页面
+
+![image-20231008153117813](imge/WEB开发.assets/image-20231008153117813.png)
+
+### 4.2 templates 模板
+
+![image-20231008163608362](imge/WEB开发.assets/image-20231008163608362.png)
+
+### 4.3 静态文件
+
+在开发过程中一般将：图片、CSS、JS 作为静态文件
+
+#### 4.3.1 static目录
+
+在app目录下创建static文件夹
+
+![image-20231008171654173](imge/WEB开发.assets/image-20231008171654173.png)
+
+#### 4.3.2 引用静态文件
+
+![image-20231008171757219](imge/WEB开发.assets/image-20231008171757219.png)
+
+## 5 模板语法
+
+本质上：在HTML中写一些占位符，由数据对这些占位符替换和处理。
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<h1>模板语法学习</h1>
+<!--字符语法-->
+<div>{{ n1 }}</div>
+<div>{{ n2 }}</div>
+<!--列表语法-->
+
+<!--列表索引-->
+<div>{{ n2.0 }}</div>
+<div>{{ n2.1 }}</div>
+<div>{{ n2.2 }}</div>
+
+<!--循环读取-->
+<div>
+    {% for item in n2 %}
+    <span>{{ item }}</span>
+    {% endfor %}
+</div>
+<hr/>
+{{ n3 }}
+
+<!--字典索引-->
+{{ n3.name }}
+{{ n3.salary }}
+{{ n3.role }}
+
+<ul>
+    <!--循环取键值-->
+    {% for item in n3.keys %}
+    <li>{{ item }}</li>
+    {% endfor %}
+    <hr/>
+
+    <!--循环取键值对-->
+    {% for k,v in n3.items %}
+    <li>{{ k }} = {{ v }}</li>
+    {% endfor %}
+    <hr/>
+
+</ul>
+<hr/>
+{{ n4 }}
+
+<!--列表套字典-->
+{{ n4.1 }}
+{{ n4.1.name }}
+
+{% for item in n4 %}
+	<div>{{ item.name }} {{ item.salary }}</div>
+{% endfor %}
+
+<hr/>
+<!--条件语句-->
+{% if n1 == "韩超1" %}
+	<h1>打打啊打打</h1>
+{% elif n1 == 'xxxx' %}
+	<h1>bibibibi</h1>
+{% else %}
+	<h1>八八八八八八八</h1>
+{% endif %}
+<hr/>
+
+</body>
+</html>
+```
 
 
 

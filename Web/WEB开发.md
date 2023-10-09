@@ -3572,6 +3572,65 @@ app目录结构：
 </html>
 ```
 
+## 案例：伪联通新闻中心
+
+### urls.py
+
+```
+urlpatterns = [
+    #  联通新闻中心
+    path('news/', views.news),
+]
+
+```
+
+### views.py
+
+```
+def news(req):
+    # 1.定义新闻（字典或列表） 或去数据库取
+    # 或网络请求联通新闻
+    # 向地址：http://www.chinaunicom.com.cn/api/article/NewsByIndex/2/2022/11/news
+    # 第三方模块：requests
+    import requests
+    headers = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:109.0) Gecko/20100101 Firefox/114.0"}
+
+    res = requests.get(
+        url="http://www.chinaunicom.com.cn/api/article/NewsByIndex/3/2023/09/news", headers=headers)
+
+    data_list = res.json()
+    return render(req, 'news.html', {"news_list": data_list,"status_code":res.status_code})
+```
+
+### news.html
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<h1>联通新闻中心</h1>
+<ul>
+    <h2> 网页响应状态：{{ status_code }}</h2>
+     {% for item in news_list %}
+        <li>{{ item.news_title }} 时间：{{ item.post_time }}</li>
+    {% endfor %}
+</ul>
+</body>
+</html>
+```
+
+### 效果：
+
+![image-20231009164059432](imge/WEB开发.assets/image-20231009164059432.png)
+
+6 
+
+
+
 
 
 

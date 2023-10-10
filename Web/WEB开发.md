@@ -3744,7 +3744,7 @@ pip install mysqlclient
 
 - 自带工具创建数据库
 
-  [参考MYSQL教程](D:\数据库\记事本\study-notes\MySQL\MySQL知识整理.md)
+  [参考MYSQL教程](..\MySQL\MySQL知识整理.md)
 
 
 

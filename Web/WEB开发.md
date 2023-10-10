@@ -3627,11 +3627,124 @@ def news(req):
 
 ![image-20231009164059432](imge/WEB开发.assets/image-20231009164059432.png)
 
-6 
+## 6 请求和响应
 
+![image-20231010092514487](imge/WEB开发.assets/image-20231010092514487.png)
 
+## 案例：用户登录
 
+### urls.py
 
+```
+urlpatterns = [
+    # 用户登录
+    path('login/', views.login),
+]
+```
+
+### views.py
+
+初版
+
+```
+def login(request):
+    if request.method == "GET":
+        return render(request, "login.html")
+    else:
+        #  如果是POST请求，获用户提交的数据
+        # print(request.POST)
+        username = request.POST.get("user")
+        password = request.POST.get("pwd")
+        if username == "root" and password == "123":
+            return redirect("https://www.baidu.com")
+        else:
+            return render(request, "login.html", {"error_msg": "用户名或密码错误"})
+```
+
+优化版
+
+```
+def login(request):
+    if request.method == "GET":
+        return render(request, "login.html")
+
+    #  如果是POST请求，获用户提交的数据
+    # print(request.POST)
+    username = request.POST.get("user")
+    password = request.POST.get("pwd")
+    if username == "root" and password == "123":
+        return redirect("https://www.baidu.com")
+
+    return render(request, "login.html", {"error_msg": "用户名或密码错误"})
+```
+
+### login.html
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<h1>用户登录</h1>
+<form method="post" action="/login/">
+    
+    {% csrf_token %}
+
+    <input type="text" name="user" placeholder="用户名"/>
+    <input type="password" name="pwd" placeholder="密码"/>
+    <input type="submit" value="提交"/>
+    <span style="color: #ff2424">{{ error_msg }}</span>
+</form>
+</body>
+</html>
+```
+
+## 7 数据库操作
+
+- MySQL数据库 + pymysql
+
+  ```
+      # ==========从数据库获取信息====================
+      # 1.连接mysql
+      import pymysql
+      conn = pymysql.connect(host="127.0.0.1", port=3306, user="website", password="website123", charset='utf8',db='website')
+      cursor = conn.cursor(cursor=pymysql.cursors.DictCursor)
+      # 2.执行SQL
+      sql = "select * from admin"
+      cursor.execute(sql)
+      data_list = cursor.fetchall()
+      # 3.关闭连接
+      cursor.close()
+      conn.close()
+  ```
+
+- Django开发操作数据库更简单，内部提供了 ORM 框架
+
+  ![image-20231010101552303](imge/WEB开发.assets/image-20231010101552303.png)
+
+### 7.1 安装第三方模块
+
+```
+pip install mysqlclient
+```
+
+注：django新版本对 pymysql 支持不好，内部有编码错误
+
+### 7.2 ORM 
+
+- 创建、修改、删除数据库中的表（不用写SQL语句）【无法创建数据库】
+- 操作表中的数据。  
+
+#### 1.自己创建数据库
+
+- 启动MySQL服务
+
+- 自带工具创建数据库
+
+  [参考MYSQL教程](D:\数据库\记事本\study-notes\MySQL\MySQL知识整理.md)
 
 
 
@@ -5010,3 +5123,15 @@ url.rewrite-once = (
 ```
 
 请记住启用FastCGI，别名和重写模块。 该配置将应用程序绑定到`/yourapplication`。
+
+# 五 常见问题
+
+## 5.1 Django
+
+### 1 CRSF验证失败
+
+![image-20231010094213751](imge/WEB开发.assets/image-20231010094213751.png)
+
+解决办法：
+
+![image-20231010094533692](imge/WEB开发.assets/image-20231010094533692.png)

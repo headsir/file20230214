@@ -96,15 +96,20 @@ UTF8MB4支持4字节，常见就是Emoji表情的存储；
 # 二、数据库
 
         *CREATE DATABASE 数据库名 【创建数据库】
-        *create database <数据库名> character set utf8 【创建数据库时指定数据库的字符集】
+        *create database <数据库名> character set <字符集> COLLATE <排序规则>【创建数据库时指定数据库的字符集】
         *show databases 【查看存在的数据库】
         *drop database <数据库名> 【删除数据库】
         *USE 库名  【进入数据库】
         *show tables 【显示数据库所有数据表】
     	*Select Database() 【查看当前所在数据库 】
 
+​    创建数据库示例：
 
-​    
+```SQL
+CREATE DATABASE `ss` CHARACTER SET 'utf8mb4' COLLATE 'utf8mb4_general_ci';
+```
+
+
 
 ## 2.1 用户权限
 

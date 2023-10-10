@@ -3746,6 +3746,423 @@ pip install mysqlclient
 
   [参考MYSQL教程](..\MySQL\MySQL知识整理.md)
 
+#### 2.django连接数据库
+
+在settings.py文件中进行配置和修改。
+
+```python
+# django默认自带
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.sqlite3',
+#         'NAME': BASE_DIR / 'db.sqlite3',
+#     }
+# }
+
+# MySQL数据库
+DATABASES = {
+    "default": {
+        "ENGINE": "django.db.backends.mysql",
+        "NAME": "website",  # 数据库名字
+        "USER": "website",
+        "PASSWORD": "website123",
+        "HOST": "127.0.0.1",
+        "PORT": "3306",
+    }
+}
+```
+
+#### 3.django操作表
+
+- 创建表
+- 删除表
+- 修改表
+
+
+
+创建表：在models.py文件中：
+
+```python
+class UserInfo(models.Model):
+    """
+    模块自动生成以下SQL语句：
+    create table app01_userinfo(
+    id bigint auto_increment primary key ,  # 自动添加
+    name varchar(32),
+    password varchar(64),
+    age int
+    )
+    """
+    name = models.CharField(max_length=32)
+    password = models.CharField(max_length=64)
+    age = models.IntegerField()
+```
+
+执行命令：
+
+```
+python manage.py makemigrations
+python manage.py migrate
+```
+
+注意：app需要已注册
+
+删除表：在models.py文件中删除表对应的模块
+
+修改表：
+
+- 新增列：必须要指定新增列对应的数据，有三种方法：
+
+  - 1.手动输入一个值
+
+  - 2.设置默认值
+
+    ```
+    (default=2)
+    ```
+
+  - 3.设置为空
+
+    ```
+    (null = True, blank = True)
+    ```
+
+#### 4.操作表数据
+
+添加数据
+
+```
+表模块.objects.create(每列对应的值)
+```
+
+删除数据
+
+```
+表模块.objects.filter(筛选条件).delete()
+表模块.objects.all().delete()
+```
+
+获取数据
+
+```
+data_list = 表模块.objects.all()  # QuerySet类型，是一个对象列表
+for obj in data_list:
+	obj.列名
+	
+# 获取第一条数据
+表模块.objects.filter(筛选条件).first()
+```
+
+更新数据
+
+```
+表模块.objects.all().update(列名=值)
+表模块.objects.filter(筛选条件).update(列名=值)
+```
+
+## 案例：用户管理
+
+### 1. 展示用户列表
+
+- url创建
+
+  ```
+  urlpatterns = [
+      #  案例：用户管理
+      path('info/list/', views.info_list),
+  ]
+  ```
+
+- 定义函数
+
+  - 获取用户信息
+
+    ```python
+    def info_list(request):
+        # 1. 获取数据库中所有用户信息
+        data_list = UserInfo.objects.all()
+        return render(request, "info_list.html", {"data_list": data_list})
+    ```
+
+  - HTML渲染
+
+    ```html
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <title>Title</title>
+    </head>
+    <body>
+    <h1>INFO列表</h1>
+    <table border="1">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>姓名</th>
+                <th>密码</th>
+                <th>年龄</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for obj in data_list %}
+            <tr>
+                <td>{{ obj.id }}</td>
+                <td>{{ obj.name }}</td>
+                <td>{{ obj.password }}</td>
+                <td>{{ obj.age }}</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+    </body>
+    </html>
+    ```
+
+### 2.添加用户
+
+- url
+
+  ```
+  urlpatterns = [
+      path('info/add/', views.info_add),
+  ]
+  ```
+
+- 函数
+
+  - GET,看到页面，输入内容
+  - POST，提交 -> 写入到数据库
+
+  ```
+  # 添加用户
+  def info_add(request):
+      if request.method == "GET":
+          return render(request, "info_add.html")
+      #  如果是POST请求，获用户提交的数据
+      # print(request.POST)
+      user = request.POST.get("user")
+      pwd = request.POST.get("pwd")
+      age = request.POST.get("age")
+  
+      if user == "" or pwd == "" or age == "":
+          return render(request, "info_add.html", {"error": "存在空值，请检查"})
+      # 添加到数据库
+      UserInfo.objects.create(name=user, password=pwd, age=age)
+      # 自动跳转
+      return redirect("/info/list/")
+  ```
+
+  HTML
+
+  ```
+  <!DOCTYPE html>
+  <html lang="en">
+  <head>
+      <meta charset="UTF-8">
+      <title>Title</title>
+  </head>
+  <body>
+  <h1>添加用户</h1>
+  <form method="post" action="/info/add/">
+          {% csrf_token %}
+      <input type="text" name="user" placeholder="用户名"/>
+      <input type="password" name="pwd" placeholder="密码"/>
+      <input type="text" name="age" placeholder="年龄"/>
+      <input type="submit" value="提交"/>
+      <span style="color: #ff2424">{{ error }}</span>
+  </form>
+  </body>
+  </html>
+  ```
+
+### 3.删除用户
+
+- url
+
+  ```
+  urlpatterns = [
+      path('info/delete/', views.info_delete),
+  ]
+  ```
+
+- 函数
+
+  ```
+  def info_delete(request):
+      nid = request.GET.get('nid')
+      UserInfo.objects.filter(id=nid).delete()
+      return redirect("/info/list/")
+  ```
+
+- HTML
+
+  ```HTML
+  <!DOCTYPE html>
+  <html lang="en">
+  <head>
+      <meta charset="UTF-8">
+      <title>Title</title>
+  </head>
+  <body>
+  <h1>INFO列表</h1>
+  <a href="/info/add/">添加用户</a>
+  <table border="1">
+      <thead>
+      <tr>
+          <th>ID</th>
+          <th>姓名</th>
+          <th>密码</th>
+          <th>年龄</th>
+          <th>操作</th>
+      </tr>
+      </thead>
+      <tbody>
+      {% for obj in data_list %}
+      <tr>
+          <td>{{ obj.id }}</td>
+          <td>{{ obj.name }}</td>
+          <td>{{ obj.password }}</td>
+          <td>{{ obj.age }}</td>
+          <td>
+              <a href="/info/delete/?nid={{ obj.id }}">删除</a>
+          </td>
+      </tr>
+      {% endfor %}
+      </tbody>
+  </table>
+  </body>
+  </html>
+  ```
+
+  效果：
+
+  ![image-20231010153453538](imge/WEB开发.assets/image-20231010153453538.png)
+
+
+
+## 总结案例：员工管理系统
+
+### 1、新建项目
+
+cmd 命令创建：
+
+![image-20231010155024031](imge/WEB开发.assets/image-20231010155024031.png)
+
+### 2、创建app
+
+```
+python manage.py startapp staffing_sys_app01
+```
+
+注册app
+
+![image-20231010161507065](imge/WEB开发.assets/image-20231010161507065.png)
+
+### 3、设计表结构
+
+```
+from django.db import models
+
+# Create your models here.
+# 部门管理
+class Department(models.Model):
+    """部门表
+    """
+    # id = models.BigAutoField(verbose_name='ID', key=True)  #  自增主键ID，系统自动创建
+    title = models.CharField(verbose_name='标题', max_length=32)
+
+
+class UserInfo(models.Model):
+    """员工表"""
+    name = models.CharField(verbose_name="姓名", max_length=16)
+    password = models.CharField(verbose_name="密码", max_length=64)
+    age = models.IntegerField(verbose_name="年龄")
+    account = models.DecimalField(verbose_name="账户余额", max_digits=10, decimal_places=2, default=0)
+    create_time = models.DateTimeField(verbose_name="入职时间")
+
+    # 无约束
+    # depart_id = models.BigIntegerField(verbose_name="部门ID")
+
+    # 1.有约束
+    #   - to, 与那张表关联
+    #   - to_field, 表中的那一列关联
+    # 2.django自动
+    #       - 写的depart
+    #       - 生成数据列depart_id
+    # 3.部门表被删除
+    # 3.1 级联删除
+    depart = models.ForeignKey(to="Department", to_field="id", on_delete=models.CASCADE)
+    # 3.2 置空
+    # depart = models.ForeignKey(to="Department", to_field="id", null=True,on_delete=models.SET_NULL)
+
+    # 在django中做的约束
+    gender_choices = (
+        (1, "男"),
+        (2, "女")
+    )
+    gender = models.SmallIntegerField(verbose_name="性别", choices=gender_choices)
+```
+
+### 4、生成MySQL中生成表
+
+- 工具连接MySQL生成数据库
+
+  [参考MYSQL教程](..\MySQL\MySQL知识整理.md)
+
+- 修改配置文件，连接MySQL
+
+  settings.py
+
+  ```
+  # MySQL数据库
+  DATABASES = {
+      "default": {
+          "ENGINE": "django.db.backends.mysql",
+          "NAME": "website",  # 数据库名字
+          "USER": "website",
+          "PASSWORD": "website123",
+          "HOST": "127.0.0.1",
+          "PORT": "3306",
+      }
+  }
+  ```
+
+- djiango命令生成数据库表
+
+  ```
+  python manage.py makemigrations
+  python manage.py migrate 
+  ```
+
+### 5、静态文件管理
+
+static目录
+
+![image-20231010170440769](imge/WEB开发.assets/image-20231010170440769.png)
+
+### 6、部门管理
+
+> 体验，最原始方法来做。
+>
+> Django中提供Form和ModelForm组件（方便）
+
+#### 6.1 部门列表
+
+展示设计：
+
+![image-20231010170934697](imge/WEB开发.assets/image-20231010170934697.png)
+
+
+
+
+
+
+
+
+
+
+
 
 
 # 四、Flask

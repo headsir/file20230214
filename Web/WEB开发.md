@@ -4116,6 +4116,33 @@ class UserInfo(models.Model):
     gender = models.SmallIntegerField(verbose_name="性别", choices=gender_choices)
 ```
 
+特殊值获取：
+
+```slq
+#  =================================特定值===========================
+gender_choices = (
+        (1, "男"),
+        (2, "女")
+    )
+    gender = models.SmallIntegerField(verbose_name="性别", choices=gender_choices)
+值获取：
+	obj.get_gender_display
+	
+#  ===================================关联表=======================
+# 根据id自动去关联的表中获取那一行数据depart对象
+depart = models.ForeignKey(to="Department", to_field="id", on_delete=models.CASCADE)
+值获取：
+	obj.depart.title
+	
+#  =================================时间格式化===================
+# python语法：
+obj.create_time.strftime("%y-%m-%d")
+
+# django语法：
+obj.create_time|date:"Y-m-d"
+
+```
+
 ### 4、生成MySQL中生成表
 
 - 工具连接MySQL生成数据库
@@ -4202,9 +4229,20 @@ layout.html
 {% endblock %}
 ```
 
+### 8 用户管理
 
+```sql
+INSERT INTO `website`.`staffing_sys_app01_userinfo` (`name`, `password`, `age`, `account`, `create_time`, `gender`, `depart_id`) VALUES ('刘东', '123', 23, 100.68, '2023-09-06 17:35:05', 2, 1)
+```
 
+![image-20231011173759260](imge/WEB开发.assets/image-20231011173759260.png)
 
+新建用户：
+
+- 原始方式：不推荐（麻烦）
+- Django组件
+  - Form组件（小简便）
+  - ModelForm组件（最简便）
 
 
 

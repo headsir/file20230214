@@ -3469,9 +3469,21 @@ app目录结构：
     python manage.py runserver
     ```
 
-  - Pycharm
+    ![image-20231011094653206](imge/WEB开发.assets/image-20231011094653206.png)
 
-    略
+  - Pycharm
+  
+    Django配置
+    
+    ![image-20231011094243577](imge/WEB开发.assets/image-20231011094243577.png)
+    
+    启动配置
+    
+    ![image-20231011094423322](imge/WEB开发.assets/image-20231011094423322.png)
+
+​				
+
+
 
 ### 4.1 简单页面
 
@@ -4152,6 +4164,14 @@ static目录
 展示设计：
 
 ![image-20231010170934697](imge/WEB开发.assets/image-20231010170934697.png)
+
+
+
+
+
+
+
+
 
 
 

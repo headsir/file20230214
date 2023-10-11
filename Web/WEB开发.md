@@ -4165,7 +4165,42 @@ static目录
 
 ![image-20231010170934697](imge/WEB开发.assets/image-20231010170934697.png)
 
+效果展示：
 
+![image-20231011160528930](imge/WEB开发.assets/image-20231011160528930.png)
+
+### 7 模板的继承
+
+定义母版：
+
+layout.html
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+	<h1>标题<h1/>
+    <div>
+        {% block content %}{% endblock %}
+    </div>
+    <h1>底部<h1/>
+</body>
+</html>
+```
+
+继承母版：
+
+```html
+{% extends 'layout.html' %}
+
+{% block content %}
+    <h1>首页</h1>
+{% endblock %}
+```
 
 
 

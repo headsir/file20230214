@@ -3872,6 +3872,12 @@ for obj in data_list:
 表模块.objects.filter(筛选条件).update(列名=值)
 ```
 
+## 常用设置
+
+### 1 汉化
+
+![image-20231011214804498](imge/WEB开发.assets/image-20231011214804498.png)
+
 ## 案例：用户管理
 
 ### 1. 展示用户列表
@@ -4240,17 +4246,125 @@ INSERT INTO `website`.`staffing_sys_app01_userinfo` (`name`, `password`, `age`, 
 新建用户：
 
 - 原始方式：不推荐（麻烦）
+
+  ```
+  - 用户提交数据没有校验
+  - 错误，页面上应该有错误提示
+  - 页面上，每有一个字段都要我们重新写一遍
+  - 关联的数据，手动获取并展示循环展示在页面。
+  ```
+
 - Django组件
   - Form组件（小简便）
   - ModelForm组件（最简便）
 
+#### 8.1 初始Form（非数据库操作）
+
+##### 1、views.py
+
+```python
+class MyForm(Form):
+    user = forms.CharField(widget=forms .Input)
+	pwd = form.CharFiled(widget=forms .Input)
+	email = form.CharFiled(widget=forms.Input)
 
 
+def user_add(request):
+    """添加用户(原始方式)"""
+    if request.method == "GET":
+        form = MyForm()
+        return render(request, "user_add.html",{"form":form})
+```
+
+##### 2、user_add.html
+
+简化版1：
+
+```html
+<form method="post">
+    {{ form.user }}
+    {{ form.pwd }}
+    {{ form.email }}
+    <!-- <input type="text" placeholder="姓名" name="user"/> -->
+</form>
+```
+
+简化版2：
+
+```html
+<form method="post">
+	{% for field in form %}
+    	{{ field }}
+	{% endfor %}
+    <!-- <input type="text" placeholder="姓名" name="user"/> -->
+</form>
+```
+
+#### 8.2 ModelForm（针对数据库中的某个表）
+
+##### 1、models.py
+
+```python
+class UserInfo(models.Model):
+    """员工表"""
+    name = models.CharField(verbose_name="姓名", max_length=16)
+    password = models.CharField(verbose_name="密码", max_length=64)
+    age = models.IntegerField(verbose_name="年龄")
+    account = models.DecimalField(verbose_name="账户余额", max_digits=10, decimal_places=2, default=0)
+    create_time = models.DateTimeField(verbose_name="入职时间")
+    depart = models.ForeignKey(to="Department", to_field="id", on_delete=models.CASCADE)
+    gender_choices = (
+        (1, "男"),
+        (2, "女")
+    )
+    gender = models.SmallIntegerField(verbose_name="性别", choices=gender_choices)
+
+```
+
+##### 2、views.py
+
+```python
+class MyForm(ModelForm):
+    XX = forms.CharField(widget=forms .Input)
+	class Meta:
+        model = UserInfo
+        fields = ["name","password","age",XX]
 
 
+def user_add(request):
+    """添加用户(原始方式)"""
+    if request.method == "GET":
+        form = MyForm()
+        return render(request, "user_add.html",{"form":form})
+```
 
+##### 3、user_add.html
 
+```html
+<form method="post">
+	{% for field in form %}
+    	{{ field }}
+	{% endfor %}
+    <!-- <input type="text" placeholder="姓名" name="user"/> -->
+</form>
+```
 
+#### 8.3 编辑用户
+
+- 点击编辑，跳转到编辑页面（将编辑行的ID携带过去）
+- 编辑页面（默认数据，根据ID获取并设置到页面中）
+- 提交
+  - 错误提示
+  - 数据校验
+  - 在数据库更新
+
+#### 8.3 删除用户
+
+参见 案例源码
+
+### 9 靓号管理
+
+![image-20231011224643684](imge/WEB开发.assets/image-20231011224643684.png)
 
 
 

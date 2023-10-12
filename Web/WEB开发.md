@@ -4164,6 +4164,26 @@ blank=False、null=True。这个设定不允许表单中该字段为空，但是
 """
 ```
 
+#### 判断数据是否存在
+
+```python
+    # # 验证：方式2（钩子方法）
+    def clean_mobile(self):
+        txt_mobile = self.cleaned_data["mobile"]
+        exists = models.PrettyNum.objects.filter(mobile=txt_mobile).exists()
+        if exists:
+            raise ValidationError("手机号已存在")
+        # # 验证通过,用户输入的值返回
+        return txt_mobile
+```
+
+自己以外是否存在
+
+```python
+# self.instance.pk 当前编辑的哪一行的ID  exclude 排除xxx以外
+exists = models.PrettyNum.objects.filter(mobile=txt_mobile).exclude(id=self.instance.pk).exists()
+```
+
 
 
 
@@ -4420,6 +4440,124 @@ class PrettyNum(models.Model):
     status = models.SmallIntegerField(verbose_name="状态", choices=status_choices, default=2)
 
 ```
+
+#### 9.2 靓号列表
+
+- URL
+
+- 函数
+
+  - 获取所有靓号
+
+  - 结合html+render将靓号罗列出来
+
+    ```
+    id 号码 价格 级别 状态
+    ```
+
+#### 9.3 新建靓号
+
+- 列表点击跳转：/pretty/add/
+
+- URL
+
+- ModelForm类
+
+  ```python
+  from django import forms
+  
+  
+  class PrettyModelForm(forms.ModelForm):
+      ...
+  ```
+
+- 函数
+
+  - 实例化的对象
+  - 通过render将对象传入到HTML中
+  - 模板的循环展示所有的字段
+
+- 点击提交
+
+  - 数据校验
+
+    参考：(https://www.cnblogs.com/wupeiqi/articles/6144178.html)
+
+    ![image-20231012155854598](imge/WEB开发.assets/image-20231012155854598.png)
+
+  - 保存到数据库
+
+  - 跳转回靓号列表
+
+#### 9.4 编辑靓号
+
+- 列表页面：/pretty/数字/edit/
+- URL
+- 函数
+  - 根据ID获取当前编辑的对象
+  - ModelForm配合，默认显示数据
+  - 提交修改。 
+
+#### 9.5 搜索手机号
+
+```
+q = models.PrettyNum.objects.filter(mobile="15688991110", id=2)
+
+data_dict = {"mobile": "15688991110", "id": 2}
+q1 = models.PrettyNum.objects.filter(**data_dict)
+```
+
+数字条件
+
+```
+q1 = models.PrettyNum.objects.filter(id=2)  # 等于12
+q1 = models.PrettyNum.objects.filter(id__gt=2)  # 大于12
+q1 = models.PrettyNum.objects.filter(id__gte=2)  # 大于等于12
+q1 = models.PrettyNum.objects.filter(id__lt=2)  # 小于12
+q1 = models.PrettyNum.objects.filter(id__lte=2)  # 小于等于12
+```
+
+字符串
+
+```
+q1 = models.PrettyNum.objects.filter(mobile="15688991110")  # 等于
+q1 = models.PrettyNum.objects.filter(mobile__startswith="156")  # 开头
+q1 = models.PrettyNum.objects.filter(mobile__endswith="156")  # 结尾
+q1 = models.PrettyNum.objects.filter(mobile__contains="156")  # 包含
+```
+
+pretty_list.html
+
+```html
+<div style="float: right;width: 300px;">
+                <form method="get">
+                    <div class="input-group">
+                        <input type="text" name="q" class="form-control" placeholder="Search for..." value="{{ search_data }}">
+                        <span class="input-group-btn">
+                            <button class="btn btn-default" type="submit">
+                                <span class="glyphicon glyphicon-search" aria-hidden="true"></span>
+                            </button>
+                        </span>
+                    </div>
+                </form>
+            </div>
+```
+
+views.py
+
+```python
+def pretty_list(request):
+    """靓号列表"""
+    data_dict = {}
+    search_data = request.GET.get("q", "")  # 没有q 默认为空
+    if search_data:
+        data_dict["mobile__contains"] = search_data
+    # 排序order_by("-id")，降序-
+    queryset = models.PrettyNum.objects.filter(**data_dict).order_by("-level")
+    return render(request, "pretty_list.html", {"queryset": queryset, "search_data": search_data})
+```
+
+#### 9.6 分页
 
 
 

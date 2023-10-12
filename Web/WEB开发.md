@@ -4122,7 +4122,7 @@ class UserInfo(models.Model):
     gender = models.SmallIntegerField(verbose_name="性别", choices=gender_choices)
 ```
 
-特殊值获取：
+#### 特殊值获取：
 
 ```slq
 #  =================================特定值===========================
@@ -4148,6 +4148,25 @@ obj.create_time.strftime("%y-%m-%d")
 obj.create_time|date:"Y-m-d"
 
 ```
+
+#### 详解Django 中的blank=True 和 null=True
+
+```
+# 想要允许为空， null =True，blank = True
+"""
+详解Django 中的blank=True 和 null=True
+来源：https://blog.csdn.net/folkboat/article/details/89189032
+当存在两个参数时，总共会有四种设定组合
+blank=True、null=True。统一的表明了该字段（列）是可以为空的。
+blank=False、null=False。统一的表面了该字段（列）不可以为空。
+blank=True、null=False。这个设定的意义在于，某些字段并不希望用户在表单中创建（如slug），而是通过在save方法中根据其他字段生成。
+blank=False、null=True。这个设定不允许表单中该字段为空，但是允许在更新时或者通过shell等非表单方式插入数据该字段为空
+"""
+```
+
+
+
+
 
 ### 4、生成MySQL中生成表
 
@@ -4364,9 +4383,43 @@ def user_add(request):
 
 ### 9 靓号管理
 
+#### 9.1 数据库表设计
+
 ![image-20231011224643684](imge/WEB开发.assets/image-20231011224643684.png)
 
+根据表结构的需求，在models.py中创建类（由类生成数据库中的表）
 
+```python
+# 靓号表
+class PrettyNum(models.Model):
+    """靓号表"""
+    mobile = models.CharField(verbose_name="手机号", max_length=11)  # 后期需要正则匹配及查找，建议字符串
+    # 想要允许为空， null =True，blank = True
+    """
+    详解Django 中的blank=True 和 null=True
+    来源：https://blog.csdn.net/folkboat/article/details/89189032
+    当存在两个参数时，总共会有四种设定组合
+    blank=True、null=True。统一的表明了该字段（列）是可以为空的。
+    blank=False、null=False。统一的表面了该字段（列）不可以为空。
+    blank=True、null=False。这个设定的意义在于，某些字段并不希望用户在表单中创建（如slug），而是通过在save方法中根据其他字段生成。
+    blank=False、null=True。这个设定不允许表单中该字段为空，但是允许在更新时或者通过shell等非表单方式插入数据该字段为空
+    """
+    price = models.IntegerField(verbose_name="价格")
+    level_choices = (
+        (1, "1级"),
+        (2, "2级"),
+        (3, "3级"),
+        (4, "4级"),
+    )
+    level = models.SmallIntegerField(verbose_name="级别", choices=level_choices, default=1)
+
+    status_choices = (
+        (1, "已占用"),
+        (2, "未使用"),
+    )
+    status = models.SmallIntegerField(verbose_name="状态", choices=status_choices, default=2)
+
+```
 
 
 

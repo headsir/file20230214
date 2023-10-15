@@ -4303,8 +4303,8 @@ INSERT INTO `website`.`staffing_sys_app01_userinfo` (`name`, `password`, `age`, 
 
 ```python
 class MyForm(Form):
-    user = forms.CharField(widget=forms .Input)
-	pwd = form.CharFiled(widget=forms .Input)
+    user = forms.CharField(widget=forms.Input)
+	pwd = form.CharFiled(widget=forms.Input)
 	email = form.CharFiled(widget=forms.Input)
 
 
@@ -4532,7 +4532,7 @@ pretty_list.html
 <div style="float: right;width: 300px;">
                 <form method="get">
                     <div class="input-group">
-                        <input type="text" name="q" class="form-control" placeholder="Search for..." value="{{ search_data }}">
+    <input type="text" name="q" class="form-control" placeholder="Search for..." value="{{ search_data }}">
                         <span class="input-group-btn">
                             <button class="btn btn-default" type="submit">
                                 <span class="glyphicon glyphicon-search" aria-hidden="true"></span>
@@ -4558,6 +4558,681 @@ def pretty_list(request):
 ```
 
 #### 9.6 分页
+
+```python
+# 数据库获取所有数据
+queryset = models.PrettyNum.objects.all()
+# 数据库获取id=1的前10条数据
+queryset = models.PrettyNum.objects.filter(id=1)[0:10]
+
+# 第1页
+queryset = models.PrettyNum.objects.all()[0:10]
+
+# 第2页
+queryset = models.PrettyNum.objects.all()[10:20]
+
+# 第3页
+queryset = models.PrettyNum.objects.all()[20:30]
+```
+
+
+
+```python
+# 数据总条数
+models.PrettyNum.objectsall().count()
+
+# id=1数据总条数
+models.PrettyNum.objects.filter(id=1).count()
+```
+
+- 分页的逻辑和处理规则
+
+  views.py
+
+  ```python
+      # 根据用户想要访问的页码，计算出起止位置
+      page = int(request.GET.get('page', 1))
+      page_size = 10
+      star = (page - 1) * page_size
+      end = page * page_size
+      # ===========================================搜索功能=============================
+      data_dict = {}
+      # q 搜索框输入的值，获取搜索条件
+      search_data = request.GET.get("q", "")  # 没有q 默认为空
+      if search_data:
+          data_dict["mobile__contains"] = search_data
+      # ===============================分页规则================================================
+      # 排序order_by("-id")，降序-
+      queryset = models.PrettyNum.objects.filter(**data_dict).order_by("-level")[star:end]
+  
+      # 数据总条数
+      total_count = models.PrettyNum.objects.filter(**data_dict).order_by("-level").count()
+      # divmod 计算商和余数
+      total_page_count, div = divmod(total_count, page_size)
+      if div:
+          total_page_count += 1
+  
+      # 计算出，显示当前页的前5页，后五页
+      plus = 5
+      if total_page_count <= 2 * plus + 1:
+          # 数据库中的数据比较少，都没有达到11页
+          start_page = 1
+          end_page = total_page_count
+      else:
+          # 数据库中的数据比较多>11页
+          # 当前页<5（小极值）
+          if page <= plus:
+              start_page = 1
+              end_page = 2 * plus + 1
+          else:
+              # 当前页+5>总页数
+              if (page + plus) > total_page_count:
+                  start_page = total_page_count - 2 * plus
+                  end_page = total_page_count
+              else:
+                  start_page = page - plus
+                  end_page = page + plus
+  #=================================分页HTML代码生成=======================================
+      #  mark_safe解决页面不显示后台html代码问题
+      from django.utils.safestring import mark_safe
+      page_str_list = []
+      
+      # 首页
+      page_str_list.append('<li> <a href="?page={}">首页</a></li>'.format(1))
+      # 上一页
+      if page > 1:
+          prev = '<li> <a href="?page={}">上一页</a></li>'.format(page - 1)
+      else:
+          prev = '<li> <a href="?page={}">上一页</a></li>'.format(1)
+  
+      page_str_list.append(prev)
+  
+      for i in range(start_page, end_page + 1):
+          if i == page:
+              ele = '<li class="active"> <a href="?page={}">{}</a></li>'.format(i, i)
+          else:
+              ele = '<li> <a href="?page={}">{}</a></li>'.format(i, i)
+          page_str_list.append(ele)
+      # 下一页
+      if page < total_page_count:
+          prev = '<li> <a href="?page={}">下一页</a></li>'.format(page + 1)
+      else:
+          prev = '<li> <a href="?page={}">下一页</a></li>'.format(total_page_count)
+      page_str_list.append(prev)
+  
+      # 尾页
+      page_str_list.append('<li> <a href="?page={}">尾页</a></li>'.format(total_page_count))
+  
+      page_string = mark_safe("".join(page_str_list))
+      
+      # 跳转页面功能
+      search_string = """
+      <li>
+          <form style="float: left;margin-left: -1px;" method="get">
+              <div class="input-group" style="width: 200px">
+                  <input name="page"
+                         style="position: relative;float: left;display: inline-block;width: 88px;border-radius: 0;"
+                         type="text" class="form-control" placeholder="页码"
+                         value="{{ search_data }}">
+                  <button style="border-radius: 0" class="btn btn-default" type="submit">
+                      跳转
+                  </button>
+              </div>
+          </form>
+      </li>
+      """
+      page_str_list.append(search_string)
+  #====================================================================
+  
+      return render(request, "pretty_list.html",
+                    {"queryset": queryset, "search_data": search_data, "page_string": page_string})
+  ```
+
+  pretty_list.html
+
+  ```html
+  <ul class="pagination">
+      {{ page_string }}
+  </ul>
+  ```
+
+- 封装分页类
+
+  pagination.py
+
+  ```python
+  #!/usr/bin/env python
+  # -*- coding: utf-8 -*-
+  # @File    : pagination.py
+  # @Time    : 2023/10/15 11:15
+  # @Author  : 978345836@qq.com
+  # @Software: win11 python3.9
+  # @Version : 1.0
+  # @Describe: 自定义的分页组件
+  
+  """
+  程序说明：
+      功能：实现WEB数据分页显示
+  使用方法如下：\n
+  在视图函数中：
+      def pretty_list(request):
+  
+          # 1.根据自己的情况去筛选自己的数据\n
+          queryset = models.PrettyNum.objects.all()
+  
+          # 2.实例化分页对象\n
+          page_object = Pagination(request, queryset)
+  
+          context = {
+              "queryset": page_object.page_queryset,  # 分完页的数据\n
+              "page_string": page_object.html()  # 生成页码\n
+          }
+  
+          return render(request, "pretty_list.html", context)
+  
+  在HTML页码中：
+      {% for obj in queryset %}
+          {{ obj.xx }}
+      {% endfor %}
+  
+      <ul class="pagination">
+          {{ page_string }}
+      </ul>
+  """
+  
+  
+  # here put the import lib
+  
+  class Pagination(object):
+      def __init__(self, request, queryset, page_size=10, page_param="page", plus=5):
+          """
+          :param request: 请求的对象
+          :param queryset: 符合条件的数据（根据这个数据给它进行分页处理）
+          :param page_size:每页显示多少条数据
+          :param page_param:在URL中传递的获取分页的参数，例如：/etty/list/?page=12
+          :param plus:显示当前页的 前或后几页（页码）
+          """
+          # 根据用户想要访问的页码，计算出起止位置
+          # 获取网页传递的页码值
+          page = request.GET.get(page_param, "1")
+          # isdecimal(),检查字符串是否只包含十进制字符
+          if page.isdecimal():
+              page = int(page)
+          else:
+              page = 1
+          # 页码
+          self.page = page
+  
+          # 页面显示条数
+          self.page_size = page_size
+  
+          # 页面起始数据位置
+          self.star = (page - 1) * page_size
+          # 页面结束数据位置
+          self.end = page * page_size
+  
+          # 当前页显示的数据
+          self.page_queryset = queryset[self.star:self.end]
+  
+          # 获取总页码
+          total_count = queryset.count()  # 数据总条数
+          # divmod 计算商和余数
+          total_page_count, div = divmod(total_count, page_size)
+          if div:
+              total_page_count += 1
+          self.total_page_count = total_page_count  # 总页码
+          # 显示页码数量，显示当前页的前plus页，后plus页
+          self.plus = plus
+  
+      def html(self):
+          # 计算出，显示当前页的前5页，后五页
+          if self.total_page_count <= 2 * self.plus + 1:
+              # 数据库中的数据比较少，都没有达到11页
+              start_page = 1
+              end_page = self.total_page_count
+          else:
+              # 数据库中的数据比较多>11页
+              # 当前页<5（小极值）
+              if self.page <= self.plus:
+                  start_page = 1
+                  end_page = 2 * self.plus + 1
+              else:
+                  # 当前页+5>总页数
+                  if (self.page + self.plus) > self.total_page_count:
+                      start_page = self.total_page_count - 2 * self.plus
+                      end_page = self.total_page_count
+                  else:
+                      start_page = self.page - self.plus
+                      end_page = self.page + self.plus
+          #  mark_safe解决页面不显示后台html代码问题
+          from django.utils.safestring import mark_safe
+          page_str_list = []
+  
+          # 首页
+          page_str_list.append('<li> <a href="?page={}">首页</a></li>'.format(1))
+          # 上一页
+          if self.page > 1:
+              prev = '<li> <a href="?page={}">上一页</a></li>'.format(self.page - 1)
+          else:
+              prev = '<li> <a href="?page={}">上一页</a></li>'.format(1)
+  
+          page_str_list.append(prev)
+  
+          for i in range(start_page, end_page + 1):
+              if i == self.page:
+                  ele = '<li class="active"> <a href="?page={}">{}</a></li>'.format(i, i)
+              else:
+                  ele = '<li> <a href="?page={}">{}</a></li>'.format(i, i)
+              page_str_list.append(ele)
+          # 下一页
+          if self.page < self.total_page_count:
+              prev = '<li> <a href="?page={}">下一页</a></li>'.format(self.page + 1)
+          else:
+              prev = '<li> <a href="?page={}">下一页</a></li>'.format(self.total_page_count)
+          page_str_list.append(prev)
+  
+          # 尾页
+          page_str_list.append('<li> <a href="?page={}">尾页</a></li>'.format(self.total_page_count))
+  
+          # 跳转页面功能
+          search_string = """
+          <li>
+              <form style="float: left;margin-left: -1px;" method="get">
+                  <div class="input-group" style="width: 200px">
+                      <input name="page"
+                             style="position: relative;float: left;display: inline-block;width: 88px;border-radius: 0;"
+                             type="text" class="form-control" placeholder="页码">
+                      <button style="border-radius: 0" class="btn btn-default" type="submit">
+                          跳转
+                      </button>
+                  </div>
+              </form>
+          </li>
+          """
+          page_str_list.append(search_string)
+          page_string = mark_safe("".join(page_str_list))
+  
+          return page_string
+  ```
+
+- 小Bug，搜索+分页情况下
+
+  ```
+  分页时候，保留原来的搜索条件
+  
+  http://127.0.0.1:8000/pretty/list/?q=8
+  http://127.0.0.1:8000/pretty/list/?page=15
+  
+  http://127.0.0.1:8000/pretty/list/?q=8&page=15
+  ```
+
+  优化后
+
+  ```python
+  #!/usr/bin/env python
+  # -*- coding: utf-8 -*-
+  # @File    : pagination.py
+  # @Time    : 2023/10/15 11:15
+  # @Author  : 978345836@qq.com
+  # @Software: win11 python3.9
+  # @Version : 1.0
+  # @Describe: 自定义的分页组件
+  
+  """
+  程序说明：
+      功能：实现WEB数据分页显示
+  使用方法如下：\n
+  在视图函数中：
+      def pretty_list(request):
+  
+          # 1.根据自己的情况去筛选自己的数据\n
+          queryset = models.PrettyNum.objects.all()
+  
+          # 2.实例化分页对象\n
+          page_object = Pagination(request, queryset)
+  
+          context = {
+              "queryset": page_object.page_queryset,  # 分完页的数据\n
+              "page_string": page_object.html()  # 生成页码\n
+          }
+  
+          return render(request, "pretty_list.html", context)
+  
+  在HTML页码中：
+      {% for obj in queryset %}
+          {{ obj.xx }}
+      {% endfor %}
+  
+      <ul class="pagination">
+          {{ page_string }}
+      </ul>
+  """
+  
+  # here put the import lib
+  
+  #  mark_safe解决页面不显示后台html代码问题
+  from django.utils.safestring import mark_safe
+  
+  
+  class Pagination(object):
+      def __init__(self, request, queryset, page_size=2, page_param="page", plus=5):
+          """
+          :param request: 请求的对象
+          :param queryset: 符合条件的数据（根据这个数据给它进行分页处理）
+          :param page_size:每页显示多少条数据
+          :param page_param:在URL中传递的获取分页的参数，例如：/etty/list/?page=12
+          :param plus:显示当前页的 前或后几页（页码）
+          """
+  
+          # 复制 request.GET 对象，此对象可修改
+          query_dict = request.GET.copy()  # 源码中属于深拷贝
+          self.query_dict = query_dict
+  
+          self.page_param = page_param
+  
+          # 根据用户想要访问的页码，计算出起止位置
+          # 获取网页传递的页码值
+          page = request.GET.get(page_param, "1")
+          # isdecimal(),检查字符串是否只包含十进制字符
+          if page.isdecimal():
+              page = int(page)
+          else:
+              page = 1
+          # 页码
+          self.page = page
+  
+          # 页面显示条数
+          self.page_size = page_size
+  
+          # 页面起始数据位置
+          self.star = (page - 1) * page_size
+          # 页面结束数据位置
+          self.end = page * page_size
+  
+          # 当前页显示的数据
+          self.page_queryset = queryset[self.star:self.end]
+  
+          # 获取总页码
+          total_count = queryset.count()  # 数据总条数
+          # divmod 计算商和余数
+          total_page_count, div = divmod(total_count, page_size)
+          if div:
+              total_page_count += 1
+          self.total_page_count = total_page_count  # 总页码
+          # 显示页码数量，显示当前页的前plus页，后plus页
+          self.plus = plus
+  
+      def html(self):
+          # 计算出，显示当前页的前5页，后五页
+          if self.total_page_count <= 2 * self.plus + 1:
+              # 数据库中的数据比较少，都没有达到11页
+              start_page = 1
+              end_page = self.total_page_count
+          else:
+              # 数据库中的数据比较多>11页
+              # 当前页<5（小极值）
+              if self.page <= self.plus:
+                  start_page = 1
+                  end_page = 2 * self.plus + 1
+              else:
+                  # 当前页+5>总页数
+                  if (self.page + self.plus) > self.total_page_count:
+                      start_page = self.total_page_count - 2 * self.plus
+                      end_page = self.total_page_count
+                  else:
+                      start_page = self.page - self.plus
+                      end_page = self.page + self.plus
+  
+          page_str_list = []
+  
+          # 首页
+          self.query_dict.setlist(self.page_param, [1])  # 在原URL中添加页码参数 ，self.query_dict.urlencode()  page=6&q=8
+          page_str_list.append('<li> <a href="?{}">首页</a></li>'.format(self.query_dict.urlencode()))
+          # 上一页
+          if self.page > 1:
+              self.query_dict.setlist(self.page_param, [self.page - 1])  # 在原URL中添加页码参数
+              prev = '<li> <a href="?{}">上一页</a></li>'.format(self.query_dict.urlencode())
+          else:
+              self.query_dict.setlist(self.page_param, [1])  # 在原URL中添加页码参数
+              prev = '<li> <a href="?{}">上一页</a></li>'.format(self.query_dict.urlencode())
+  
+          page_str_list.append(prev)
+  
+          for i in range(start_page, end_page + 1):
+              self.query_dict.setlist(self.page_param, [i])  # 在原URL中添加页码参数
+              if i == self.page:
+                  ele = '<li class="active"> <a href="?{}">{}</a></li>'.format(self.query_dict.urlencode(), i)
+              else:
+                  ele = '<li> <a href="?{}">{}</a></li>'.format(self.query_dict.urlencode(), i)
+              page_str_list.append(ele)
+  
+          # 下一页
+          if self.page < self.total_page_count:
+              self.query_dict.setlist(self.page_param, [self.page + 1])  # 在原URL中添加页码参数
+              prev = '<li> <a href="?{}">下一页</a></li>'.format(self.query_dict.urlencode())
+          else:
+              self.query_dict.setlist(self.page_param, [self.total_page_count])  # 在原URL中添加页码参数
+              prev = '<li> <a href="?{}">下一页</a></li>'.format(self.query_dict.urlencode())
+          page_str_list.append(prev)
+  
+          # 尾页
+          self.query_dict.setlist(self.page_param, [self.total_page_count])  # 在原URL中添加页码参数
+          page_str_list.append('<li> <a href="?{}">尾页</a></li>'.format(self.query_dict.urlencode()))
+  
+          # 跳转页面功能
+          search_string = """
+          <li>
+              <form style="float: left;margin-left: -1px;" method="get">
+                  <div class="input-group" style="width: 200px">
+                      <input name="page"
+                             style="position: relative;float: left;display: inline-block;width: 88px;border-radius: 0;"
+                             type="text" class="form-control" placeholder="页码">
+                      <button style="border-radius: 0" class="btn btn-default" type="submit">
+                          跳转
+                      </button>
+                  </div>
+              </form>
+          </li>
+          """
+          page_str_list.append(search_string)
+          page_string = mark_safe("".join(page_str_list))
+  
+          return page_string
+  
+  ```
+
+### 10 时间插件
+
+```html
+<!--引入css插件-->
+<link rel="stylesheet" href="static/plugins/bootstrap-3.4.1/css/bootstrap.css">
+<link rel="stylesheet" href="static/plugins/bootstrap-datepicker/css/bootstrap-datepicker.css">
+
+<input type="text" id="dt" class="form-control" placeholder="离职日期">
+
+<!--引入js模板-->
+<script src="static/js/jquery-3.6.0.min.js"></script>
+<script src="static/plugins/bootstrap-3.4.1/js/bootstrap.js"></script>
+<script src="static/plugins/bootstrap-datepicker/js/bootstrap-datepicker.js"></script>
+<!--引入汉化包-->
+<script src="static/plugins/bootstrap-datepicker/locales/bootstrap-datepicker.zh-CN.min.js"></script>
+<script>
+    $(function () {
+        $('#dt').datepicker({
+            format: "yyyy-mm-dd",
+            startDate: "1900-01-01",
+            // 中文显示
+            language: "zh-CN",
+            autoclose: true,
+            // 清楚按钮
+            clearBtn: true
+        })
+    })
+</script>
+```
+
+注意：Django 里面 规定标签name=id_字段名
+
+### 11 ModelForm和BootStrap
+
+- ModelForm可以帮助我们生成HTML标签
+
+  ```python
+  class UserModelForm(forms.ModelForm):
+      name = forms.CharField(min_length=3, label="姓名")
+  
+      class Meta:
+          model = models.UserInfo
+          fields = ["name", "password"]
+  form = UserModelForm()
+  ```
+
+  ```python
+  {{ form.name }}  普通input框
+  {{ form.password }}  普通input框
+  ```
+
+- 定义插件
+
+  ```python
+  class UserModelForm(forms.ModelForm):
+      name = forms.CharField(min_length=3, label="姓名")
+  
+      class Meta:
+          model = models.UserInfo
+          fields = ["name", "password", "age"]
+          widgets = {
+               "name": forms.TextInput(attrs={"class": "form-control"}),
+               "password": forms.PasswordInputt(attrs={"class": "form-control"}),
+              "age": forms.TextInput(attrs={"class": "form-control"}),
+           }
+  ```
+
+  ```python
+  class UserModelForm(forms.ModelForm):
+      name = forms.CharField(
+          min_length=3,
+          label="姓名",
+          widget=forms.TextInput(attrs={"class": "form-control"})
+      )
+  
+      class Meta:
+          model = models.UserInfo
+          fields = ["name", "password", "age", "account", "create_time", "gender", "depart"]
+  ```
+
+- 重新定义init方法,批量设置
+
+  ```python
+  class UserModelForm(forms.ModelForm):
+      class Meta:
+          model = models.UserInfo
+          fields = ["name", "password", "age", "account", "create_time", "gender", "depart"]
+  
+      def __init__(self, *args, **kwargs):
+          super().__init__(*args, **kwargs)
+  
+          # 循环找到所有的插件，添加了 class= "form-control"
+          for name, field in self.fields.items():
+              field.widget.attrs = {
+                  "class": "form-control", 
+                   "placeholder": field.label
+                 }
+  ```
+
+- 优化，字段中有属性，保留原来的属性，没有属性，才增加
+
+  ```python
+  class UserModelForm(forms.ModelForm):
+      class Meta:
+          model = models.UserInfo
+          fields = ["name", "password", "age", "account", "create_time", "gender", "depart"]
+  
+      def __init__(self, *args, **kwargs):
+          super().__init__(*args, **kwargs)
+  		            
+          # 循环找到所有的插件，添加了 class= "form-control"
+          for name, field in self.fields.items():
+              # 字段中有属性，保留原来的属性，没有属性，才增加
+              if field.widget.attrs:
+              	field.widget.attrs["class"]= "form-control",
+              	field.widget.attrs["placeholder"]= field.label,
+              else:    
+                  field.widget.attrs = {
+                      "class": "form-control", 
+                       "placeholder": field.label
+                     }
+  ```
+
+- 自定义类
+
+  ```python
+  #!/usr/bin/env python
+  # -*- coding: utf-8 -*-
+  # @File    : bootstrap.py
+  # @Time    : 2023/10/15 16:10
+  # @Author  : 978345836@qq.com
+  # @Software: win11 python3.9
+  # @Version : 1.0
+  # @Describe: bootstrap样式组件
+  
+  """
+  程序说明：
+      功能：简化BootStrap样式使用
+  使用方法：
+  1.直接继承类【BootStrapModelForm】
+  class UserModelForm(BootStrapModelForm):
+      name = forms.CharField(
+          min_length=3,
+          label="姓名",
+          widget=forms.TextInput(attrs={"class": "form-control"})
+      )
+  
+      class Meta:
+          model = models.UserInfo
+          fields = ["name", "password", "age", "account", "create_time", "gender", "depart"]
+  
+  """
+  
+  # here put the import lib
+  from django import forms
+  
+  
+  class BootStrapModelForm(forms.ModelForm):
+      def __init__(self, *args, **kwargs):
+          super().__init__(*args, **kwargs)
+          # 循环找到所有的插件，添加了 class= "form-control"
+          for name, field in self.fields.items():
+              # 字段中有属性，保留原来的属性，没有属性，才增加
+              if field.widget.attrs:
+                  field.widget.attrs["class"] = "form-control"
+                  field.widget.attrs["placeholder"] = field.label
+              else:
+                  field.widget.attrs = {
+                      "class": "form-control",
+                      "placeholder": field.label
+                  }
+  ```
+
+### 12 程序整理
+
+#### 1、视图函数拆分
+
+- 将views.py文件拆分 到views文件夹，删除views.py文件
+
+![image-20231015164607198](imge/WEB开发.assets/image-20231015164607198.png)
+
+- 修改urls.py文件
+
+![image-20231015164824239](imge/WEB开发.assets/image-20231015164824239.png)
+
+### 13 管理员操作
+
+
+
+
+
+
 
 
 

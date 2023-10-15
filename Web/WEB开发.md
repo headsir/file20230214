@@ -5228,9 +5228,53 @@ models.PrettyNum.objects.filter(id=1).count()
 
 ### 13 管理员操作
 
+- MD5加密
+- 新密码是否与以前密码一致校验
 
+部分代码
 
+```python
+class AdminResetModelForm(BootStrapModelForm):
+    confirm_password = forms.CharField(
+        label="确认密码",
+        widget=forms.PasswordInput(render_value=True)  # (render_value=True) 报错后密码是否清空
+    )
 
+    class Meta:
+        model = models.Admin
+        fields = ["password", "confirm_password"]
+        widgets = {
+            "password": forms.PasswordInput(render_value=True)  # (render_value=True) 报错后密码是否清空
+        }
+
+    # clean_xxxxx固定用法
+    def clean_password(self):
+        """
+        :return: 返回MD5加密后的数据
+        """
+        pwd = self.cleaned_data.get("password")
+        md5_pwd = md5(pwd)
+
+        # 取数据校验当前密码和新密码是否一致，【id=self.instance.pk, password=md5_pwd】 筛选 ID及新密码是否存在
+        exists = models.Admin.objects.filter(id=self.instance.pk, password=md5_pwd).exists()
+        if exists:
+            raise ValidationError("不能与以前密码相同")
+        return md5_pwd
+
+    def clean_confirm_password(self):
+        pwd = self.cleaned_data.get("password")  # 加密后的数据
+        confirm = md5(self.cleaned_data.get("confirm_password"))
+        if pwd:
+            # 验证两次密码是否一致
+            if confirm != pwd:
+                raise ValidationError("密码不一致")
+            # 钩子函数，confirm_password字段数据库保存值
+        return confirm
+```
+
+效果
+
+![image-20231015223659007](imge/WEB开发.assets/image-20231015223659007.png)
 
 
 

@@ -5282,6 +5282,257 @@ class AdminResetModelForm(BootStrapModelForm):
 
 ![image-20231016170240354](imge/WEB开发.assets/image-20231016170240354.png)
 
+登录成功后：
+
+- cookie，随机字符串
+- session，用户信息  
+
+在其他需要登录才能访问的页面中，都需要加入：
+
+```python
+def index(request):
+    info = request.session.get("info")
+	if not info:
+    	return redirect("/login/")
+```
+
+
+
+##### cookie生成
+
+```python
+# 用户名和密码正确
+# 网站生成随机字符串，写到用户浏览器cookie中，再写入到session中
+request.session["info"] = {'id': admin_object.id, "name": admin_object.username}
+return redirect("/admin/list/")
+```
+
+网站：
+
+![image-20231016195308905](imge/WEB开发.assets/image-20231016195308905.png)
+
+![image-20231016195356832](imge/WEB开发.assets/image-20231016195356832.png)
+
+数据库：
+
+![image-20231016195459650](imge/WEB开发.assets/image-20231016195459650.png)
+
+##### cookie验证：
+
+```python
+# 检查用户是否已经登录，已登录，继续，未登录，跳转回登录页面
+# 用户发来请求，获取cookie随机字符串，拿着随机字符串看看session中有没有
+# request.session["info"]  用户之前登录过，可以通过，用户没有登录过，报错
+info = request.session.get("info")
+if not info:
+    return redirect("/login/")
+```
+
+#### 14.2 中间件
+
+![image-20231016204714448](imge/WEB开发.assets/image-20231016204714448.png)
+
+中间件的使用方法：
+
+- 定义中间件
+
+  ![image-20231016211233591](imge/WEB开发.assets/image-20231016211233591.png)
+
+- 应用中间件
+
+  ![image-20231016211227780](imge/WEB开发.assets/image-20231016211227780.png)
+
+
+
+- 在中间件的process_request方法
+
+  ```
+  # 如果方法中没有返回值（返回None）,继续向后走
+  # 如果有返回值 HttpResponse、render、redirect
+  ```
+
+#### 14.3 中间件实现登录校验
+
+- 定义中间件auth.py
+
+  ```python
+  #!/usr/bin/env python
+  # -*- coding: utf-8 -*-
+  # @File    : auth.py
+  # @Time    : 2023/10/16 21:04
+  # @Author  : 978345836@qq.com
+  # @Software: win11 python3.9
+  # @Version : 1.0
+  # @Describe: 中间件实现登录校验
+  
+  """
+  程序说明：
+      功能：中间件实现登录校验
+  """
+  
+  # here put the import lib
+  from django.utils.deprecation import MiddlewareMixin
+  from django.shortcuts import HttpResponse, redirect
+  
+  
+  class AuthMiddleware(MiddlewareMixin):
+      """ 中间件 """
+  
+      def process_request(self, request):
+          # 排除不需要登录就能访问的页面
+          # request.path_info 获取当前用户请求的URL /login/
+          if request.path_info == "/login/":
+              return
+  
+          # 1.读取当前访问的用户的session信息，如果能读到，说明已登录成功过，就可以继续访问
+          info_dict = request.session.get("info")
+          if info_dict:
+              return
+  
+          # 2.没有登录过，回到登录页面
+  
+          # 如果方法中没有返回值（返回None）,继续向后走
+          # 如果有返回值 HttpResponse、render、redirect
+          print("M1.process_request")
+          return redirect("/login/")
+  
+      def process_response(self, request, response):
+          print("M1.process_response")
+          return response
+  ```
+
+- 注册中间件settings.py
+
+  ```
+  MIDDLEWARE = [
+  'staffing_sys_app01.middieware.auth.AuthMiddleware',
+  ]
+  ```
+
+#### 14.4 注销
+
+```python
+def logout(request):
+    """ 注销 """
+    request.session.clear()
+    return redirect("/login/")
+```
+
+#### 14.5 当前用户
+
+![image-20231016215257465](imge/WEB开发.assets/image-20231016215257465.png)
+
+### 15 图片验证码
+
+![image-20231016220832638](imge/WEB开发.assets/image-20231016220832638.png)
+
+
+
+#### 15.1 生成图片
+
+参考：(https://www.cnblogs.com/wupeiqi/articles/5812291.html)
+
+```python
+pip install pillow
+```
+
+```python
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+# @File    : test.py
+# @Time    : 2023/10/3 17:32
+# @Author  : 978345836@qq.com
+# @Software: win11 python3.9
+# @Version : 1.0
+# @Describe: 图片验证码自动生成
+
+"""
+程序说明：
+    功能：生成图片验证码
+"""
+
+# here put the import lib
+import random
+from PIL import Image, ImageDraw, ImageFont, ImageFilter
+
+
+def check_code(width=120, height=30, char_length=5, font_file='Monaco.ttf', font_size=28):
+    code = []
+    img = Image.new(mode='RGB', size=(width, height), color=(255, 255, 255))
+    draw = ImageDraw.Draw(img, mode='RGB')
+
+    def rndChar():
+        """
+        生成随机字母
+        :return:
+        """
+        return chr(random.randint(65, 90))
+
+    def rndColor():
+        """
+        生成随机颜色
+        :return:
+        """
+        return (random.randint(0, 255), random.randint(10, 255), random.randint(64, 255))
+
+    # 写文字
+    font = ImageFont.truetype(font_file, font_size)
+    for i in range(char_length):
+        char = rndChar()
+        code.append(char)
+        h = random.randint(0, 4)
+        draw.text((i * width / char_length, h), char, font=font, fill=rndColor())
+
+    # 写干扰点
+    for i in range(40):
+        draw.point([random.randint(0, width), random.randint(0, height)], fill=rndColor())
+
+    # 写干扰圆圈
+    for i in range(40):
+        draw.point([random.randint(0, width), random.randint(0, height)], fill=rndColor())
+        x = random.randint(0, width)
+        y = random.randint(0, height)
+        draw.arc((x, y, x + 4, y + 4), 0, 90, fill=rndColor())
+
+    # 画干扰线
+    for i in range(5):
+        x1 = random.randint(0, width)
+        y1 = random.randint(0, height)
+        x2 = random.randint(0, width)
+        y2 = random.randint(0, height)
+
+        draw.line((x1, y1, x2, y2), fill=rndColor())
+
+    img = img.filter(ImageFilter.EDGE_ENHANCE_MORE)
+    return img, ''.join(code)
+
+
+if __name__ == '__main__':
+    # 1. 直接打开
+    # img,code = check_code()
+    # img.show()
+
+    # 2. 写入文件
+    img, code = check_code()
+    print(code)
+    with open('code.png', 'wb') as f:
+        img.save(f, format='png')
+
+    # 3. 写入内存(Python3)
+    # from io import BytesIO
+    # stream = BytesIO()
+    # img.save(stream, 'png')
+    # stream.getvalue()
+
+    # 4. 写入内存（Python2）
+    # import StringIO
+    # stream = StringIO.StringIO()
+    # img.save(stream, 'png')
+    # stream.getvalue()
+```
+
+
+
 
 
 

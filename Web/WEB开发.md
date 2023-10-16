@@ -4241,7 +4241,7 @@ static目录
 
 ![image-20231011160528930](imge/WEB开发.assets/image-20231011160528930.png)
 
-### 7 模板的继承
+### 7、 模板的继承
 
 定义母版：
 
@@ -4274,7 +4274,7 @@ layout.html
 {% endblock %}
 ```
 
-### 8 用户管理
+### 8、用户管理
 
 ```sql
 INSERT INTO `website`.`staffing_sys_app01_userinfo` (`name`, `password`, `age`, `account`, `create_time`, `gender`, `depart_id`) VALUES ('刘东', '123', 23, 100.68, '2023-09-06 17:35:05', 2, 1)
@@ -4401,7 +4401,7 @@ def user_add(request):
 
 参见 案例源码
 
-### 9 靓号管理
+### 9、 靓号管理
 
 #### 9.1 数据库表设计
 
@@ -5041,7 +5041,7 @@ models.PrettyNum.objects.filter(id=1).count()
   
   ```
 
-### 10 时间插件
+### 10、 时间插件
 
 ```html
 <!--引入css插件-->
@@ -5073,7 +5073,7 @@ models.PrettyNum.objects.filter(id=1).count()
 
 注意：Django 里面 规定标签name=id_字段名
 
-### 11 ModelForm和BootStrap
+### 11、 ModelForm和BootStrap
 
 - ModelForm可以帮助我们生成HTML标签
 
@@ -5214,9 +5214,9 @@ models.PrettyNum.objects.filter(id=1).count()
                   }
   ```
 
-### 12 程序整理
+### 12、程序整理
 
-#### 1、视图函数拆分
+#### 12.1 视图函数拆分
 
 - 将views.py文件拆分 到views文件夹，删除views.py文件
 
@@ -5226,7 +5226,7 @@ models.PrettyNum.objects.filter(id=1).count()
 
 ![image-20231015164824239](imge/WEB开发.assets/image-20231015164824239.png)
 
-### 13 管理员操作
+### 13、管理员操作
 
 - MD5加密
 - 新密码是否与以前密码一致校验
@@ -5276,9 +5276,11 @@ class AdminResetModelForm(BootStrapModelForm):
 
 ![image-20231015223659007](imge/WEB开发.assets/image-20231015223659007.png)
 
+### 14、用户登录
 
+#### 14.1 cookie和session
 
-
+![image-20231016170240354](imge/WEB开发.assets/image-20231016170240354.png)
 
 
 

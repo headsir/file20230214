@@ -3821,6 +3821,43 @@ python manage.py migrate
 
 删除表：在models.py文件中删除表对应的模块
 
+- django下删数据表后重建
+
+  来源：http://runxinzhi.com/djlbolgs-p-12978459.html
+
+  ```
+  一、利用Model类来操作
+  
+  其实也很简单，在models.py中，把想删除的数据表对应的Model注释掉，然后执行
+  
+  python manage.py makemigrations
+  python manage.py migrate
+  
+  就删除对应数据表了。
+  
+  然后写入新的Model，去掉注释，再次执行makemigrations和migrate就行了。
+  
+  二、sql删除数据表，fake迁移制造迁移记录，再真正迁移
+  
+  1、先到数据库把表删掉：
+  
+  drop table 数据表名称;
+  
+  2、注释django中对应的Model
+  
+  3、在终端执行以下命令：
+  
+  python manage.py makemigrations
+  python manage.py migrate --fake
+  
+  fake就不是真正的迁移，只是制造当前状态的迁移记录。
+  
+  4、去掉注释重新迁移
+  
+  python manage.py makemigrations app名称
+  python manage.py migrate
+  ```
+
 修改表：
 
 - 新增列：必须要指定新增列对应的数据，有三种方法：

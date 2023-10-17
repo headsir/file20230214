@@ -5568,6 +5568,91 @@ if __name__ == '__main__':
     # stream.getvalue()
 ```
 
+### 16、Ajax请求
+
+浏览器向网站发送请求时：URL和表单的形式提交。
+
+- GET
+- POST
+
+特点：页面刷新
+
+除此之外，也可以基于Ajax向后台发送请求。
+
+- 依赖jQuery
+
+- 编写ajax代码
+
+  ```javascript
+  $.ajax({
+      url:"发送的地址"，
+      type:"post",
+      # 参数
+      data:{
+          n1:123,
+          n2:456
+  	},
+      # 返回值
+      success:function(res){
+      console.log(res);
+  }
+  })
+  ```
+
+#### 15.1 GET请求
+
+```javascript
+    $.ajax({
+        url:'/task/ajax/',
+        type:"get",
+        data:{
+            n1:123,
+            n2:456
+        },
+        success:function(res){
+            console.log(res)
+        }
+    })
+```
+
+```python
+from django.shortcuts import render, HttpResponse
+def task_ajax(request):
+    print(request.GET)
+    return HttpResponse("成功了")
+```
+
+#### 15.2 POST请求
+
+```javascript
+    $.ajax({
+        url:'/task/ajax/',
+        type:"post",
+        data:{
+            n1:123,
+            n2:456
+        },
+        success:function(res){
+            console.log(res)
+        }
+    })
+```
+
+```python
+from django.shortcuts import render, HttpResponse
+from django.views.decorators.csrf import csrf_exempt
+
+@csrf_exempt  # 免除CSRF认证
+def task_ajax(request):
+    print(request.GET)
+    print(request.POST)
+    return HttpResponse("成功了")
+```
+
+
+
+
+
 
 
 

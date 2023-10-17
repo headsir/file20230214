@@ -5649,6 +5649,68 @@ def task_ajax(request):
     return HttpResponse("成功了")
 ```
 
+#### 15.3 绑定事件
+
+```html
+        // 方法二：
+        $(function () {
+            // 页面框架加载完成之后代码自动执行
+            bindBtnEvent();
+        })
+
+        function bindBtnEvent() {
+            $("#btn1").click(function () {
+                $.ajax({
+                    url: '/task/ajax/',
+                    type: "post",
+                    data: {
+                        n1: 123,
+                        n2: 456
+                    },
+                    success: function (res) {
+                        console.log(res)
+                    }
+                })
+            })
+        }
+```
+
+#### 15.4 ajax请求的返回值
+
+一般都会返回JSON格式。
+
+```python
+from django.http import JsonResponse
+
+@csrf_exempt  # 免除CSRF认证
+def task_ajax(request):
+
+
+    print(request.GET)
+    print(request.POST)
+    json_string = json.dumps(request.POST)
+    return HttpResponse(json_string)
+    # return JsonResponse(request.POST)
+```
+
+```
+                $.ajax({
+                    url: '/task/ajax/',
+                    type: "post",
+                    data: {
+                        n1: 123,
+                        n2: 456
+                    },
+                    // 字符串JSON序列化HttpResponse(json_string)
+                    // JsonResponse(request.POST) 不需要
+                    dataType: "JSON",
+                    success: function (res) {
+                        console.log(res.n1)
+                    }
+                })
+            })
+```
+
 
 
 

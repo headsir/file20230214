@@ -3406,7 +3406,7 @@ pip install django
 
 ### 2.2 Pycharm专业版
 
-略
+注意：删除settings.py中的DIR temolates删除。
 
 
 
@@ -4220,10 +4220,6 @@ blank=False、null=True。这个设定不允许表单中该字段为空，但是
 # self.instance.pk 当前编辑的哪一行的ID  exclude 排除xxx以外
 exists = models.PrettyNum.objects.filter(mobile=txt_mobile).exclude(id=self.instance.pk).exists()
 ```
-
-
-
-
 
 ### 4、生成MySQL中生成表
 
@@ -5599,7 +5595,7 @@ if __name__ == '__main__':
   })
   ```
 
-#### 15.1 GET请求
+#### 16.1 GET请求
 
 ```javascript
     $.ajax({
@@ -5622,7 +5618,7 @@ def task_ajax(request):
     return HttpResponse("成功了")
 ```
 
-#### 15.2 POST请求
+#### 16.2 POST请求
 
 ```javascript
     $.ajax({
@@ -5649,7 +5645,7 @@ def task_ajax(request):
     return HttpResponse("成功了")
 ```
 
-#### 15.3 绑定事件
+#### 16.3 绑定事件
 
 ```html
         // 方法二：
@@ -5675,7 +5671,7 @@ def task_ajax(request):
         }
 ```
 
-#### 15.4 ajax请求的返回值
+#### 16.4 ajax请求的返回值
 
 一般都会返回JSON格式。
 
@@ -5711,9 +5707,27 @@ def task_ajax(request):
             })
 ```
 
+### 17 订单管理
 
+#### 17.1 表结构
 
+![image-20231018164909892](imge/WEB开发.assets/image-20231018164909892.png)
 
+```python
+# 订单表
+class Order(models.Model):
+    """ 订单表 """
+    oid = models.CharField(verbose_name="订单号", max_length=64)
+    title = models.CharField(verbose_name="名称", max_length=32)
+    price = models.IntegerField(verbose_name="价格")
+
+    status_choices = {
+        (1, "待支付"),
+        (2, "已支付"),
+    }
+    status = models.SmallIntegerField(verbose_name="状态", choices=status_choices, default=1)
+    admin = models.ForeignKey(verbose_name="管理员", to="Admin", on_delete=models.CASCADE)
+```
 
 
 

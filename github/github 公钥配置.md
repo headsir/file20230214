@@ -10,6 +10,8 @@ ssh-keygen -t rsa -C "你的邮箱"
 
 ![image-20220117132107504](imge\github 公钥配置.assets\image-20220117132107504.png)
 
+![image-20231019153912186](imge/github 公钥配置.assets/image-20231019153912186.png)
+
 ### **2、配置SSH**
 
 将.pub里面的全部代码复制到github的SSH中
@@ -18,10 +20,14 @@ ssh-keygen -t rsa -C "你的邮箱"
 
 ![image-20220117132611177](imge\github 公钥配置.assets\image-20220117132611177.png)
 
+GITEE设置
+
+![image-20231019154255007](imge/github 公钥配置.assets/image-20231019154255007.png)
+
 ### **3、测试ssh keys是否设置成功**
 
 ```
- ssh -T git@github.com
+ ssh -T git@gitee.com
 ```
 
 ### 4、.git/config 文件配置
@@ -51,9 +57,11 @@ ssh-keygen -t rsa -C "你的邮箱"
 
 
 
-### 5、.gitconfig 文件配置S
+### 5、.gitconfig 文件配置
 
 ![image-20220207151519509](imge\github 公钥配置.assets\image-20220207151519509.png)
+
+![image-20231019153712932](imge/github 公钥配置.assets/image-20231019153712932.png)
 
 
 

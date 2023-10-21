@@ -5729,6 +5729,219 @@ class Order(models.Model):
     admin = models.ForeignKey(verbose_name="管理员", to="Admin", on_delete=models.CASCADE)
 ```
 
+#### 17.2 ajax添加
+
+新建按钮功能实现
+
+```javascript
+function bindBtnAddEvent() {
+    $("#btnAdd").click(function () {
+        // 将正在编辑的ID设置为空
+        EDIT_ID = undefined;
+        //给错误信息置空
+        $(".error-msg").empty();
+        // 清空对话框中的数据
+        $("#formAdd")[0].reset();
+
+        // 修改对话框的标题
+        $("#myModalLabel").text("新建");
+        // 点击新建按钮，显示对话框
+        $('#myModal').modal("show");
+    });
+}
+```
+
+向后台发送添加数据
+
+```javascript
+function doAdd() {
+    // 向后台发送数据（添加的Ajax请求）
+    $.ajax({
+        url: "/order/add/",
+        type: "post",
+        data: $("#formAdd").serialize(),
+        success: function (res) {
+            // console.log(res)
+            if (res.status) {
+                // alert("创建成功");
+                // 清空表单,$("#formAdd")是jQuery对象->$("#formAdd")[0] DOM对象
+                $("#formAdd")[0].reset();
+                // 关闭对话框
+                $('#myModal').modal("hide");
+                // 刷新页面
+                location.reload();
+                // 用JS实现页面刷新
+                // location.reload();
+            } else {
+                // $.each 循环
+                $.each(res.error, function (name, errorList) {
+                    // ModelForm 默认标签ID 为 id_字段名，添加错误信息
+                    $("#id_" + name).next().text(errorList[0]);
+                })
+            }
+        }
+    })
+}
+```
+
+#### 17.3 ajax数据提交
+
+数据提交
+
+```javascript
+function bindBtnSaveEvent() {
+    $("#btnSave").click(function () {
+        // alert("保存"),
+        //给错误信息置空
+        $(".error-msg").empty();
+        if (EDIT_ID) {
+            // 编辑
+            doEdit();
+        } else {
+            // 添加
+            doAdd();
+        }
+    });
+}
+```
+
+#### 17.4 ajax删除数据
+
+```javascript
+// 实现删除按钮功能
+function bindBtnDeleteEvent() {
+    $(".btn-delete").click(function () {
+        // alert("点击了删除");
+        // 显示删除对话框
+        $("#deleteModal").modal("show");
+        // 获取当前行的ID并赋值给全局变量
+        DELETE_ID = $(this).attr("uid");
+        // console.log(DELETE_ID)
+    });
+}
+
+// 向后台发送删除数据
+function bindBtnConfirmDeleteEvent() {
+    $("#btnConfirmDelete").click(function () {
+        // 点击确认按钮删除按钮，将全局变量中设置的那个要删除ID发送到后台
+        $.ajax({
+            // url: "/order/" + DELETE_ID + "/delete/",  ==> /order/123/delete/
+            url: "/order/delete/",  //  ==> /order/delete/?uid=123
+            type: "GET",
+            data: {
+                uid: DELETE_ID
+            },
+            dataType: "JSON",
+            success: function (res) {
+                if (res.status) {
+                    // alert("删除成功")
+                    // 方法一：
+                    // 关闭对话框
+                    // $('#deleteModal').modal("hide");
+
+                    // 在页面上将当前一行数据删除
+                    // $("tr[uid='" + DELETE_ID + "']").remove();
+                    // 要删除的ID置空
+                    //  DELETE_ID = 0;
+
+                    // 方法二：
+                    location.reload();
+
+                } else {
+                    // 删除失败
+                    alert(res.error);
+                }
+            }
+        })
+    })
+}
+```
+
+#### 17.5 ajax编辑数据
+
+```javascript
+// 向后台获取编辑数据
+function bindBtnEditEvent() {
+            $(".btn-edit").click(function () {
+                //给错误信息置空
+                $(".error-msg").empty();
+                // 清空对话框中的数据
+                $("#formAdd")[0].reset();
+                var uid = $(this).attr("uid");
+                EDIT_ID = uid;
+                // alert("编辑")
+                // 发送Ajax请求获取当前行的相关数据 /order/detail/?uid=123
+                $.ajax({
+                    url: "/order/detail/",
+                    type: "get",
+                    data: {
+                        uid: uid
+                    },
+                    dataType: "JSON",
+                    success: function (res) {
+                        if (res.status) {
+                            console.log(res)
+                            // 在对话框中默认显示
+                            // 将数据赋值到对应的标签
+                            $.each(res.data, function (name, value) {
+                                $("#id_" + name).val(value);
+                            })
+                            // 修改对话框的标题
+                            $("#myModalLabel").text("编辑");
+                            // 点击编辑，显示对话框
+                            $("#myModal").modal("show");
+                        } else {
+                            alert(res.error);
+                        }
+                    }
+                })
+
+            })
+        }
+
+// 实现向后台发送编辑后数据
+function doEdit() {
+            // 向后台发送数据（编辑的Ajax请求）
+            $.ajax({
+                url: "/order/edit/" + "?uid=" + EDIT_ID,
+                type: "post",
+                data: $("#formAdd").serialize(),
+                success: function (res) {
+                    // console.log(res)
+                    if (res.status) {
+                        // 清空表单,$("#formAdd")是jQuery对象->$("#formAdd")[0] DOM对象
+                        $("#formAdd")[0].reset();
+                        // 关闭对话框
+                        $('#myModal').modal("hide");
+                        // 刷新页面
+                        location.reload();
+                        // 用JS实现页面刷新
+                        // location.reload();
+                    } else {
+                        if (res.tips) {
+                            alert(res.tips);
+                        } else {
+                            // $.each 循环
+                            $.each(res.error, function (name, errorList) {
+                                // ModelForm 默认标签ID 为 id_字段名，添加错误信息
+                                $("#id_" + name).next().text(errorList[0]);
+                            })
+                        }
+                    }
+                }
+
+            })
+        }
+```
+
+### 18 数据统计-图表
+
+- highchart，国外
+
+- echarts，国内
+
+  官网：https://echarts.apache.org/zh/index.html
+
 
 
 

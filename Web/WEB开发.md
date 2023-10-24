@@ -5956,7 +5956,25 @@ function doEdit() {
   
   参考资料：https://echarts.apache.org/examples/zh/index.html#chart-type-line
 
+## 8 文件上传
 
+### 8.1 基本操作
+
+```html
+<form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    <input type="text" name="username">
+    <input type="file" name="avatar">
+    <input type="submit" value="提交">
+</form>
+```
+
+```python
+# 'username': ['6666']
+print(request.POST)  # 请求体中的数据
+# 'avatar': [<InMemoryUploadedFile: Python程序开发的全流程.jpg (image/jpeg)>]
+print(request.FILES)  # 请求体发过来的文件
+```
 
 
 

@@ -5940,6 +5940,18 @@ function doEdit() {
 
   官网：https://www.hcharts.cn/demo/highcharts/bar-basic
 
+  ```
+   highcharts去掉右下角highchart.com和右上角的图标(三个小横杆)
+   
+  去除右下角highchart.com
+   credits: {enabled:false}
+  
+  去除右上角图标
+  exporting: {enabled:false}
+  ```
+
+  
+
 - echarts，国内
 
   官网：https://echarts.apache.org/zh/index.html

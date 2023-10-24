@@ -5938,9 +5938,13 @@ function doEdit() {
 
 - highchart，国外
 
+  官网：https://www.hcharts.cn/demo/highcharts/bar-basic
+
 - echarts，国内
 
   官网：https://echarts.apache.org/zh/index.html
+  
+  参考资料：https://echarts.apache.org/examples/zh/index.html#chart-type-line
 
 
 

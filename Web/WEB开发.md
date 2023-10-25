@@ -3909,6 +3909,14 @@ for obj in data_list:
 表模块.objects.filter(筛选条件).update(列名=值)
 ```
 
+判断数据是否存在
+
+```
+# EXISTS 运算符用于判断查询子句是否有记录，如果有一条或多条记录存在返回 True，否则返回 False。
+表模块.objects.filter(筛选条件).exists()
+        
+```
+
 ## 常用设置
 
 ### 1 汉化
@@ -5974,6 +5982,67 @@ function doEdit() {
 print(request.POST)  # 请求体中的数据
 # 'avatar': [<InMemoryUploadedFile: Python程序开发的全流程.jpg (image/jpeg)>]
 print(request.FILES)  # 请求体发过来的文件
+```
+
+```python
+from django.shortcuts import render, HttpResponse
+
+
+def upload_list(request):
+    """ 文件上传 """
+    if request.method == "GET":
+        return render(request, "upload_list.html")
+
+    # # 'username': ['6666']
+    # print(request.POST)  # 请求体中的数据
+    # # 'avatar': [<InMemoryUploadedFile: Python程序开发的全流程.jpg (image/jpeg)>]
+    # print(request.FILES)  # 请求体发过来的文件
+
+    file_object = request.FILES.get("avatar")
+    print(file_object.name)
+    # file_object.name 文件名字
+    # file_object.chunks 文件数据块
+    f = open(file_object.name, mode="wb")
+    for chunk in file_object.chunks():
+        f.write(chunk)
+    f.close()
+
+    return HttpResponse("....")
+```
+
+### 案例：批量上传数据
+
+```html
+<form method="post" enctype="multipart/form-data" action="/depart/multi/" class="form-inline"
+      style="width: 210px">
+    {% csrf_token %}
+    <div class="form-group">
+        <input type="file" name="exc" style="width: 150px">
+    </div>
+    <div class="form-group">
+        <input type="submit" value="上传" class="btn btn-info">
+    </div>
+</form>
+```
+
+```python
+def depart_multi(request):
+    """ 批量上传（Excel文件）"""
+    # 获取用户上传文件对象
+    file_object = request.FILES.get("exc")
+    # <class 'django.core.files.uploadedfile.TemporaryUploadedFile'>
+    from django.core.files.uploadedfile import TemporaryUploadedFile
+
+    import pandas as pd
+    # 直接打开excel并读取内容
+    df = pd.read_excel(file_object, sheet_name="Sheet1")
+
+    for text in df['名称'].to_list():
+        # EXISTS 运算符用于判断查询子句是否有记录，如果有一条或多条记录存在返回 True，否则返回 False。
+        exists = models.Department.objects.filter(title=text).exists()
+        if not exists:
+            models.Department.objects.create(title=text)
+    return redirect("/depart/list/")
 ```
 
 

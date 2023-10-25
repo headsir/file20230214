@@ -6045,6 +6045,14 @@ def depart_multi(request):
     return redirect("/depart/list/")
 ```
 
+### 案例：混合数据（Form)
+
+提交页面时：用户输入数据+文件（输入不能为空、报错）
+
+
+
+
+
 
 
 

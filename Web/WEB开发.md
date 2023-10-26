@@ -4331,6 +4331,7 @@ INSERT INTO `website`.`staffing_sys_app01_userinfo` (`name`, `password`, `age`, 
   - 用户提交数据没有校验
   - 错误，页面上应该有错误提示
   - 页面上，每有一个字段都要我们重新写一遍
+  
   - 关联的数据，手动获取并展示循环展示在页面。
   ```
 

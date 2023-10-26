@@ -598,6 +598,16 @@ row_number() OVER (PARTITION BY COL1 ORDER BY COL2 DESC)
 */
 ```
 
+案例：
+
+```
+SELECT *
+FROM (
+SELECT *,ROW_NUMBER() over (PARTITION BY  lte.`日期` ORDER BY lte.`分运营商上下行总流量MB` DESC ) AS row_num 
+FROM `高校_天级小区级_lte_2023` AS lte ) as t
+WHERE row_num <= 100
+```
+
 ### 3.7.18 行列转置
 
 ```mysql

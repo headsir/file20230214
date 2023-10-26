@@ -6013,6 +6013,8 @@ def upload_list(request):
 
 ### 案例：批量上传数据
 
+![image-20231026204808229](imge/WEB开发.assets/image-20231026204808229.png)
+
 ```html
 <form method="post" enctype="multipart/form-data" action="/depart/multi/" class="form-inline"
       style="width: 210px">
@@ -6050,7 +6052,115 @@ def depart_multi(request):
 
 提交页面时：用户输入数据+文件（输入不能为空、报错）
 
+- Form生成HTML标签：type=file
+- 表单的验证
+- form.cleaned_data 获取 数据 + 文件对象
 
+![image-20231026204725953](imge/WEB开发.assets/image-20231026204725953.png)
+
+注意：就目前而言，所有的静态文件都只能放在static目录。
+
+- static 存放静态文件的路径，包括：CSS、JS、项目图片
+- media 用户上传的数据目录
+
+### 8.2 启用media
+
+#### 在urls.py中进行配置：
+
+```python
+from django.urls import path, re_path
+from django.views.static import serve
+from django.conf import settings
+
+urlpatterns = [
+    re_path(r"^media/(?P<path>.*)$", serve, {'document_root': settings.MEDIA_ROOT}, name='media'),
+]
+```
+
+#### 在settings.py中进行配置：
+
+```python
+import os
+
+MEDIA_ROOT = os.path.join(BASE_DIR, "media")
+MEDIA_URL = "/media/"
+```
+
+在浏览器上访问地址：
+
+http://127.0.0.1:8000/media/Python程序开发的全流程.jpg
+
+### 案例：混合数据（ModelForm）
+
+#### models.py
+
+```python
+class City(models.Model):
+    """ 城市 """
+    name = models.CharField(verbose_name="姓名", max_length=32)
+    count = models.IntegerField(verbose_name="人口")
+
+    # 本质上数据也是CharField，自动保存数据
+    img = models.FileField(verbose_name="Logo", max_length=128, upload_to="city/")
+```
+
+#### 定义ModelForm
+
+```python
+from staffing_sys_app01.utils.bootstrap import BootStrapModelForm
+
+class UpModelForm(BootStrapModelForm):
+    bootstrap_exclude_fields = ["img"]
+
+    class Meta:
+        model = models.City
+        fields = "__all__"
+```
+
+#### 视图
+
+```python
+def upload_model_form(request):
+    """ 上传文件和数据（ModelForm） """
+    title = "ModelForm上传文件"
+    if request.method == "GET":
+        form = UpModelForm()
+        return render(request, "upload_form.html", {"form": form, "title": title})
+    form = UpModelForm(data=request.POST, files=request.FILES)
+    if form.is_valid():
+        # 对于文件：自动保存
+        # 字段 + 上传路径 写入数据库
+        form.save()
+        return HttpResponse("成功")
+    return render(request, "upload_form.html", {"form": form, "title": title})
+```
+
+#### 小结
+
+- 自己手动去写
+
+  ```python
+  file_object = request.FILES.get("avatar")
+  ...
+  ```
+
+- Form组件（表单验证）
+
+  ```python
+  form = UpForm(data=request.POST, files=request.FILES)
+  if form.is_valid():
+  	image_object = form.cleaned_data.get("img")
+    
+  具体文件操作还是手动做
+  ```
+
+- ModelForm(表单验证 + 自动保存数据库 + 自动保存文件)
+
+
+
+## 学习路线
+
+![image-20231026223719451](imge/WEB开发.assets/image-20231026223719451.png)
 
 
 

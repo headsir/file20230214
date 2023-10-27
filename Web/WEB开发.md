@@ -3404,6 +3404,10 @@ pip install django
   "D:\ProgramData\virtual directory\python_learing-uJLLoHwc\Scripts\django-admin.exe" startproject 项目名称
   ```
 
+举例：
+
+![image-20231027093909301](imge/WEB开发.assets/image-20231027093909301.png)
+
 ### 2.2 Pycharm专业版
 
 注意：删除settings.py中的DIR temolates删除。
@@ -3447,7 +3451,7 @@ app目录结构：
 
 ```
 
-## 4 快速上手
+## 4 快速上手(mysite_01)
 
 - app注册
 
@@ -3584,7 +3588,7 @@ app目录结构：
 </html>
 ```
 
-## 案例：伪联通新闻中心
+## 案例：伪联通新闻中心(mysite_01)
 
 ### urls.py
 
@@ -3643,7 +3647,7 @@ def news(req):
 
 ![image-20231010092514487](imge/WEB开发.assets/image-20231010092514487.png)
 
-## 案例：用户登录
+## 案例：用户登录(mysite_01)
 
 ### urls.py
 
@@ -3923,7 +3927,7 @@ for obj in data_list:
 
 ![image-20231011214804498](imge/WEB开发.assets/image-20231011214804498.png)
 
-## 案例：用户管理
+## 案例：用户管理(mysite_01)
 
 ### 1. 展示用户列表
 
@@ -4104,7 +4108,7 @@ for obj in data_list:
 
 
 
-## 总结案例：员工管理系统
+## 总结案例：员工管理系统(StaffingSystem)
 
 ### 1、新建项目
 
@@ -5965,9 +5969,9 @@ function doEdit() {
   
   参考资料：https://echarts.apache.org/examples/zh/index.html#chart-type-line
 
-## 8 文件上传
+### 19 文件上传
 
-### 8.1 基本操作
+#### 19.1 基本操作
 
 ```html
 <form method="post" enctype="multipart/form-data">
@@ -6011,7 +6015,7 @@ def upload_list(request):
     return HttpResponse("....")
 ```
 
-### 案例：批量上传数据
+#### 案例：批量上传数据
 
 ![image-20231026204808229](imge/WEB开发.assets/image-20231026204808229.png)
 
@@ -6048,7 +6052,7 @@ def depart_multi(request):
     return redirect("/depart/list/")
 ```
 
-### 案例：混合数据（Form)
+#### 案例：混合数据（Form)
 
 提交页面时：用户输入数据+文件（输入不能为空、报错）
 
@@ -6063,9 +6067,9 @@ def depart_multi(request):
 - static 存放静态文件的路径，包括：CSS、JS、项目图片
 - media 用户上传的数据目录
 
-### 8.2 启用media
+#### 19.2 启用media
 
-#### 在urls.py中进行配置：
+##### 在urls.py中进行配置：
 
 ```python
 from django.urls import path, re_path
@@ -6077,7 +6081,7 @@ urlpatterns = [
 ]
 ```
 
-#### 在settings.py中进行配置：
+##### 在settings.py中进行配置：
 
 ```python
 import os
@@ -6090,9 +6094,9 @@ MEDIA_URL = "/media/"
 
 http://127.0.0.1:8000/media/Python程序开发的全流程.jpg
 
-### 案例：混合数据（ModelForm）
+#### 案例：混合数据（ModelForm）
 
-#### models.py
+##### models.py
 
 ```python
 class City(models.Model):
@@ -6104,7 +6108,7 @@ class City(models.Model):
     img = models.FileField(verbose_name="Logo", max_length=128, upload_to="city/")
 ```
 
-#### 定义ModelForm
+##### 定义ModelForm
 
 ```python
 from staffing_sys_app01.utils.bootstrap import BootStrapModelForm
@@ -6117,7 +6121,7 @@ class UpModelForm(BootStrapModelForm):
         fields = "__all__"
 ```
 
-#### 视图
+##### 视图
 
 ```python
 def upload_model_form(request):
@@ -6135,7 +6139,7 @@ def upload_model_form(request):
     return render(request, "upload_form.html", {"form": form, "title": title})
 ```
 
-#### 小结
+##### 小结
 
 - 自己手动去写
 
@@ -6156,9 +6160,36 @@ def upload_model_form(request):
 
 - ModelForm(表单验证 + 自动保存数据库 + 自动保存文件)
 
+  
+
+## 案例： 纯净版项目+多app应用+数据同步（PureMsn）
+
+### 1 纯净版项目
+
+- 创建Django项目内置很多组件，生成很多表
+- 纯净版
 
 
-## 学习路线
+
+
+
+
+
+## 案例：任务管理平台
+
+
+
+
+
+## 案例：Django+vue.js前后端分离项目
+
+
+
+
+
+
+
+# 学习路线
 
 ![image-20231026223719451](imge/WEB开发.assets/image-20231026223719451.png)
 

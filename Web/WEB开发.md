@@ -6162,18 +6162,79 @@ def upload_model_form(request):
 
   
 
-## 案例： 纯净版项目+多app应用+数据同步（PureMsn）
+## 专题： 纯净版项目+多app应用
 
-### 1 纯净版项目
+### 1 纯净版项目（PureMsn）
 
 - 创建Django项目内置很多组件，生成很多表
+
 - 纯净版
 
+  settings.py
 
+  注释掉以下组件：
 
+  ```python
+  # APP
+  INSTALLED_APPS = [
+      # 'django.contrib.admin',  # 内置后台管理
+      # 'django.contrib.auth',  # 用户和权限管理
+      # 'django.contrib.contenttypes',  # 多表关联
+      # 'django.contrib.messages',  # 消息闪现
+  
+  ]
+  
+  # 中间件
+  MIDDLEWARE = [
+      # 'django.contrib.auth.middleware.AuthenticationMiddleware',
+      # 'django.contrib.messages.middleware.MessageMiddleware',
+  ]
+  ```
 
+​		数据库表
 
+![image-20231027113306619](imge/WEB开发.assets/image-20231027113306619.png)
 
+### 2 多app应用(Apps_pro)
+
+- 方式1：
+
+  ```python
+  crm项目
+  	- app01
+      - app02
+      ...
+      - crm
+      - manage.py
+  ```
+
+- 方式2：(推荐)
+
+  ```python
+  crm项目
+  	- apps
+      	- app01
+          - app02
+          ...
+      - crm
+      - manage.py
+  ```
+
+  1、创建应用命令
+
+  ```python
+  python manage.py startapp app01 apps/app01
+  ```
+
+  2、修改配置文件
+
+  - apps -> app01 -> apps.py 
+
+    ![image-20231027114614646](imge/WEB开发.assets/image-20231027114614646.png)
+
+  - settings.py注册app
+
+    ![image-20231027114806133](imge/WEB开发.assets/image-20231027114806133.png)
 
 ## 案例：任务管理平台
 

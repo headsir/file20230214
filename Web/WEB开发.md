@@ -6236,9 +6236,91 @@ def upload_model_form(request):
 
     ![image-20231027114806133](imge/WEB开发.assets/image-20231027114806133.png)
 
-## 案例：任务管理平台
+## 案例：任务管理平台(web_saas)
+
+saas平台
+
+> bug&任务追踪平台
+
+---
+
+### 一、搭建项目环境
+
+安装django模块
+
+```python
+python 3.9
+pip install django==1.11.28
+```
+
+安装django项目
+
+```python
+"D:\ProgramData\virtual directory\web_saas-IpLZ7j8E\Scripts\django-admin.exe" startproject s25
+```
+
+创建app
+
+```python
+python manage.py startapp app01
+```
+
+### 二、本地配置
+
+local_settings.py
+
+#### 2.1 在settings中导入
+
+```python
+try:
+    from .local_settings import *
+except ImportError:
+    pass
+```
+
+#### 2.2 创建自己本地 local_settings.py
+
+```python
+# 语言配置
+LANGUAGE_CODE = 'zh-hans'
+# 短信模板
+SMS = 666
+```
+
+==切勿给他人。==
+
+#### 2.3 git
+
+git忽略文件.gitignore
+
+```
+# pycharm
+.idea/
+.DS_Store
+
+__pycache__/
+*.py[cod]
+*.$py.calss
 
 
+# Django stuff:
+local_settings.py
+*.sqlite3
+
+# database migrations
+*/migrations/*.py
+!*/migrations/__init__.py
+```
+
+#### 腾信云短信
+
+```
+SDK AppID 	1400864874
+App Key  	283d1c22c8cc54201c59a39713804b73
+```
+
+- 创建签名
+  - 申请公众号
 
 
 

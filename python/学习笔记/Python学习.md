@@ -126,6 +126,39 @@ if __name__ == '__main__':
     execute()
 ```
 
+### 2.3.3 gitee配置
+
+git忽略文件.gitignore
+
+```git
+# pycharm 自动生成的目录
+.idea/
+
+# python缓存文件
+__pycache__/
+*.py[cod]
+*.$py.calss
+
+
+# Django stuff:
+local_settings.py
+*.sqlite3
+
+# database migrations
+*/migrations/*.py
+!*/migrations/__init__.py
+```
+
+![image-20231029154232362](imge/Python学习.assets/image-20231029154232362.png)
+
+
+
+
+
+
+
+
+
 ## 2.4 VScode 使用
 
 ### 2.4.1 界面汉化

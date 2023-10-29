@@ -6294,10 +6294,10 @@ SMS = 666
 git忽略文件.gitignore
 
 ```
-# pycharm
+# pycharm 自动生成的目录
 .idea/
-.DS_Store
 
+# python缓存文件
 __pycache__/
 *.py[cod]
 *.$py.calss
@@ -6312,15 +6312,121 @@ local_settings.py
 !*/migrations/__init__.py
 ```
 
-#### 腾信云短信
+### 三、腾信云短信
 
 ```
 SDK AppID 	1400864874
 App Key  	283d1c22c8cc54201c59a39713804b73
 ```
 
-- 创建签名
-  - 申请公众号
+- 申请公众号【姓名+业务】
+
+- 申请签名【姓名+业务+公众号】
+
+  ```
+  张晓强单验小组交流公众号
+  ```
+
+- 申请模板
+
+  ```
+  模板ID:1969179
+  模板内容：验证码为：{1}，您正在登录，若非本人操作，请勿泄露。
+  ```
+
+**python发短信**
+
+来源：https://www.cnblogs.com/liqiangwei/p/14412751.html
+
+> 1、安装SDK
+
+```python
+pip install qcloudsms-py
+```
+
+> 2、基于SDK发送短信
+
+```python
+from qcloudsms_py import SmsMultiSender, SmsSingleSender
+from qcloudsms_py.httpclient import HTTPError
+def send_sms_single(phone_num, template_id, template_param_list):
+    """
+    单条发送短信
+    :param phone_num: 手机号
+    :param template_id: 腾讯云短信模板ID
+    :param template_param_list: 短信模板所需参数列表，例如:【验证码：{1}，描述：{2}】，则传递参数 [888,666]按顺序去格式化模板
+    :return:
+    """
+    appid = 112142311  # 自己应用ID
+    appkey = "8cc5b87123y423423412387930004"  # 自己应用Key
+    sms_sign = "Python之路"  # 自己腾讯云创建签名时填写的签名内容（使用公众号的话这个值一般是公众号全称或简称）
+    sender = SmsSingleSender(appid, appkey)
+    try:
+        response = sender.send_with_param(86, phone_num, template_id, template_param_list, sign=sms_sign)
+    except HTTPError as e:
+        response = {'result': 1000, 'errmsg': "网络异常发送失败"}
+    return response
+
+
+
+def send_sms_multi(phone_num_list, template_id, param_list):
+    """
+    批量发送短信
+    :param phone_num_list:手机号列表
+    :param template_id:腾讯云短信模板ID
+    :param param_list:短信模板所需参数列表，例如:【验证码：{1}，描述：{2}】，则传递参数 [888,666]按顺序去格式化模板
+    :return:
+    """
+    appid = 112142311
+    appkey = "8cc5b87123y423423412387930004"
+    sms_sign = "Python之路"
+    sender = SmsMultiSender(appid, appkey)
+    try:
+        response = sender.send_with_param(86, phone_num_list, template_id, param_list, sign=sms_sign)
+    except HTTPError as e:
+        response = {'result': 1000, 'errmsg': "网络异常发送失败"}
+    return response
+if __name__ == '__main__':
+    result1 = send_sms_single("15131255089", 548760, [666, ])
+    print(result1)
+    result2 = send_sms_single( ["15131255089", "15131255089", "15131255089", ],548760, [999, ])
+    print(result2)
+```
+
+> **关于频率限制**
+>
+> 腾讯云短信后台可以进行 短信频率 的限制。但是，由于我们是免费用户所以无法进行设置，只能使用默认的配置（30秒发1条/1小时发5条/1天发10条）。
+
+案例：
+
+```python
+def send_sms(request):
+    """ 发送短信 """
+    code = random.randrange(1000, 9999)
+    res = send_sms_single("1325393126", 1969179, [code, ])
+    if res["result"] == 0:
+        return HttpResponse("成功")
+    else:
+        return HttpResponse(res['errmsg'])
+```
+
+### 四、短信验证码功能实现
+
+- 点击获取验证码
+  - ​	获取手机号
+  - 向后台发送ajax
+    - 手机
+    - tpl = register
+  - 想手机发送验证码(ajax/sms/redis)
+  - 验证码失效处理60s
+
+### 五、redis基本操作
+
+[下载安装](../Redis/Redis基本操作.md "下载安装指导")
+
+[python操作redis](..\python\模块\数据库处理\redis模块\redis使用方法.md "操作方法")
+
+
 
 
 

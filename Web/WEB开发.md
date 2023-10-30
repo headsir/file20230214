@@ -4317,6 +4317,10 @@ layout.html
 {% block content %}
     <h1>首页</h1>
 {% endblock %}
+
+{% block js %}
+    <h1>首页</h1>
+{% endblock %}
 ```
 
 ### 8、用户管理
@@ -6425,6 +6429,76 @@ def send_sms(request):
 [下载安装](../Redis/Redis基本操作.md "下载安装指导")
 
 [python操作redis](..\python\模块\数据库处理\redis模块\redis使用方法.md "操作方法")
+
+django中使用redis:
+
+- redis模块 + 连接池	不方便
+
+- django-redis    方便使用
+
+  - 安装：django-redis(内部依赖redis模块)
+
+    ```python
+    pip install django-redis
+    ```
+
+  -   settings.py中添加相关配置
+
+    ```python
+    CACHES = {
+        "default": {
+            "BACKEND": "django_redis.cache.RedisCache",
+            "LOCATION": "redis://192.168.0.109:6379",  # 安装redis的主机 IP(不可以使用location) 和 端口
+            "OPTIONS": {
+                "CLIENT_CLASS": "django_redis.client.DefaultClient",
+                "CONNECTION_POOL_KWARGS": {
+                    "max_connections": 1000,
+                    "encoding": "utf-8"
+                },
+                "PASSWORD": "foobared"  # redis密码
+            }
+        }
+    }
+    ```
+
+  - 使用
+
+    在django的视图中操作redis
+
+    ```python
+    def index(request):
+        # 连接池中获取一个连接
+        conn = get_redis_connection('default')
+    
+        conn.set('nickname', '999', ex=10)
+        value = conn.get('nickname')
+        print(value)
+        return HttpResponse("OK")
+    ```
+
+### 六、实现注册
+
+#### 6.1 展示注册页面
+
+##### 6.1.1 创建web应用 & 注册app
+
+##### 6.1.2 模板路径处理
+
+##### 6.1.3 母版准备
+
+##### 6.1.4 URL准备
+
+
+
+#### 6.2 点击获取验证码
+
+#### 6.3 点注册
+
+
+
+
+
+
 
 
 

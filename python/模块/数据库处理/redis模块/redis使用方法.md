@@ -6,7 +6,7 @@
 pip install redis
 ```
 
-## python直连redis数据库
+## python直连redis数据库（不推荐）
 
 ```python
 import redis
@@ -33,7 +33,10 @@ import redis    # 导入redis模块，通过python操作redis 也可以直接在
 
 # host是redis主机，需要redis服务端和客户端都起着 redis默认端口是6379
 # 加上decode_responses=True，写入的键值对中的value为str类型，不加这个参数写入的则为字节类型
-pool = redis.ConnectionPool(host='localhost', port=6379,password='foobared' decode_responses=True)
+# max_connections 连接池最大连接数，默认 2**31 = 2147483648
+pool = redis.ConnectionPool(host='localhost', port=6379,password='foobared'  encoding='utf-8',max_connections=1000, decode_responses=True)
+
+# 去连接池中获取一个连接
 r = redis.Redis(connection_pool=pool)
 
 r.set('gender', 'male')     # key是"gender" value是"male" 将键值对存入redis缓存

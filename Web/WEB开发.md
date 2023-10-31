@@ -6312,8 +6312,8 @@ local_settings.py
 *.sqlite3
 
 # database migrations
-*/migrations/*.py
-!*/migrations/__init__.py
+**/migrations/*.py
+!**/migrations/__init__.py
 ```
 
 ### 三、腾信云短信

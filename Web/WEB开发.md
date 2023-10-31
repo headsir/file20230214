@@ -6484,9 +6484,57 @@ django中使用redis:
 
 ##### 6.1.2 模板路径处理
 
+- 按照app注册顺序，查找模板
+- 多app情况下：static/templates/app01/模板文件
+
 ##### 6.1.3 母版准备
 
 ##### 6.1.4 URL准备
+
+urls.py
+
+```python
+from django.conf.urls import url, include
+from django.contrib import admin
+
+urlpatterns = [
+    url(r'^admin/', admin.site.urls),
+    # include路由分发
+    url(r'^app01/', include('app01.urls', namespace='app01')),
+    url(r'^', include('web.urls')),
+]
+```
+
+web/urls.py
+
+```python
+from django.conf.urls import url
+from web.views import account
+
+urlpatterns = [
+    # name 参数方便反向解析
+    url(r'^register/$', account.register, name="register"),
+]
+```
+
+app01/urls.py
+
+```python
+from django.conf.urls import url
+from app01 import views
+
+urlpatterns = [
+    url(r'^send/sms/', views.send_sms),
+    url(r'^register/', views.register),
+    url(r'^index/', views.index),
+]
+```
+
+##### 6.1.5 注册页面显示
+
+- 母版中导航
+- 注册页面样式
+- ModelForm放到指定目录forms
 
 
 

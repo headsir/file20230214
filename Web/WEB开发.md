@@ -6566,17 +6566,89 @@ urlpatterns = [
   	$("#id_" + key).next().text(value[0]);}
   ```
 
-  
-
 - 成功，倒计时
+
+  - disabled属性
+
+    ```
+    $("#btnSms").prop("disabled",true)  # 添加disaled属性，不可操作
+    $("#btnSms").prop("disabled",false)  # 移除disaled属性，可操作
+    ```
+
+  - 定时器
+
+    ```倒计时python
+    # 1000毫秒运行1次
+    var obj = setInterval(function(){
+        console.log(123);
+    },1000)
+    # 清除定时器
+    clearInterval(obj);
+    ```
+
+    倒计时
+
+    ```python
+    var time = 60;
+    var obj = setInterval(function(){
+        time = time - 1;
+        if(time < 1){
+            clearInterval(obj);
+        }
+    },1000)
+    ```
+
+    注：刷新页面后倒计时消失，在腾讯云短信后台设置发送频率
 
 #### 6.3 点注册
 
+##### 6.3.1 点击收集数据&ajax
 
+不用form表单提交是因为如果提交失败，会刷新页面，倒计时失效。
 
+```python
+/*
+点击提交（注册），不用form表单提交是因为如果提交失败，会刷新页面，倒计时失效。
+*/
+function bindClickSubmit() {
+    $("#btnSubmit").click(function () {
+        // 收集表单中的数据(找到每一个字段)
+        //  $("#regForm").serialize()  // 所有字段数据 + csrf_token
+        // 数据通过ajax发送到后台
+        $.ajax({
+            url: "{% url 'register' %}",
+            type: "POST",
+            data: $("#regForm").serialize()  // 所有字段数据 + csrf_token
+            dataType: "JSON"
+            success: function (res) {
+                console.log(res)
+            }
+        })
+```
 
+##### 6.3.2 数据校验(每个字段)
 
+使用ModelForm钩子方法校验
 
+##### 6.3.3写入数据库
+
+##### 6.3.4 500BUG
+
+前端
+
+![image-20231101180251855](imge/WEB开发.assets/image-20231101180251855.png)
+
+后台
+
+![image-20231101180317276](imge/WEB开发.assets/image-20231101180317276.png)
+
+验证失败，数据为空，数据库报错
+
+解决办法：
+
+验证码校验，加手机号判断
+
+![image-20231101181600402](imge/WEB开发.assets/image-20231101181600402.png)
 
 
 

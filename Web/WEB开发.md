@@ -6560,6 +6560,14 @@ urlpatterns = [
 ##### 6.2.6 成功失败
 
 - 失败，错误信息
+
+  ```html
+  $.each(res.error,function (key,value){
+  	$("#id_" + key).next().text(value[0]);}
+  ```
+
+  
+
 - 成功，倒计时
 
 #### 6.3 点注册

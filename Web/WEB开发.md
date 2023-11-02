@@ -6652,7 +6652,7 @@ function bindClickSubmit() {
 
 ![image-20231101181600402](imge/WEB开发.assets/image-20231101181600402.png)
 
-### 七、实现登录
+### 七、实现登录&注销
 
 #### 7.1 短信登录
 
@@ -6666,11 +6666,57 @@ function bindClickSubmit() {
 
 ##### 7.2.1 图片验证码
 
+```python
+def image_code(request):
+    """ 生成图片验证码 """
+    from utils.image_code import check_code
+    image_object, code = check_code()
+    # 写入session,60s过期
+    request.session["image_code"] = code
+    request.session.set_expiry(60)  # 主动修改session过期时间
+    # 3. 写入内存(Python3)
+    from io import BytesIO
+    stream = BytesIO()
+    image_object.save(stream, 'png')
+
+    return HttpResponse(stream.getvalue())
+```
+
+###### 点击更换图片
+
+```PYTHON
+<img src="{% url 'image_code' %}" id="imageCode" title="点击更换图片">
+
+$(function () {
+    $("#imageCode").click(function () {
+        var oldSrc = $(this).attr('src');
+        $(this).attr('src', oldSrc + "?");
+    })
+})
+```
+
+效果：
+
+![image-20231102102650011](imge/WEB开发.assets/image-20231102102650011.png)
+
 ##### 7.2.2 Session & Cookie
 
 ##### 7.2.3 页面显示
 
 ##### 7.2.4 登录
+
+#### 7.3 注销
+
+### 八、django离线脚本
+
+```
+离线：非django运行时
+脚本：一个或几个py文件
+```
+
+
+
+
 
 
 

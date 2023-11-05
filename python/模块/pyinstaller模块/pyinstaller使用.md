@@ -46,6 +46,12 @@ pyinstaller --help
 
 `pyinstaller -F<单个可执行程序文件> -n chengxu<exe程序名> name.py<需要打包的py文件> -i icon.icon<exe图标> `
 
+```
+pyinstaller -F -n chengxu main.py -w
+```
+
+
+
 图标使用介绍
 
 ```python

@@ -6486,7 +6486,7 @@ django中使用redis:
 ##### 6.1.2 模板路径处理
 
 - 按照app注册顺序，查找模板
-- 多app情况下：static/templates/app01/模板文件
+- 多app情况下：templates/app01/模板文件
 
 ##### 6.1.3 母版准备
 

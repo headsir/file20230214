@@ -34,8 +34,10 @@ pipenv --python 3.7  # 也可指定具体版本
 ```
 pipenv install  "" # 安装本地包到虚拟环境
 pipenv install 模块  # 模块安装
-pipenv install --dev  # 安装所有依赖
+pipenv install --dev  # 安装开发包和默认包
 pipenv install -r requirements.txt  # 导入requirements.txt 需要转码为UTF-8
+# 只安装开发包
+pipenv install -r --dev requirements.txt 
 
 官方		https://pypi.org/simple
 华为镜像源  https://mirrors.huaweicloud.com/
@@ -72,9 +74,9 @@ pipenv  uninstall --all  # 卸载全部包
 ```
 导出虚拟环境安装的包
 方法1：pipenv run pip freeze > requirements.txt # 相当于【pipenv run pip freeze】
-方法2：pipenv lock -r > requirements.txt
+方法2：pipenv  requirements >requirements.txt
 
-导出开发用的包：pipenv lock -r --dev > requirements.txt
+导出开发用的包：pipenv requirements --dev > requirements.txt
 ```
 
 #### 3.5 其它

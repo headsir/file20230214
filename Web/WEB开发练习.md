@@ -1,15 +1,52 @@
-# 案例：题库管理系统（question bank）
+# 案例：题库管理系统
 
-开发环境：
+英文名：question bank management syste
+
+简称：QuestionBankManagementSys
+
+---
+
+## 开发环境：
+
+- python版本：3.9.13
 
 - django版本：
 
-- python版本：
+## 创建项目
 
-  
+```
+"D:\ProgramData\virtual directory\python_learing-uJLLoHwc\Scripts\django-admin.exe" startproject QuestionBankManagementSys
+```
 
-- URL设置
-  - 网优试题（network optimization）
-  - 其它试题（other）:暂时预留
-- 表结构设计
-- 页面设计
+
+
+
+
+## 创建app
+
+## 本地配置
+
+- 创建自己本地 local_settings.py
+- git忽略文件.gitignore配置
+
+## 系统构思
+
+注册功能
+
+登录功能
+
+题库展示
+
+题库导入
+
+试题学习
+
+试题练习
+
+错题收集
+
+错题练习
+
+## 注册功能
+
+## 登录功能

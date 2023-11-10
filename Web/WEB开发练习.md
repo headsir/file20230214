@@ -67,6 +67,10 @@
   !**/migrations/__init__.py
   ```
 
+## 数据库
+
+使用sqlite3本地数据库
+
 ## 创建app
 
 采用多app模式。

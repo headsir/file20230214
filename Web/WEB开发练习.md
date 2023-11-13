@@ -296,5 +296,11 @@ http://127.0.0.1:8000/media/Python程序开发的全流程.jpg
 ## 题库展示
 
 - URL准备
+
+  ```PYTHON
+  path(r'question/list/', question.question_list, name="question_list"),
+  ```
+
 - 数据表结构设计
+
 - 页面样式

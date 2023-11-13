@@ -10,7 +10,7 @@ import sys
 
 time模块介绍：
 
-[ee](../../../底层模块/Datetime_time.md)
+[time](../../../底层模块/Datetime_time.md)
 
 
 

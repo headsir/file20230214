@@ -284,6 +284,9 @@ indent-rainbow 缩进渲染
 graph LR
 	id1[数字] -.-> id2["整形(int)：不带小数点的数字"]
 	id1[数字] -.-> id3["浮点型(float)：带小数点的数字"]
+	id1[数字] -.-> id4["复数(complex)：包含实部和虚部，分别以一个浮点数表示"]
+	
+	id3-.->id5["有关你的程序运行所在机器上浮点数的精度和内部表示法可在 sys.float_info 中查看"]
 ```
 
 ### 3.3.2、字符串(str)
@@ -415,6 +418,113 @@ Python3.6新加特性，前缀f用来格式化字符串。可以看出f前缀可
 而且加上f前缀后,支持在大括号内,运行Python表达式。
 你还可以用fr前缀来表示原生字符串。
 ```
+
+#### 字符串的方法
+
+- str.capitalize()  
+
+  > 返回原字符串的副本，其首个字符大写，其余为小写
+
+  > 举例：print(str.capitalize("abc"))
+
+- str.casefold()  
+
+  > 返回原字符串消除大小写的副本。 消除大小写的字符串可用于忽略大小写的匹配。
+
+  > 举例：print("ABc".casefold())
+
+- str.center(*width*[, *fillchar*])  
+
+  > 返回长度为 *width* 的字符串，原字符串在其正中。 使用指定的 *fillchar* 填充两边的空位（默认使用 ASCII 空格符）。 如果 *width* 小于等于 `len(s)` 则返回原字符串的副本。
+
+  > 举例：print("abc".center(7,"="))
+
+- str.count(*sub*[, *start*[, *end*]])
+
+  > 返回子字符串 *sub* 在 [*start*, *end*] 范围内非重叠出现的次数。 可选参数 *start* 与 *end* 会被解读为切片表示法。
+  >
+  > 如果 *sub* 为空，则返回字符之间的空字符串数，即字符串的长度加一。
+
+  > 举例：print("ABADc".count("A",0,4))
+
+- str.encode(*encoding='utf-8'*, *errors='strict'*)
+
+  > 返回编码为 [`bytes`](https://docs.python.org/zh-cn/3.12/library/stdtypes.html#bytes) 的字符串。
+
+  > 举例：print("ABADc".encode(encoding="utf-8"))
+
+- str.endswith(*suffix*[, *start*[, *end*]])
+
+  > 如果字符串以指定的 *suffix* 结束返回 `True`，否则返回 `False`。 *suffix* 也可以为由多个供查找的后缀构成的元组。 如果有可选项 *start*，将从所指定位置开始检查。 如果有可选项 *end*，将在所指定位置停止比较。
+
+  > 举例：print("ABADc".endswith("B",0,2))
+
+- str.expandtabs(*tabsize=8*)
+
+  > 把字符串中的 tab 符号 \t 转为空格，tab 符号 \t 默认的空格数是 8，在第 0、8、16...等处给出制表符位置，如果当前位置到开始位置或上一个制表符位置的字符数不足 8 的倍数则以空格代替。
+
+  > 举例：
+  >
+  > ```python
+  > tr = "runoob\t12345\tabc"
+  > print('原始字符串: {}'.format(str))
+  > 
+  > # 默认 8 个空格
+  > # runnob 有 6 个字符，后面的 \t 填充 2 个空格
+  > # 12345 有 5 个字符，后面的 \t 填充 3 个空格
+  > print('替换 \\t 符号: {}'.format(str.expandtabs()))
+  > 
+  > # 2 个空格
+  > # runnob 有 6 个字符，刚好是 2 的 3 倍，后面的 \t 填充 2 个空格
+  > # 12345 有 5 个字符，不是 2 的倍数，后面的 \t 填充 1 个空格
+  > print('使用 2 个空格替换 \\t 符号: {}'.format(str.expandtabs(2)))
+  > 
+  > # 3 个空格
+  > print('使用 3 个空格: {}'.format(str.expandtabs(3)))
+  > 
+  > # 4 个空格
+  > print('使用 4 个空格: {}'.format(str.expandtabs(4)))
+  > 
+  > # 5 个空格
+  > print('使用 5 个空格: {}'.format(str.expandtabs(5)))
+  > 
+  > # 6 个空格
+  > print('使用 6 个空格: {}'.format(str.expandtabs(6)))
+  > ```
+  >
+  > 输出结果：
+  >
+  > ```python
+  > 原始字符串: runoob	12345	abc
+  > 替换 \t 符号: runoob  12345   abc
+  > 使用 2 个空格替换 \t 符号: runoob  12345 abc
+  > 使用 3 个空格: runoob   12345 abc
+  > 使用 4 个空格: runoob  12345   abc
+  > 使用 5 个空格: runoob    12345     abc
+  > 使用 6 个空格: runoob      12345 abc
+  > ```
+
+- str.find(*sub*[, *start*[, *end*]])
+
+  > 返回子字符串 *sub* 在 `s[start:end]` 切片内被找到的最小索引。 可选参数 *start* 与 *end* 会被解读为切片表示法。 如果 *sub* 未被找到则返回 `-1`。
+
+  > 举例：print("runoob\t12345\tabcoob".find("oob", 1,7))
+
+- `str.format(**args, ***kwargs)` 
+
+  > 执行字符串格式化操作。 调用此方法的字符串可以包含字符串字面值或者以花括号 `{}` 括起来的替换域。 每个替换域可以包含一个位置参数的数字索引，或者一个关键字参数的名称。 返回的字符串副本中每个替换域都会被替换为对应参数的字符串值
+
+  > 举例：参见[案例](#字符串格式化（三种） "字符串格式化（三种）")
+
+- str.format_map(*mapping*)
+
+  > 类似于 `str.format(**mapping)`，不同之处在于 `mapping` 会被直接使用而不是复制到一个 dict 。 适宜使用此方法的一个例子是当 `mapping` 为 dict 的子类的情况：
+
+  > 举例：print( "{a}ddddd{age}".format_map({"a":"key","age":32}))
+
+....未完[https://docs.python.org/zh-cn/3.12/library/stdtypes.html#str.find]
+
+
 
 
 

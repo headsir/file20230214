@@ -1,3 +1,5 @@
+https://zhuanlan.zhihu.com/p/355304094
+
 # pyinstaller打包程序
 
 # 安装pyinstaller
@@ -85,3 +87,14 @@ pyinstaller httpclient.py --noconsole --hidden-import PySide2.QtXml --icon="logo
 
 
 
+## **多进程打包**
+
+如果py程序是多进程的话，使用pyinstaller打包会出现错误，这个时候只要加上一行代码
+
+在：
+
+```text
+    if __name__=='__mian__':
+        #新增下面一行代码即可打包多进程
+        multiprocessing.freeze_support()  
+```

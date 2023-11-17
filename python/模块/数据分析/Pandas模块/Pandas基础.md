@@ -555,6 +555,14 @@ pd.read_excel(io, sheet_name=0, header=0, names=None, index_col=None,
   }
   ```
   
+  ```python
+  df = pd.read_csv(file_paths, dtype={
+      '网元ID': str,
+      'cellId': str,
+      "CU小区不在服总时长(s)": str
+  })
+  ```
+  
 - 其它
 
   涉及行、列索引设置及指定导入某列，设定方法与导入 .xlsx 文件一致。

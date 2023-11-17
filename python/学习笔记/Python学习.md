@@ -1,3 +1,44 @@
+# Python之禅
+
+```python
+Beautiful is better than ugly.
+精美优于丑陋。
+Explicit is better than implicit.
+明确优于含混。
+Simple is better than complex.
+简明优于繁复。
+Complex is better than complicated.
+繁复优于难懂。
+Flat is better than nested.
+平铺直叙优于构架交错。
+Sparse is better than dense.
+错落有致优于密密麻麻。
+Readability counts.
+易读性很必要。
+Special cases aren't special enough to break the rules. Although practicality beats purity.
+尽管在按部就班面前，实用性更重要，但是在规则面前没有特例。
+Errors should never pass silently. Unless explicitly silenced.
+错误不应被轻易的放过，除非故意如此。
+In the face of ambiguity, refuse the temptation to guess.
+在模棱两可的时候不要试图去盲目测试。
+There should be one-- and preferably only one --obvious way to do it.
+一定有一种明显的方法去解决它，最好是唯一一种。
+Although that way may not be obvious at first unless you're Dutch.
+尽管在开始时没有那么显而易见，除非你是个荷兰人。（Python创始人是个荷兰人，或是调侃复杂问题像是看荷兰语）
+Now is better than never. Although never is often better than *right* now.
+尽管从不开始经常好过于不暇思索立马就做，但是现在仍优于从不开始。
+If the implementation is hard to explain, it's a bad idea.
+如何执行方案很难解释，那这行不通。
+If the implementation is easy to explain, it may be a good idea.
+如果执行方案很容易解释，那这或许是个好主意。
+Namespaces are one honking great idea -- let's do more of those!
+命名空间是个超级棒的主意，让我们多一些这样的想法。
+```
+
+---
+
+# 学习参考
+
 Python ==**官方文档**== https://docs.python.org/zh-cn/3.11/archives/python-3.11.0-docs-pdf-a4.zip
 
 ==简明== Python 教程http://home.ustc.edu.cn/~hyx/bak/python/index.html
@@ -9,6 +50,8 @@ Python ==**官方文档**== https://docs.python.org/zh-cn/3.11/archives/python-3
 白月黑羽教程https://www.byhy.net/
 
 【Python Qt 图形界面程序开发项目实战】https://www.bilibili.com/video/BV19A411H7dS?p=6&vd_source=d6c3edd9a4f6205095ccfba6b2a61eec
+
+----
 
 # 一、安装Python
 
@@ -1662,6 +1705,21 @@ print(sorted(cars, key=reverse))   # 翻转排序
 ## 5.11 repr() 方法
 
 repr() 方法可以将读取到的格式字符，比如换行符、制表符，转化为其相应的转义字符。
+
+## 5.12 函数标注
+
+函数标注通常用于 类型提示：例如以下函数预期接受两个 int 参数并预期返回一个 int 值:
+
+```python
+def sum_two_numbers(a: int, b: int) -> int:
+   return a + b
+```
+
+
+
+
+
+
 
 
 

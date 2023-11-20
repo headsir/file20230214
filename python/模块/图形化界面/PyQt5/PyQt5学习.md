@@ -1651,3 +1651,34 @@ if __name__ == "__main__":
 
 ```
 
+# 六、中文路径解决方法
+
+方案一：
+
+```python
+import sys, os
+import os.path
+
+from PyQt5.QtCore import *
+QCoreApplication.addLibraryPath(r'.\site-packages\PyQt5\Qt5\plugins')  #### 这一行是新增的。用的是相对路径。
+
+from PyQt5.QtWidgets import *
+
+app = QApplication([])
+```
+
+方案二：
+
+```python
+#  vim: set ts=4 sw=4 tw=0 et ft=python :
+import sys, os
+import os.path
+
+os.environ['QT_QPA_PLATFORM_PLUGIN_PATH'] = r'.\site-packages\PyQt5\Qt5\plugins'  #### 这一行是新增的。用的是相对路径。
+
+from PyQt5.QtCore import *
+from PyQt5.QtWidgets import *
+
+app = QApplication([])
+```
+

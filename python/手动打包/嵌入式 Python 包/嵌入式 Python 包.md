@@ -32,6 +32,9 @@ Lib\site-packages
 # 套壳方式使用
 
 来源：https://github.com/skywind3000/PyStand
+
+案例文件：https://files.cnblogs.com/files/blogs/685292/PyStand-py39-x64.zip?t=1700739105&download=true
+
 使用系统：WIN10及以上
 
 "PyStand-py39-x64\runtime"  python嵌入式软件目录

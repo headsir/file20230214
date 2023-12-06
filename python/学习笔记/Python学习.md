@@ -2793,6 +2793,8 @@ project_name
 
 ​		|- README.md  # 程序说明文件
 
+​		|- .gitignore # git忽略文件设置
+
 工程包含：`main.py`、`config.ini`文件
 
 - `main.py`文件：用于脚本代码的编写，是工程的主入口，必须定义一个execute(**kw)函数作为脚本程序的主入口
@@ -3197,7 +3199,7 @@ logger = logger()
 
 def read_csv_diy(paths):
     f = open(paths,'rb')
-    encode = detect(f.read(100))['enconding']
+    encode = detect(f.read(100))['encoding']
     logger.info(encode)
     if encode == 'utf-8':
         data = pd.read_csv(paths,encoding='utf-8')

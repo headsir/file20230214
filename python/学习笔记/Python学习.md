@@ -3113,6 +3113,149 @@ def validate_input(func):
     # Your old data processing code here
 ```
 
+# 十二、Python库
+
+## 12.1 Dash
+
+Dash是比较新的软件包，它是用纯Python构建数据可视化app的理想选择，因此特别适合处理数据的任何人。Dash是Flask，Plotly.js和React.js的混合体。
+
+![image-20231206090553145](imge/Python学习.assets/image-20231206090553145.png)
+
+## 12.2 Pygame
+
+Pygame是SDL多媒体库的Python装饰器，SDL(Simple DirectMedia Layer)是一个跨平台开发库，旨在提供对以下内容的低级接口：
+
+- 音频
+- 键盘
+- 鼠标
+- 游戏杆
+- 基于OpenGL和Direct3D的图形硬件
+
+Pygame具有高度的可移植性，几乎可以在所有平台和操作系统上运行。尽管它具有完善的游戏引擎，但您也可以使用此库直接从Python脚本播放MP3文件
+
+## 12.3 Pillow
+
+Pillow专门用于处理图像，您可以使用该库创建缩略图，在文件格式之间转换，旋转，应用滤镜，显示图像等等。如果您需要对许多图像执行批量操作，这是理想的选择。
+
+## 12.4 Colorama
+
+Colorama允许你在终端使用颜色，非常适合Python脚本，文档简短而有趣，可以在Colorama PyPI页面上找到
+
+## 12.5 JmesPath
+
+在Python中使用JSON非常容易，因为JSON在Python字典上的映射非常好。此外，Python带有自己出色的json库，用于解析和创建JSON。对我来说，这是它最好的功能之一。如果我需要使用JSON，可以考虑使用Python。
+
+JMESPath使Python处理JSON更加容易，它允许您明确的地指定如何从JSON文档中提取元素。
+
+## 12.6 Requests
+
+Requests建立在世界上下载量最大的Python库urllib3上，它令Web请求变得非常简单，功能强大且用途广泛。
+
+Requests可以完成您能想到的所有高级工作，例如：
+
+- 认证
+- 使用cookie
+- 执行POST，PUT，DELETE等
+- 使用自定义证书
+- 使用会话Session
+- 使用代理
+
+## 12.7 Simplejson
+
+Python中的本地json模块有什么问题？没有！实际上，Python的json是simplejson。意思是，Python采用了simplejson的一个版本，并将其合并到每个发行版中。但是使用simplejson具有一些优点：
+
+- 它适用于更多Python版本。
+- 它比Python随附的版本更新频率更高。
+- 它具有用C编写的（可选）部分，因此非常快速。
+
+由于这些事实，您经常会在使用JSON的脚本中看到以下内容：
+
+![img](imge/Python学习.assets/v2-01b1481df9ff378a1c33a8a222c0eecb_720w.webp)
+
+我将只使用默认的json，除非您特别需要：
+
+- 速度
+- 标准库中没有的东西
+
+Simplejson比json快很多，因为它用C实现一些关键部分。除非您正在处理数百万个JSON文件，否则您不会对这种速度感兴趣。
+
+## 12.8. Emoji
+
+Emoji库非常有意思，但并非每个人都喜欢表情包，分析视角媒体数据时，Emoji包非常有用。
+
+![image-20231206091410644](imge/Python学习.assets/image-20231206091410644.png)
+
+## 12.9. Chardet
+
+您可以使用chardet模块来检测文件或数据流的字符集。例如，这在分析大量随机文本时很有用。但是，当您不知道字符集是什么时，也可以在处理远程下载的数据时使用它。
+
+```python
+from nemo.log import logger
+from chardet import detect
+
+logger = logger()
+
+def read_csv_diy(paths):
+    f = open(paths,'rb')
+    encode = detect(f.read(100))['enconding']
+    logger.info(encode)
+    if encode == 'utf-8':
+        data = pd.read_csv(paths,encoding='utf-8')
+    if encode == 'GB2312':
+        try:
+            data = pd.read_csv(paths,encoding='gbk')
+        except UnicodeDecodeError:
+            data = pd.read_csv(paths,encoding='GB18030')
+    if encode == 'UTF-8-SIG':
+        data = pd.read_csv(paths,encoding='UTF-8-SIG')
+    if encode == 'iso-8859-1':
+        data = pd.read_csv(paths,encoding='gbk')
+    else:
+        logger.info("文件编码不可读")
+        data = pd.DataFrame()
+    return data
+```
+
+## 12.10. Python-dateutil
+
+python-dateutil模块提供了对标准datetime模块的强大扩展。我的经验是，常规的Python日期时间功能在哪里结束，而python-dateutil就出现了。
+
+您可以使用此库做很多很棒的事情。我将这些示例限制为我发现特别有用的示例：模糊分析日志文件中的日期，例如：
+
+![image-20231206091712908](imge/Python学习.assets/image-20231206091712908.png)
+
+## 12.11. 进度条：progress和tqdm
+
+这里有点作弊，因为这是两个包，但忽略其中之一是不公平的。
+
+您可以创建自己的进度条，这也许很有趣，但是使用progress或tqdm程序包更快，更不容易出错。
+
+## 12.12. IPython
+
+IPython是Jupyter Notebook的核心，它是一个开放源代码Web应用程序，可让您创建和共享包含实时代码，方程式，可视化效果和叙述文本的文档。
+
+## 12.13. 房屋自动化Homeassistant
+
+## 12.14. Flask
+
+Flask是我的入门库，用于创建快速的Web服务或简单的网站。这是一个微框架，这意味着Flask旨在使核心保持简单但可扩展。
+
+## 12.15. BeautifulSoup
+
+如果您从网站上提取了一些HTML，则需要对其进行解析以获取实际所需的内容。Beautiful  Soup是一个Python库，用于从HTML和XML文件中提取数据。它提供了导航，搜索和修改解析树的简单方法。它非常强大，即使损坏了，也能够处理各种HTML。相信我，HTML经常被破坏，所以这是一个非常强大的功能。
+
+它的一些主要功能：
+
+- Beautiful Soup会自动将传入文档转换为Unicode，将传出文档转换为UTF-8。您无需考虑编码。
+- Beautiful Soup位于流行的Python解析器（如lxml和html5lib）的顶部，使您可以尝试不同的解析策略或提高灵活性。
+- BeautifulSoup会解析您提供的任何内容，并为您做遍历树的工作。您可以将其告诉“查找所有链接”，或“查找带有粗体的表格标题，然后给我该文字。”
+
+
+
+
+
+
+
 
 
 

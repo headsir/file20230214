@@ -26,43 +26,68 @@ configparser.ConfigParser().read("Config.ini", encoding="utf-8")
 
 
 
-
+封装
 
 ```
 # -*- coding: utf-8 -*-
+"""
+更新日期：202301212
+"""
 
-
-import configparser
 import os
+import configparser
+from chardet import detect
 
-class ReadConfig():
-    def __init__(self, configDir):
 
+class GetConfig:
+    def __init__(self, config_file):
+        """
+        初始化配置文件【.ini】
+        :param config_file: 配置文件路径
+        """
+        f = open(config_file, 'rb')
+        encode = detect(f.read(10))['encoding']
+        if encode not in ["utf-8"]:
+            raise Exception("【%s】文件编码【%s】不可读" % (config_file, encode))
+        # 实例化配置文件对象
         self.cf = configparser.ConfigParser()
-
-        if os.path.isfile(configDir):  # 判断文件是否存在
-            self.cf.read(configDir, encoding="utf8")
+        # 读取配置文件
+        if os.path.isfile(config_file):  # 判断文件是否存在
+            self.cf.read(config_file, encoding="utf8")
         else:  # 不存在报错
             raise FileNotFoundError
 
     def getSectionValue(self, section):
-        # if section in self.cf.sections():  # 判断节点是否存在
+        """
+        获取某一节点的所有配置
+        :param section: 节点名
+        :return: 节点配置，类型：字典
+        """
+        # if section in self.cf.sections():  # 判断节点是否存在，cf.sections 节点列表
+
+        # 指示配置中是否存在指定的节
         if self.cf.has_section(section):  # 判断节点是否存在
             return dict(self.cf.items(section))
         else:
-            print("【{}】不存在".format(section))
-            return "【{}】不存在".format(section)
+            raise Exception("【{}】不存在".format(section))
 
     def getOptionsValue(self, section, options):
+        """
+        获取某一节点下某一项配置
+        :param section: 节点名
+        :param options: 配置项名
+        :return: 某一项配置，类型：字符串
+        """
+        # 指示配置中是否存在指定的节
         if self.cf.has_section(section):
+            # 检查给定部分中给定选项是否存在
             if self.cf.has_option(section, options):  # 判断节点是否存在
                 return self.cf.get(section, options)
             else:
-                print("【{0}】不存在".format(options))
-                return "【{0}】不存在".format(options)
+                raise Exception("【{0}】不存在".format(options))
         else:
-            print("【{0}】不存在".format(section))
-            return "【{0}】不存在".format(section)
+            raise Exception("【{0}】不存在".format(section))
+
 
 # 配置文件地址
 configDir = r"./v20220716/config.ini"

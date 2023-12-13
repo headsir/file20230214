@@ -30,6 +30,30 @@ sys模块包括了一组非常实用的服务，内含很多函数方法和变�
 
 ​	[用法](https://zhuanlan.zhihu.com/p/377418978)
 
+```python
+# 将控制台输出保存到文件
+class Logger(object):
+
+    def __init__(self, filename='log/log.txt', stream=sys.stdout):
+        self.terminal = stream
+        self.log = open(filename, 'a')
+
+    def write(self, message):
+        # 输出到命令行
+        self.terminal.write(message)
+        # 输出到文件
+        self.log.write(message)
+
+    def flush(self):
+        pass
+
+
+# 之后的控制台输出内容输出到【log/log.txt】文件
+sys.stdout = Logger(stream=sys.stdout)
+```
+
+
+
 ## 6、标准输入
 
 ​		`sys.stdin.readline()[:-1]`

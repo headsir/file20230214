@@ -28,6 +28,8 @@ pip install xlwings
   df = rang.options(pd.DataFrame, expand='table').value
   ```
 
+  备注：A列数据为索引列，可使用reset_index()重置索引。
+
 - pandas数据写入
 
   ```
@@ -200,7 +202,7 @@ xw.sheets.add(name=None,before=None,after=None)
 xw.sheets.active
 ```
 
-#### 3、rang常用的api
+#### 3、range常用的api
 
 ```python
 # 引用当前活动工作表的单元格

@@ -67,11 +67,18 @@ from openpyxl import load_workbook
 # 读取Excel文件
 wb = load_workbook('example.xlsx')
 sheet = wb['Sheet1'] # 选择要操作的工作表名称或索引号
+
+方法一：
 dataframe = []
 for row in sheet.iter_rows(values_only=True):
     dataframe.append(row)
 df = pd.DataFrame(dataframe[1:], columns=[cell for cell in dataframe[0]])
 print(df)
+
+方法二：
+df = pd.DataFrame(sheet.values)
+df.columns = df.iloc[[0]].values.tolist()
+df = df.drop(df.index[[0]] , axis = 0)
 ```
 
 

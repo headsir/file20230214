@@ -77,8 +77,15 @@ print(df)
 
 方法二：
 df = pd.DataFrame(sheet.values)
-df.columns = df.iloc[[0]].values.tolist()
-df = df.drop(df.index[[0]] , axis = 0)
+df.columns = df.iloc[[0]].values[0]
+df = df.iloc[1:]
+```
+
+## pandas数据类型转openpyxl
+
+```python
+for i in df.values:
+    ws.append(i.tolist())
 ```
 
 

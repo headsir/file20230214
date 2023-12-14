@@ -58,6 +58,26 @@ wb = Workbook(write_only=True)
     ...     print(sheet.title)
 ```
 
+## 转pandas数据类型：
+
+```python
+import pandas as pd
+from openpyxl import load_workbook
+ 
+# 读取Excel文件
+wb = load_workbook('example.xlsx')
+sheet = wb['Sheet1'] # 选择要操作的工作表名称或索引号
+dataframe = []
+for row in sheet.iter_rows(values_only=True):
+    dataframe.append(row)
+df = pd.DataFrame(dataframe[1:], columns=[cell for cell in dataframe[0]])
+print(df)
+```
+
+
+
+
+
 # 三、保存
 
 ## 保存到流中在网络中使用：
@@ -249,17 +269,17 @@ wb = Workbook(write_only=True)
 
 使用`Worksheet.values`属性遍历工作表中的所有行，但只返回单元格值：
 
-```
-    for row in ws.values:
-       for value in row:
-         print(value)
+```python
+for row in ws.values:
+    for value in row:
+        print(value)
 ```
 
 `Worksheet.iter_rows()`和`Worksheet.iter_cols()`可以设置`values_only`参数来仅返回单元格的值：
 
-```
-    >>> for row in ws.iter_rows(min_row=1, max_col=3, max_row=2, values_only=True):
-    ...   print(row)
-    (None, None, None)
-    (None, None, None)
+```python
+for row in ws.iter_rows(min_row=1, max_col=3, max_row=2, values_only=True):
+	print(row)
+(None, None, None)
+(None, None, None)
 ```

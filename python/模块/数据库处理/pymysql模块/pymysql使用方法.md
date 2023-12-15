@@ -12,7 +12,6 @@ class Model(object):
     def __init__(self, username='root', password='123456', database='demo',
                  port=3306, host='localhost'):
         """
-
         :param username: MySQL 用户名
         :param password: MySQL 密码
         :param database: 数据库名称

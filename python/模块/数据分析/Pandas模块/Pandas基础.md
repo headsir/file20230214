@@ -585,7 +585,7 @@ pd.read_excel(io, sheet_name=0, header=0, names=None, index_col=None,
 
 #### 2.1.4 导入SQL文件
 
-导入方法：read_read_sql()
+导入方法：read_sql()
 
 利用 sqlalchemy 模块连接数据库
 

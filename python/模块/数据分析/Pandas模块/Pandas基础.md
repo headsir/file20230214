@@ -2355,23 +2355,7 @@ DataFrame.to_excel(excel_writer, sheet_name='Sheet1', na_rep='', float_format=No
 
 通过参数 inf_rep 设置填充值
 
-### 9.2 导出为 .csv 文件
-
-利用 to_csv() 方法。
-
-#### 9.2.1 设置文件导出路径
-
-通过参数 path_or_buf 设置文件导出路径，举例：df.to_excel(path_or_buf = "文件保存路径")
-
-#### 9.2.2 设置分隔符号
-
-通过参数 sep 指明分隔符号，常用分隔符：逗号、空格、制表符、分号等
-
-#### 9.2.3 设置编码格式
-
-通过参数 encoding 设置，默认为 UTF-8 ，中文会乱码，一般使用 utf-8-sig 、gbk
-
-#### 9.2.3 在新建文件中添加多个Sheet
+#### 9.1.8 在新建文件中添加多个Sheet
 
 利用 ExcelWriter() 函数，参数 engine 设置所使用的包，举例：
 
@@ -2383,7 +2367,7 @@ df3.to_excel(writer,sheet_name = "df3",index = False)
 writer.save()
 ```
 
-#### 9.2.4 在已存在文件中添加Sheet
+#### 9.1.9 在已存在文件中添加Sheet
 
 利用 openpyxl 模块
 
@@ -2407,6 +2391,22 @@ with pd.ExcelWriter(path_file, engine="openpyxl") as writer:
     data.to_excel(excel_writer=writer, sheet_name=sheeetname, index=False)  # index=False,忽略行标签
     writer.save()
 ```
+
+### 9.2 导出为 .csv 文件
+
+利用 to_csv() 方法。
+
+#### 9.2.1 设置文件导出路径
+
+通过参数 path_or_buf 设置文件导出路径，举例：df.to_excel(path_or_buf = "文件保存路径")
+
+#### 9.2.2 设置分隔符号
+
+通过参数 sep 指明分隔符号，常用分隔符：逗号、空格、制表符、分号等
+
+#### 9.2.3 设置编码格式
+
+通过参数 encoding 设置，默认为 UTF-8 ，中文会乱码，一般使用 utf-8-sig 、gbk
 
 ## 9.3 导出mysql数据库
 

@@ -74,13 +74,53 @@ designer界面如下：
 
 ![image-20231219112603776](imge/Pyside2学习.assets/image-20231219112603776.png)
 
-组件选择区：用来选择组件，鼠标选择组件后就可以拖拽到窗口界面上，在本教程中会使用到一部分这里的组件。
+#### 组件选择区：
 
-工作区：用来布置界面，调整窗口，我们可以把工作区中的窗口随意拖拽、调整大小；
+用来选择组件，鼠标选择组件后就可以拖拽到窗口界面上，在本教程中会使用到一部分这里的组件。
 
-对象查看区：查看界面上共有多少组件，以及它们的布局关系；
+##### 布局组件
 
-属性设置区：设置组件的属性，如文本、大小、名称等。
+![image-20231226162328756](imge/Pyside2学习.assets/image-20231226162328756.png "布局组件")
+
+##### 间隔组件
+
+![image-20231226162509645](imge/Pyside2学习.assets/image-20231226162509645.png "间隔组件")
+
+##### 按钮组件
+
+![image-20231226162833551](imge/Pyside2学习.assets/image-20231226162833551.png "按钮组件")
+
+##### 视图组件
+
+![image-20231226163350430](imge/Pyside2学习.assets/image-20231226163350430.png "视图组件")
+
+##### 部件组件
+
+![image-20231226163614412](imge/Pyside2学习.assets/image-20231226163614412.png "部件组件")
+
+##### 容器组件
+
+![image-20231226164228621](imge/Pyside2学习.assets/image-20231226164228621.png "容器组件")
+
+##### 输入小部件
+
+![image-20231226165153781](imge/Pyside2学习.assets/image-20231226165153781.png "输入小部件")
+
+##### 显示部件
+
+![image-20231226170039301](imge/Pyside2学习.assets/image-20231226170039301.png "显示部件")
+
+#### 工作区：
+
+用来布置界面，调整窗口，我们可以把工作区中的窗口随意拖拽、调整大小；
+
+#### 对象查看区：
+
+查看界面上共有多少组件，以及它们的布局关系；
+
+#### 属性设置区：
+
+设置组件的属性，如文本、大小、名称等。
 
 这里我们先把工作区中的窗口拖放到中间，再从组件选择区里拖拽一个Label组件到窗口上，如下图所示：
 
@@ -268,7 +308,7 @@ if __name__ == "__main__":
 
 ![image-20231226124821040](imge/Pyside2学习.assets/image-20231226124821040.png "放置个Label")
 
-### 案例		
+### 主窗口（QMainWindow）案例
 
 ​		现在，我们准备实现这样一个程序，单击动作1或动作2，更改Label显示不同的文本，同时状态栏记录我们当前的鼠标正在点击哪个选项。
 
@@ -345,6 +385,331 @@ if __name__ == "__main__":
 ​		我们执行这个py文件，在显示的界面中点击菜单1中的选项1或选项2，会发现Label和状态栏显示的文字会发生变化，而状态栏显示的文字会随着鼠标再次移动到菜单栏上而消失（不是bug，状态栏的设计就是这样的）：
 
 ![image-20231226134849353](imge/Pyside2学习.assets/image-20231226134849353.png "执行结果")
+
+
+
+## 快速入门四:
+
+### Qt的信号-槽机制
+
+​		在大多数情况下，我们希望程序在我们做出某些操作后给出正确的回应，比如，在登录流程中，我们点击登录按钮，程序就会将用户名和密码发送到服务器；或者在执行一些需要查看进度的任务时，程序会在进度条上正确显示当前的进度。那么问题来了，程序要怎么知道在我们执行操作后要进行什么回应呢？Qt使用了信号-槽机制来解决这个问题。
+
+​		信号-槽机制是Qt特有的机制，第一眼看上去，这个名称很让人费解，是因为这个机制在Qt的文档中叫做Signal and  Slot，直译过来就是这样啦，在其他文章中，基本也是这么称呼的。我倒是觉得换一种方式可能更好理解，毕竟“槽“这个东西不太形象，我们可以把信号想作是信号发射器，槽想作是信号接收器，当我们做出某些操作后（比如按下按钮），信号发射器就会向指定的信号接收器（槽）发射一个信号，然后信号接收器（槽）收到信号，对信号进行处理，最后给出回应。
+
+看到这里大家可能还是有些不太理解，接下来我们用代码来解释这个流程。
+
+我们先来看部分代码：
+
+```text
+# action1有一个triggered信号
+# trigger_action1()方法就是槽
+# 使用connect()方法将信号和槽联系起来
+# 当我们点击action1时，triggered信号就被发射出去
+# trigger_action1()槽收到信号后，就会执行方法内的代码
+self.ui.action1.triggered.connect(self.trigger_action1)
+```
+
+​		在PySide中，很多widget组件都带有不同的内置信号，比如pushButton（按钮）的clicked信号（代表被点击）、lineEdit（行编辑器）的textChanged信号（代表文本发生改变）等，这些内置的信号极大地方便了我们的日常开发，当现有的信号不足以满足我们的需求时，我们也可以自己编写信号。
+
+​		接下来我们用lineEdit（行编辑器）的textChanged信号来写一个demo。首先，我们创建如下的界面（QWidget或QMainWindow都可以）：
+
+![image-20231226151938621](imge/Pyside2学习.assets/image-20231226151938621.png "demo界面")
+
+界面上有两个组件：一个Line Edit和一个Label，我们要做的就是当在输入框中输入字符时，Label会自动变成输入框中的字符。
+
+接下来我们把这个界面保存为signal.ui文件，生成signal_ui.py文件，再新建一个main.py文件：
+
+```python
+# -*- coding: utf-8 -*-
+import sys
+from PySide2.QtWidgets import QWidget, QApplication
+from signal_ui import Ui_Form
+
+
+class MyWidget(QWidget):
+    def __init__(self):
+        super().__init__()
+        self.ui = Ui_Form()
+        self.ui.setupUi(self)
+
+        # 将lineEdit具有的textChanged信号与update_label()槽连接
+        # 这样每次当lineEdit的文本发生变化，就会执行update_label()方法
+        self.ui.lineEdit.textChanged.connect(self.update_label)
+
+    def update_label(self):
+        # 获取当前lineEdit的文本内容
+        text = self.ui.lineEdit.text()
+        # 更新label的文本
+        self.ui.label.setText(text)
+
+
+if __name__ == '__main__':
+    app = QApplication(sys.argv)
+    window = MyWidget()
+    window.show()
+    sys.exit(app.exec_())
+```
+
+![image-20231226152544509](imge/Pyside2学习.assets/image-20231226152544509.png "执行结果")
+
+## 快速入门五
+
+### 线程-QThread
+
+QThread是一个常用且非常重要的类，主要用来执行比较耗费时间的代码，这么说不太直观，我们来举个例子。
+
+​		假设我们需要开发一个倒计时程序，功能很简单，点击开始倒计时按钮后，每隔一秒在界面上显示从30到1共30个数字。首先我们准备好界面：
+
+![image-20231226153457304](imge/Pyside2学习.assets/image-20231226153457304.png "程序界面")
+
+
+
+之后将界面生成为ui_ui.py。
+
+现在界面上显示的数字为30，在我们点击“开始倒计时”按钮后，我们希望数字变成29、28、27……最后变为1。现在我们来看一下不使用QThread时，会发生什么事情。
+
+注意，这里会涉及到pushButton的使用方法。
+
+```python
+# -*- coding: utf-8 -*-
+import sys
+import time
+from PySide2.QtWidgets import QApplication, QWidget
+from ui_ui import Ui_Form
+
+
+class MyWidget(QWidget):
+    def __init__(self):
+        super().__init__()
+        self.ui = Ui_Form()
+        self.ui.setupUi(self)
+
+        # 注意：这里是按钮的点击事件
+        # 将pushButton具有的clicked信号与button_clicked()槽连接
+        # 这样每次当我们点击按钮，就会执行button()方法
+        self.ui.pushButton.clicked.connect(self.button_clicked)
+
+    def button_clicked(self):
+        # 每隔一秒，将label上显示的数字减一，直到数字为1
+        while True:
+            # 获取label上正在显示的数字，并转为int类型
+            number = int(self.ui.label.text())
+            # 判断数字是否等于1，如果为1则结束循环
+            if number == 1:
+                break
+            # 数字不为1，等待一秒
+            time.sleep(1)
+            # 将数字减一
+            number -= 1
+            # 将label更新为新数字
+            self.ui.label.setText(str(number))
+```
+
+执行代码，点击界面上的按钮，等待一会，我们会发现，数字并没有更新，并且界面卡住了，如果我们用鼠标点击界面的其他地方，会发现界面变成了下面的样子，还会显示“（未响应）”，同时，鼠标也会开始转圈圈。
+
+![image-20231226153751899](imge/Pyside2学习.assets/image-20231226153751899.png "界面卡死")
+
+再多等待一会后，程序会直接变为结束时的样子，数字直接变成了1，并没有按照我们预想的那样，从30一个一个地变化为1:
+
+![image-20231226153900363](imge/Pyside2学习.assets/image-20231226153900363.png "执行结束")
+
+为什么程序会变成这个样子呢？
+
+​		一般来说，大部分的界面程序都有一个专门负责界面显示的“渲染进程”，这里的界面程序不单单指Windows桌面程序，也包括安卓APP等其他运行环境下的界面程序。这个“渲染进程”只负责一件事，那就是刷新并显示界面，它不停地刷新界面，这样，当界面发生变化的时候，它就会及时地为我们显示变化后的界面。
+
+​		嗯，这个进程貌似很厉害的样子，可是和程序卡住有什么关系呢？这里还需要提到一个概念，就是“耗时操作”，简单来说就是耗费时间的操作，常见的有：和数据库交互、请求网络资源、磁盘IO（比如写文件、读文件）等。这些耗时操作对于我们人类来说感觉很快，但是对“渲染进程”来说简直慢的不行，因为它要不停地刷新界面，一会儿都等不了，而一旦“渲染进程”要等待其他操作时，就会发生程序的“卡死”现象。
+
+​		那么问题的原因就找到了，我们的倒计时代码和渲染进程冲突了，渲染进程必须等我们倒计时结束才会更新界面，所以我们才会在程序执行完时，看到数字变为了1，而并没有看到数字连续变化，因为这个时候，渲染进程正在等我们倒计时结束呐。
+
+​		解决的办法也很简单，那就是避免在渲染进程中执行耗时操作（渲染进程1秒都等不了，何况我们需要30秒，哈哈）。在PySide中，就是通过QThread来解决，我们使用QThread来执行耗时操作，这样，渲染进程和耗时操作就会同时进行，不会导致界面卡死。
+
+QThread的使用方式与Python原生的Thread类似，我们来看一下使用QThread后的代码，注释很多，需要耐心看：
+
+```python
+# -*- coding: utf-8 -*-
+import sys
+import time
+from PySide2.QtWidgets import QApplication, QWidget
+# 从QtCore中导入QThread、Signal和Slot
+from PySide2.QtCore import QThread, Signal, Slot
+from ui_ui import Ui_Form
+
+
+class MyWidget(QWidget):
+    def __init__(self):
+        super().__init__()
+        self.ui = Ui_Form()
+        self.ui.setupUi(self)
+
+        # 注意：这里是按钮的点击事件
+        # 将pushButton具有的clicked信号与button_clicked()槽连接
+        # 这样每次当我们点击按钮，就会执行button()方法
+        self.ui.pushButton.clicked.connect(self.button_clicked)
+
+    def button_clicked(self):
+        # 获取界面上的起始数字
+        number = int(self.ui.label.text())
+        # 注意：使用self将thread声明为属性
+        # 避免button_clicked()方法结束，thread中止
+        # 将起始数字传给thread
+        self.thread = MyThread(number)
+        # 将thread的自定义信号连接到接收信号的槽，这里就是update_label()方法
+        self.thread.signal.connect(self.update_label)
+        # 执行thread
+        self.thread.start()
+
+    # 用来接收自定义信号的方法
+    # 接收的信号应为一个int变量
+    @Slot(int)
+    def update_label(self, number):
+        # number为接收到的信号
+        # 将label更新为接收到的信号，即更新后的数字
+        self.ui.label.setText(str(number))
+ 
+
+# 继承QThread
+class MyThread(QThread):
+    # 声明一个自定义信号
+    # 信号是一个int变量
+    signal =Signal(int)
+
+    def __init__(self, number):
+        super().__init__()
+        self.number = number
+
+    def run(self):
+        # QThread启动时，将会执行这里的代码
+        # 每隔一秒，将number减一，直到数字为1
+        while True:
+            # 判断数字是否等于1，如果为1则结束循环
+            if self.number == 1:
+                break
+            # 数字不为1，等待一秒
+            time.sleep(1)
+            # 将数字减一
+            self.number -= 1
+            # 将更新好的数字通过信号传给界面
+            # emit()方法将信号发射给建立好连接的槽
+            self.signal.emit(self.number)
+
+
+if __name__ == '__main__':
+    app = QApplication(sys.argv)
+    window = MyWidget()
+    window.show()
+    sys.exit(app.exec_())
+```
+
+重新执行我们的程序，我们会发现，程序正常了，而且在完全按照我们期待的方式执行。
+
+![image-20231226155055026](imge/Pyside2学习.assets/image-20231226155055026.png "正确的结果")
+
+# 四、白月黑羽教程学习
+
+白月黑羽教程：https://www.byhy.net/tut/py/gui/qt_02/
+
+## 案例入门：
+
+现在我们要开发一个程序，让用户输入一段文本包含：员工姓名、薪资、年龄。
+
+格式如下：
+
+```py
+薛蟠     4560 25
+薛蝌     4460 25
+薛宝钗   35776 23
+薛宝琴   14346 18
+王夫人   43360 45
+王熙凤   24460 25
+王子腾   55660 45
+王仁     15034 65
+尤二姐   5324 24
+贾芹     5663 25
+贾兰     13443 35
+贾芸     4522 25
+尤三姐   5905 22
+贾珍     54603 35
+```
+
+该程序可以把薪资在 2万 以上、以下的人员名单分别打印出来。
+
+当然我们可以像以前一样，开发命令行程序（准确的说应该叫字符终端程序，因为UI是字符终端），让用户在字符终端输入。
+
+但是如果我们能开发下面这样的图形界面程序，就更酷了
+
+![image-20231226161706954](imge/Pyside2学习.assets/image-20231226161706954.png)
+
+界面设计如下：
+
+![image-20231226170748784](imge/Pyside2学习.assets/image-20231226170748784.png)
+
+```python
+import sys
+from PySide2.QtWidgets import QWidget, QApplication
+from PySide2.QtWidgets import QMessageBox
+from 薪资表统计_ui import Ui_Form
+
+
+class MyWidget(QWidget):
+    def __init__(self):
+        super().__init__()
+        self.ui = Ui_Form()
+        self.ui.setupUi(self)
+
+        self.ui.button.clicked.connect(self.handleCalc)
+
+    def handleCalc(self):
+        info = self.ui.textEdit.toPlainText()
+        print(info)
+
+        # 薪资20000 以上 和 以下 的人员名单
+        salary_above_20k = ''
+        salary_below_20k = ''
+        """
+        info.splitlines():
+            splitlines() 按照行('\r', '\r\n', \n')分隔，返回一个包含各行作为元素的列表，
+            如果参数 keepends 为 False，不包含换行符，如果为 True，则保留换行符。
+            参数
+                keepends -- 在输出结果里是否保留换行符('\r', '\r\n', \n')，
+                默认为 False，不包含换行符，如果为 True，则保留换行符。
+            返回值
+                返回一个包含各行作为元素的列表
+        """
+        for line in info.splitlines():
+            if not line.strip():
+                continue
+            # split() 字符串转列表
+            parts = line.split(' ')
+            # 去掉列表中的空字符串内容
+            parts = [p for p in parts if p]
+            name, salary, age = parts
+            if int(salary) >= 20000:
+                salary_above_20k += name + '\n'
+            else:
+                salary_below_20k += name + '\n'
+
+        QMessageBox.about(window,
+                          '统计结果',
+                          f'''薪资20000 以上的有：\n{salary_above_20k}
+                    \n薪资20000 以下的有：\n{salary_below_20k}'''
+                          )
+
+
+if __name__ == '__main__':
+    app = QApplication(sys.argv)
+    window = MyWidget()
+    window.show()
+    sys.exit(app.exec_())
+
+```
+
+运行效果：
+
+![image-20231226173730378](imge/Pyside2学习.assets/image-20231226173730378.png)
+
+
+
+
 
 
 

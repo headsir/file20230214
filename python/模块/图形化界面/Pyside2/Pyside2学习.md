@@ -100,6 +100,87 @@ designer界面如下：
 
 ![image-20231226162833551](imge/Pyside2学习.assets/image-20231226162833551.png "按钮组件")
 
+逐个解释一下各个用途：
+
+###### （1）按压按钮 QPushButton
+
+​    最基本的按钮，点击该按钮通常是通知程序进行一个操作，比如弹个窗、下一步、保存、退出等等，这是经常用到的，操作系统里的对话框里几乎全部都有这种按压按钮。
+
+###### （2）工具按钮 QToolButton
+
+工具按钮通常都不是一个，是一排放置在工具栏 QToolBar 里面，作为快捷按钮来用，比如 Qt 设计师的工具栏：
+
+![image-20231227165949650](imge/Pyside2学习.assets/image-20231227165949650.png "工具按钮")
+
+###### （3）单选按钮 QRadioButton
+
+​    单选按钮通常是多个放在一块，表示互斥的一组选项，只能选择其中一个来填写，比如一个人性别有男、女，只能选择一个，而不能同时是男的又是女的。
+
+​		头两排单选按钮父窗口都是主窗体，默认情况下是互斥的，所以只能选中一个。而分组框里的单选按钮，它们的父窗口是分组框控件，所以与上面两排的不冲突。头两排解决办法：增加Frame控件。
+
+![image-20231227173118338](imge/Pyside2学习.assets/image-20231227173118338.png "单选案例")
+
+
+
+效果图：
+
+![image-20231227173631888](imge/Pyside2学习.assets/image-20231227173631888.png "单选效果图")
+
+单选按钮值获取：radioButton.isChecked()函数
+
+```python
+if self.radioButton.isChecked():
+    strResult += "性别：男\r\n"
+elif self.radioButton_2.isChecked():
+    strResult += "性别：女\r\n"
+else:
+    strResult += "性别：未选中\r\n"
+```
+
+###### （4）复选框 QCheckBox
+
+​    与单选按钮不同，复选框通常表示多个可以同时存在的选项，比如一个人可以同时多个爱好，比如读书、看电影、爬山、游泳等
+
+​	复选框还有一种特殊用途，叫三态复选框，比如 WORD 办公软件，一段文字既可以是加粗、部分加粗、都不加粗三种状态，三态复选  框就是用来干这类事情的。将传统两种状态复选框变成三态复选框的函数是：tristate
+
+![image-20231227184650472](imge/Pyside2学习.assets/image-20231227184650472.png "复选框")
+
+| **枚举常量**             | **数值** | **描述**       |
+| ------------------------ | -------- | -------------- |
+| **Qt::Unchecked**        | 0        | 条目未选中     |
+| **Qt::PartiallyChecked** | 1        | 条目有部分选中 |
+| **Qt::Checked**          | 2        | 条目全选中     |
+
+- 复选框按钮状态获取：checkBox.isChecked()函数
+
+- 三态复选框状态获取：
+
+  - `checkBox.isChecked()`选中与部分选中全部返回True
+
+  - santaicheckBox.checkState() 返回以下三种状态：
+
+    - PySide2.QtCore.Qt.CheckState.PartiallyChecked ：QtCore.Qt.PartiallyChecked
+
+    - PySide2.QtCore.Qt.CheckState.Checked ：QtCore.Qt.Checked
+
+    - PySide2.QtCore.Qt.CheckState.Unchecked ：QtCore.Qt.Unchecked
+
+      ```python
+      checkBox.checkState() == QtCore.Qt.Unchecked
+      ```
+
+      
+
+
+
+
+
+
+
+
+
+
+
 ##### 视图组件
 
 ![image-20231226163350430](imge/Pyside2学习.assets/image-20231226163350430.png "视图组件")
@@ -132,6 +213,8 @@ designer界面如下：
 
 设置组件的属性，如文本、大小、名称等。
 
+##### 关键属性
+
 最关键的属性都自动被加粗显示了，有三个： 
 
 - **objectName**：对象名称，用过这个对象名称就能调用该对象的函数。
@@ -141,8 +224,6 @@ designer界面如下：
 ![image-20231227163010600](imge/Pyside2学习.assets/image-20231227163010600.png "属性说明")
 
 ![image-20231227163424209](imge/Pyside2学习.assets/image-20231227163424209.png "文本编辑框介绍")
-
-![image-20231227163748505](imge/Pyside2学习.assets/image-20231227163748505.png)
 
 
 
@@ -199,6 +280,32 @@ designer界面如下：
 | Ignored          | ShrinkFlag \|  GrowFlag \|  IgnoreFlag | 野蛮扩张     | 忽略建议尺寸，虽然能屈能伸，但是它会尽最大可能占据空间。     |
 
 ![image-20231227152832619](imge/Pyside2学习.assets/image-20231227152832619.png "水平策略示例")
+
+###### styleSheet:实现可视化地编辑样式表
+
+“编辑样式表”对话框上方是四个按钮，点击按钮会显示如上图中的菜单。
+
+“添加资源”是给控件添加前景图、背景图、边框图等。
+
+“添加渐变”和“添加颜色”功能类似，    可以为控件设置各种样式的渐变色。
+
+“添加颜色”是给控件添加前景色 color、背景色 background-color、边框色 border-color    等等。
+
+点击“添加字体”会弹出字体设置对话框，可以改变控件显示文字的字体、字号、粗体等效果。
+
+这里可以简单添加一个前景色 color 和 背景色    background-color ，两个颜色读者可以随意设置。
+
+重要的是学会设置样式表颜色，至于颜色本身不重要。
+
+添加好 color 和    background-color 之后，点击下方的“OK” 按钮，在编辑样式表对话框关闭之后就会查看效果，类似下图所示：
+
+​		如果多次设置了前景色 color ，那么该对话框里会有多个 color    行，实际显示时按照最后一行的颜色显示，其他颜色设置也是类似的。如果要取消已设置的颜色，只需删除该对话框中间文本框里相应的文本行即可，比如删除上面的    background-color 一行（行尾是以 ; 结束），然后添加渐变背景色如SunRay
+
+![image-20231227165033889](imge/Pyside2学习.assets/image-20231227165033889.png "控件样式")
+
+
+
+
 
 这里我们先把工作区中的窗口拖放到中间，再从组件选择区里拖拽一个Label组件到窗口上，如下图所示：
 

@@ -694,6 +694,24 @@ deque(['Michael', 'Terry', 'Graham'])
 > 	print (变量（键名） + '：' + 字典名['键名'])
 > ```
 
+- 字典与JSON（字符串）互相转换：
+
+```python
+import json
+
+# 将Python对象转换成JSON
+json_data = json.dumps({"name": "John", "age": 25})
+
+# 将JSON转换成Python对象
+python_obj = json.loads(json_data)
+
+print(type(json_data))  # <class 'str'>
+print(type(python_obj))  # <class 'dict'>
+
+print(json_data)  # {"name": "John", "age": 25}
+print(python_obj)  # {'name': 'John', 'age': 25}
+```
+
 ### 3.4.3 元组
 
 语法格式：元组名 = (元素1, 元素2,·······)
@@ -1139,8 +1157,6 @@ for i, j in enumerate(list):
 1 2
 2 3    
 ```
-
-
 
 # 五、自定义函数
 
@@ -3283,9 +3299,164 @@ Flask是我的入门库，用于创建快速的Web服务或简单的网站。这
 - Beautiful Soup位于流行的Python解析器（如lxml和html5lib）的顶部，使您可以尝试不同的解析策略或提高灵活性。
 - BeautifulSoup会解析您提供的任何内容，并为您做遍历树的工作。您可以将其告诉“查找所有链接”，或“查找带有粗体的表格标题，然后给我该文字。”
 
+## 12.16 enum枚举库
+
+来源：https://zhuanlan.zhihu.com/p/560204709
+
+​		枚举(Enum)是一种数据类型，是绑定到唯一值的符号表示。您可以使用它来创建用于变量和属性的常量集。它们类似于全局变量，但是，它们提供了更有用的功能，例如分组和类型安全。Python 在 3.4 版本中添加了标准库 enum。
+
+使用枚举有以下好处：
+
+- 代码更容易阅读，更容易维护。
+- 减少由转换或错误输入引起的 bug。
+- 使将来修改代码变得更容易。
+
+### 如何使用枚举
+
+以我们最熟悉的性别为例，先创建一个枚举类型：
+
+```python
+from enum import Enum
+class Gender(Enum):
+    男 = 1
+    女 = 0
+    未知 = 2
+print(Gender)  # <enum 'Gender'>
+```
+
+访问枚举：
+
+```python
+for g in Gender:
+    print(g.name, g.value)
+================================================
+男 1
+女 0
+未知 2
+```
+
+```python
+print(Gender.男.name)  # 男
+print(Gender.男.value)  # 1
+print(isinstance(Gender.男, Gender))  # True
+print(Gender['男'])  # Gender.男
+print(Gender['男'].name)  # 男
+print(Gender['男'].value)  # 1
+print(Gender(0).name)  # 女
+```
+
+接下来，让我们先看看不使用枚举的版本，然后再看看使用枚举的版本，这样就知道枚举的好处了。
+
+以汽车销售为例，我们需要根据不同国家的税率来计算汽车的出售价格。不使用枚举的版本如下：
+
+```python
+# dataclasses库参见：https://blog.csdn.net/jay_yxm/article/details/107977913
+from dataclasses import dataclass
 
 
+@dataclass
+class Car:
+    model: str
+    price: float
+    registraion_state: str
 
+    def total_cost(self) -> float:
+        if self.registraion_state == "OR":
+            return self.price + (self.price * 0.05)
+        elif self.registraion_state == "WA":
+            return self.price + (self.price * 0.10)
+        elif self.registraion_state == "CA":
+            return self.price + (self.price * 0.08)
+        else:
+            raise TypeError("Invalid registraion_state value")
+
+
+car1 = Car(model="RAV4", price=30000, registraion_state="OR")
+car2 = Car(model="RAV4", price=30000, registraion_state="WA")
+car3 = Car(model="RAV5", price=30000, registraion_state="CA")
+print(car1.total_cost())
+print(car2.total_cost())
+print(car3.total_cost())
+```
+
+代码共 26 行，用 3.9 版本运行结果如下：
+
+```text
+31500.0
+33000.0
+32400.0
+```
+
+接下来，我们来看一看使用枚举版本的代码：
+
+```python
+from enum import Enum
+from dataclasses import dataclass
+
+class StateTax(Enum):
+    OR = 0.05
+    WA = 0.10
+    CA = 0.08
+
+@dataclass
+class Car:
+    model: str
+    price: float
+    tax: StateTax
+
+    def total_cost(self) -> float:
+        return  self.price + (self.price * self.tax.value)       
+    
+    def get_tax(self):
+        return self.tax.value
+
+
+car1 = Car(model="RAV4", price=30000, tax=StateTax.OR)
+car2 = Car(model="RAV4", price=30000, tax=StateTax.WA)
+car3 = Car(model="RAV4", price=30000, tax=StateTax.CA)
+print(car1.total_cost())
+print(car2.total_cost())
+print(car3.total_cost())
+```
+
+代码共 28 行，运行结果不变，但是代码更优雅，更容易阅读了。而且后续增加出口的国家地区，也非常简单，只需要增加一个枚举类型，创建一个新的 Car 对象，需求修改 Car 类的任何代码：
+
+```python
+class StateTax(Enum):
+    OR = 0.05
+    WA = 0.10
+    CA = 0.08
+    CN = 0.03
+
+car4 = Car(model="RAV4", price=30000, tax=StateTax.CN)
+```
+
+### 从字典创建枚举
+
+```text
+from enum import Enum
+
+tax = {
+    'OR': 0.05,
+    'WA': 0.10,
+    'CA': 0.08,
+    'CN': 0.03
+}
+
+StateTax = Enum('tax', tax)
+```
+
+访问枚举的三种方式：
+
+```text
+print(StateTax['CN'])
+print(StateTax.CN)
+print(StateTax(0.03)) #通过 value 来访问
+```
+
+---
+
+枚举 (Enum)  是绑定到唯一值的符号。我们可以通过定义一个继承自 Enum 的类来创建枚举，使用 enum[member_name] 通过名称访问 Enum  成员，也可以通过并通过 enum(member_value) 访问，还可以通过 enum.member_name 来访问。Enum  可以帮助我们使代码更具可读性，更具可维护性，枚举类型一旦定义，不可修改，更安全，推荐大家都用一用。
 
 
 

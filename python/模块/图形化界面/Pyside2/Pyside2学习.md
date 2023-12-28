@@ -143,7 +143,7 @@ else:
 
 ​	复选框还有一种特殊用途，叫三态复选框，比如 WORD 办公软件，一段文字既可以是加粗、部分加粗、都不加粗三种状态，三态复选  框就是用来干这类事情的。将传统两种状态复选框变成三态复选框的函数是：tristate
 
-![image-20231227184650472](imge/Pyside2学习.assets/image-20231227184650472.png "复选框")
+![image-20231227184650472](imge/Pyside2学习.assets/image-20231227184650472.png "复选框选择")
 
 | **枚举常量**             | **数值** | **描述**       |
 | ------------------------ | -------- | -------------- |
@@ -169,11 +169,50 @@ else:
       checkBox.checkState() == QtCore.Qt.Unchecked
       ```
 
-      
+
+- 设置三态复选框状态：
+
+  ```
+  checkBox_7.setCheckState(QtCore.Qt.PartiallyChecked)
+  ```
+
+![image-20231228161652176](imge/Pyside2学习.assets/image-20231228161652176.png "复选框未选中")
+
+![image-20231228161746661](imge/Pyside2学习.assets/image-20231228161746661.png "复选框部分选中")
+
+![image-20231228161858714](imge/Pyside2学习.assets/image-20231228161858714.png "复选框全部选中")
+
+###### （5）命令链接按钮 QCommandLinkButton
+
+这是 Qt 仿造 Vista 里的命令链接按钮引入的扁平风格按钮，点击这个按钮一般意味着打开新的功能窗口或网站链接等
+
+信号：
+
+```python
+self.ui.commandLinkButton.clicked.connect(self.checkcommandLinkButton)
+self.ui.commandLinkButton_2.clicked.connect(self.checkcommandLinkButton2)
+```
+
+槽函数：
+
+```python
+# 打开文件夹
+def checkcommandLinkButton(self):
+    QtGui.QDesktopServices.openUrl(QtCore.QUrl("file:///D:/桌面"))
+# 访问网页
+def checkcommandLinkButton2(self):
+    QtGui.QDesktopServices.openUrl(QtCore.QUrl("http://www.baidu.com"))
+```
+
+![image-20231228164011590](imge/Pyside2学习.assets/image-20231228164011590.png "命令链接按钮")
 
 
 
+###### （6）标准按钮盒 QDialogButtonBox
 
+标准按钮盒通常用于对话框程序，举例来说，我们常见的保存询问对话框里面有“保存”、“丢弃”、“取消”三个标准按钮，确认对话框有 “OK”“Cancel”等标准按钮，Qt 将这些典型的按钮做成标准按钮盒，并将相应的信号加以封装，方便程序员使用
+
+![image-20231228151315717](imge/Pyside2学习.assets/image-20231228151315717.png "标准按钮盒")
 
 
 
@@ -197,9 +236,153 @@ else:
 
 ![image-20231226165153781](imge/Pyside2学习.assets/image-20231226165153781.png "输入小部件")
 
+常用的 Qt 文本编辑控件：
+
+- QLineEdit 只接受单行普通文本输入，针对最普通的 C++ 字符串编辑和显示，默认都是白底黑字，没有彩色字体。
+
+- QPlainTextEdit 可以接收多行普通文本输入,针对最普通的 C++ 字符串编辑和显示，默认都是白底黑字，没有彩色字体。
+
+- QTextEdit 是升级版的编辑控件，支持 HTML 网页的丰富文本编辑，当然也可以利用它编辑普通文本。
+
+###### QLineEdit
+
+​		接收一行文本输入，编辑器一般都有对文本的复制、粘贴、剪切、撤销、重做等功能，单行编辑控件原生自带这些功能，右击单行编辑控件或者使用 Ctrl+C、Ctrl+V、Ctrl+X 等快捷键都可以使用这些默认功能。
+
+​		单行编辑控件最重要的属性就是 text，获取或者修改文本是单行编辑控件最重要的功能。
+
+获取文本的函数：text()函数获取全部的文本，也可以选取用户高亮选中的部分文本，通过函数：selectedText()
+
+设置文本的函数：setText()
+
+默认情况下，单行编辑控件的文本长度限制为 32767，获取单行编辑控件的文本长度限定的函数为：maxLength()
+
+修改文本长度限定，可以通过函数：setMaxLength(int)
+
+> 用户从图形界面编辑文本，还是程序内部用代码修改文本，都会触发如下信号textChanged()
+>
+> 只根据用户在图形界面的编辑行为触发textEdited(),程序代码里通过函数 setText() ，那么只会触发之前的 textChanged() 信号
+>
+> 如果希望追踪文本的所有变化，需要关联 textChanged() 信号，如果只希望跟踪用户在图形界面的编辑更改，那就关联 textEdited() 信号。
+
+设置属性 echoMode 来显示星号密码, 主要有==四种显示模式==：
+①Normal，普通模式，用户输入什么显示什么，这是默认的显示模式。
+② NoEcho，不显示任何东西，这是 Unix/Linux 常用的密码显示模式，用户敲密码时不显示任何文本，这样能隐藏密码的长 度，不被人从屏幕偷窥。
+③ Password，每一个密码字符都用星号显示，这是 Windows 常用的密码显示模式。
+④ PasswordEchoOnEdit，当输入一个密码字符时，短暂显示该字符，然后迅速将该字符显示为星号，方便提示用户当前输入了什么字符，类 似 Android 解锁密码的输入方式。
+
+![image-20231228173200595](imge/Pyside2学习.assets/image-20231228173200595.png "显示模式设置")
+
+案例：登录界面
+
+例子效果就是点击“登录”按钮时，获取用户名，计算密码的 Hash 值并弹窗显示出来。点击“退出”按钮时，窗口自动关闭。
+
+==returnPressed信号==:当用户在文本框中任何时候按下回车键，就会发出 returnPressed信号。
+
+有时我们需要处理这种情况，比如登录界面，用户输完密码直接按回车健就进行登录处理，可以指定处理returnPressed信号，如下所示：
+
+```python
+# 处理回车
+self.ui.lineEditUser.returnPressed.connect(self.login)
+self.ui.lineEditPassword.returnPressed.connect(self.login)
+```
+
+密码哈希值：
+
+```python
+QtCore.QCryptographicHash.hash(self.lineEditPassword.text().strip().encode("utf-8"),
+                                                QtCore.QCryptographicHash.Sha3_256)
+# 把每个Hash字节转成一对十六进制字符显示,256bit对应32字节，变成64个十六进制字符
+strMsg += str(QtCore.QByteArray.toHex(m_passwordHash))
+```
+
+```python
+import sys
+# 因为我们创建的界面是MainWindow，所以这里要继承QMainWindow
+from PySide2.QtWidgets import QApplication, QWidget, QMessageBox
+from PySide2 import QtCore, QtUiTools, QtGui
+
+
+class UiLoader(QtUiTools.QUiLoader):
+    _baseinstance = None
+
+    def createWidget(self, classname, parent=None, name=''):
+        if parent is None and self._baseinstance is not None:
+            widget = self._baseinstance
+        else:
+            widget = super(UiLoader, self).createWidget(classname, parent, name)
+            if self._baseinstance is not None:
+                setattr(self._baseinstance, name, widget)
+        return widget
+
+    def loadUi(self, uifile, baseinstance=None):
+        self._baseinstance = baseinstance
+        widget = self.load(uifile)
+        QtCore.QMetaObject.connectSlotsByName(widget)
+        return widget
+
+
+class MainWindow(QWidget):
+    def __init__(self, parent=None):
+        super(MainWindow, self).__init__(parent)
+        # 导入我们生成的界面【动态加载ui文件,QMainWind会出现异常，需要重写UiLoader】
+        self.ui = UiLoader().loadUi("登录框示例-单行文本编辑.ui", self)
+        # 处理回车
+        self.ui.lineEditUser.returnPressed.connect(self.login)
+        self.ui.lineEditPassword.returnPressed.connect(self.login)
+
+        self.ui.pushButtonLogin.clicked.connect(self.login)
+        self.ui.pushButtonExit.clicked.connect(self.exit)
+
+    def login(self):
+        if not (self.lineEditUser.text() and self.lineEditPassword.text()):
+            QMessageBox.warning(self, "警告信息", "用户名或密码为空，不能登录", QMessageBox.Yes | QMessageBox.No)
+            return
+        # 用户名字符串
+        m_strUser = self.lineEditUser.text().strip()
+        # 不能明文保存密码，存储密码hash值
+        m_passwordHash = QtCore.QCryptographicHash.hash(
+            self.lineEditPassword.text().strip().encode("utf-8"),QtCore.QCryptographicHash.Sha3_256)
+
+        # 构造消息
+        # 添加用户名
+        strMsg = "用户名：" + m_strUser + "\r\n" + "密码 Hash："
+        # 把每个Hash字节转成一对十六进制字符显示,256bit对应32字节，变成64个十六进制字符
+        strMsg += str(QtCore.QByteArray.toHex(m_passwordHash))
+        # 弹窗显示，注意：实际应用中会将用户名和密码Hash与数据库或配置文件里的做比较，而不是弹窗
+        QMessageBox.information(self, "用户信息", strMsg)
+
+    def exit(self):
+        # 界面关闭
+        self.ui.close()
+        # 界面隐藏
+        # self.ui.hide()
+
+
+if __name__ == "__main__":
+    app = QApplication(sys.argv)
+    window = MainWindow()
+    window.show()
+    # 结束QApplication
+    sys.exit(app.exec_())
+    # 注意，在PySide6中，需要使用app.exec()
+    # sys.exit(app.exec())
+```
+
+
+
+
+
+
+
+
+
 ##### 显示部件
 
 ![image-20231226170039301](imge/Pyside2学习.assets/image-20231226170039301.png "显示部件")
+
+常用的 Qt 文本浏览控件：
+
+- QTextBrowser 是 QTextEdit 的只读版本，并能打开网页链接。
 
 #### 工作区：
 

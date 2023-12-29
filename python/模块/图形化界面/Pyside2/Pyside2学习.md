@@ -56,6 +56,14 @@ linguist:
     工作目录:$FileDir$
 ```
 
+## 工具配置：
+
+![image-20231229101438258](imge/Pyside2学习.assets/image-20231229101438258.png "QtDesigner工具配置截图")
+
+
+
+
+
 # 三、快速入门
 
 来源：https://www.zhihu.com/people/si-tu-32-83/posts
@@ -105,6 +113,32 @@ designer界面如下：
 ###### （1）按压按钮 QPushButton
 
 ​    最基本的按钮，点击该按钮通常是通知程序进行一个操作，比如弹个窗、下一步、保存、退出等等，这是经常用到的，操作系统里的对话框里几乎全部都有这种按压按钮。
+
+![image-20231229155212377](imge/Pyside2学习.assets/image-20231229155212377.png "最常用的信号列表如下：")
+
+关于“**将当前状态传递给外界**”这句作用难以理解，其实就是：控件中的clicked（）信号和clicked（bool）信号是两个不同的信号
+
+> ### 1、clicked()
+
+映射槽函数时，clicked（）信号映射到的槽函数是不带参的
+
+比如槽函数可以写作def ClickedAction(self)，与按钮动作连接的语句为self.btn.clicked.connect(self.ClickedAction)；
+
+> ### 2、clicked(bool)
+
+clicked（bool）信号映射到的槽函数可以是带参数的
+
+比如槽函数可以写作def  ClickedAction(self，status)，其中参数status就是按钮当前的状态(Tru or  False)，而与按钮动作连接的语句self.btn.clicked[bool].connect(self.ClickedAction)，无需使用lambda传入status。
+ 很显然，**clicked（bool）只是当按钮的setCheckable()设置为True时才有可能使得status为True**（即设置后按钮想点灯开关一样，能够按一下保持一直开，再按下保持一直关），否则开关点击一下后仍为关闭状态，status一直为False。
+
+```python
+self.ui.pushButtonBold.setCheckable(True)
+self.ui.pushButtonBold.clicked.connect(self.on_pushButtonBold_clicked)
+def on_pushButtonBold_clicked(self,status):
+    print(status)  # True False
+```
+
+
 
 ###### （2）工具按钮 QToolButton
 
@@ -246,6 +280,8 @@ def checkcommandLinkButton2(self):
 
 ###### QLineEdit
 
+单行编辑控件
+
 ​		接收一行文本输入，编辑器一般都有对文本的复制、粘贴、剪切、撤销、重做等功能，单行编辑控件原生自带这些功能，右击单行编辑控件或者使用 Ctrl+C、Ctrl+V、Ctrl+X 等快捷键都可以使用这些默认功能。
 
 ​		单行编辑控件最重要的属性就是 text，获取或者修改文本是单行编辑控件最重要的功能。
@@ -254,13 +290,13 @@ def checkcommandLinkButton2(self):
 
 设置文本的函数：setText()
 
+清除所有文本的函数： clear()
+
 默认情况下，单行编辑控件的文本长度限制为 32767，获取单行编辑控件的文本长度限定的函数为：maxLength()
 
 修改文本长度限定，可以通过函数：setMaxLength(int)
 
 > 用户从图形界面编辑文本，还是程序内部用代码修改文本，都会触发如下信号textChanged()
->
-> 只根据用户在图形界面的编辑行为触发textEdited(),程序代码里通过函数 setText() ，那么只会触发之前的 textChanged() 信号
 >
 > 如果希望追踪文本的所有变化，需要关联 textChanged() 信号，如果只希望跟踪用户在图形界面的编辑更改，那就关联 textEdited() 信号。
 
@@ -272,7 +308,21 @@ def checkcommandLinkButton2(self):
 
 ![image-20231228173200595](imge/Pyside2学习.assets/image-20231228173200595.png "显示模式设置")
 
-案例：登录界面
+信号函数：
+
+**表一 信号汇总表**
+
+| 序号 | 信号                  | 说明                                                         |
+| ---- | --------------------- | ------------------------------------------------------------ |
+| 1    | textChanged           | 当修改文本内容时，这个信号会被发射                           |
+| 2    | textEdited            | 当文本被编辑时，就会发射这个信号                             |
+| 3    | returnPressed         | 光标在行编辑框内时，点击**回车键**即发射信号                 |
+| 4    | selectionChanged      | 当选择的文本内容改变了，这个信号就会被发射                   |
+| 5    | editingFinished       | 当按返回或者**回车键**时，或者行编辑失去焦点时，这个信号会被发射 |
+| 6    | cursorPositionChanged | 当焦点，即**光标**位置改变就发射信号                         |
+| 7    | inputRejected         | 当用户输入不合法字符时，将发出此信号。前提要 setValidator() 等设置合法字符范围，**Qt 5.12 版本新增**。 |
+
+==案例：登录界面==
 
 例子效果就是点击“登录”按钮时，获取用户名，计算密码的 Hash 值并弹窗显示出来。点击“退出”按钮时，窗口自动关闭。
 
@@ -301,31 +351,11 @@ import sys
 from PySide2.QtWidgets import QApplication, QWidget, QMessageBox
 from PySide2 import QtCore, QtUiTools, QtGui
 
-
-class UiLoader(QtUiTools.QUiLoader):
-    _baseinstance = None
-
-    def createWidget(self, classname, parent=None, name=''):
-        if parent is None and self._baseinstance is not None:
-            widget = self._baseinstance
-        else:
-            widget = super(UiLoader, self).createWidget(classname, parent, name)
-            if self._baseinstance is not None:
-                setattr(self._baseinstance, name, widget)
-        return widget
-
-    def loadUi(self, uifile, baseinstance=None):
-        self._baseinstance = baseinstance
-        widget = self.load(uifile)
-        QtCore.QMetaObject.connectSlotsByName(widget)
-        return widget
-
-
 class MainWindow(QWidget):
     def __init__(self, parent=None):
         super(MainWindow, self).__init__(parent)
         # 导入我们生成的界面【动态加载ui文件,QMainWind会出现异常，需要重写UiLoader】
-        self.ui = UiLoader().loadUi("登录框示例-单行文本编辑.ui", self)
+        self.ui = UiLoader().load("登录框示例-单行文本编辑.ui", self)
         # 处理回车
         self.ui.lineEditUser.returnPressed.connect(self.login)
         self.ui.lineEditPassword.returnPressed.connect(self.login)
@@ -368,6 +398,440 @@ if __name__ == "__main__":
     # sys.exit(app.exec())
 ```
 
+==数据验证器和伙伴快捷键==
+
+1. 数据验证器
+
+   ​		在用户输入时，可能用到一个功能就是数据验证，限制用户输入非法的取值。比如限定 IPv4 的取值为 0.0.0.0 到 255.255.255.255 ，端口取值范围 0 到 65535，而网卡 MAC 地址限定为 48 bit 数值对应的十六进制字符串，比如 AA:BB:CC:DD:EE:FF 。
+   Qt 针对单行编辑控件，提供三种方式来使用数据验证器：
+
+   （1）单行编辑控件自带的输入模板 inputMask：
+   通过函数设置输入模板，这个输入模板字符串是 QLineEdit 自定义的，应用范围比较局限，功能也相对简单，设置函数为：
+
+   ![image-20231229104309747](imge/Pyside2学习.assets/image-20231229104309747.png "程序设置")
+
+   ![image-20231229104404241](imge/Pyside2学习.assets/image-20231229104404241.png "软件设置")
+
+   具体的 inputMask 字符串格式可以查询 QLineEdit 的文档，我们举 MAC 地址的例子，"H" 表示所有的十六进制字符，包括大小写的十六进制字符，而且 "H" 占位的字符不能省略。小写的 "h" 也代表所有十六进制字符，但 "h" 占位是可以省略的字符.
+   对于 MAC 地址，输入模板为 "HH:HH:HH:HH:HH:HH" 。
+
+   （2）整型数值和浮点数值验证器
+
+   目前存在BUG，[参见](##3、QIntValidator设置范围无效 "BUG描述")
+
+   ```python
+   # 新建整数验证器
+   intVali = QtGui.QIntValidator()
+   intVali.setRange(0, 65535)
+   # 设置给lineEditPort
+   self.ui.lineEditPort.setValidator(intVali)
+   ```
+
+   （3）正则表达式验证器
+
+   正则表达式是最为强大的数据验证和数据筛选武器，正则表达式作为大杀器，几乎无所不能。Qt 提供 QRegExp 类支持正则表达式，正则表达式的验证器类为 QRegExpValidator。一般是先通过字符串构建一个正则表达式：
+
+   QRegExp(const QString & pattern, Qt::CaseSensitivity cs = Qt::CaseSensitive, PatternSyntax syntax = RegExp)
+
+   ```python
+   # 定义IPv4正则表达式，注意"\\"就是一个反斜杠字符
+   re = QtCore.QRegExp("^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}"
+   "(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$")
+   ```
+
+   pattern 是正则表达式字符串，cs 指是否大小写敏感，默认是敏感的，syntax 是语法格式，用默认的 RegExp，这是类似 Perl 语言风格的正则表达式。一般可以搜索 IPv4 格式的 Perl 或其他语言的正则表达式，拿过来用即可。
+   然后根据 QRegExp 构建一个正则表达式验证器：
+
+   QRegExpValidator(const QRegExp & rx, QObject * parent = 0)
+
+   ```python
+   # 新建正则表达式验证器
+   reVali = QtGui.QRegExpValidator(re)
+   ```
+
+   最后将 QRegExpValidator 对象通过函数 QLineEdit::setValidator() 函数设置给单行编辑控件就行了
+
+   ```python
+   # 设置给lineEditIP
+   self.ui.lineEditIP.setValidator(reVali)
+   ```
+
+2. 伙伴快捷键
+
+   标签控件里的 "&" 用于设置伙伴快捷键，因为单行编辑控件没法显示自己的快捷键，所以需要通过伙伴标签控件来设置快捷键。"&MAC" 意味着伙伴快捷键为 Alt+M ，"&IP" 快捷键就是 Alt+I ，"&Port" 快捷键是 Alt+P 。当然，快捷键能实现的前提是设置伙伴，我们点击设计模式上面的带有橙色小块的图标，进入伙伴编辑模式：
+
+   ![image-20231229111056479](imge/Pyside2学习.assets/image-20231229111056479.png "编辑伙伴模式")
+
+   在伙伴编辑模式，编辑伙伴关系类似在画图板画线的操作，从标签控件画线到右边的单行编辑控件即可。将三行的标签都设置为对应的单行编辑控件伙伴。设置为伙伴之后， 标签控件就不再显示 "&" ，而是将 "&" 右边第一个字母添加下划线显示，这样伙伴快捷键就设置成功了。
+
+   程序运行时，伙伴快捷键自动生效：
+   按 Alt+M ，自动切换到 MAC 地址编辑控件；
+   按 Alt+I ，自动切换到 IP 地址编辑控件；
+   按 Alt+P ，自动切换到端口编辑控件。
+   示范的例子标签文本都是英文的，如果是中文文本，以端口为例，可以设置为 "端口(&P)" ，这样快捷键也是 Alt+P。
+
+3. 单词补全
+
+   在进行文本编辑时，编辑器常用的一个功能就是单词补全，比如 Linux 系统命令行里面输入命令或文件名头几个字符，然后按 Tab 键就会实现命令或文件名的补 全。单行编辑控件也有类似功能，通过设置单词补全器 QCompleter 实现。
+
+   单词补全：
+
+   ```python
+   # 星期单词列表
+   listDayOfWeek = ["Monday", "Tuesday", "Wednesday", "Thursday",
+                    "Friday", "Saturday", "Sunday"]
+   
+   # 构建补全器
+   cpDayOfWeek = QtWidgets.QCompleter(listDayOfWeek)
+   # # 大小写不敏感
+   cpDayOfWeek.setCaseSensitivity(QtCore.Qt.CaseInsensitive)
+   # 设置给lineEditDayOfWeek
+   self.ui.lineEditDayOfWeek.setCompleter(cpDayOfWeek)
+   ```
+
+   时间补全：
+
+   ```python
+   # 年份列表
+   listYear = ["2016", "2015", "2008", "2006", "1999", "1991"]
+   # 重新排序，默认是大小写敏感排序，对数字字符没影响
+   listYear.sort()
+   # 构建补全器
+   cpYear = QtWidgets.QCompleter(listYear)
+   # 设置给 lineEditYear
+   self.ui.lineEditYear.setCompleter(cpYear)
+   ```
+
+   中文补全：
+
+   ```python
+   # 何夕名字列表
+   listHeXi = ["何百夕", "何千夕", "何万夕", "何亿夕"]
+   # 中文没有大小写敏感，也不要排序
+   # 构建补全器
+   cpHexi = QtWidgets.QCompleter(listHeXi)
+   # 设置给lineEditHeXi
+   self.ui.lineEditHeXi.setCompleter(cpHexi)
+   ```
+
+###### TextEdit
+
+丰富文本编辑控件
+
+对于多行普通文本编辑，Qt 提供 QPlainTextEdit 类，对于更为复杂的丰富文本编辑，Qt 提供了 QTextEdit 类，QTextEdit 有一个便于浏览丰富文本的派生类 QTextBrowser，相当于是 QTextEdit 只读版本，并另外做了一些打开网页链接的扩展功能。QPlainTextEdit 与 QTextEdit 采用的技术是差不多的，只是对普通文本编辑做了优化。本节重点介绍丰富文本编辑控件 QTextEdit ，学习编写一个简易的文本编辑器，然后介绍QTextBrowser 控件的扩展功能，根据 QTextBrowser 做一个简易的 HTML 查看器。
+
+QTextEdit 是一个高级的所见即所得（WYSIWYG）浏览器/编辑器，支持丰富文本格式，类似 HTML 风格的标记。它被优化用于编辑大型文档和快速相应用户的输入。
+
+QTextEdit 基于段落和字符工作，段落是格式化的字符串，一般以换行符作为段落分隔标志，比如 C++ 字符串的 "\r\n" ，HTML 语言的 "`<br>`" 。QTextEdit 显示段落内部的文本时，会自动根据控件宽度，将段落内的长文本根据单词间隔进行自动换行（word-wrapped），类似 Windows 记事本里的自动换行功 能。
+
+QTextEdit 内部使用 QTextDocument 类管理文档，一篇文档可以有 0 个或多个段落组成，文本的对齐模式由其所属的段落对齐模式确定。对于段落内的文本字符，又可以有自己的字符格式，比如加粗、倾斜、字体、文字颜色、文字背景色等等。段落仅 仅是对文档组成部分的分隔和形容，并没有对应的 Qt 类。实际上编辑器内使用文本光标表示当前编辑位置，通常根据光标指示位置来编辑文本，文本光标是有具体的类，即 QTextCursor。
+
+需要注意的是，QTextEdit 不仅仅是一个编辑控件，更大程度上它是一个比较完备而又复杂的视图 + 文档体系，如下图所示：
+
+![image-20231229143948200](imge/Pyside2学习.assets/image-20231229143948200.png)
+
+基于 QTextEdit 可以开发出一个功能完备的丰富文本编辑程序，上图就是Qt 库自带编辑器主窗口程序例子
+
+
+QTextEdit 可以显示图片、列表和表格，如果文档太大，QTextEdit 自带滚动条，可以显示很多页的文档。QTextEdit 既可以编辑普通文本（plain text），也可以编辑丰富文本（rich text）。QTextEdit 支持的丰富文本格式是 HTML 4 标记语言的一个子集，在 Qt 助手里索引 Supported HTML Subset，可以查看具体支持哪些标记。
+
+因为 QTextEdit 和 QTextBrowser 都是仅支持 HTML 4 标记语言的子集，对于网页显示功能是不完备的，如果需要真正的网页浏览器功 能，那么建议使用更为强大的 Qt WebKit，在 Qt 助手索引里输入 Qt WebKit Widgets ，可以查看相应的文档。
+
+QTextEdit 同时具有两大功能，既可以作为显示控件使用，也可以作为丰富文本编辑器使用。QTextEdit 这两种用途是同时具备的，不需要什么设置，下面介绍仅仅是从函数功能分类来讲，在作为显示用途时，编辑器方面的函数管用，作为编辑器用途时，显示用的函数也是管用 的。
+作为显示控件时，可以使用三个函数设置需要显示的文本：
+
+setHtml()
+
+setHtml() 函数用于设置显示丰富的 HTML 网页文本
+
+setPlainText()
+
+setPlainText() 函数用于设置显示普通的无格式文本。
+
+setText()
+
+setText() 函数是通用的槽函数，它自动根据 text 内容猜测文本是不是 HTML 标记语言的，如果是 HTML 文本就显示丰富文本，如果不是那就当作普通无格式的文本显示。
+
+段落内的文本默认是根据控件宽度自动换行的，这样就不会用到水平的滚动条。对于长文本，如果不希望自动换行，那么可用 setLineWrapMode() 函数改变自动换行的特性，枚举常量 QTextEdit::NoWrap 就是不自动换行。如果是不自动换行，那么长的文本会导致水平滚动条显现，可以通过拖动水平滚动条查看长文本。另外，QTextEdit 自带查找函数 find() ，可以查找并高亮显示相应的文本。
+
+QTextEdit 作为编辑器使用时，常规的复制、粘贴、剪切、撤销、重做等功能毫无疑问都是默认支持的，不要编写额外代码，QTextEdit 自己就有这些完备的功能，右击它就能看到对应的编辑菜单。对于光标指示的当前文本字符，可以通过函数设置丰富的文本格式，下面列一个简表：
+
+| **槽函数**                         | 描述                                            |
+| ---------------------------------- | ----------------------------------------------- |
+| **setFontItalic(bool)**            | 设置斜体字。                                    |
+| **setFontWeight(int)**             | 设置粗体字。                                    |
+| **setFontUnderline(bool)**         | 设置文字下划线。                                |
+| **setFontFamily(QString)**         | 设置字体家族，如 "宋体"、"黑体"、"文泉驿黑体"。 |
+| **setFontPointSize(qreal)**        | 设置字号大小，如 9，12，16，48 等 。            |
+| **setTextColor(QColor)**           | 设置文字颜色。                                  |
+| **setTextBackgroundColor(QColor)** | 设置文字背景色 。                               |
+| **setCurrentFont(QFont)**          | 设置综合字体格式，QFont 类封装了上面所有格式。  |
+
+需要注意的是 setFontFamily(QString) 设置的才是如 "宋体"、"黑体"、"文泉驿黑体" 等字体家族，而 setCurrentFont(QFont) 是设置所有的综合字体，QFont 涵盖文字字符的所有格式，之前的斜体、粗体、字体家族、字体颜色等等，全包含在 QFont 内部。如果只希望设置某一方面的字体特性，可以用前面散装的快捷函数如 setFontItalic(bool)、setFontWeight(bool) 等，如果希望设置文本所有的综合字体格式，那么用最后的 setCurrentFont(QFont)。
+
+上面设置字体格式的函数全是槽函数，因此可以直接与其他控件的状态信号关联，比如列举字体家族的控件 QFontComboBox 的信号
+
+void QFontComboBox::currentIndexChanged(const QString & text)
+
+可以直接关联到 setFontFamily(QString) 槽函数。
+
+除了文本字符本身的格式，段落对齐是采用另外的槽函数：
+
+void QTextEdit::setAlignment(Qt::Alignment a)
+上面的字体设置函数影响的就是文本光标指示的单词或高亮选中的文本。光标和高亮选中的文本通过 QTextCursor 类管理，针对选中的文本，可以获取该文本片段的字体格式，也可以进行复制、粘贴、剪切、删除等操作。获取当前的光标对象使用函数：
+
+QTextCursor QTextEdit::textCursor() const
+
+因为文档里不同文字有各种各样的格式，当光标指向某个单词或选中文本片段时，会触发当前字符格式变化的信号：
+
+void QTextEdit::currentCharFormatChanged(const QTextCharFormat & f)
+
+QTextCharFormat 与 QFont 不是继承关系，QTextCharFormat 内部包含有 QFont 成员变量，QTextCharFormat 与 QFont 有类似的各种字体格式函数，但 QTextCharFormat 更为强大，包含的更多的细节设置，比如文字在垂直方向的对齐。从 currentCharFormatChanged() 信号的参数里，可以提取当前选中的文本片段的各种字体格式，从而实时感知文档内部不同文本片段的丰富格式。与这个信号对应的设置函数是：
+
+void QTextEdit::setCurrentCharFormat(const QTextCharFormat & format)
+
+但是 setCurrentCharFormat 不是槽函数，仅仅是公有成员函数。设置字体格式一般用之前列表里的多个快捷函数来设置。用户编辑文本时，新增加的文本也是根据 currentCharFormat 自动设置的。
+
+当 QTextEdit 内文本内容发生变化时，不论是用户手动增删还是快捷函数改变字体，都会触发文本变化信号：
+
+void QTextEdit::textChanged()
+
+这个信号没有带文本参数，需要用其他公有函数获取文本，获取完整的丰富文本的函数为：
+
+QString QTextEdit::toHtml() const
+
+获取无格式的普通文本的函数为：
+
+QString QTextEdit::toPlainText() const
+
+接下来示范一个简化版的文本编辑器例子，可能丑陋了点，主要学习一下感知文本格式的变化和通过按钮修改选中文本的格式。
+
+5.3.2 简易文本编辑器示例
+单选按钮和复选框有选中状态和非选中状态等，普通的按压按钮也是可以有两种状态 的，通过基类 QAbstractButton 函数可以设置按压按钮的两种状态（Qt 设计师界面选中按钮，在右下角属性编辑器选中 checkable 属性也可以）：
+
+setCheckable(bool)
+
+![image-20231229153651926](imge/Pyside2学习.assets/image-20231229153651926.png "二态按钮软件设置")
+
+二态按钮程序设置
+
+```python
+self.ui.pushButtonBold.setCheckable(True)
+```
+
+二态按压按钮按下去之后不会自动弹起，按下去的状态就是 true，处于弹起状态就是 false。
+二态按压按钮的当前状态也可以通过 isChecked() 函数获取，或者在关联信号时，选择如下两个信号之一：
+
+void QAbstractButton::clicked(bool)
+
+void QAbstractButton::toggled(bool)
+
+信号 clicked(bool) 只在图形界面用户点击按钮时才触发，如果通过程序代码调用函数 setDown()、setChecked()、toggle() 改变按钮状态，不会触发 clicked(bool) 信号。
+而第二个信号 toggled(bool) 无论是用户点击改变，还是程序调用函数来改变，都会触发 toggled(bool) 信号。
+
+对于文本字体格式的粗体、斜体、下划线等，也是 bool 类型的两种状态，例子中就用二态按压按钮来表示。文本格式的按钮有两种用途，一是根据文档内光标移动，智能感知不同文本片段的格式变化，即接收 QTextEdit::currentCharFormatChanged(QTextCharFormat) 信号；二是选中一段文本，点击格式按钮会修改选中文本的格式，即接收 QAbstractButton::clicked(bool) 信号。介绍完基本的知识，下面开始这个简易编辑器例子学习。
+
+==界面的用途==，第一行的 5 个按钮加上第二行的 单行编辑控件、字体枚举组合框，共 7 个，对应上面小节表格中前 7 个快捷函数，表格中最后一个综合 字体函数例子没用上。
+"粗体"、"斜体"、"下划线" 3 个用于二态按钮显示，等会会在代码里面设置为二态按钮。
+"前景色" 和 "背景色" 按钮会弹出颜色选取对话框，用户选择颜色后，会影响丰富文本编辑控件里选中的文本片段颜色。
+字号编辑控件和字体家族枚举组合框也是类似的，影响丰富文本编辑控件里选中的字体大小和家族。
+
+![image-20231229153102016](imge/Pyside2学习.assets/image-20231229153102016.png "简易编辑器")
+
+```python
+import sys
+# 因为我们创建的界面是MainWindow，所以这里要继承QMainWindow
+from PySide2.QtWidgets import QApplication, QWidget
+from PySide2 import QtCore, QtUiTools, QtGui, QtWidgets
+from test_Pyside2.特重要_动态加载UI import UiLoader
+
+
+class MainWindow(QWidget):
+    def __init__(self, parent=None):
+        # super() 是用来解决多重继承问题的，直接用类名调用父类方法在使用单继承的时候没问题，
+        # 但是如果使用多继承，会涉及到查找顺序（MRO）、重复调用（钻石继承）等种种问题。
+        super(MainWindow, self).__init__(parent)
+        # 导入我们生成的界面
+        self.ui = UiLoader().loadUi("简易编辑器.ui", self)
+
+        # 粗体
+        self.ui.pushButtonBold.setCheckable(True)
+        self.ui.pushButtonBold.clicked.connect(self.on_pushButtonBold_clicked)
+        # 斜体
+        self.ui.pushButtonItalic.setCheckable(True)
+        self.ui.pushButtonItalic.clicked.connect(self.on_pushButtonItalic_clicked)
+        # 下划线
+        self.ui.pushButtonUnderline.setCheckable(True)
+        self.ui.pushButtonUnderline.clicked.connect(self.on_pushButtonUnderline_clicked)
+        # 前景色
+        self.ui.pushButtonColor.clicked.connect(self.on_pushButtonColor_clicked)
+        # 背景色
+        self.ui.pushButtonBGColor.clicked.connect(self.on_pushButtonBGColor_clicked)
+        # 字号
+        # 字号原本是浮点数，这里简化为整数
+        # 字体点阵大小，这里设置下限0，上限72
+        # 0不是没有字号，是不确定字号多大
+        vali = QtGui.QIntValidator(0, 72)
+        self.ui.lineEditFontSize.setValidator(vali)
+        # 默认显示字号9
+        self.ui.lineEditFontSize.setText(str(9))
+
+        # editingFinished() 信号会在单行编辑控件失去输入焦点，或者用户在单行编辑控件里按回车键时触发。
+        self.ui.lineEditFontSize.editingFinished.connect(self.on_lineEditFontSize_editingFinished)
+        # 字体选择
+        self.fontComboBox.setFontFilters(QtWidgets.QFontComboBox.AllFonts)
+        # 内置槽函数不允许传参 使用lambda
+        self.ui.fontComboBox.currentFontChanged.connect(
+            lambda strFontFamily: self.ui.textEdit.setFont(strFontFamily))
+
+        # 文本框
+        # 为丰富文本编辑控件添加感应文字格式变化的信号 currentCharFormatChanged(QTextCharFormat)
+        # <QTextCharFormat> 是实时感知到的文本片段格式
+        self.ui.textEdit.currentCharFormatChanged.connect(self.on_textEdit_currentCharFormatChanged)
+        # 再为丰富文本编辑控件添加文本内容发生变化的时信号 textChanged() 对应的槽函数：
+        self.ui.textEdit.textChanged.connect(self.on_textEdit_textChanged)
+
+        # 丰富文本编辑框初始内容
+        self.ui.textEdit.setHtml("<b>粗体字的行<br></b>"
+                                 "<i>斜体字的行<br></i>"
+                                 "<u>下划线的行<br></u>"
+                                 "<font style=\"color:red;\">文本前景色<br></font>"
+                                 "<font style=\"background:yellow;\">文字背景色<br></font>"
+                                 "<font style=\"font-size:18pt;\">字号大小变化的行<br></font>"
+                                 "<font style=\"font-family:黑体;\">字体家族变化的行<br></font>"
+                                 )
+        # html字号有pt(PointSize)和px(PixelSize)两种形式，例子代码适用于pt
+        # 通常1英寸 == 72 pt(点) == 96 px(像素)，网页中最常用到的：9pt == 12x
+
+    # 粗体
+    def on_pushButtonBold_clicked(self, status):
+        if status:
+            self.ui.textEdit.setFontWeight(QtGui.QFont.Bold)  # 粗体
+        else:
+            self.ui.textEdit.setFontWeight(QtGui.QFont.Normal)  # 普通
+
+    # 斜体
+    def on_pushButtonItalic_clicked(self, status):
+        self.ui.textEdit.setFontItalic(status)
+
+    # 下划线
+    def on_pushButtonUnderline_clicked(self, status):
+        self.ui.textEdit.setFontUnderline(status)
+
+    # 文字前景色设置
+    def on_pushButtonColor_clicked(self):
+        clr = QtWidgets.QColorDialog.getColor(QtCore.Qt.black)  # 默认是黑色文字
+        if clr.isValid():  # 如果用户选了颜色
+            self.ui.textEdit.setTextColor(clr)
+            # 同步设置该按钮的前景色
+            # strSS = tr("color: %1").arg(clr.name())
+            strSS = "color:%s" % clr.name()
+            self.ui.pushButtonColor.setStyleSheet(strSS)
+
+    # 文字背景色设置
+    def on_pushButtonBGColor_clicked(self):
+        bgclr = QtWidgets.QColorDialog.getColor(QtCore.Qt.white)  # 用白色背景
+        if bgclr.isValid():  # 如果用户选了颜色
+            self.ui.textEdit.setTextBackgroundColor(bgclr)
+            # 同步设置该按钮的背景色
+            # strSSBG = tr("background: %1").arg(bgclr.name())
+            strSSBG = "background: %s" % bgclr.name()
+            self.ui.pushButtonBGColor.setStyleSheet(strSSBG)
+
+    # 字号修改好了，设置选中文本的字号
+    def on_lineEditFontSize_editingFinished(self):
+        nFontSize = int(self.ui.lineEditFontSize.text())
+        # 设置字号
+        self.ui.textEdit.setFontPointSize(nFontSize)
+
+    # 根据光标位置或选中文本感知字体格式
+    def on_textEdit_currentCharFormatChanged(self, format):
+        # 粗体检测
+        # 通过 format.fontWeight() 来判断字体格式是否为粗体 QFont::Bold，如果是粗体就同步设置 "粗体" 按钮的状态为 true，否则为 false。
+        if format.fontWeight() == QtGui.QFont.Bold:
+            self.ui.pushButtonBold.setChecked(True)
+        else:
+            self.ui.pushButtonBold.setChecked(False)
+        # 斜体检测
+        # 通过 format.fontItalic() 来判断斜体状态，同步设置 "斜体" 按钮的状态。
+        self.ui.pushButtonItalic.setChecked(format.fontItalic())
+        # 下划线检测
+        # 通过format.fontUnderline() 来判断是否有下划线，同步设置 "下划线" 按钮的状态。
+        self.ui.pushButtonUnderline.setChecked(format.fontUnderline())
+
+        # 获取文字前景色和背景色
+        # format 对象里面没有直接获取颜色的函数，先获取画刷，然后根据画刷来判断前景色或背景色。
+        """
+        获取前景色画刷函数为 format.foreground()，前景色画刷一般用于描绘文字和线条。因为文本有可能是无格式的普通文本，对于这些无格式普通文本，
+        前景色画刷和背景色画刷其实都 是没有的，用的是默认的黑色字，没有背景色。因此需要判断画刷是否为 Qt::NoBrush。
+        如果不是 Qt::NoBrush，那么获取前景色的颜色，然后同步设置按钮的 QSS。
+        如果画刷是 Qt::NoBrush，那么把按钮的 QSS 设置为空串。
+        获取背景色画刷函数为 format.background()，同步按钮颜色的代码与前景色是类似的。
+        """
+        # 文字前景色画刷，不一定有
+        brushText = format.foreground()
+        if brushText != QtCore.Qt.NoBrush:  # 有前景色画刷
+            clrText = brushText.color()
+            strSS = "color: %s" % clrText.name()
+            self.ui.pushButtonColor.setStyleSheet(strSS)
+        else:  # 没有前景色画刷 Qt::NoBrush
+            self.ui.pushButtonColor.setStyleSheet("")
+        # 文字背景画刷，不一定有
+        brushBG = format.background()
+        if brushBG != QtCore.Qt.NoBrush:  # 有背景色画刷
+            clrBG = brushBG.color()
+            strSSBG = "background: %s" % clrBG.name()
+            self.ui.pushButtonBGColor.setStyleSheet(strSSBG)
+        else:  # 没背景画刷Qt::NoBrush
+            self.ui.pushButtonBGColor.setStyleSheet("")
+
+        # 对于字号和字体家族检测，一定要用 QFont 的函数，不要用 QTextCharFormat 的函数
+        # QTextCharFormat 的字号和字体家族函数不准，经常为 0 或空串
+        curFont = format.font()  # 获取 QFont 成员
+        nFontSize = int(curFont.pointSize())  # 字号检测
+        # 如果是 px 形式， QFont::pointSize() 函数返回 -1
+        if nFontSize == -1:  # 如果 pt 是 -1，是 px 格式
+            # 如果是 px ，换算成 pt
+            nFontSize = int(curFont.pixelSize() * 9.0 / 12.0)
+            self.ui.lineEditFontSize.setText(str(nFontSize))
+
+        # 字体家族检测
+        strFontFamily = curFont.family()
+        self.ui.fontComboBox.setCurrentText(strFontFamily)
+    # 用于打印的丰富编辑控件内容的
+    def on_textEdit_textChanged(self):
+        # print(self.ui.textEdit.toHtml())  # 打印丰富文本
+        print(self.ui.textEdit.toPlainText())  # 打印普通无格式文本
+
+    # 设置字体
+    def setFontFamily(self, strFontFamily):
+        print(strFontFamily)
+        self.ui.textEdit.setFont(QtGui.QFont(strFontFamily.family()))
+
+
+if __name__ == "__main__":
+    app = QApplication(sys.argv)
+    window = MainWindow()
+    window.show()
+    # 结束QApplication
+    sys.exit(app.exec_())
+    # 注意，在PySide6中，需要使用app.exec()
+    # sys.exit(app.exec())
+```
+
+因为例子故意设计得比较简单，只用了 QTextEdit 的快捷函数，
+所以并没有直接触及内部的 QTextDocument 和 QTextCursor，一切都是交给 QTextEdit 自己实现的。
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -383,6 +847,175 @@ if __name__ == "__main__":
 常用的 Qt 文本浏览控件：
 
 - QTextBrowser 是 QTextEdit 的只读版本，并能打开网页链接。
+
+###### QTextBrowser
+
+QTextBrowser 是 QTextEdit 的只读版本，它继承了 QTextEdit 全部的特性，支持的 HTML 标记语言子集也是一样的。当然，QTextBrowser 还有更多增强功能，用于打开浏览 HTML 内部的超链接。QTextBrowser 本身就是 HTML 文件浏览器，虽然支持的只是 HTML 子集。
+QTextBrowser 显示的内容可以用基类的 setHtml() 、setPlainText() 等函数，另外　QTextBrowser　还有自己专属的打开文件链接函数：
+
+virtual void setSource(const QUrl & name)
+
+这是一个槽函数，它参数类似 QUrl("file:///D:/QtProjects/ch05/simplebrowser/opensuse.htm") 文件链接，自动打开并解析 HTML 文件内容，然后显示到控件界面。当源文件链接 Source 发生变化时，会触发信号：
+
+void sourceChanged(const QUrl & src)
+
+参数 src 是新的链接地址，通过这个信号可以跟踪浏览的源文件链接变化。
+
+相比基类 QTextEdit ，QTextBrowser 增强了关于 HTML 超链接浏览方面的功能。关于打开文档超链接，QTextBrowser 有两个新的属性，bool 类型 openLinks 属性是针对本地文件链接，访问函数为：
+
+bool openLinks() const
+
+void setOpenLinks(bool open)
+
+openLinks 属性默认为 true，用户点击时，自动打开本地的文档链接。
+第二个是 bool 类型 openExternalLinks 属性，是针对 HTTP/HTTPS 等形式的外部链接，可以启动系统的网页浏览器打开外部链接（因为 QTextBrowser 自己没有网络功能，访问不了外部网站）。访问这个属性的函数为：
+
+bool openExternalLinks() const
+
+void setOpenExternalLinks(bool open)
+
+不过这个属性默认是 false，默认不打开外部链接，需要通过 setOpenExternalLinks(true) ，然后用户点击外部链接时，才会启动网 页浏览器打开外部链接。
+
+针对本地 HTML 文档浏览，QTextBrowser 实现了与网页浏览器非常类似的功能，比如下面四个槽函数：
+
+virtual void backward() //后退
+
+virtual void forward() //前进
+
+virtual void home()   //回到最初的主页
+
+virtual void reload()  //重新加载，就是刷新
+
+QTextBrowser 能记住打开文档的历史记录，与常见的网页浏览器是类似的，因此有前进、后退等功能。
+
+QTextBrowser 针对 HTML 文件浏览有多个信号，具体的请查看 Qt 助手里 QTextBrowser 类的帮助文档，这里列几个常用的信号：
+
+void backwardAvailable(bool available)
+
+void forwardAvailable(bool available)
+
+第一个信号是反映 "后退" 操作的可用性变化，比如用户连续点击多个文件链接，可以后退到之前文件，就会触发这个信号。第二个信号是反映 "前进" 操作的可用性变化，与 "后退" 操作是类似的，当用户后提到旧文件，就可以前进到以前打开的新文件。
+如果用户一直后退，退到无文件可退，那么 backwardAvailable() 信号参数值就为 false，表示无法后提，其他情况都为 true。forwardAvailable() 工作原理是相反的，无文件可前进是 false，有文件前进是 true。
+
+针对用户点击文档里面的超链接和将鼠标悬浮在超链接上的情况，也有对应的信号：
+
+void anchorClicked(const QUrl & link)
+
+void highlighted(const QUrl & link)
+
+void highlighted(const QString & link)
+
+anchorClicked() 是在用户点击超链接时触发，因为 QTextBrowser 自己会自动处理本地文档链接，也能调用系统里的网页浏览器打开外部链接，所以这个信号一般不需要自己处理。如果希望改变 QTextBrowser 打开链接的特性，才会用到这个信号。highlighted() 信号是指用户选中超链接，鼠标悬浮在超链接上面，但是没有点击，这个信号可以用于提醒用户超链接文本背后的详细地址是什么，两个 highlighted() 信号参数稍有区别，一个是 QUrl 表示超链接，另一个是链接的字符串。
+
+==简易 HTML 查看器示例==
+
+本小节的例子是实现能打开本地的 HTML 类型文件，文件内容由 QTextBrowser 负责解析并浏览，然后外加一个只读的 QPlainTextEdit，同步显示 QTextBrowser 内部解析得到的 HTML 源码。
+
+QTextBrowser::setSource() 函数需要一个 HTML 文件的 QUrl 链接作为参数，这里学一个新的对话框，就是 QFileDialog，这个对话框与颜色对话框 QColorDialog 类似，可以通过定义实例使用，也可以通过静态函数使用。例子使用的是获取文件 URL 的静态函数：
+
+QUrl getOpenFileUrl(QWidget * parent = 0, const QString & caption = QString(), const QUrl & dir = QUrl(), const QString & filter = QString(), QString * selectedFilter = 0, Options options = 0, const QStringList & supportedSchemes = QStringList())
+
+调用这个函数，会弹出打开文件对话框，用户选择一个文件，点击确定后会返回一个实际文件对应的 QUrl 对象，如果用户取消了对话框，返回值的 QUrl 内容为空。
+该函数参数比较多：
+parent 是父窗口指针；
+caption 是该对话框的标题字符串；
+dir 是初始化进入的文件目录链接地址；
+filter 是文件名筛选格式串；
+selectedFilter 针对如果 filter 内部有多个筛选格式，设置选中的那个筛选格式。
+options 和 supportedSchemes 可以不用管，几乎用不到。
+
+参数里比较重要的是 filter （注意该字符串里的标点符号都是英文的），因为目录里的文件可能非常多，需要根据扩展名来筛选我们需要的文件类 型，filter 常见形式举例如下：
+
+"Images (*.png *.xpm *.jpg)"
+
+Images 是文件类型名称，这个可以自定义，用于提示而已。英文括号里面的才是重点：*.png 代表扩展名为 png 的所有文件，*.xpm 代表扩展名为 xpm 的所有文件，*.jpg 代表扩展名为 jpg 的所有文件，多个扩展名之间用空格分开。
+上面示范的字符串尽管有三个扩展名，但是只有一对英文括号，它仅仅算一个筛选器。
+带有多个筛选器的字符串示例如下：
+
+"Images (*.png *.xpm *.jpg);;Text files (*.txt);;XML files (*.xml)"
+
+含有多个筛选器的字符串是几个筛选器字符串的拼接，各个筛选器之间用两个英文分号隔开。如果希望看到所有文件，不筛选，那么可以不设置 filter ，或者把 filter 设置为 "All files (*)" 。
+
+```python
+import sys
+
+from PySide2 import QtCore, QtGui, QtWidgets
+# 因为我们创建的界面是MainWindow，所以这里要继承QMainWindow
+from PySide2.QtWidgets import QApplication, QWidget
+
+from test_Pyside2.特重要_动态加载UI import UiLoader
+
+
+class MainWindow(QWidget):
+    def __init__(self, parent=None):
+        # super() 是用来解决多重继承问题的，直接用类名调用父类方法在使用单继承的时候没问题，
+        # 但是如果使用多继承，会涉及到查找顺序（MRO）、重复调用（钻石继承）等种种问题。
+        super(MainWindow, self).__init__(parent)
+        # 导入我们生成的界面
+        self.ui = UiLoader().loadUi("简易HTML查看器.ui", self)
+
+        #  设置 QPlainTextEdit 只读模式
+        self.ui.plainTextEdit.setReadOnly(True)
+        #  设置 QTextBrowser 能自动用系统浏览器打开外站链接
+        self.ui.textBrowser.setOpenExternalLinks(True)
+        #  将 "后退"、"前进"按钮设置为不可用状态
+        self.ui.pushButtonBackward.setEnabled(False)
+        self.ui.pushButtonForeward.setEnabled(False)
+
+        # 打开HTML
+        self.ui.pushButtonOpen.clicked.connect(self.on_pushButtonOpen_clicked)
+        # 后退,内置槽函数
+        self.ui.pushButtonBackward.clicked.connect(self.ui.textBrowser.backward)
+        # 前进,内置槽函数
+        self.ui.pushButtonForeward.clicked.connect(self.ui.textBrowser.forward)
+        # 浏览框 textBrowser
+        self.ui.textBrowser.backwardAvailable.connect(self.on_textBrowser_backwardAvailable)
+        self.ui.textBrowser.forwardAvailable.connect(self.on_textBrowser_forwardAvailable)
+        self.ui.textBrowser.textChanged.connect(self.on_textBrowser_textChanged)
+
+    # 打开HTML
+    def on_pushButtonOpen_clicked(self):
+        urlFileName, urlFileType = QtWidgets.QFileDialog.getOpenFileUrl(self, "open HTML", QtCore.QUrl(),
+                                                                        "HTML files(*.htm *.html)")
+        urlFile = urlFileName.url()
+        # URL 非空，才进行打开操作
+        if urlFile:
+            # 打印文件链接
+            print(urlFile)
+            # 设置浏览的源文件
+            self.ui.textBrowser.setSource(urlFile)
+
+    #  浏览框 textBrowser
+    #  根据能否后退，设置 "后退" 按钮可用状态
+    def on_textBrowser_backwardAvailable(self, arg1):
+        print(arg1)
+        #  根据能否后退，设置 "后退" 按钮可用状态
+        self.ui.pushButtonBackward.setEnabled(arg1)
+
+    #  根据能否前进，设置 "前进" 按钮可用状态
+    def on_textBrowser_forwardAvailable(self, arg1):
+        self.ui.pushButtonForeward.setEnabled(arg1)
+
+    #  当 QTextBrowser 控件内容变化时，QPlainTextEdit 跟着变化
+    def on_textBrowser_textChanged(self):
+        #  获取 html 字符串，设置给 plainTextEdit
+        strHtml = self.ui.textBrowser.toHtml()
+        self.ui.plainTextEdit.setPlainText(strHtml)
+
+
+if __name__ == "__main__":
+    app = QApplication(sys.argv)
+    window = MainWindow()
+    window.show()
+    # 结束QApplication
+    sys.exit(app.exec_())
+    # 注意，在PySide6中，需要使用app.exec()
+    # sys.exit(app.exec())
+```
+
+
+
+
 
 #### 工作区：
 
@@ -524,7 +1157,7 @@ class MyWidget(QWidget):
 
         # 加在UI文件2种方式：静态加载、动态加载
         # 导入我们生成的界面【静态加载ui.py文件】
-        from hello_ui import Ui_Form
+        # from hello_ui import Ui_Form
         # 设置界面为我们生成的界面
         # self.ui = Ui_Form()
         # self.ui.setupUi(self)
@@ -1075,17 +1708,84 @@ if __name__ == '__main__':
 
 ![image-20231226173730378](imge/Pyside2学习.assets/image-20231226173730378.png)
 
+# 五、界面加载方式
+
+  加载UI文件2种方式：
+
+- 静态加载，通过[工具](# 二、配置Pycharm外部工具  "工具配置方法") pyside2-uic 将UI文件转换成.py导入。
+
+  ![image-20231229101217637](imge/Pyside2学习.assets/image-20231229101217637.png "转换工具使用")
+
+- 动态加载
+
+  
+
+## 5.1 静态加载
+
+```python
+# -*- coding: utf-8 -*-
+# 导入sys
+import sys
+# 任何一个PySide界面程序都需要使用QApplication
+# 我们要展示一个普通的窗口，所以需要导入QWidget，用来让我们自己的类继承
+from PySide2.QtWidgets import QApplication, QWidget
+
+# 继承QWidget类，以获取其属性和方法
+class MyWidget(QWidget):
+    def __init__(self):
+        super().__init__()
+        # 导入我们生成的界面【静态加载ui.py文件】
+        from hello_ui import Ui_Form
+        # 设置界面为我们生成的界面
+        self.ui = Ui_Form()
+        self.ui.setupUi(self)
+
+# 程序入口
+if __name__ == "__main__":
+    # 初始化QApplication，界面展示要包含在QApplication初始化之后，结束之前
+    app = QApplication(sys.argv)
+
+    # 初始化并展示我们的界面组件
+    window = MyWidget()
+    window.show()
+
+    # 结束QApplication
+    sys.exit(app.exec_())
+    # 注意，在PySide6中，需要使用app.exec()
+    # sys.exit(app.exec())
+```
+
+## 5.2 动态加载
+
+重写 UiLoader [原因及代码参见](##2、PySide2 QUiLoader导致主窗口异常)
+
+```python
+# -*- coding: utf-8 -*-
+import sys
+from PySide2.QtWidgets import QApplication, QWidget, QMessageBox
+from PySide2 import QtCore, QtUiTools, QtGui
 
 
+class UiLoader(QtUiTools.QUiLoader):
+	pass
 
+class MainWindow(QWidget):
+    def __init__(self, parent=None):
+        # super() 是用来解决多重继承问题的，直接用类名调用父类方法在使用单继承的时候没问题，
+        # 但是如果使用多继承，会涉及到查找顺序（MRO）、重复调用（钻石继承）等种种问题。
+        super(MainWindow, self).__init__(parent)
+        # 导入我们生成的界面
+        self.ui = UiLoader().loadUi("XXXXX.ui", self)
 
-
-
-
-
-
-
-
+if __name__ == "__main__":
+    app = QApplication(sys.argv)
+    window = MainWindow()
+    window.show()
+    # 结束QApplication
+    sys.exit(app.exec_())
+    # 注意，在PySide6中，需要使用app.exec()
+    # sys.exit(app.exec())
+```
 
 # 遇到的问题
 
@@ -1115,7 +1815,7 @@ with open(file_path, 'rb') as f:
 
 问题原因：文件编码格式原因，导致的报错。
 
-## 2、PySide2 QUiLoader导致主窗口（mainwindow）异常
+## 2、PySide2 QUiLoader导致主窗口异常
 
 主窗口 相关控件不能正常显示。
 
@@ -1143,3 +1843,8 @@ class UiLoader(QtUiTools.QUiLoader):
         return widget
 ```
 
+## 3、QIntValidator设置范围无效
+
+使用QIntValidator对QLineEdeit需要限制0-255时发现使用QIntValidator(0,255)，没有生效，显示范围为0-999均可输入
+
+解决方法：一般都是采用重写QValidator的成员函数validate和fixedup

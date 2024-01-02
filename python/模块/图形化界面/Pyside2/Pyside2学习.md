@@ -933,6 +933,8 @@ QVariant 是 Qt 统一表示各种变量数据的类，可以将任意 Qt 的数
 
 ![image-20240102115827627](imge/Pyside2学习.assets/image-20240102115827627.png "右键编辑项目")
 
+![image-20240102144101652](imge/Pyside2学习.assets/image-20240102144101652.png "组件")
+
 ```python
 import sys
 # 因为我们创建的界面是MainWindow，所以这里要继承QMainWindow
@@ -1016,9 +1018,102 @@ if __name__ == "__main__":
 
 
 
+**卖盒饭示例**
+
+利用浮点计数器来表示盒饭的单价，就是每份盒饭多少钱，利用整数计数器和滑动条同步表示盒饭的 份数，然后计算总价钱是多少。
+盒饭的名称是列在组合框下拉列表里面，每个条目除了盒饭名称，条目内部还对应一个用户数据，保存盒饭的单价，这样用户选择某个盒饭名称的时候，盒饭单价就自动显示 到浮 点计数器里。不过浮点计数器的单价没有定死，可以临时调整。
+
+- 盒饭组合框的内容用程序代码填充，因为我们会把盒饭的价钱也填充到盒饭条目里面，作为条目的用户数据保存着。
+- 当用户选择某个盒饭之后，从盒饭条目的用户数据获取单价，然后设置单价的浮点计数器数值。
+- 对于份数的整数计数器和水平滑动条，可以通过整数计数器右边上下箭头调整，也可以拖动滑动条的滑块改变份数，整数计数器和滑动条通过信号和槽机制同步。
+- 点击 "计算总价" 按钮会将 单价 * 份数，得到的总价钱显示到单行编辑器里面。
+
+![image-20240102155138729](imge/Pyside2学习.assets/image-20240102155138729.png "组件展示")
 
 
 
+```python
+import sys
+# 因为我们创建的界面是MainWindow，所以这里要继承QMainWindow
+from PySide2.QtWidgets import QApplication, QWidget
+from PySide2 import QtCore, QtUiTools, QtGui, QtWidgets
+from test_Pyside2.特重要_动态加载UI import UiLoader
+
+
+class MainWindow(QWidget):
+    def __init__(self, parent=None):
+        # super() 是用来解决多重继承问题的，直接用类名调用父类方法在使用单继承的时候没问题，
+        # 但是如果使用多继承，会涉及到查找顺序（MRO）、重复调用（钻石继承）等种种问题。
+        super(MainWindow, self).__init__(parent)
+        # 导入我们生成的界面
+        self.ui = UiLoader().loadUi("卖盒饭示例.ui", self)
+        #  添加盒饭组合框条目
+        self.ui.comboBoxSnacks.addItem(str("番茄鸡蛋"), 8.50)
+        self.ui.comboBoxSnacks.addItem(str("土豆烧肉"), 10.00)
+        self.ui.comboBoxSnacks.addItem(str("鱼香肉丝"), 10.00)
+        self.ui.comboBoxSnacks.addItem(str("青椒鸡蛋"), 8.50)
+        self.ui.comboBoxSnacks.addItem(str("地三鲜"), 9.00)
+
+        #  设置盒饭单价的范围和步进
+        self.ui.doubleSpinBoxPrice.setRange(0.00, 100.00)
+        self.ui.doubleSpinBoxPrice.setSingleStep(1.00)
+        # 设置单价的后缀 " 元"
+        self.ui.doubleSpinBoxPrice.setSuffix(str(" 元"))
+
+        #  设置份数计数器的范围和步进
+        self.ui.spinBoxCount.setRange(0, 100)
+        self.ui.spinBoxCount.setSingleStep(1)
+        #  设置份数滑动条的范围和步进
+        self.ui.horizontalSlider.setRange(0, 100)
+        self.ui.horizontalSlider.setSingleStep(1)
+        #  设置滑动条的刻度显示和刻度间隔
+        self.ui.horizontalSlider.setTickPosition(QtWidgets.QSlider.TicksBothSides)
+        self.ui.horizontalSlider.setTickInterval(10)
+
+        #  同步份数的计数器和滑动条
+        self.ui.spinBoxCount.valueChanged.connect(self.ui.horizontalSlider.setValue)
+        self.ui.horizontalSlider.valueChanged.connect(self.ui.spinBoxCount.setValue)
+
+        # 需要用组合框条目的序号获取该条目的用户数据，所以选择参数为 int 的序号变化信号。
+        self.ui.comboBoxSnacks.currentIndexChanged.connect(self.on_comboBoxSnacks_currentIndexChanged)
+        # 计算总价信号
+        self.ui.pushButtonCalc.clicked.connect(self.on_pushButtonCalc_clicked)
+
+    # 盒饭组合框槽函数
+    def on_comboBoxSnacks_currentIndexChanged(self, index):
+        if index < 0:  # 序号为负数不处理
+            return
+        # 正常序号
+        dblPrice = self.ui.comboBoxSnacks.itemData(index)
+        # 设置单价的浮点计数器
+        self.ui.doubleSpinBoxPrice.setValue(dblPrice)
+        # 打印当前的盒饭名和单价
+        print(self.ui.comboBoxSnacks.currentText() + "\t" + str(dblPrice))
+
+    # 计算总价
+    def on_pushButtonCalc_clicked(self):
+        dblTotal = self.ui.doubleSpinBoxPrice.value() * self.ui.spinBoxCount.value()
+        # 设置单行编辑控件显示文本
+        self.ui.lineEditTotal.setText(str("%.2f 元" % dblTotal))
+
+
+if __name__ == "__main__":
+    app = QApplication(sys.argv)
+    window = MainWindow()
+    window.show()
+    # 结束QApplication
+    sys.exit(app.exec_())
+    # 注意，在PySide6中，需要使用app.exec()
+    # sys.exit(app.exec())
+```
+
+效果展示：
+
+![image-20240102155259193](imge/Pyside2学习.assets/image-20240102155259193.png "效果展示")
+
+选择盒饭的名字，然后单价浮点计数器会自动修改为该盒饭的单价。
+份数的整数计数器可以设置份数，或者拖动右边的滑动条也可以方便地设置份数。
+点击 "计算总价" 按钮，就会计算得到 盒饭单价 * 份数 的总价，显示在单行编辑控件里。
 
 
 
@@ -1194,10 +1289,6 @@ QKeySequenceEdit 通常配合动作类 QAction 使用，带有菜单和工具条
 
 ![image-20231226170039301](imge/Pyside2学习.assets/image-20231226170039301.png "显示部件")
 
-常用的 Qt 文本浏览控件：
-
-- QTextBrowser 是 QTextEdit 的只读版本，并能打开网页链接。
-
 ###### QTextBrowser
 
 QTextBrowser 是 QTextEdit 的只读版本，它继承了 QTextEdit 全部的特性，支持的 HTML 标记语言子集也是一样的。当然，QTextBrowser 还有更多增强功能，用于打开浏览 HTML 内部的超链接。QTextBrowser 本身就是 HTML 文件浏览器，虽然支持的只是 HTML 子集。
@@ -1362,6 +1453,135 @@ if __name__ == "__main__":
     # 注意，在PySide6中，需要使用app.exec()
     # sys.exit(app.exec())
 ```
+
+###### QLabel
+
+标签控件毫无疑问是最常用的
+
+###### QGraphicsView
+
+这是专门用于绘制图形的视图类，它的内部工作原理也是遵循 View/Modal 框架的，QGraphicsView 类是属于视图显示的部分，而内部模型是 QGraphicsScene，绘图场景类内部可以添加各种图形，如线条、矩形、多边形，另外还可以自定义绘图条目 QGraphicsItem
+
+###### QCalendarWidget
+
+日期编辑器有自动弹出日历的功能，弹出的其实就是 QCalendarWidget 日历控件，QCalendarWidget 一般只用于日历显示。日历控件常用的属性是 selectedDate，就是选中的高亮的日子，该属性访问函数为：
+
+> QDate selectedDate() const
+>
+> void setSelectedDate(const QDate & date)
+
+用户是可以从日历界面自己选中日子的，选中日子变化时，发送信号：
+
+void selectionChanged()
+
+日历控件默认是不显示日子列表的网格，可以通过属性 gridVisible 改变是否显示网格的特性，访问函数为：
+
+bool isGridVisible() const
+
+void setGridVisible(bool show)
+
+日历控件因为有一个月的日子列表，比较占界面的空间，如果涉及到日子编辑，==建议用日期编辑器==，日期编辑器也是可以弹出日历的，日期编辑器占的地方也比较小。
+
+###### QLCDNumber
+
+LCD 数字显示控件就是比较传统的电子表、计算器等液晶显示器，也俗称 888 显示器，每个数字都是通过部分 8 的笔画来显示。QLCDNumber 的属性及设置函数、描述如下表所示：
+
+| **属性**              | **设置函数**                                                 | **描述**                                                     |
+| --------------------- | ------------------------------------------------------------ | ------------------------------------------------------------ |
+| **digitCount**        | void setDigitCount(int)                                      | 数字的位数限定，这个控件类不限定数值大小，只限定数的位数。   |
+| **segmentStyle**      | void setSegmentStyle(SegmentStyle)                           | 设置笔画线段的显示风格。SegmentStyle 是枚举类型，有三种，默认是QLCDNumber::Filled |
+| **intValue 和 value** | void display(int num) void display(double num) void display(const QString & s) | 既可以获取整型数值 intValue()，也可以获取浮点数值 value()。数值的设置函数不叫 set*，而是 display() 函数。 |
+| **smallDecimalPoint** | void setSmallDecimalPoint(bool)                              | 小数点的显示方式，默认情况下该属性为 false，小数点会占一个数字位。如果设置函数参数为 true，小型小数点就显示在数字之间的缝隙，而不会单独占一位。 |
+| **mode**              | void setMode(Mode)                                           | 设置显示的数字类型，比如十进制、二进制等，默认是十进制 QLCDNumber::Dec。 |
+
+关于上面属性表格，再说明一下，属性的设置函数上面列举了，而属性的获取函数与属性名一样，所以没列。
+
+setSegmentStyle() 函数用于设置数字笔画的显示风格，显示风格 SegmentStyle 有三个枚举常量：
+①QLCDNumber::Outline，用背景色绘制笔画，这个显示风格其实看不清数字，不建议用。
+②QLCDNumber::Filled，用背景色填充每个笔画的边框，笔画内部用前景色绘制。在控件比较小时，每个数字位也比较小，笔画比较细，这个显示风格就 看不清数字，因为几乎全是用背景色画笔画。如果控件比较大，那么前景色绘制的部分就比较清晰。如果控件比较小，也不建议用这个风格。
+③QLCDNumber::Flat，笔画全部用前景色填充，笔画的边框也是一样的前景色，所以称为扁平风格，这个显示风格最推荐使用，笔画非常清晰。
+
+LCD 数字显示控件的数值，有两个属性，intValue 是整数类型，value 是双精度浮点数类型，这个控件类不限定数值的大小，只限定显示的数字位数。因为是数字显示控件，不是编辑控件，它的显示通过三个 display() 函数设置，使用 QString 为参数的 display() 函数，除了显示数字和小数点，还能显示一些能支持的字符，比如 字母O/数字0、S/5、g/9、负号、小数点、十六进制数、冒号、度数（°）等。
+
+LCD 数字显示控件的工作模式 mode 有四种，QLCDNumber::Hex 是十六进制、QLCDNumber::Dec 是十进制、QLCDNumber::Oct 是八进制、QLCDNumber::Bin 是二进制，默认的模式是十进制的。QLCDNumber 的功能基本围绕以上属性展开，弄清楚属性之后，使用该类控件就比较简单了。
+
+######  QProgressBar
+
+进度条在文件的网络上传和下载过程中经常见到，因为某一个事情比较耗费时间，需要用进度条显示该事件完成的进度，一般显示进度的百分比，比如 78% 。进度条 QProgressBar 常用的属性、设置函数和描述如下表（不常用的略过了，详细情况可以查看帮助文档）：
+
+| **属性**        | **设置函数**                           | **描述**                                                     |
+| --------------- | -------------------------------------- | ------------------------------------------------------------ |
+| **orientation** | void setOrientation(Qt::Orientation)   | 显示的方向，Qt::Horizontal 是水平进度条（默认值），Qt::Vertical 是垂直进度条。 |
+| **format**      | void setFormat(const QString & format) | 设置显示文本的格式，默认格式是 "%p%"，就是百分比显示，如 78% |
+| **textVisible** | void setTextVisible(bool visible)      | 决定是否显示百分比的文本，一般是显示的，例外的是苹果系统风格从不显示进度条文本的。 |
+| **maximum**     | void setMaximum(int maximum)           | 进度条数值的上限。                                           |
+| **minimum**     | void setMinimum(int minimum)           | 进度条数值的下限。                                           |
+| **value**       | void setValue(int value)               | 进度条当前数值。                                             |
+| **text**        | 无                                     | 进度条文本通过 format 属性设置，可以获取文本 text()，但不能直接设置文本。 |
+
+首先要明确的是进度条的数值设置，默认下限是 0，默认上限是 100，这样当数值 value 为 24 时，显示的文本就是 %24 ，通过下限、上限、当前数值来计算需要显示的百分比文本，而不能直接设置显示的文本。
+数值的范围由 setMaximum() 和 setMinimum() 函数限定，或者用如下范围设置函数一次设置：
+
+void setRange(int minimum, int maximum)
+
+显示的文本格式通过 setFormat() 函数来控制，参数字符串默认是 "%p%" ，意义为：
+第一个 "%p" 是格式串占位符，指计算百分比数值，第二个 "%" 就是指百分号本身，这样显示的就是如 "24%" 字样。
+如果希望显示当前数值本身，而不是百分比，那么用格式串占位符 "%v" ，就代表当前的 value 值。
+另外还有一个格式串占位符是 "%m" ，代表上限减去下限的差额。
+
+三个格式串占位符是可以混搭的，比如 "%v/%m" 就是既显示当前值，也显示总差额，比如显示为 "24/100" 。
+除去三个占位符的其他字符，会照原样显示，比如 / 字符。再比如 "%v MB/%m MB"，实际显示为 "24 MB/100 MB" 。
+
+默认是显示文本的，调用函数 setTextVisible(false) 就会不显示文本，只显示进度条本身。
+orientation 属性决定进度条的显示方向，水平进度条最为常见，对于垂直进度条的文本显示，有个例外的属性 textDirection，这个 textDirection 只对垂直进度条有效，表示垂直进度条的文本显示方向，其设置函数为
+
+void setTextDirection(QProgressBar::Direction textDirection)
+
+QProgressBar::TopToBottom 表示从顶部到底部显示文本，QProgressBar::BottomToTop 是从底部到顶部显示文本。
+
+###### Line
+
+线条控件就是纯粹作为分隔用途的，比如有多个用途的控件，可以用线条 Line 分隔一下。
+水平线条和垂直线条的类虽然在设计师里显示的类名叫 Line，实际上没有这个 Line 类。
+线条其实是用 QFrame 类模拟实现的，水平线条代码举例如下：
+
+line = new QFrame(Form);
+line->setObjectName(QStringLiteral("line"));
+line->setGeometry(QRect(60, 60, 118, 3));
+line->setFrameShape(QFrame::HLine);
+line->setFrameShadow(QFrame::Sunken);
+
+参数里的 Form 是父窗口指针，QFrame::HLine 就是画水平线条，QFrame::Sunken 是指绘制一个凹下去效果的三维阴影。
+垂直线条的代码举例如下：
+
+line_2 = new QFrame(Form);
+line_2->setObjectName(QStringLiteral("line_2"));
+line_2->setGeometry(QRect(70, 100, 3, 61));
+line_2->setFrameShape(QFrame::VLine);
+line_2->setFrameShadow(QFrame::Sunken);
+
+水平线条和垂直线条属性 orientation 的取值不一样，Horizontal 是水平线条，Vertical 是垂直线条，其他都是类似的。Qt 设计师会根据线条的方向、位置、粗细，计算出线条占用的矩形，然后设置给 QFrame 对象。
+QFrame 是专门用于绘制边框的类，一般有边框特效的控件就是从 QFrame 派生的，本节标签控件、进度条控件、LCD 数字显示控件 的基类就是 QFrame。
+
+###### QOpen GL Widget
+
+OpenGL 三维绘图控件  
+
+QOpenGLWidget  这个控件非常新，是从 Qt 5.4 版本才开始有的，这个控件用于在普通窗体里面进行 OpenGL 绘图。
+
+###### QDeclarativeView
+
+这个控件是从 Qt 4 保留而来的，目前 QtQuick 1 已经弃用了，所以不建议用这个控件了。在 Qt 设计师独立程序能看到这个控件，而在 QtCreator 设计模式已经没有这个控件了。
+
+###### QQuickWidget
+
+QQuickWidget 是 QtQuick 2 集成到普通窗体程序里的控件，是目前建议使用的控件。关于这个控件的使用方法请参考 QQuickWidget 帮助文档。
+
+###### QWebView
+
+网页浏览视图
+
+QTextBrowser 是一个不完全的浏览器，而 QWebView 则是一个完整的浏览器控件，支持 HTML 全部特性，当然也有网络访问功能。QWebView 位于 Qt 的 webkitwidgets 模块里，使用该控件需要添加该模块到 *.pro 文件里面。在 Qt 5 之后，网页浏览相关的控件和类都基于 Chrome 核心了，所以效率是比较高的。
 
 
 

@@ -822,6 +822,197 @@ if __name__ == "__main__":
 因为例子故意设计得比较简单，只用了 QTextEdit 的快捷函数，
 所以并没有直接触及内部的 QTextDocument 和 QTextCursor，一切都是交给 QTextEdit 自己实现的。
 
+###### QComboBox
+
+组合框相当于是单行编辑控件加一个数据条目列表，用户可以手动输入数据，也可以从数据列表选择一个条目作为输入数据
+
+字体组合框 QFontComboBox 的列表是自动添加的，普通的 QComboBox 是程序员通过代码来添加。
+
+常用的添加函数分两类，一类是追加 到列表末尾的 add* 函数，另一类是将条目插入到某个序号位置，即 insert* 函数。
+
+- 首先是追加到末尾的函数：
+
+  > void addItem(const QString & text, const QVariant & userData = QVariant())
+  >
+  > void addItem(const QIcon & icon, const QString & text, const QVariant & userData = QVariant())
+  >
+  > void addItems(const QStringList & texts)
+
+  第一个 addItem 函数，是将参数里的 text 添加到列表末尾显示出来，userData 是附加的用户数据，可有可无。对于组合框的运用，一般是直接使用列表的序号或者列表的文本 text，如果需要用到序号、文本之外的复杂数据，设定 userData 一同添加到列表里。userData 不会显示出来，就是内存中的数据，知道序号之后，可以通过 itemData(index) 函数获取。
+  第二个 addItem 函数也是添加一个条目到列表末尾，但多一个显示图标 icon，图标和文本 text 会同时显示在组合框的下拉列表里面。
+  第三个函数 addItems 是批量添加多个字符串到列表末尾，这种批量添加方式没有图标，也没有用户数据，就是将 texts 字符串列表添加到组合框下拉列表末尾。
+
+- 另一类添加条目的函数是 insert* 系列函数，多一个 index 序号，会将条目插入到 index 序号的位置：
+
+  > void insertItem(int index, const QString & text, const QVariant & userData = QVariant())
+  >
+  > void insertItem(int index, const QIcon & icon, const QString & text, const QVariant & userData = QVariant())
+  >
+  > void insertItems(int index, const QStringList & list)
+
+  需要注意这个 index 取值范围，组合框下拉列表的条目总数为 count()：
+  如果 index 在合法的序号范围 0 到 count()-1，那么条目就正好从 index 位置插入，新的条目序号就是 index 序号开始。
+  如果 index 是负数，那么插入到列表最前面。
+  如果 index >= count()，那么会插入到列表最后面。
+  insert* 系列函数其他参数含义与 add* 函数是一样的。
+
+组合框的列表条目计数属性为 count，获取函数为 count() ，这个计数由组合框自己维护，不能手动 set 的。添加条目的函数很多，但是==删除条目==的函数只需要两个：
+
+> void QComboBox::removeItem(int index)  //删除序号为 index 的条目
+>
+> void QComboBox::clear()  //槽函数，清空所有条目
+
+用户从下拉列表选择的条目序号是由整型属性 currentIndex 确定，访问函数：
+
+> int currentIndex() const
+>
+> void setCurrentIndex(int index)
+
+选中的序号变化后发送信号：
+
+> void currentIndexChanged(int index)
+>
+> void currentIndexChanged(const QString & text)
+
+第一个信号参数是选中条目序号，第二个信号的参数是选中条目的文本 text。
+
+组合框另外还有一个文本的属性 currentText，是指在组合框内部包含的单行编辑器的文本。访问这个属性的函数为：
+
+> QString currentText() const
+>
+> void setCurrentText(const QString & text)
+
+当组合框内部包含的单行编辑器的文本发生改变时触发信号：
+
+void currentTextChanged(const QString & text)
+
+也许有读者会问，刚才不是有 currentIndexChanged(QString) 信号，怎么还来个 currentTextChanged(QString)，这两个一样吗？
+当然不一样！条目序号变化的 currentIndexChanged(QString) 信号触发时，当前文本属性的 currentTextChanged(QString) 会触发，但反过来不一定。
+
+默认情况下，组合框内部包含的单行编辑器是只读的，用户只能从下拉列表选择条目，然后组合框内部包含的单行编辑器的文本会变成该序号的条目文本。但是可以改变这一 只读特性，就是 editable 属性，该属性决定用户能不能在组合框内部包含的单行编辑器里手动敲入字符，其访问函数为：
+
+> bool isEditable() const
+>
+> void setEditable(bool editable)
+
+默认是不可编辑的，如果调用 setEditable(true)，那么就可以编辑了。用户手动编辑的内容，一般不在下拉列表里，就不触发序号改变的信号，而只会触发当前文本属性变化的信号 currentTextChanged(QString)。
+对于可编辑的组合框，用户完全可以手动输入下拉列表之外的文本，然后可以用信号 currentTextChanged(QString) 或者用 currentText() 获取当前文本。
+而且，editable 属性为 true 时，不仅仅能允许用户自定义内部编辑框里的内容，如果用户手动输入了下拉列表之外的内容，并且在内部编辑框里面按下 Enter 回车键，那么用户新编辑的文本条目会自动添加到组合框的下拉列表里面。也就是说，程序运行时，用户可以手动新增条目到下拉列表里，所需操作就是输入新条目并按回车键。
+对于可编辑的组合框，用户手动新增的条目，默认会添加到下拉列表末尾，可以通过设置 insertPolicy 属性改变插入特性。该属性的访问函数为：
+
+> InsertPolicy insertPolicy() const
+>
+> void setInsertPolicy(InsertPolicy policy)
+
+插入策略的枚举类型 InsertPolicy 的常量比较多，具体请查阅 Qt 帮助文档，这里不列举了。
+
+关于组合框列表显示，还有两个属性可能会用到，一个是 maxVisibleItems，因为下拉列表的条目可能很多，不可能全部显示，maxVisibleItems 就是指定下拉列表最多同时显示的条目数，超过这个数值时，下拉列表右边会自动出现滚动条，拖动滚动条就可以查看其他的条目。maxVisibleItems 默认值为 10，设置函数为 setMaxVisibleItems(int maxItems)。
+另一个属性是关于图标显示的，组合框显示的图标大小，由属性 iconSize 确定，如果图标太大也不美观。如果为条目设置了图标，那么建议所有图标文件的像素 宽度、高度都一样大，如果不一样大，最好手动设置显示的图标大小，通过函数 setIconSize(const QSize & size) 。
+
+组合框一般情况下是直接使用选中条目的序号或显示的文本 text 信息，也有例外，就是序号和文本都不够用的时候，那就需要给条目设置用户数据，可以在 add* 或 insert* 函数里面设置用户数据，也可以手动设置各个条目的用户数据：
+
+void setItemData(int index, const QVariant & value, int role = Qt::UserRole)
+
+获取数据就用如下函数：
+
+QVariant itemData(int index, int role = Qt::UserRole) const
+
+QVariant 是 Qt 统一表示各种变量数据的类，可以将任意 Qt 的数据类型赋值给 QVariant 对象，也可以由 QVariant 对象转出为其他数据类型。至于 role 角色，是为了让组合框理解数据的类型，是用于显示，还是用于干别的，目前不用修改角色，使用默认值 Qt::UserRole 就够了。等以后学到复杂的 Model/View 再理会角色的问题，组合框还有一些函数就是用于 Model/View ，这里都没有列举，因为暂时用不到那么复杂的东西。 Model/View 是 Qt 对数据处理和图形显示的经典软件设计框架 MVC（Model View Controller）的简化版，感兴趣的读者可以查询 MVC 框架的意义，或者查看 Qt 帮助文档索引 Model/View Programming 。
+
+ **个人信息收集示例**
+
+个人信息收集的例子经常在人员信息登记、统计过程中用到，这里是简化版的，收集姓名、性别、职业、生日四方面信息：
+
+- 姓名采用单行编辑器收集。
+
+- 性别信息采用默认的组合框表示，因为性别就 "男" 和 "女"，所以下拉列表是固定的。
+
+- 职业信息也是使用组合框，枚举一些职业，但是真正的职业是非常多的，不可能穷举，所以会通过代码来设置这个职业组合框为可编辑的。
+
+- 生日信息 收集是采用日期编辑控件，会弹出每个月的日历供用户选择。
+
+![image-20240102115827627](imge/Pyside2学习.assets/image-20240102115827627.png "右键编辑项目")
+
+```python
+import sys
+# 因为我们创建的界面是MainWindow，所以这里要继承QMainWindow
+from PySide2.QtWidgets import QApplication, QWidget
+from PySide2 import QtCore, QtUiTools, QtGui, QtWidgets
+from test_Pyside2.特重要_动态加载UI import UiLoader
+
+
+class MainWindow(QWidget):
+    def __init__(self, parent=None):
+        # super() 是用来解决多重继承问题的，直接用类名调用父类方法在使用单继承的时候没问题，
+        # 但是如果使用多继承，会涉及到查找顺序（MRO）、重复调用（钻石继承）等种种问题。
+        super(MainWindow, self).__init__(parent)
+        # 导入我们生成的界面
+        self.ui = UiLoader().loadUi("个人信息收集示例.ui", self)
+        # 无论接收 currentIndexChanged(int) 信号还是 currentIndexChanged(QString) 都可以，上图示范的是参数类型为 int 的信号。
+        # 对于用户不可手动编辑的组合框（只能从下拉列表选择），通常接收这两个信号中的一个就足够了。
+        self.ui.comboBoxGender.currentIndexChanged.connect(self.on_comboBoxGender_currentIndexChanged)
+        # 对于用户可编辑的组合框，用户如果手动敲字符输入职业名，那么序号变化的信号不一定触发，因此应该接收当前文本变化的信号
+        # currentTextChanged(QString) 信号，这样保证无论用户采用哪种手段输入，都会接收到文本变化的信号。
+        self.ui.comboBoxJob.currentTextChanged.connect(self.on_comboBoxJob_currentTextChanged)
+        # 日期编辑器添加 dateChanged(QDate) 信号对应的槽函数，感知日期的变化
+        self.ui.dateEdit.dateChanged.connect(self.on_dateEdit_dateChanged)
+
+        self.ui.pushButton.clicked.connect(self.on_pushButtonCommit_clicked)
+
+    # 性别选择框槽函数
+    def on_comboBoxGender_currentIndexChanged(self, index):
+        if index < 0:  # index 可能 -1，表示用户没有选，或者条目全被删除了
+            return  # 直接返回
+        # 打印信息
+        print("性别：%s" % self.ui.comboBoxGender.itemText(index))
+
+    # 职业选择
+    def on_comboBoxJob_currentTextChanged(self, arg1):
+        # 不是基于序号的，直接得到了新的文本
+        print("职业:%s" % arg1)
+
+    # 日期
+    def on_dateEdit_dateChanged(self, date):
+        # qDebug()<<date.toString("yyyy-MM-dd");  //参数是日期字符串格式
+        # yyyy 是四位数年份，MM 是两位数月份，dd 是两位数日子，比如 "2000-01-01"
+        print(date.toString("yyyy-MM-dd"))
+
+    # 提交按钮
+    def on_pushButtonCommit_clicked(self):
+        strResult = ""  # 结果字符串
+        # 获取姓名
+        strResult += "姓名：%s\r\n" % self.ui.lineEditName.text()
+        # 性别
+        strResult += "性别：%s\r\n" % self.ui.comboBoxGender.currentText()
+        # 职业
+        strResult += "职业：%s\r\n" % self.ui.comboBoxJob.currentText()
+        # 生日
+        strResult += "生日：%s\r\n" % self.ui.dateEdit.date().toString()
+        # QDate::toString() 如果不带参数格式，自动按照本地化语言的日期格式返回字符串
+
+        # 额外功能，根据当前时间和用户生日，计算用户当前岁数
+        dtCur = QtCore.QDateTime.currentDateTime()
+        # 计算岁数
+        nYears = dtCur.date().year() - self.ui.dateEdit.date().year()
+        strResult += "岁数：%d" % nYears
+
+        # 显示消息框
+        QtWidgets.QMessageBox.information(self, "信息", strResult)
+
+
+if __name__ == "__main__":
+    app = QApplication(sys.argv)
+    window = MainWindow()
+    window.show()
+    # 结束QApplication
+    sys.exit(app.exec_())
+    # 注意，在PySide6中，需要使用app.exec()
+    # sys.exit(app.exec())
+```
+
+效果：
+
+![image-20240102130723709](imge/Pyside2学习.assets/image-20240102130723709.png "案例效果")
 
 
 
@@ -831,6 +1022,165 @@ if __name__ == "__main__":
 
 
 
+###### QFontComboBox
+
+字体组合框 
+
+这是普通组合框的派生类，自动枚举操作系统里的各种字体家族，并作为列表提供给用户选择，字体组合框就是一个定制化的枚举字体 的组合框，其他功能与普通组合框其实没什么区别。
+
+###### QSpinBox
+
+计数器用于接收整数数值输入，一般会指定整数值下限 setMinimum()、上限 setMaximum() 和步进 setSingleStep()，计数器就是一个单行编辑器加右边的上下箭头图标，点击向上箭头，整数就会增加步进的值，点击向下箭头，就会减少步进的数值。就是 个记分牌，分值能按照步进值增加或减少，整数值不会超出下限和上限的范围，相当于也自带了一个验证器。
+计数器的输入数值属性名为 value，访问函数为：
+
+> int value() const
+>
+> void setValue(int val)
+
+不管是通过直接编辑数值还是通过上下箭头调整数值，都会触发信号：
+
+> void valueChanged(int i)
+>
+> void valueChanged(const QString & text)
+
+两个信号一个信号参数是整数数值，另一个是整数的数字字符串。
+因为计数时可能用到一些字符的前缀或者后缀单位（千米 km、千克 kg 等），计数器里面的编辑框是可以附带前缀属性 prefix 和后缀属性 suffix，通过如下函数访问前缀和后缀：
+
+> QString prefix() const
+>
+> void setPrefix(const QString & prefix)
+>
+> QString suffix() const
+>
+> void setSuffix(const QString & suffix)
+
+###### QDoubleSpinBox
+
+浮点计数器与整数计数器是类似的，只不过浮点计数器用于接收 double 类型的数值，数值的下限、上限、步进都可以是浮点数。因为用于接收 double 数值，涉及到数值的精度，浮点计数器的精度属性为 decimals，默认是小数点后两位，访问精度属性的函数为：
+
+> int decimals() const
+>
+> void setDecimals(int prec)
+
+浮点计数器其他功能与整数计数器类似，只不过处理 double 类型 value 而已，前缀、后缀等属性与整数计数器是一样的。
+
+###### QTimeEdit
+
+时间编辑器用于接收时间的输入，包括时、分、秒。它的时间属性类型是 QTime，访问函数为：
+
+> QTime time() const
+>
+> void setTime(const QTime & time)
+
+当时间属性被修改时，会触发信号：
+
+void timeChanged(const QTime & time)
+
+###### QDateEdit
+
+日期编辑器用于接收日期的输入，包括公历的年、月、日。它的日期属性类型是 QDate，访问函数为：
+
+> QDate date() const
+>
+> void setDate(const QDate & date)
+
+当日期属性被修改时，会触发信号：
+
+void dateChanged(const QDate & date)
+
+日期编辑器有个附加的功能，就是弹出每个月的日历，它有个 bool 类型的属性 calendarPopup，决定用户编辑日期时，是否自动弹出日历供用户选择， 访问函数为：
+
+> bool calendarPopup() const
+>
+> void setCalendarPopup(bool enable)
+
+![image-20240102123547575](imge/Pyside2学习.assets/image-20240102123547575.png "自动弹出日历")
+
+###### QDateTimeEdit
+
+日期时间编辑器这其实是上面两个编辑器的基类，上面两个编辑器基于这个日期时间编辑器，也就是说上面两个编辑器是功能简化版而已。
+
+关于日期和时间的属性， QDateTimeEdit 有三个，
+
+- 日期属性 QDate 类型，同上面日期编辑器的，
+
+- 时间属性 QTime，同上面时间编辑器的，
+
+- 还有一个更全面的属性，类型为 QDateTime，既包含日期也包含时间，其访问函数为：
+
+- > QDateTime dateTime() const
+  >
+  > void setDateTime(const QDateTime & dateTime)
+
+  该属性被修改时触发信号：
+
+  void dateTimeChanged(const QDateTime & datetime)
+
+QDateTimeEdit 也能弹出每个月的日历，控制弹出日历的属性就是 bool 类型 calendarPopup，QDateEdit 是从 QDateTimeEdit 继承这个属性的。无论是前面的时间编辑器、日期编辑器，还是这个基类日期时间编辑器，使用方式都是比较简单的，更多内容建议查 Qt 助手帮助文档
+
+###### QDial
+
+转盘，也可以叫拨号盘、刻度盘、仪表盘等。就是给定一个下限、上限，在圆圈最多 360 度的范围内映射为数值的下限、上限，通过转动转盘来接收用户输入。转盘也可以设置步进 singleStep，整数数值属性为 value，这个与整数计数器类似。
+
+>  转盘的数值属性 value 
+>
+> 访问函数是 value() ，
+>
+> 设置函数是 setValue(int)，
+
+数值改变的信号是 valueChanged(int) 。
+比较有意思的是通过键盘来改变转盘的数值，键盘的上/下箭头或者左/右箭头控制转盘的步进，Home 键和 End 键快速设置为整数下限和上限，另外还可以为转盘设置比较大的步进，或叫页进，即 pageStep，按键盘上的 PageUp 和 PageDown 会根据大步进 pageStep 调整转盘数值，设置大步进的函数为 setPageStep(int) 。
+
+###### QScrollBar
+
+滚动条 无论是水平滚动条 Horizontal Scroll Bar 还是垂直滚动条 Vertical Scroll Bar，它们隶属同一个类，就是 QScrollBar，水平方向和垂直方向，只是通过属性 orientation 区分一下而已，该属性的访问函数为：
+
+Qt::Orientation orientation() const
+
+void setOrientation(Qt::Orientation)
+
+水平方向为 Qt::Horizontal，垂直方向为 Qt::Vertical 。
+一般很少直接用到这个滚动条类，滚动条类用于多页文档的翻页和大尺寸图片的查看，实际上 Qt 关于多页文档的编辑类，如 QPlainTextEdit、QTextEdit，全都自己带了水平滚动条和垂直滚动条，根本不要程序员自己编写滚动条代码。真正需要滚动条的程序，通常也不会 只做一个滚动条，而是水平的和垂直的都需要。
+Qt 有专门的类 QScrollArea ，它既有水平滚动条，也有垂直滚动条，如果确实需要自己添加滚动条，建议读者去查 QScrollArea 类的文档，一次性用 QScrollArea 搞定，免得还弄两个滚动条麻烦。为某个控件添加滚动区域只需用一个函数搞定：
+
+void QScrollArea::setWidget(QWidget * widget)
+
+这个函数会将 QScrollArea 对象自动附加给被包裹的 widget 对象，这样 widget 对象就有水平和垂直滚动条了。
+
+######  QSlider
+
+滑动条
+与滚动条相比，滑动条才是用来接收用户输入数值的，或者显示音视频播放进度、音量大小等。无论是水平滑动条还是垂直滑动条，它们的类都是 QSlider，只有属性 orientation 不一样，水平方向为 Qt::Horizontal，垂直方向为 Qt::Vertical 。
+滑动条的属性与前面转盘的属性是非常类似的，它们有共同基类 QAbstractSlider。转盘是圆形的，而滑动条是笔直的。函数也是类似的，下限设置函数为 setMinimum() ，上限设置函数为 setMaximum()，步进设置函数为 setSingleStep()，大步进设置函数为 setPageStep()。
+接收的输入数值属性也是整数类型 value，访问函数、信号都和前面转盘、计数器的一样。
+QSlider 独特的一个功能是可以自定义刻度，QSlider 的刻度绘制属性为 tickPosition，访问函数为：
+
+TickPosition tickPosition() const
+
+void setTickPosition(TickPosition position)
+
+tickPosition 默认值是 QSlider::NoTicks ，不显示刻度，还有其他枚举常量：
+QSlider::TicksBothSides，在滑动线的两边都印刻度；
+QSlider::TicksAbove，在滑动线上方印刻度（水平滑动条）；
+QSlider::TicksBelow，在滑动线下方印刻度（水平滑动条）；
+QSlider::TicksLeft，在滑动线左边印刻度（垂直滑动条）；
+QSlider::TicksRight，在滑动线右边印刻度（垂直滑动条）。
+
+tickPosition 是指刻度绘制的位置，而到底间隔多大数值画一个刻度线，是由属性 tickInterval 决定的，该属性访问函数为：
+
+int tickInterval() const
+
+void setTickInterval(int ti)
+
+tickInterval 默认值为 0，如果 tickPosition 确定要画刻度，那么刻度间距的数值自动从小步进 singleStep 和大步进 pageStep 之间挑。当然，如果确定要显示刻度，建议手动设置一下刻度间距。比如数值限定 0 到 100 ，那么可以隔 10 画一个刻度，或者隔 20 画一个刻度。
+
+无论是用计数器、转盘还是滑动条，都可以接收整数范围内的数值输入，到底用哪个，可以根据实际显示效果或者窗体空间大小、用户输入习惯等方面考虑，从程序员角度， 三种控件编程实现的难易程度其实都一样。
+
+###### QKeySequenceEdit
+
+快捷键编辑器 
+用户在进行文档操作时，常用复制 Ctrl+C 、粘贴 Ctrl+V、剪切 Ctrl+X ，Key Sequence 就是指这些快捷键序列。QKeySequenceEdit 就专门提供给用户自定义快捷键的，高级的文本编辑器一般带自定义快捷键功能，QKeySequenceEdit 就是接收用户输入新的快捷键的，类似游戏中用到的改键精灵功能。
+QKeySequenceEdit 通常配合动作类 QAction 使用，带有菜单和工具条的主窗口程序中，每个菜单项、工具按钮都对应一个 QAction 实例，QKeySequenceEdit 可以接收用户输入的快捷键序列，设置给 QAction 对象，这样一旦用户按下自己设置的快捷键，对应的 QAction 对象就会触发，相当于点击菜单项或工具按钮。QKeySequenceEdit 的应用等以后学到菜单、工具条再说。
 
 
 

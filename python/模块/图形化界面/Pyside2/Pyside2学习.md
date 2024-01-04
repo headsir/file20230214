@@ -2357,6 +2357,299 @@ if __name__ == "__main__":
     # sys.exit(app.exec())
 ```
 
+# 六、多线程
+
+**来源：**https://frica.blog.csdn.net/article/details/130776621?spm=1001.2101.3001.6650.1&utm_medium=distribute.pc_relevant.none-task-blog-2%7Edefault%7ECTRLIST%7ERate-1-130776621-blog-91968549.235%5Ev40%5Epc_relevant_3m_sort_dl_base3&depth_1-utm_source=distribute.pc_relevant.none-task-blog-2%7Edefault%7ECTRLIST%7ERate-1-130776621-blog-91968549.235%5Ev40%5Epc_relevant_3m_sort_dl_base3&utm_relevant_index=2
+
+[作者主页](https://frica.blog.csdn.net/?type=blog)
+
+## 6.1 多线程模板
+
+分两种情况来谈论，有返回值 与 无返回值。
+
+### 无返回值
+
+ 代码释义
+
+定义 **MyThread** 的线程类，继承自 **QThread**；
+ 在构造函数中，接收一个函数 **func** 和其它参数 **`*args`** 和 **`**kwargs`**；
+ 并在 **run()** 方法中，调用传入的函数，并将参数传递给它。
+
+定义 **do_something()** 的函数，它表示一个耗时的操作。
+
+在主程序中，实例化**MyThread** 对象 **thread**，将 **do_something** 函数作为参数传递给它。
+ 然后，通过调用 start() 方法启动线程，线程会自动执行 run() 方法中的任务。
+
+```python
+# -*- coding: utf-8 -*-
+
+import time
+from PySide6.QtCore import (Qt, QThread)
+
+
+# 自定义的工作任务类
+class MyThread(QThread):
+    def __init__(self, func, *args, **kwargs):
+        super().__init__()
+        self.func = func
+        self.args = args
+        self.kwargs = kwargs
+
+    def run(self):
+        self.func(*self.args, **self.kwargs)
+
+
+def do_something():
+    for i in range(100):
+        time.sleep(0.5)
+        print(i)
+    # time.sleep(100)
+    return '耗时操作'
+
+
+if __name__ == '__main__':
+    thread = MyThread(do_something)
+    thread.start()
+    # 使用线程对象的 wait() 方法等待子线程执行完毕,一般不推荐
+    thread.wait()
+```
+
+### 有返回值
+
+有返回值，也分两种情况来讨论
+
+- （**`不推荐`**）使用线程对象的 wait() 方法等待子线程执行完毕，然后通过自定义的方法或属性来获取返回值
+- （**`推荐`**） 使用信号和槽机制进行线程间通信
+
+#### 不推荐
+
+---
+
+> 这种情况是不推荐的，不够线程安全，
+>  在多线程编程中，共享数据可能存在竞争条件和线程安全性问题，从而引发线程安全性问题。
+
+```python
+# -*- coding: utf-8 -*-
+
+import time
+from PySide6.QtCore import (Qt, QThread)
+
+
+# 自定义的工作任务类
+class MyThread(QThread):
+    def __init__(self, func, *args, **kwargs):
+        super().__init__()
+        self.res = str()
+        self.func = func
+        self.args = args
+        self.kwargs = kwargs
+
+    def run(self):
+        self.res = self.func(*self.args, **self.kwargs)
+
+
+def do_something():
+    # time.sleep(100)
+    for i in range(100):
+        time.sleep(0.5)
+        print(i)
+    return '耗时操作'
+
+
+if __name__ == '__main__':
+    thread = MyThread(do_something)
+    thread.start()
+    thread.wait()
+    print(thread.res)
+```
+
+#### 推荐
+
+------
+
+ 代码释义
+
+整体流程如下：
+
+- 创建继承**QThread** 的 **MyThead**类，接收一个函数和不定长传参；重写了 run方法并在这里执行传递过来的函数和传参；
+- 创建继承自 **QWidget** 的 **MainWindow** 类，用于显示窗口和处理事件；
+- 在 **setup_ui** 方法中设置窗口的标题、大小，并创建标签和按钮，并将它们添加到垂直布局中；
+- 在 **setup_thread** 方法中创建 **MyThread** 线程对象，并连接它的 **finish** 信号到槽函数 **thread_finished**；
+- 在 **do_something**函数中模拟一个耗时的任务，并返回任务的结果；
+- 在 **thread_finished** 槽函数中，接收到任务完成的信号后，将结果更新到标签上；
+- 运行程序后，窗口会显示一个标签和一个按钮。点击按钮后，耗时任务会在后台执行，执行完成后，结果会显示在标签上。
+
+```python
+# -*- coding: utf-8 -*-
+
+import time
+
+from PySide2.QtCore import (QThread, Signal, Slot, QSize)
+from PySide2.QtWidgets import (QApplication, QPushButton, QLabel, QVBoxLayout, QWidget)
+
+
+class MyThread(QThread):
+    finish = Signal(str)
+
+    def __init__(self, func, *args, **kwargs):
+        super().__init__()
+        self.func = func
+        self.args = args
+        self.kwargs = kwargs
+
+    def run(self):
+        res = self.func(*self.args, **self.kwargs)
+        # 任务完成后发出信号
+        self.finish.emit(res)
+
+
+def do_something():
+    time.sleep(1)
+    return 'the function execution completed!'
+
+
+class MainWindow(QWidget):
+    def __init__(self, parent=None):
+        super().__init__(parent=parent)
+        self.setup_ui()
+        self.button.clicked.connect(self.setup_thread)
+
+    def setup_ui(self):
+        self.setWindowTitle('demo')
+        self.resize(QSize(250, 180))
+        # 创建一个垂直布局
+        layout = QVBoxLayout()
+        # 创建一个标签
+        self.label = QLabel('This is a label => ')
+        layout.addWidget(self.label)
+        # 创建一个按钮
+        self.button = QPushButton('execute')
+        layout.addWidget(self.button)
+        # 将布局设置为主窗口的布局
+        self.setLayout(layout)
+        # 显示窗口
+        self.show()
+
+    def setup_thread(self):
+        self.thread = MyThread(do_something)
+        self.thread.finish.connect(self.thread_finished)
+        self.thread.start()
+
+    @Slot(str)
+    def thread_finished(self, res):
+        self.label.setText('This is a label => ' + res)
+
+
+if __name__ == '__main__':
+    app = QApplication([])
+    window = MainWindow()
+    window.show()
+    app.exec_()
+```
+
+## 6.2线程池模板
+
+ 代码释义
+
+**MyWorker**类继承自**QRunnable**，接收一个函数、一个信号和其他可变参数。
+
+在run方法中，它调用了传入的函数并将结果发射出信号。
+
+**do_something**函数是一个模拟的耗时操作，它在执行完毕后返回一个字符串。
+
+**MainWindow**类是窗口的主要部分，它创建了一个垂直布局，并添加了一个标签和一个按钮。点击按钮后，它创建一个**MyWorker**对象，并使用线程池启动这个线程。同时，它将信号与**thread_finished**槽函数连接起来，在线程完成后更新标签的文本。
+
+```python
+import time
+
+from PySide2.QtCore import (QRunnable, QThreadPool, Signal, Slot, QSize)
+from PySide2.QtWidgets import (QApplication, QPushButton, QLabel, QVBoxLayout, QWidget)
+
+
+class MyWorker(QRunnable):
+
+    def __init__(self, func, signal, *args, **kwargs):
+        super().__init__()
+        self.func = func
+        self.args = args
+        self.kwargs = kwargs
+        self.signal = signal
+
+    def run(self):
+        res = self.func(*self.args, **self.kwargs)
+        # 任务完成后发出信号
+        self.signal.emit(res)
+
+
+def do_something():
+    time.sleep(1)
+    return 'the function execution completed!'
+
+
+class MainWindow(QWidget):
+    signal = Signal(str)
+
+    def __init__(self, parent=None):
+        super().__init__(parent=parent)
+        self.thread_pool = QThreadPool()
+        self.setup_ui()
+        self.button.clicked.connect(self.setup_thread)
+
+    def setup_ui(self):
+        self.setWindowTitle('demo')
+        self.resize(QSize(250, 180))
+        # 创建一个垂直布局
+        layout = QVBoxLayout()
+        # 创建一个标签
+        self.label = QLabel('This is a label => ')
+        layout.addWidget(self.label)
+        # 创建一个按钮
+        self.button = QPushButton('execute')
+        layout.addWidget(self.button)
+        # 将布局设置为主窗口的布局
+        self.setLayout(layout)
+        # 显示窗口
+        self.show()
+
+    def setup_thread(self):
+        worker = MyWorker(do_something, self.signal)
+        self.thread_pool.start(worker)
+        self.signal.connect(self.thread_finished)
+
+    @Slot(str)
+    def thread_finished(self, res):
+        self.label.setText('This is a label => ' + res)
+
+
+if __name__ == '__main__':
+    app = QApplication([])
+    window = MainWindow()
+    window.show()
+    app.exec_()
+```
+
+## 复用建议
+
+> 在后续复用中，有以下注意事项
+
+**多线程**和**线程池**都需要注意的是：
+
+- run方法中考虑异常捕获；
+- 线程安全性： 在多线程环境下，要注意共享数据的线程安全性。
+
+**多线程**
+
+- 线程的生命周期管理： 从创建到销毁的管理。确保在线程执行完毕后，适时释放线程资源，避免线程泄漏或过多的线程资源占用。
+
+**线程池**
+
+- 线程池的最大线程数：可以通过修改setMaxThreadCount(n) 来设置线程池的最大线程数。
+- 线程销毁：可以考虑在线程执行完毕后进行销毁操作，以释放资源。可以通过在 MyWorker 的 run 方法中添加 self.setAutoDelete(True) 来实现。
+
+**但最重要的是根据实际情况来修改！**
+
+
+
 # 遇到的问题
 
 ---

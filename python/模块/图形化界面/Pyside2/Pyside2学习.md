@@ -2650,6 +2650,33 @@ if __name__ == '__main__':
 
 
 
+# 笔记
+
+---
+
+## 控件的显示与隐藏
+
+```html
+只有父控件显示，子控件才能显示
+setVisible(bool)      设置控件是否可见
+button.setVisible(True)     True 可见
+setHidden(bool)    设置控件是否隐藏
+Ture  隐藏
+show()   显示控件
+hide()   隐藏控件
+
+
+isHidden()      #判定控件是否隐藏
+isVisible()     判定控件是否显示
+isVisibleTo(widget)     如果能随着widget控件的显示和隐藏, 而同步变化, 则返回True
+
+注意：
+isVisible()   代表控件最终的状态, 是否被我们所见(被其他控件遮挡也属于可见)
+isHidden()     只有控件设置了隐藏才返回True,否则返回False.(比例父控件没有显示，子控件是不可能显示，返回的是False)
+```
+
+
+
 # 遇到的问题
 
 ---

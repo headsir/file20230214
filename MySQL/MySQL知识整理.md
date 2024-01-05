@@ -535,7 +535,7 @@ GROUP BY `ta`.`账期月份`, `ta`.`运营商地市`
 
 括号中为当天时间的前一天，如果统计前几天就将括号中的 '1' 改成相应的天数。如果要算月或年，直接将day改为month或year即可
 
-```date_sub(curdate(),interval 1 day)
+```mysql
 date_sub(curdate(),interval 1 day)
 ```
 
@@ -596,7 +596,11 @@ escaped by '"'
 lines terminated by '\r\n';
 ```
 
-### 3.7.17 分组排序-row_number() over (）
+### 3.7.17 窗口函数
+
+参考：https://www.sjkjc.com/mysql-ref/lag/
+
+#### 分组排序-row_number() over (）
 
 ```
 SELECT*,row_number() over ( PARTITION BY t.`站址所属地市` ORDER BY t.`产品服务费合计（出账费用）（不含税）` DESC ) AS rn 
@@ -620,6 +624,41 @@ SELECT *,ROW_NUMBER() over (PARTITION BY  lte.`日期` ORDER BY lte.`分运营�
 FROM `高校_天级小区级_lte_2023` AS lte ) as t
 WHERE row_num <= 100
 ```
+
+#### 分组指定行的值-LAG() OVER()
+
+```python
+LAG(expr[, offset[, default]])
+OVER (
+  [PARTITION BY partition_column_list]
+  [ORDER BY order_column_list]
+)
+```
+
+**参数**
+
+- *`expr`* 必需的。它可以是一个列名或者表达式。
+- *`offset`* 可选的。相对于当前行的偏移的行数。默认值为 1。
+- *`default`* 可选的。它可以是一个列名或者表达式。
+- *`partition_column_list`* 参与分区的列的列表。
+- *`order_column_list`* 参与排序的列的列表。
+
+**返回值**
+
+返回来自当前行所在的分区内当前行之前的指定行之内的值。
+
+案例：
+
+```python
+SELECT * 
+, b.`电信用户流量/T` - LAG(b.`电信用户流量/T`,1) OVER() "电信用户流量增长/T"
+,b.`电信VoNR话务量/Erl` - LAG(b.`电信VoNR话务量/Erl`,1) OVER() "电信VoNR话务量增长/Erl"
+FROM 数据源 AS b
+```
+
+![image-20240105105501719](imge/MySQL知识整理.assets/image-20240105105501719.png "效果")
+
+
 
 ### 3.7.18 行列转置
 

@@ -694,7 +694,7 @@ deque(['Michael', 'Terry', 'Graham'])
 > 	print (变量（键名） + '：' + 字典名['键名'])
 > ```
 
-- 字典与JSON（字符串）互相转换：
+- **字典与JSON（字符串）互相转换**
 
 ```python
 import json
@@ -710,6 +710,30 @@ print(type(python_obj))  # <class 'dict'>
 
 print(json_data)  # {"name": "John", "age": 25}
 print(python_obj)  # {'name': 'John', 'age': 25}
+
+```
+
+- **字典转换成对象类型**
+
+```python
+# 字典转换成对象类型
+class ObjectDict(dict):
+    def __init__(self, *args, **kwargs):
+        super(ObjectDict, self).__init__(*args, **kwargs)
+
+    def __getattr__(self, key):
+        value = self[key]
+        if isinstance(value, dict):
+            value = ObjectDict(value)
+        return value
+# ==================================================        
+json_data = {"name":
+                 {"John": "a",
+                  "zzz": "b",
+                  },
+             "age": 30,
+             "city": "New York"}
+obj = ObjectDict(json_data)
 ```
 
 ### 3.4.3 元组

@@ -232,7 +232,7 @@ import pymysql
 from loguru import logger
 
 
-class Model(object):
+class MysqlModel(object):
     """
     操作mysql数据库的方法封装
     """

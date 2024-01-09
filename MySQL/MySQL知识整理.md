@@ -1534,3 +1534,92 @@ SELECT CONCAT ("alter DEFINER=`wlanlink`@`%` SQL SECURITY DEFINER VIEW ",TABLE_S
 -- 其中gaoxiao_baozhang@%为原视图定义者，wlanlink@%为需要修改的新的视图定义者
 ```
 
+## 10 binlog文件恢复数据
+
+### 常用命令
+
+```
+是否启用binlog日志
+show variables like 'log_bin';
+
+查看详细的日志配置信息
+show global variables like '%log%';
+
+mysql数据存储目录
+show variables like '%dir%';
+```
+
+### binlog配置项
+
+```
+[mysqld]
+# 设置日志三种格式：STATEMENT、ROW、MIXED 。
+binlog_format = mixed
+# 设置日志路径，注意路经需要mysql用户有权限写
+log-bin = /data/mysql/logs/mysql-bin.log
+# 设置binlog清理时间
+expire_logs_days = 7
+# binlog每个日志文件大小
+max_binlog_size = 100m
+# binlog缓存大小
+binlog_cache_size = 4m
+# 最大binlog缓存大小
+max_binlog_cache_size = 512m
+```
+
+### 查询binlog文件内容
+
+```mysql
+show binlog events in 'binlog.000555';
+```
+
+### 获取恢复数据节点
+
+![image-20240109155057821](imge/MySQL知识整理.assets/image-20240109155057821.png "数据节点")
+
+### 执行命令
+
+方式一：
+
+```cmd
+D:\Program Files\mysql-8.0.25-winx64\mysql-8.0.25-winx64\bin> mysqlbinlog --start-position=892540935 --stop-position=892541930 "D:\Program Files\mysql-8.0.25-winx64\mysql-8.0.25-winx64\data\binlog.000584" | mysql -uroot -pqazwsx
+```
+
+方式二：
+
+```cmd
+D:\Program Files\mysql-8.0.25-winx64\mysql-8.0.25-winx64\bin>mysqlbinlog --start-position=892540935 --stop-position=892541930 --database=binlogtest "D:\Program Files\mysql-8.0.25-winx64\mysql-8.0.25-winx64\data\binlog.000584" | mysql -uroot -pqazwsx -v binlogtest
+```
+
+案例：
+
+```sql
+-- 创建数据库
+CREATE DATABASE `binlogtest` CHARACTER SET 'utf8mb4' COLLATE 'utf8mb4_general_ci'
+-- 创建数据表
+CREATE TABLE test (
+  id int NOT NULL AUTO_INCREMENT,
+  name varchar(10) DEFAULT NULL,
+  age int DEFAULT 0,
+  PRIMARY KEY (id)
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
+-- 添加数据
+insert into test values(2,'lisi',30);
+insert into test values(3,'wangwu',40);
+```
+
+删除数据库
+
+恢复数据
+
+### **中文名字数据库，数据会恢复失败**
+
+导出binlog文件内容，整理SQL语句，手动恢复
+
+```cmd
+D:\Program Files\mysql-8.0.25-winx64\mysql-8.0.25-winx64\bin> mysqlbinlog --start-position=4516 --stop-position=25417 "D:\Program Files\mysql-8.0.25-winx64\mysql-8.0.25-winx64\data\binlog.000555" -v --set-charset=utf8 >out.sql
+```
+
+- 参数 -v ：会将row格式内容解析为sql
+- 参数--set-charset=utf8 ：解决中文乱码
+

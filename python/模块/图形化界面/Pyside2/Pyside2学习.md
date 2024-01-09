@@ -2675,13 +2675,133 @@ isVisible()   代表控件最终的状态, 是否被我们所见(被其他控件
 isHidden()     只有控件设置了隐藏才返回True,否则返回False.(比例父控件没有显示，子控件是不可能显示，返回的是False)
 ```
 
+## 无边框拖动解决方法
 
+https://www.cnblogs.com/jieliu8080/p/10536973.html
+
+```python
+class Window(QtWidgets.QWidget):
+    _startPos = None
+    _endPos = None
+    _isTracking = False
+    
+    ....
+    
+    def mouseMoveEvent(self, e: QtGui.QMouseEvent):  # 重写移动事件
+        self._endPos = e.pos() - self._startPos
+        self.move(self.pos() + self._endPos)
+
+    def mousePressEvent(self, e: QtGui.QMouseEvent):
+        if e.button() == QtCore.Qt.LeftButton:
+            self._isTracking = True
+            self._startPos = QtCore.QPoint(e.x(), e.y())
+
+    def mouseReleaseEvent(self, e: QtGui.QMouseEvent):
+        if e.button() == QtCore.Qt.LeftButton:
+            self._isTracking = False
+            self._startPos = None
+            self._endPos = None
+```
+
+## 窗口操作内置槽函数
+
+![image-20240109180501133](imge/Pyside2学习.assets/image-20240109180501133.png "窗口操作内置槽函数")
+
+## 多线程案例
+
+- 用的线程池模板
+
+- 通过进度条验证
+
+  ```python
+  import time
+  
+  from PySide2.QtCore import (QRunnable, QThreadPool, Signal, Slot)
+  from PySide2.QtWidgets import (QApplication, QWidget)
+  from tests.test_Pyside2.特重要_动态加载UI import UiLoader
+  
+  
+  class MyThreadPool(QRunnable):
+      def __init__(self, func, signal, *args, **kwargs):
+          super().__init__()
+          self.func = func
+          self.args = args
+          self.kwargs = kwargs
+          self.signal = signal
+  
+      def run(self):
+          res = self.func(*self.args, **self.kwargs)
+          # 任务完成后发出信号
+          self.signal.emit(res)
+  
+  def do_something(number, signal):
+      # QThread启动时，将会执行这里的代码
+      # 每隔一秒，将number减一，直到数字为1
+      while True:
+          # 判断数字是否等于1，如果为1则结束循环
+          if number == 1:
+              break
+          # 数字不为1，等待一秒
+          time.sleep(1)
+          # 将数字减一
+          number -= 1
+          signal.emit(str(number))
+      return "运行结束"
+  
+  class MainWindow(QWidget):
+      signal = Signal(str)
+      signal2 = Signal(str)
+  
+      def __init__(self, parent=None):
+          super().__init__(parent=parent)
+          self.thread_pool = QThreadPool()
+          self.ui = UiLoader().loadUi("ui.ui", self)
+          self.setup_ui()
+  
+      def setup_ui(self):
+          # 导入我们生成的界面
+          self.ui.progressBar.hide()
+          self.ui.progressBar_2.hide()
+          self.pushButton.clicked.connect(self.setup_thread)
+          self.pushButton_2.clicked.connect(self.setup2_thread)
+  
+      @Slot(str)
+      def setup_thread(self):
+          self.ui.progressBar.show()
+          number = int(self.ui.label.text())
+          worker = MyThreadPool(do_something, self.signal, number, self.signal)
+          self.thread_pool.start(worker)
+          self.signal.connect(self.ui.label.setText)
+          self.signal.connect(
+              lambda i: self.ui.progressBar.setValue(
+                  (number - (int(i) - 1)) / number * 100)
+              if i != "运行结束" else None)
+  
+      @Slot(str)
+      def setup2_thread(self):
+          self.ui.progressBar_2.show()
+          number = int(self.ui.label_2.text())
+          worker = MyThreadPool(do_something, self.signal2, number, self.signal2)
+          self.thread_pool.start(worker)
+          self.signal2.connect(self.ui.label_2.setText)
+          self.signal2.connect(
+              lambda i: self.ui.progressBar_2.setValue(
+                  (number - (int(i) - 1)) / number * 100)
+              if i != "运行结束" else None)
+  
+  
+  if __name__ == '__main__':
+      app = QApplication([])
+      window = MainWindow()
+      window.show()
+      app.exec_()
+  ```
+
+  
 
 # 遇到的问题
 
 ---
-
-
 
 ## 1、ValueError: source code string cannot contain null bytes
 

@@ -138,7 +138,11 @@ def on_pushButtonBold_clicked(self,status):
     print(status)  # True False
 ```
 
+**设置按钮状态**
 
+```
+setEnabled(True)
+```
 
 ###### （2）工具按钮 QToolButton
 

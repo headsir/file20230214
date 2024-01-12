@@ -266,7 +266,7 @@ insert into tdb1.able1 select top 5 * from db2.table2 (前五条纪录)
 ```SQL
 * 删除数据	DELETE FROM 表名 where 条件
 
-DELETE FROM 表名
+DELETE FROM 表名【清空表】
 truncate  table 表名【清空表】
 DROP TABLE 表名  【删除数据表】
 

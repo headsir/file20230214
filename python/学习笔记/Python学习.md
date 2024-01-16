@@ -716,7 +716,6 @@ print(python_obj)  # {'name': 'John', 'age': 25}
 - **字典转换成对象类型**
 
 ```python
-# 字典转换成对象类型
 class ObjectDict(dict):
     def __init__(self, *args, **kwargs):
         super(ObjectDict, self).__init__(*args, **kwargs)

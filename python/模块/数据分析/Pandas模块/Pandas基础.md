@@ -2537,6 +2537,20 @@ DataFrame.diff(periods=1, axis=0)
 diff_df["汇总/TB"].abs()
 ```
 
+### 10.6 筛选最大值所在行
+
+```python
+import pandas as pd
+data = {'year':[2016,2016,2017,2017,2017,2018,2018],
+        'num':[2,5,4,7,8,90,78],
+        'name':['a','b','c','d','e','f','g']}
+df = pd.DataFrame(data)
+#  筛选最大值所在的行
+df_groupby = df[['year','num']].groupby(by='year',as_index=False).max()
+#  对原始数据合并
+df_merge = pd.merge(df_groupby,df,on=['year','num'],how='left')
+```
+
 
 
 [^1]: inplace参数：是否改变原始表数据

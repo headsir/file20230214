@@ -1656,7 +1656,7 @@ https://blog.csdn.net/wofengyun/article/details/90513262
 
 ### 4. 虚拟机克隆
 
-### 5. 虚拟机克隆
+### 5. 虚拟机快照
 
 
 

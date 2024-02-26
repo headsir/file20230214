@@ -505,6 +505,17 @@ pd.read_excel(io, sheet_name=0, header=0, names=None, index_col=None,
   [43503 rows x 1 columns]
   ```
 
+- 指定导入列格式
+
+  通过设置 converters 参数指定导入列格式
+
+  ```
+  df = pd.read_excel("D:/桌面/202402地市起租确认信息确认0226.xlsx", 
+  	converters={"需求单号": str, "站址编码": str, })
+  ```
+
+  
+
 #### 2.1.2 导入 .csv 文件
 
 导入方法：read_csv()

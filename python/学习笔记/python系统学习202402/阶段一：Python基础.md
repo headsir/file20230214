@@ -1792,7 +1792,258 @@ graph LR
 	id3-.->id5["有关你的程序运行所在机器上浮点数的精度和内部表示法可在 sys.float_info 中查看"]
 ```
 
-###
+#### 3.2、字符串(str)
+
+- 单引号(‘ ’)
+- 双引号(“ ”)
+- 三引号(“”“ ”“”)
+- 转义字符(反斜杠+想要实现的转义功能首字母)，如：\n
+- 字符串是不可变的
+- 按字面意义级连字符串 +
+
+##### 编码介绍
+
+文件存储时，使用某种编码，打开时就需要使用相同的编码，否则就会乱码。
+
+字符底层存储时本质上都是0101010101010101。
+
+字符和二进制的对应关系 (编码)：
+
+- ascli编码,256种对应关系
+
+- gb2312、gbk，中文和亚洲一些国家【中文是用2个字节】
+
+- unicode、ucs2/ucs4，包括现在发现的所有文明
+
+- utf-8编码，【中文是用3个字节】
+
+  ```python
+  data = "中"
+  res = data.encode("utf-8")
+  print(res)  # b'\xe4\xb8\xab'  3个字节
+  
+  # 16进制转二进制，10进制跳板
+  int("e4",base=16)  # 228
+  bin(228)  # 0b11100100
+  ```
+
+- 编码、解码
+
+  ```
+  encode：编码
+  decode：解码
+  python内部编码方式为unicode，decode将其他编码方式转换成unicode编码方式，encode将unicode转换成其他编码方式。
+  因此unicode相当于一个中转:
+  (1)decode->unicode->encode 
+  (2)encode->unicode->decode 
+  
+  isinstance(s,unicode)#用来判断是否为unicode
+  ```
+
+##### 计算机单位
+
+```
+位/字节/KB/M/G/T/...
+```
+
+##### 字符串格式化（三种）
+
+输出格式设置
+
+- 一对一填充：`print('我在学习:{}'.format('python 基础知识'))`
+
+- 多对多填充：`print('我在学习:{0}中的{1}'.format('python数据分析','python 基础知识'))`
+
+- 浮点数设置：`print('{}约{:.2f}亿'.format('python数据分析',2))`，说明：.2f[^注1]
+
+- 浮点数设置：`print("程序运行%.2f秒" % time)`，说明：.2f[^注1]
+
+- 百分数设置：`print('中国男性占总人口的比例：{:.2%}亿'.format(0.122))`，说明：.2%[^注2]
+
+```
+v1 = "我是{},今年{}岁".format("武沛齐",77)
+v2 = "我是%s,今年%d岁" %("武沛齐",77)
+
+name = "武沛齐"
+age = 19
+v3 = f"我是{name},今年{age}岁"
+```
+
+##### 字符串前缀
+
+###### 1.前加 u
+
+```
+例子：u"字符串中有中文"
+含义：
+前缀u表示该字符串是[unicode]编码，Python2中用，用在含有中文字符的字符串前，防止因为编码问题，导致中文出现乱码。另外一般要在文件开关标明编码方式采用utf8。
+Python3中，所有字符串默认都是unicode字符串。
+```
+
+###### 2. 字符串前加 r
+
+```
+例子：r"\n\t"
+含义：
+在普通字符串中，反斜线是[转义符]，代表一些特殊的内容，如换行符\n。
+前缀r表示该字符串是原始字符串，即\不是转义符，只是单纯的一个符号。
+常用于特殊的字符如换行符、正则表达式、文件路径。
+注意不能在原始字符串结尾输入反斜线，否则Python不知道这是一个字符还是换行符(字符串最后用\表示换行)，会报错：
+SyntaxError: EOL while scanning string literal
+那如果是一个文件夹路径就是以\结尾怎么办呢，可以再接一个转义\的字符串：
+print(r'C:\Program File\my\path''\\') C:\Program File\my\path\
+```
+
+###### 3. 字符串前加 b
+
+```
+例子：b'## Hello World!' 
+含义：
+前缀b表示该字符串是bytes类型。
+用在Python3中，Python3里默认的str是unicode类。Python2的str本身就是bytes类，所以可不用。
+常用在如网络编程中，服务器和浏览器只认bytes类型数据。如：send 函数的参数和 recv 函数的返回值都是 bytes 类型。
+在 Python3 中，bytes 和 str 的互相转换方式是
+str.encode('utf-8')
+bytes.decode('utf-8')
+```
+
+###### 4. 字符串前加 f
+
+```
+例子：
+\>>> account = '测试工程师小站'
+
+\>>> month = '30'
+
+\>>> f'我的微信公众号是：{account}，已经连续发文{int(month) * 5}天啦！'
+
+'我的微信公众号是：测试工程师小站，已经连续发文150天啦！'
+含义：
+Python3.6新加特性，前缀f用来格式化字符串。可以看出f前缀可以更方便的格式化字符串,比format()方法可读性高且使用方便。
+而且加上f前缀后,支持在大括号内,运行Python表达式。
+你还可以用fr前缀来表示原生字符串。
+```
+
+##### 字符串的方法
+
+- str.capitalize()  
+
+  > 返回原字符串的副本，其首个字符大写，其余为小写
+
+  > 举例：print(str.capitalize("abc"))
+
+- str.casefold()  
+
+  > 返回原字符串消除大小写的副本。 消除大小写的字符串可用于忽略大小写的匹配。
+
+  > 举例：print("ABc".casefold())
+
+- str.center(*width*[, *fillchar*])  
+
+  > 返回长度为 *width* 的字符串，原字符串在其正中。 使用指定的 *fillchar* 填充两边的空位（默认使用 ASCII 空格符）。 如果 *width* 小于等于 `len(s)` 则返回原字符串的副本。
+
+  > 举例：print("abc".center(7,"="))
+
+- str.count(*sub*[, *start*[, *end*]])
+
+  > 返回子字符串 *sub* 在 [*start*, *end*] 范围内非重叠出现的次数。 可选参数 *start* 与 *end* 会被解读为切片表示法。
+  >
+  > 如果 *sub* 为空，则返回字符之间的空字符串数，即字符串的长度加一。
+
+  > 举例：print("ABADc".count("A",0,4))
+
+- str.encode(*encoding='utf-8'*, *errors='strict'*)
+
+  > 返回编码为 [`bytes`](https://docs.python.org/zh-cn/3.12/library/stdtypes.html#bytes) 的字符串。
+
+  > 举例：print("ABADc".encode(encoding="utf-8"))
+
+- str.endswith(*suffix*[, *start*[, *end*]])
+
+  > 如果字符串以指定的 *suffix* 结束返回 `True`，否则返回 `False`。 *suffix* 也可以为由多个供查找的后缀构成的元组。 如果有可选项 *start*，将从所指定位置开始检查。 如果有可选项 *end*，将在所指定位置停止比较。
+
+  > 举例：print("ABADc".endswith("B",0,2))
+
+- str.expandtabs(*tabsize=8*)
+
+  > 把字符串中的 tab 符号 \t 转为空格，tab 符号 \t 默认的空格数是 8，在第 0、8、16...等处给出制表符位置，如果当前位置到开始位置或上一个制表符位置的字符数不足 8 的倍数则以空格代替。
+
+  > 举例：
+  >
+  > ```python
+  > tr = "runoob\t12345\tabc"
+  > print('原始字符串: {}'.format(str))
+  > 
+  > # 默认 8 个空格
+  > # runnob 有 6 个字符，后面的 \t 填充 2 个空格
+  > # 12345 有 5 个字符，后面的 \t 填充 3 个空格
+  > print('替换 \\t 符号: {}'.format(str.expandtabs()))
+  > 
+  > # 2 个空格
+  > # runnob 有 6 个字符，刚好是 2 的 3 倍，后面的 \t 填充 2 个空格
+  > # 12345 有 5 个字符，不是 2 的倍数，后面的 \t 填充 1 个空格
+  > print('使用 2 个空格替换 \\t 符号: {}'.format(str.expandtabs(2)))
+  > 
+  > # 3 个空格
+  > print('使用 3 个空格: {}'.format(str.expandtabs(3)))
+  > 
+  > # 4 个空格
+  > print('使用 4 个空格: {}'.format(str.expandtabs(4)))
+  > 
+  > # 5 个空格
+  > print('使用 5 个空格: {}'.format(str.expandtabs(5)))
+  > 
+  > # 6 个空格
+  > print('使用 6 个空格: {}'.format(str.expandtabs(6)))
+  > ```
+  >
+  > 输出结果：
+  >
+  > ```python
+  > 原始字符串: runoob	12345	abc
+  > 替换 \t 符号: runoob  12345   abc
+  > 使用 2 个空格替换 \t 符号: runoob  12345 abc
+  > 使用 3 个空格: runoob   12345 abc
+  > 使用 4 个空格: runoob  12345   abc
+  > 使用 5 个空格: runoob    12345     abc
+  > 使用 6 个空格: runoob      12345 abc
+  > ```
+
+- str.find(*sub*[, *start*[, *end*]])
+
+  > 返回子字符串 *sub* 在 `s[start:end]` 切片内被找到的最小索引。 可选参数 *start* 与 *end* 会被解读为切片表示法。 如果 *sub* 未被找到则返回 `-1`。
+
+  > 举例：print("runoob\t12345\tabcoob".find("oob", 1,7))
+
+- `str.format(**args, ***kwargs)` 
+
+  > 执行字符串格式化操作。 调用此方法的字符串可以包含字符串字面值或者以花括号 `{}` 括起来的替换域。 每个替换域可以包含一个位置参数的数字索引，或者一个关键字参数的名称。 返回的字符串副本中每个替换域都会被替换为对应参数的字符串值
+
+  > 举例：参见[案例](#字符串格式化（三种） "字符串格式化（三种）")
+
+- str.format_map(*mapping*)
+
+  > 类似于 `str.format(**mapping)`，不同之处在于 `mapping` 会被直接使用而不是复制到一个 dict 。 适宜使用此方法的一个例子是当 `mapping` 为 dict 的子类的情况：
+
+  > 举例：print( "{a}ddddd{age}".format_map({"a":"key","age":32}))
+
+....未完[https://docs.python.org/zh-cn/3.12/library/stdtypes.html#str.find]
+
+
+
+
+
+#### 3.3、布尔值
+
+```mermaid
+graph LR
+	id1["布尔值(bool)"] -.-> id2["True：大部分对象"]
+	id1["布尔值(bool)"] -.-> id3["False：None（没有值）、False、0、空数据类型"]
+```
+
+
+
+##
 
 
 

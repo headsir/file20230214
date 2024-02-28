@@ -1705,4 +1705,111 @@ Namespaces are one honking great idea -- let's do more of those!
 
 ## 1.2 变量&输入输出&基本数据类型
 
-**变量**
+### 1.  变量
+
+**常量**：值不能改变的数据
+
+**变量**：值可以变化的数据
+
+变量的命名规则：
+
+- 必须以字母或下划线开头，建议英文字母开头，如：name、name_1
+- 禁止用Python的关键字或内置函数命名，如：print
+- 建议：使用英文字母和数字组成变量，变量名要有一定的意义，能够直观地描述变量所代表的数据内容。
+
+注：定义变量时不需要指明变量的数据类型，Python会自动识别。
+
+### 2.  输入输出
+
+#### 2.1 输入函数 input
+
+```
+input([prompt])
+```
+
+参数说明：
+
+- prompt: 提示信息
+
+```python
+a = input("请输入:")
+```
+
+#### 2.2 输出函数 print
+
+print函数有四个参数：sep、end、file和flush
+
+> 1、print()函数可以输出一个值，也可以同时输出多个值，如果输出多个值，这多个值之间用半角逗号隔开；
+>
+> 2、sep参数指定输出的多个值之间的间隔符，如不指定，则默认间隔符是一个半角空格；
+>
+> 3、end参数指定输出所有的值之后再输出什么符号，如不指定，则默认输出一个换行符；
+>
+> 4、file参数指明输出到文件还是到屏幕，默认是输出到屏幕；
+>
+> 5、flush参数指明是否立即将输出缓冲区的内容全部输出。
+
+- 字符串中将自动包括行结束符，但也可以在换行的地方添加一个 \ 来避免此情况。参见以下示例：
+
+```
+print("""\
+Usage: thingy [OPTIONS]
+-h Display this usage message
+-H hostname Hostname to connect to
+""")
+```
+
+- print 函数结束符，默认end = “\n” ,`print("====",end='\n')`
+
+- print 函数字符分割符，默认sep=“ ”, `print("====","ddd",sep=';')`
+
+- 连接符：+
+
+- 复制符：*
+
+- 格式化：datetime:=^30 ,其它符号`<`,`>`
+
+  ```
+  t ="2023年6月26日-2023年6月30日"
+  print(f"{t:=^30}")
+  
+  ====2023年6月26日-2023年6月30日=====
+  ```
+
+
+### 3.  基本数据类型
+
+基本数据类型：数字、字符串。
+
+#### 3.1、数字
+
+```mermaid
+graph LR
+	id1[数字] -.-> id2["整形(int)：不带小数点的数字"]
+	id1[数字] -.-> id3["浮点型(float)：带小数点的数字"]
+	id1[数字] -.-> id4["复数(complex)：包含实部和虚部，分别以一个浮点数表示"]
+	
+	id3-.->id5["有关你的程序运行所在机器上浮点数的精度和内部表示法可在 sys.float_info 中查看"]
+```
+
+###
+
+
+
+
+
+
+
+## 学习参考网站
+
+Python ==**官方文档**== https://docs.python.org/zh-cn/3.11/archives/python-3.11.0-docs-pdf-a4.zip
+
+==简明== Python 教程http://home.ustc.edu.cn/~hyx/bak/python/index.html
+
+孙兴华==办公自动化视频==https://www.bilibili.com/video/BV1gt4y1D7W8?p=2&vd_source=d6c3edd9a4f6205095ccfba6b2a61eec
+
+孙兴华==课件==http://721p.ysepan.com/
+
+白月黑羽教程https://www.byhy.net/
+
+【Python Qt 图形界面程序开发项目实战】https://www.bilibili.com/video/BV19A411H7dS?p=6&vd_source=d6c3edd9a4f6205095ccfba6b2a61eec

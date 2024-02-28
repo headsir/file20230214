@@ -1701,3 +1701,8 @@ Namespaces are one honking great idea -- let's do more of those!
 
 ---
 
+## 1.1 认识Python
+
+## 1.2 变量&输入输出&基本数据类型
+
+**变量**

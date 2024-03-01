@@ -39,3 +39,8 @@ Ctrl + PgUp / Ctrl + PgDn
 - SUMIF：SUMIF(条件区域，条件，求和区域）
 
 - SUMIFS：SUMIFS(求和区域，条件区域1，条件1，条件区域2，条件2，.....)
+
+## 7、计数COUNT应用
+
+- COUNTIF：对满足多个条件的单元格计数
+- COUNTIFS：COUNTIFS(条件区域1,条件1,[条件区域2,条件2],…)

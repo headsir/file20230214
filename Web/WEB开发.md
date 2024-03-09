@@ -8321,7 +8321,19 @@ url.rewrite-once = (
 
 请记住启用FastCGI，别名和重写模块。 该配置将应用程序绑定到`/yourapplication`。
 
-# 五 常见问题
+# 五、Flask+Vue
+
+
+
+
+
+
+
+
+
+
+
+#  常见问题
 
 ## 5.1 Django
 

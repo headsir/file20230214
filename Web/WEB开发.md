@@ -7057,7 +7057,7 @@ def hello_world():
 def hello_world():
     return 'hello world'
 
-app.add_url_rule('/', 'hello', hello_world)
+app.add_url_rule('/hello', 'hello', hello_world)
 ```
 
 ## 5 变量规则
@@ -7164,7 +7164,8 @@ app = Flask(__name__)
 def hello_admin():
     return 'Hello Admin'
 
-@app.route('/guest/<guest>')
+# endpoint 路由别名,默认为函数名，不能重名
+@app.route('/guest/<guest>'，endpoint='hello_guest')
 def hello_guest(guest):
     return 'Hello %s as Guest' % guest
 

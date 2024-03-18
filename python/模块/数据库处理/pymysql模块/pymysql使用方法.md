@@ -445,6 +445,258 @@ def getMysqlField(mysql, database, table):
     return [i["COLUMN_NAME"] for i in mysql.fetchall(sql, params)]
 ```
 
+## 第四版：
+
+- 为了方便对数据库连接池的使用，对个人封装的pymysql使用方法拆分
+
+MysqlPythonTool.py
+
+```python
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+# @File    : MysqlPythonTool.py
+# @Time    : 2024/3/18 15:58
+# @Author  : 978345836@qq.com
+# @Software: win11 python3.9
+# @Version : 1.0
+# @Describe: pymysql的python使用方法封装
+
+"""
+程序说明：
+    功能：
+"""
+
+from loguru import logger
+import pymysql
+
+__all__ = [
+    "PyMysqlUser",  # 数据库增删改查方法封装
+    'data_export_mysql',  # 数据批量导入数据的方法
+    'getMysqlField',  # 获取Mysql数据库某个表所有字段
+    'structure_sql',  # 构建Mysql建表语句，默认txt
+]
+
+
+# 数据库增删改查方法封装
+class PyMysqlUser(object):
+    """
+    操作mysql数据库的方法封装
+    """
+
+    def __init__(self, connection: pymysql.connect, cursor: pymysql.connect.cursor) -> None:
+        """
+        :param connection:  数据库连接
+        :param cursor:  数据库游标
+        """
+        self.connection = connection
+        self.cursor = cursor
+
+    # 查询所有数据
+    def fetchall(self, query, params=None):
+        """
+        Mysql查询所有数据
+        :param query: SQL查询语句，必须参数。
+        :param params: SQL查询语句参数，可选参数。
+        :return:返回二维元组，如((‘id’,‘title’),)
+        """
+        """
+        函数使用说明：
+            下面为SQL查询数据表字段语句：
+            select COLUMN_NAME from information_schema.COLUMNS
+            where table_name = %s AND table_schema = %s;
+            params = (table, database)
+            # 数据表字段获取
+            [i["COLUMN_NAME"] for i in mysql.fetchall(sql语句, 参数)]
+            备注：
+            - 如果参数为数据表或字段，应使用以下方法：
+            - t = ("归属组", "工作日报")
+            - 'SELECT %s FROM %s;' % t 
+            原因：SQL语句 表名、字段名 非字符串，  params参数为字符串报错        
+        """
+        try:
+            # 执行SQL语句
+            self.cursor.execute(query, params)
+            # 获取记录列表
+            return self.cursor.fetchall()
+        except Exception as error:
+            raise error
+
+    # 查询多条数据
+    def fetchmany(self, query, params=None, size=None):
+        """
+        Mysql查询前 n 行数据
+        :param query: SQL查询语句，必须参数。
+        :param params: SQL查询语句参数，可选参数。
+        :param size: 设置查询数量，可选参数,默认返回一条数据。
+        :return:返回二维元组，如((‘id’,‘title’),(‘id’,‘title’),)
+        """
+        """
+        函数使用说明：
+            下面为SQL查询数据表字段语句：
+            select COLUMN_NAME from information_schema.COLUMNS
+            where table_name = %s AND table_schema = %s;
+            params = (table, database)
+            # 数据表字段获取
+            [i["COLUMN_NAME"] for i in mysql.fetchmany(sql语句, 参数, 返回结果数量 )]
+        """
+        try:
+            self.cursor.execute(query, params)
+            return self.cursor.fetchmany(size)
+        except Exception as error:
+            raise error
+
+    # 查询一条数据
+    def fetchone(self, query, params=None):
+        """
+        Mysql查询最上面的第一条结果
+        :param query: SQL查询语句，必须参数。
+        :param params: SQL查询语句参数，可选参数。
+        :return:返回单个的元组
+        """
+        """
+        函数使用说明：
+            下面为SQL查询数据表字段语句：
+            select COLUMN_NAME from information_schema.COLUMNS
+            where table_name = %s AND table_schema = %s;
+            params = (table, database)
+            # 数据表字段获取
+            mysql.fetchone(sql, params)
+        """
+        try:
+            self.cursor.execute(query, params)
+            return self.cursor.fetchone()
+        except Exception as error:
+            raise error
+
+    # 增删改的方法
+    def change(self, query, params=None, many=False):
+        """
+            Mysql更删改的方法
+        :param query: SQL查询语句，必须参数。
+        :param params: SQL查询语句参数，可选参数。
+        :param many: 设置执行单条数据还是批量数据，可选参数,默认执行单条条数据。
+        :return: 受影响的行数
+        """
+        """
+        使用说明：
+        删除单条数据SQL语句：
+            DELETE FROM `铁塔费用_原始数据v1_copy1` AS d
+            WHERE d.序号 = %s
+            mysql.change(SQL语句,params=("821874")
+        批量添加数据SQL语句：：
+            INSERT INTO `铁塔费用_原始数据v1_copy1` (`字段1`,`字段2`) VALUES (%s,%s)
+            params=[[字段1的值，字段2的值],[字段1的值，字段2的值]]
+            mysql.change(SQL语句, params,many=True)
+        批量更新数据SQL语句：
+            table_name="student"
+            UPdate `{table_name}` AS d set d.subjectid=%s WHERE d.name = %s    
+            params=[(13, "John"), (11, "Martin")]
+            mysql.change(SQL语句, params,many=True)
+        """
+        try:
+            # many=True，是执行处理多个数据的SQL语句
+            if many:
+                # 一次执行可以操作多个数据
+                res = self.cursor.executemany(query, params)
+            # many=False,执行删除、修改或单个数据添加的SQL语句
+            else:
+                res = self.cursor.execute(query, params)
+            self.connection.commit()
+            return res
+        except Exception as error:
+            raise error
+
+
+# 数据批量导入数据库的方法
+def data_export_mysql(data, mysql, msql_sheet):
+    """
+    数据批量导入数据的方法,空值请导入前处理完成，否则报错\n
+    空值处理建议：
+        data = data.replace("", None)  # 字符串 替换
+        data = data.replace(np.nan, None)  # 数字 替换
+    :param data: 数据，格式 DataFrame
+    :param mysql: 数据库实例
+    :param msql_sheet: 数据库【表名】
+    :return:
+    """
+    # 构造SQL语句
+    data_columns = "`,`".join(list(data.columns)).replace("%", "%%")
+    # 构造SQL语句value值,将DataFrame类型转为[[],[],[]]
+    data_list = data.values.tolist()
+    # 计算VALUE值个数
+    s_count_data = len(data_list[0]) * "%s,"
+    # 构造SQL语句
+    insert_sql_data = f"INSERT INTO `{msql_sheet}` (`{data_columns}`) VALUES ({s_count_data[:-1]});"
+    # 数据导入数据库
+    res = mysql.change(query=insert_sql_data, params=data_list, many=True)
+    logger.info(f"数据库【{msql_sheet}】：添加{res}条数据")
+    return res
+
+
+# 获取Mysql数据库某个表所有字段。
+def getMysqlField(mysql, database, table):
+    """
+        获取Mysql数据库某个表所有字段。
+    :param mysql: Mysql 对象
+    :param database: 数据库名字
+    :param table: 表名字
+    :return:返回数据表所有字段
+    """
+    """
+    使用说明：
+    1、获取Mysql数据库【database】表【表名】，所有字段
+    columns_list = getMysqlField(
+        mysql=mysql,
+        database="database",
+        table=“表名”
+    )
+    2、如果哪个字段不需要通过列表推导式将其排除
+    removeList = ['序号', '创建日期', '更新日期']
+    columns = [i for i in columns2 if i not in removeList]
+    3、sql语句添加数据库筛选原因：
+    # 获取数据库字段（原理获取服务器系统表数据【information_schema.COLUMNS】）
+    # 如果服务器上不同数据库中有相同表名，会出现错误，必须通过【table_schema】对数据库筛选
+    """
+    sql = """
+    select COLUMN_NAME from information_schema.COLUMNS
+    where table_name = %s AND table_schema = %s;
+    """
+    params = (table, database)
+    # 数据表字段获取
+    return [i["COLUMN_NAME"] for i in mysql.fetchall(sql, params)]
+
+
+# 构建Mysql建表语句，默认txt
+def structure_sql(database, sheet, fields_list, sheet_comment=""):
+    """
+        构建Mysql建表语句，默认txt
+    :param database: 数据库名字
+    :param sheet: 数据库表名
+    :param fields_list: 字段列表
+    :param sheet_comment: 数据表说明
+    :return:
+    """
+    sql_body = ""
+    for fields in fields_list:
+        sql_body += f"""
+            `{fields}` text CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci,
+        """
+
+    sql = f"""
+    CREATE TABLE IF NOT EXISTS `{database}`.`{sheet}`  (
+      `pk_id` int NOT NULL AUTO_INCREMENT COMMENT '序号，自增，主键索引',
+      {sql_body}
+      `created_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建日期，自动添加',
+      `updated_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新日期，自动添加',
+      `delete_flag` tinyint NOT NULL DEFAULT 0 COMMENT '删除标记，0表示未删除，1表示已删除，默认\"0\"',
+      `remarks` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '/' COMMENT '备注，默认\"/\"',
+      PRIMARY KEY (`pk_id`) USING BTREE
+    ) ENGINE = InnoDB  CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = 
+    '{sheet_comment}' ROW_FORMAT = Dynamic;
+    """
+    return sql
+```
+
 
 
 

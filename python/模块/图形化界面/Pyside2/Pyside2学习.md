@@ -2862,3 +2862,5 @@ class UiLoader(QtUiTools.QUiLoader):
 使用QIntValidator对QLineEdeit需要限制0-255时发现使用QIntValidator(0,255)，没有生效，显示范围为0-999均可输入
 
 解决方法：一般都是采用重写QValidator的成员函数validate和fixedup
+
+## 4、线程池影响主线程 运行

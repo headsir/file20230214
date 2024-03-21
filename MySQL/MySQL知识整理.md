@@ -1388,9 +1388,16 @@ truncate table 你的表名
 //这样不但将数据全部删除，而且重新定位自增的字段
 
 方法2：
-delete from 你的表名
+delete from 你的表名  删除表
+
+==不可用==
+
+```
 dbcc checkident(你的表名,reseed,0) 
 //重新定位自增的字段，让它从1开始
+```
+
+
 
 ## 2. UNION报错
 

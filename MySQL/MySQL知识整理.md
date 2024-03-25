@@ -625,7 +625,7 @@ FROM `高校_天级小区级_lte_2023` AS lte ) as t
 WHERE row_num <= 100
 ```
 
-#### 分组指定行的值-LAG() OVER()
+#### 指定行之前的值-LAG() OVER()
 
 ```python
 LAG(expr[, offset[, default]])
@@ -645,7 +645,7 @@ OVER (
 
 **返回值**
 
-返回来自当前行所在的分区内当前行之前的指定行之内的值。
+返回来自当前行所在的分区内当前行==之前==的指定行之内的值。
 
 案例：后一行减前一行
 
@@ -658,7 +658,43 @@ FROM 数据源 AS b
 
 ![image-20240105105501719](imge/MySQL知识整理.assets/image-20240105105501719.png "效果")
 
+#### 指定行之后的值 LEAD() OVER（）
 
+这里是 MySQL `LEAD()` 函数的语法：
+
+```sql
+LEAD(expr[, offset[, default]])
+OVER (
+  [PARTITION BY partition_column_list]
+  [ORDER BY order_column_list]
+)
+```
+
+### 参数
+
+- *`expr`*
+
+  必需的。它可以是一个列名或者表达式。
+
+- *`offset`*
+
+  可选的。相对于当前行的偏移的行数。默认值为 1。
+
+- *`default`*
+
+  可选的。它可以是一个列名或者表达式。
+
+- *`partition_column_list`*
+
+  参与分区的列的列表。
+
+- *`order_column_list`*
+
+  参与排序的列的列表。
+
+**返回值**
+
+返回来自当前行所在的分区内当前行==之后==的指定行之内的行的值。
 
 ### 3.7.18 行列转置
 

@@ -6,13 +6,11 @@
 
 [Qt 编程指南](https://qtguide.ustclug.org/)
 
-#  一、Pyside2模块安装
+#  一、Pyside6模块安装
 
 ```cmd
 pip install Pyside2
 ```
-
-版本：PySide2  5.15.2.1
 
 # 二、配置Pycharm外部工具
 

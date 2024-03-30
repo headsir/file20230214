@@ -93,6 +93,10 @@ if __name__ == '__main__':
 
 ![image-20240329224604659](imge/PySide6.assets/image-20240329224604659.png)
 
+- geometry属性：[参见](#4.2.1 绝对布局 "4.2.1 绝对布局")
+- minimumSize和maximumSize属性：[参见](#4、minimumSize和maximumSize属性  "4.2.2 4、minimumSize和maximumSize属性")
+- sizePollcy属性：[参见](#5、sizePolicy属性  "4.2.2 5、sizePolicy属性")
+
 ### 转换ui文件
 
 - 命令行 
@@ -251,7 +255,485 @@ QT Designer提供了4种窗口布局方式：
 
 ![image-20240330080810541](imge/PySide6.assets/image-20240330080810541.png)
 
-布局一般有两种方式：
+常用布局一般有两种方式：
 
 - 使用布局管理器
 - 使用容器控件
+
+### 4.2.1 绝对布局
+
+最简单的布局方法就是设置geometry属性，主要用来设置控件在窗口中的绝对坐标与控件自身大小
+
+![image-20240330120131305](imge/PySide6.assets/image-20240330120131305.png)
+
+```python
+# 创建PushButton 对象，父类self.centralwidget
+self.pushButton = QPushButton(self.centralwidget)
+# 设置对象位置及大小
+self.pushButton.setGeometry(QRect(20, 10, 75, 24))
+# 设置对象名字
+self.pushButton.setObjectName(u"pushButton")
+```
+
+
+
+![image-20240330122334758](imge/PySide6.assets/image-20240330122334758.png)
+
+```python
+self.label = QLabel(self.centralwidget)
+self.label.setObjectName(u"label")
+self.label.setGeometry(QRect(82, 244, 24, 16))
+
+self.doubleSpinBox_returns_min = QDoubleSpinBox(self.centralwidget)
+self.doubleSpinBox_returns_min.setObjectName(u"doubleSpinBox_returns_min")
+self.doubleSpinBox_returns_min.setGeometry(QRect(138, 244, 53, 20))
+```
+
+### 4.2.2 布局管理器布局
+
+#### 1、垂直布局器
+
+![image-20240330123529412](imge/PySide6.assets/image-20240330123529412.png)
+
+![image-20240330125047706](imge/PySide6.assets/image-20240330125047706.png)
+
+```
+# 创建 垂直布局器 
+self.verticalLayout = QVBoxLayout(self.widget)
+self.verticalLayout.setObjectName(u"verticalLayout")
+
+self.verticalLayout.setContentsMargins(0, 0, 0, 0)
+self.verticalLayout.addWidget(self.label_6)
+self.verticalLayout.addWidget(self.label)
+self.verticalLayout.addWidget(self.label_2)
+self.verticalLayout.addWidget(self.label_3)
+
+# 下面参数可不设置，保持默认
+self.verticalLayout.setStretch(1, 2)
+self.verticalLayout.setStretch(3, 1)
+
+self.verticalLayout.setSizeConstraint(QLayout.SetMinimumSize)
+
+self.verticalLayout.setSpacing(6)
+```
+
+#### 2、网格布局
+
+![image-20240330130218866](imge/PySide6.assets/image-20240330130218866.png)
+
+![image-20240330131158371](imge/PySide6.assets/image-20240330131158371.png)
+
+```python
+# 创建网格布局器
+self.gridLayout = QGridLayout(self.widget1)
+self.gridLayout.setObjectName(u"gridLayout")
+self.gridLayout.setContentsMargins(0, 0, 0, 0)
+
+# gridLayout.addWidget(窗口控件, 行位置, 列位置, 要合并的行数, 要合并的列数)，后两个是可选参数
+self.gridLayout.addWidget(self.label_4, 0, 0, 1, 1)
+self.gridLayout.addWidget(self.label_5, 0, 1, 1, 1)
+self.gridLayout.addWidget(self.doubleSpinBox_returns_min, 1, 0, 1, 1)
+self.gridLayout.addWidget(self.doubleSpinBox_returns_max, 1, 1, 1, 1)
+self.gridLayout.addWidget(self.doubleSpinBox_maxdrawdown_min, 2, 0, 1, 1)
+self.gridLayout.addWidget(self.doubleSpinBox_maxdrawdown_max, 2, 1, 1, 1)
+self.gridLayout.addWidget(self.doubleSpinBox_sharp_min, 3, 0, 1, 1)
+self.gridLayout.addWidget(self.doubleSpinBox_sharp_max, 3, 1, 1, 1)
+
+# 下面参数可不设置，保持默认
+self.gridLayout.setSizeConstraint(QLayout.SetMinimumSize)
+self.gridLayout.setHorizontalSpacing(33)
+self.gridLayout.setVerticalSpacing(11)
+
+self.gridLayout.setRowStretch(0, 4)
+self.gridLayout.setRowStretch(1, 6)
+self.gridLayout.setRowStretch(2, 2)
+self.gridLayout.setRowStretch(3, 1)
+
+self.gridLayout.setColumnStretch(0, 4)
+self.gridLayout.setColumnStretch(1, 8)
+
+self.gridLayout.setColumnMinimumWidth(0, 3)
+self.gridLayout.setColumnMinimumWidth(1, 6)
+
+self.gridLayout.setRowMinimumHeight(1, 5)
+self.gridLayout.setRowMinimumHeight(3, 1)
+```
+
+#### 3、水平布局
+
+![image-20240330132410340](imge/PySide6.assets/image-20240330132410340.png)
+
+- Vertical Spacer 表示两个布局器不要彼此挨着
+- Horizontal Spacer 表示”开始“按钮与网格布局器尽可能离远一点
+- Vertical Line 用一条线分割开来
+
+![image-20240330135153955](imge/PySide6.assets/image-20240330135153955.png "水平间隔设置")
+
+```python
+self.line = QFrame(self.widget)
+self.line.setObjectName(u"line")
+self.line.setFrameShape(QFrame.VLine)
+self.line.setFrameShadow(QFrame.Sunken)
+# 垂直间隔设置
+self.verticalSpacer = QSpacerItem(20, 40, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Expanding)
+# 水平间隔设置
+self.horizontalSpacer = QSpacerItem(13, 108, QSizePolicy.Policy.MinimumExpanding, QSizePolicy.Policy.Minimum)
+```
+
+![image-20240330135054667](imge/PySide6.assets/image-20240330135054667.png)
+
+设置方法参考垂直布局
+
+#### 4、minimumSize和maximumSize属性
+
+用来控制布局管理器中的最小尺寸和最大尺寸。
+
+
+
+![image-20240330140232185](imge/PySide6.assets/image-20240330140232185.png)
+
+```python
+self.pushButton.setMinimumSize(QSize(100, 100))
+self.pushButton.setMaximumSize(QSize(300, 300))
+```
+
+无论如何压缩按钮都不会小于100像素，无论如何拉伸也不会大于300像素。
+
+![image-20240330140817070](imge/PySide6.assets/image-20240330140817070.png)
+
+#### 5、sizePolicy属性
+
+每个窗口控件都有属于自己的两个尺寸：
+
+- sizeHint（推荐尺寸）：窗口控件的期望尺寸
+- minimumSizeHint（推荐最小尺寸）：对窗口控件进行压缩时能被压缩到的最小尺寸。
+
+如果控件没有被布局，那么这两个函数返回无效值，否则返回对应尺寸。没有被布局的控件不建议使用这两个函数，若控件已经被布局，除非设置了minimumSize或将sizePolicy属性设置为QsizePolicy.Ignore，否则控件尺寸不会小于minimumSizeHint。
+
+sizePolicy属性作用是如果窗口控件在布局管理器中的布局不能满足我们的需求，可以通过设置该窗口控件的sizePolicy属性实现布局的微调。sizePolicy是每个窗口控件特有属性，不同窗口控件可能不同。
+
+按钮控件默认的sizePolicy属性的设置：
+
+![image-20240330142917213](imge/PySide6.assets/image-20240330142917213.png)
+
+```python
+# 策略
+sizePolicy = QSizePolicy(QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Fixed)
+# 水平伸展 0
+sizePolicy.setHorizontalStretch(0)
+# 垂直伸展 0
+sizePolicy.setVerticalStretch(0)
+sizePolicy.setHeightForWidth(self.pushButton.sizePolicy().hasHeightForWidth())
+
+self.pushButton.setSizePolicy(sizePolicy)
+```
+
+水平策略和垂直策略参数：
+
+- Fixed：窗口控件具有其sizeHint所提示的尺寸，并且尺寸不会再改变
+- Minimum：窗口控件的sizeHint所提示的尺寸就是它最小的尺寸，不能被压缩比这个值小，可以扩展更大，没有优势
+- Maximum：窗口控件的sizeHint所提示的尺寸就是它最大的尺寸，不能比这个值大，可以缩小
+- Preferred：窗口控件的sizeHint所提示的尺寸就是它的期望尺寸，控件可以缩小、变大，和其它控件的sizeHint（默认QWidget的策略）相比没有优势
+- Expanding：窗口控件可以缩小到minimumsizeHint所提示的尺寸，也可以变大比sizeHint所提示的尺寸大，它希望能够变得更大
+- MinimumExpanding：窗口控件的sizeHint所提示的尺寸就是它最小的尺寸，控件不能被压缩的比这个值小，它希望能够变得更大
+- Ignored：无视窗口控件的sizeHint和minimumsizeHint所提示的尺寸，控件将获得尽可能多的空间
+
+3个标签会分别按照1:3:1比例缩放。
+
+![image-20240330145120541](imge/PySide6.assets/image-20240330145120541.png)
+
+```python
+sizePolicy = QSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Preferred)
+sizePolicy.setHorizontalStretch(0)
+sizePolicy.setVerticalStretch(1)
+sizePolicy.setHeightForWidth(self.label.sizePolicy().hasHeightForWidth())
+self.label.setSizePolicy(sizePolicy)
+
+sizePolicy1 = QSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Preferred)
+sizePolicy1.setHorizontalStretch(0)
+sizePolicy1.setVerticalStretch(3)
+sizePolicy1.setHeightForWidth(self.label_2.sizePolicy().hasHeightForWidth())
+self.label_2.setSizePolicy(sizePolicy1)
+
+sizePolicy.setHeightForWidth(self.label_3.sizePolicy().hasHeightForWidth())
+self.label_3.setSizePolicy(sizePolicy)
+```
+
+
+
+##### sizePolicy:控件的布局（参考）
+
+参见：https://blog.csdn.net/kongcheng253/article/details/128769765
+
+![image-20231227145005865](imge/PySide6.assets/image-20231227145005865.png "sizePolicy属性")
+
+基于 QWidget的控件都会继承 sizePolicy 属性（ QSizePolicy 类型），这个属性包括两个大的方面内容：**伸展因子 （Stretch Factor）和 伸展策略（Policy）**，这些都会影响到界面最终的布局显示
+
+伸展因子（Stretch Factor）：
+
+---
+
+> 水平伸展、垂直伸展
+
+```
+取值范围是 0 到 255，负数就当做 0，大于 255 就当做 255，因此设置超出范围的数也没意义。
+```
+
+伸展因子都是 0，那么三个按钮在水平布局里就是均匀拉伸：
+
+![image-20231227150038184](imge/PySide6.assets/image-20231227150038184.png "伸展因子都是 0")
+
+如果把 "One" 按钮的 "水平伸展" 设为 1，"Two" 按钮的 "水平伸展" 设为 2，"Three" 按钮的 "水平伸展" 设为  3，那么在窗口拉大时，该行三个按钮的伸展因子之和为 1+2+3 == 6，新的空间就按照 1/6 ，2/6 ，3/6  的比例划分给这三个按钮，显示效果就如下面这样:
+
+![image-20231227150119818](imge/PySide6.assets/image-20231227150119818.png "伸展因子 1、2、3")
+
+如果把 "One" 按钮的 "水平伸展" 设为 2，"Two" 按钮的 "水平伸展" 设为 4，"Three" 按钮的 "水平伸展" 设为  0，那么在窗口拉大时，分配规律就是：先计算伸展因子之和 2+4+0 == 6，新的空间按照 2/6 ，4/6，0/6  的比例划分给这三个按钮，显示效果如下：
+
+![image-20231227150311451](imge/PySide6.assets/image-20231227150311451.png "伸展因子 2、4、0")
+
+因为第三个按钮的伸展因子是 0，第三个按钮会保持一个建议尺寸，其他两个按钮会根据伸展因子的占比进行拉伸。三个水平伸展因子为 2、4、0，其实也可以直接写成 1、2、0，两种是等价的，不管有没有公约数
+
+**除了控件自身可以设置伸展因子，布局器也可以为内部直属的控件或子布局器设置伸展因子。如果布局器和内部直属的控件都设置了伸展因子，那么布局器的设置会覆盖直属控件的伸展因子。因此==不建议==直接设置控件自己的伸展因子属性，而是通过布局器来设置各个子控件或子布局器的伸展因子。**
+
+伸展策略：
+
+---
+
+> 水平策略、垂直策略
+
+| 枚举常量         | **数值**                               | **拉伸特点** | **描述**                                                     |
+| ---------------- | -------------------------------------- | ------------ | ------------------------------------------------------------ |
+| Fixed            | 0                                      | 固定         | 以建议尺寸固定住，对于水平方向是固定宽度，垂直方向是固定高度。 |
+| Minimum          | GrowFlag                               | 被动拉大     | 以建议尺寸为最小尺寸，如果有多余的空间就拉伸，没有多余的空间就保持建议尺寸。被动扩张。 |
+| Maximum          | ShrinkFlag                             | 被动缩小     | 以建议尺寸为最大尺寸，窗口缩小时，如果其他控件需要，该控件可以尽量缩小为其他控件腾出空间。 |
+| Preferred        | GrowFlag \|  ShrinkFlag                | 被动伸缩     | 以建议尺寸为最佳尺寸，能屈能伸，窗口缩小时可以为其他控件腾出空间，窗口变大时，也可以占据其他控件不需要的空闲空间。基类 QWidget 默认是这种策略。被动扩张。 |
+| Expanding        | GrowFlag \|  ShrinkFlag \|  ExpandFlag | 主动扩张     | 建议尺寸仅仅是明智的建议，但控件基本不采用。这个模式也是能屈能伸，但它倾向于主动扩张，它会尽可能占据新增的区域。 |
+| MinimumExpanding | GrowFlag \|  ExpandFlag                | 主动扩张     | 以建议尺寸作为最小尺寸，主动扩张，尽可能占据新增的区域。     |
+| Ignored          | ShrinkFlag \|  GrowFlag \|  IgnoreFlag | 野蛮扩张     | 忽略建议尺寸，虽然能屈能伸，但是它会尽最大可能占据空间。     |
+
+![image-20231227152832619](imge/PySide6.assets/image-20231227152832619.png "水平策略示例")
+
+
+
+
+
+### 4.2.3 Qt DesIgner布局顺序
+
+使用Qt Designer开发一个完整的GUI程序的流程如下：
+
+1、将一个窗口控件拖拽到窗口中并放置在大致正确的位置，除了Containers栏，一般不需要调整各栏的尺寸
+
+2、要用代码引用的窗口控件应指定一个名字，需要微调的窗口控件可以设置对应的属性
+
+3、重复前两个步骤，直到所需要的全部窗口控件都被拖拽到窗口中
+
+4、如有需要，在窗口控件之间可以用 Vertical Spacer、Horizontal Spacer、Horizontal Line、Vertical Line隔开（实际上前两个步骤就可以包含这部分内容）
+
+5、选择需要布局的窗口控件，使用布局管理器或切分窗口（splitter）对他们布局
+
+6、重复步骤 5 ，直到所有的窗口控件和分隔符都布局好为止
+
+7、单击窗口，并使用布局管理器对其进行布局
+
+8、为窗口中的标签设置伙伴关系
+
+9、如果按键次序有问题，则需要设置窗口的Tab健次序
+
+10、在适当的地方为内置信号和槽建立信号与槽连接
+
+11、预览窗口，并检查所有内容能否按照设想进行工作
+
+12、设置窗口的对象名（在类中会用到这个名字）、窗口的标题并保存
+
+13、使用工具pyside6-uic.exe编译窗口，并根据需要生成对话框代码（在逻辑文件上建立信号与槽连接的方式）
+
+14、进行正常的代码编写工作，即编写业务逻辑文件。
+
+### 4.2.4 设置伙伴关系
+
+标签控件里的 "&" 用于设置伙伴快捷键，因为单行编辑控件没法显示自己的快捷键，所以需要通过伙伴标签控件来设置快捷键。
+
+"&MAC" 意味着伙伴快捷键为 Alt+M ，"&IP" 快捷键就是 Alt+I ，"&Port" 快捷键是 Alt+P 。
+
+当然，快捷键能实现的前提是设置伙伴，我们点击设计模式上面的带有橙色小块的图标，进入伙伴编辑模式：
+
+![image-20231229111056479](imge/PySide6.assets/image-20231229111056479.png "编辑伙伴模式")
+
+在伙伴编辑模式，编辑伙伴关系类似在画图板画线的操作，从标签控件画线到右边的单行编辑控件即可。
+
+将三行的标签都设置为对应的单行编辑控件伙伴。
+
+设置为伙伴之后， 标签控件就不再显示 "&" ，而是将 "&" 右边第一个==字母添加下划线显示==，这样伙伴快捷键就设置成功了。
+
+程序运行时，伙伴快捷键自动生效：
+按 Alt+M ，自动切换到 MAC 地址编辑控件；
+按 Alt+I ，自动切换到 IP 地址编辑控件；
+按 Alt+P ，自动切换到端口编辑控件。
+示范的例子标签文本都是英文的，如果是中文文本，以端口为例，可以设置为 "端口(&P)" ，这样快捷键也是 Alt+P。
+
+对应代码：
+
+```PYTHON
+self.label.setBuddy(self.doubleSpinBox_returns_min)
+```
+
+### 4.2.5 设置Tab键次序
+
+![image-20240330202901521](imge/PySide6.assets/image-20240330202901521.png)
+
+进入编辑Tab键次序模式，两种修改方式：
+
+- 按顺序单击可修改
+- 右键菜单-制表符顺序列表调整
+
+## 4.3 信号与槽关联
+
+信号/槽是Qt的核心机制。在创建时间循环之后，通过建立信号与槽的连接就可以实现对象之间的通信。当信号发射（Emit）时，连接的槽函数将自动执行。在PySide中，信号与槽通过QObject.signal.connect()连接。
+
+从QObject类或其子类（如QWidget）派生的类都能够包含信号与槽，当对象改变其状态时，信号就由该对象发射出去。槽用于接收信号，但槽函数是普通的对象成员函数。
+
+在Qt编程中，通过Qt信号/槽机制对鼠标或键盘在界面上的操作进行相应处理。不同的控件能够发射的信号种类和触发时机不相同，在Qt的文档中有说明。
+
+为控件发射的信号指定对应的处理槽函数有2种方法：
+
+- 在Qt Designer中添加信号与槽
+- 通过代码连接信号与槽
+
+### 4.3.1 简单入门
+
+- 在Qt Designer中添加信号与槽
+
+![image-20240330210821667](imge/PySide6.assets/image-20240330210821667.png)
+
+- 在Qt Designer中添加信号与槽
+
+![image-20240330210923136](imge/PySide6.assets/image-20240330210923136.png)
+
+```python
+# clicked 当鼠标左键被按下然后释放时或者快捷键被释放时触发该信号
+self.closeWinBtn.clicked.connect(Form.close)
+# pressed 信号 当鼠标指针在按钮上并按下左键时触发该信号
+self.closeWinBtn.pressed.connect(Form.testSlot)
+# 通过pyside-uic.exe编译后有下面的代码
+#表示根据名字连接信号与槽
+QMetaObject.connectSlotsByName(Form)
+```
+
+**调用窗口**
+
+MainWinSignalSlog1Run.py
+
+```python
+import sys
+from PySide6.QtWidgets import QApplication, QMainWindow
+from MainWinSignalSlog1_ui import Ui_Form
+
+
+class MyMainWindow(QMainWindow, Ui_Form):
+    def __init__(self, parent=None):
+        super(MyMainWindow, self).__init__(parent)
+        self.setupUi(self)
+
+    def testSlot(self):
+        print("这是一个自定义函数，您成功了")
+
+
+if __name__ == '__main__':
+    app = QApplication(sys.argv)
+    myWin = MyMainWindow()
+    myWin.show()
+    sys.exit(app.exec())
+```
+
+### 4.3.2 获取信号与槽
+
+#### 1、从Qt Designer中获取信号与槽
+
+显示控件可用的信号与槽函数，可自定义添加
+
+![image-20240330213351179](imge/PySide6.assets/image-20240330213351179.png)
+
+#### 2、使用官方帮助网站获取信号与槽
+
+官方网址：https://doc.qt.io/qt-6/classes.html
+
+![image-20240330220434060](imge/PySide6.assets/image-20240330220434060.png "网页展示")
+
+**获取控件所属模块**
+
+通过导入的控件 反向查找父类
+
+![image-20240330220552123](imge/PySide6.assets/image-20240330220552123.png)
+
+
+
+![image-20240330220808313](imge/PySide6.assets/image-20240330220808313.png)
+
+**信号与槽的详细介绍**
+
+![image-20240330221233542](imge/PySide6.assets/image-20240330221233542.png)
+
+### 4.3.3 使用信号/槽机制
+
+## 4.4 菜单栏与工具栏
+
+### 4.4.1 界面设计
+
+![image-20240330224233712](imge/PySide6.assets/image-20240330224233712.png)
+
+#### 1、添加快捷键
+
+- 文件、编辑菜单:通过输入 文件(&F)、编辑(&E) 创建快捷键
+
+- 新建、打开、关闭：通过 动作编辑器 或属性编辑器 中的Shortcut 创建快捷方式
+
+  ![image-20240330224718219](imge/PySide6.assets/image-20240330224718219.png)
+
+  ![image-20240330225325472](imge/PySide6.assets/image-20240330225325472.png)
+
+![image-20240330224744930](imge/PySide6.assets/image-20240330224744930.png)
+
+#### 2、工具栏
+
+默认不显示工具栏，可通过右键添加工具栏，通过拖拽可将动作编辑器中的动作添加到工具栏。
+
+![image-20240330225256834](imge/PySide6.assets/image-20240330225256834.png)
+
+### 4.4.2 效果测试
+
+```python
+import sys, os
+from PySide6.QtWidgets import QMainWindow, QApplication, QFileDialog
+from MainWinMenuToolbar_ui import Ui_MainWindow
+
+
+class MainWinMenuToolbarRun(QMainWindow, Ui_MainWindow):
+    def __init__(self, parent=None):
+        super(MainWinMenuToolbarRun, self).__init__(parent)
+        self.setupUi(self)
+        # 菜单的单击事件,当单击关闭菜单时连接槽函数close()
+        self.fileCloseAction.triggered.connect(self.close)
+        # 菜单的单击事件,当单击打开菜单时连接槽函数 openMsg
+        self.fileOpenAction.triggered.connect(self.openFile)
+        # 打开计算器
+        self.openCalc.triggered.connect(lambda: os.system('calc'))
+        # 打开记事本
+        self.openNotepad.triggered.connect(lambda: os.system('notepad'))
+
+    def openFile(self):
+        file, ok = QFileDialog.getOpenFileName(self, '打开', "C:/", "ALL Files (*);;Text Files (*.txt)")
+        # 在状态栏中显示文件地址
+        self.statusbar.showMessage(file)
+        print(ok)
+
+
+if __name__ == '__main__':
+    app = QApplication(sys.argv)
+    myWin = MainWinMenuToolbarRun()
+    myWin.show()
+    sys.exit(app.exec())
+```
+
+
+
+![image-20240330232522255](imge/PySide6.assets/image-20240330232522255.png)

@@ -6,7 +6,7 @@
 
 [Qt 编程指南](https://qtguide.ustclug.org/)
 
-#  一、Pyside6模块安装
+#  一、PySide2模块安装
 
 ```cmd
 pip install Pyside2

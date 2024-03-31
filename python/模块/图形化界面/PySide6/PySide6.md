@@ -166,7 +166,7 @@ if __name__ == '__main__':
 
 ### 转换qrc文件
 
-同 转换ui文件类似，使用 pyside6-rcc.exe
+[同 转换ui文件类似，使用 pyside6-rcc.exe](#转换ui文件)
 
 ### 界面与逻辑分离
 
@@ -291,7 +291,58 @@ self.doubleSpinBox_returns_min.setGeometry(QRect(138, 244, 53, 20))
 
 ### 4.2.2 布局管理器布局
 
-#### 1、垂直布局器
+- QMainWindow窗口中添加布局管理器
+
+  QMainWindow 不能用于设置布局（使用setLayout()函数），因为主窗口的程序默认已经有了自己的布局管理器。每个QMainWindow类都有一个中心控件QWidget（中心窗口），可以对该QWidget布局来实现对QMainWindow的布局，中心控件由setCentralWidget来添加。
+
+  ```python
+  class MainWidget(QMainWindow):
+      def __init__(self, parent=None):
+          super(MainWidget, self).__init__(parent)
+  		...
+          # 添加布局管理器
+          layout = QVBoxLayout()
+          widget = QWidget(self)
+          widget.setLayout(layout)
+          # Geometry 相对坐标系,设置widget位置及大小
+          widget.setGeometry(QtCore.QRect(200, 150, 200, 200))
+          # self.setCentralWidget(widget)
+          self.widget = widget
+  
+          # 关闭窗口
+          self.button1 = QPushButton('关闭主窗口')
+          self.button1.clicked.connect(self.close)
+          layout.addWidget(self.button1)
+  ```
+
+- QWidget窗口中添加布局管理器
+
+  ```python
+  
+  class WindowLabel(QWidget):
+      def __init__(self):
+          super().__init__()
+  		...
+          # 添加布局管理
+          vbox = QVBoxLayout()
+          self.setLayout(vbox)
+          # 以上两行代码 也可以写成  vbox = QVBoxLayout(self)
+          vbox.addWidget(label_normal)
+          
+          # vbox.addStretch()
+          
+  ```
+
+- QDialog 窗口中添加布局管理器
+
+  ```python
+  mainLayout = QGridLayout(self)
+  mainLayout.addWidget(nameLb1, 0, 0)
+  ```
+
+  
+
+#### 1、垂直布局器 QVBoxLayout()
 
 ![image-20240330123529412](imge/PySide6.assets/image-20240330123529412.png)
 
@@ -299,7 +350,7 @@ self.doubleSpinBox_returns_min.setGeometry(QRect(138, 244, 53, 20))
 
 ```
 # 创建 垂直布局器 
-self.verticalLayout = QVBoxLayout(self.widget)
+self.verticalLayout = QVBoxLayout()
 self.verticalLayout.setObjectName(u"verticalLayout")
 
 self.verticalLayout.setContentsMargins(0, 0, 0, 0)
@@ -317,7 +368,7 @@ self.verticalLayout.setSizeConstraint(QLayout.SetMinimumSize)
 self.verticalLayout.setSpacing(6)
 ```
 
-#### 2、网格布局
+#### 2、网格布局 QGridLayout()
 
 ![image-20240330130218866](imge/PySide6.assets/image-20240330130218866.png)
 
@@ -325,7 +376,7 @@ self.verticalLayout.setSpacing(6)
 
 ```python
 # 创建网格布局器
-self.gridLayout = QGridLayout(self.widget1)
+self.gridLayout = QGridLayout()
 self.gridLayout.setObjectName(u"gridLayout")
 self.gridLayout.setContentsMargins(0, 0, 0, 0)
 
@@ -359,7 +410,7 @@ self.gridLayout.setRowMinimumHeight(1, 5)
 self.gridLayout.setRowMinimumHeight(3, 1)
 ```
 
-#### 3、水平布局
+#### 3、水平布局 QHBoxLayout()
 
 ![image-20240330132410340](imge/PySide6.assets/image-20240330132410340.png)
 
@@ -737,3 +788,551 @@ if __name__ == '__main__':
 
 
 ![image-20240330232522255](imge/PySide6.assets/image-20240330232522255.png)
+
+## 4.5 添加图片
+
+引用图片资源主要有两种方法：
+
+1. 先将资源文件转换为python文件，然后引用python文件（PyQt6 不支持）
+2. 在程序中通过相对路径引用外部资源
+
+### 4.5.1 创建资源文件
+
+![image-20240331150841690](imge/PySide6.assets/image-20240331150841690.png)
+
+按照以上步骤添加图片后，apprcc.qrc文件内容如下：
+
+```xml
+<RCC>
+  <qresource prefix="pic">
+    <file>images/calc.jpg</file>
+    <file>images/close.jpg</file>
+    <file>images/new.jpg</file>
+    <file>images/notepad.jpg</file>
+    <file>images/open.jpg</file>
+    <file>images/python.jpg</file>
+  </qresource>
+</RCC>
+```
+
+### 4.5.2 添加资源文件
+
+#### 1、为菜单栏和工具栏添加图标
+
+对fileOpenAction、fileNewAction 使用 ==选择资源==，对fileCloseAction使用 ==选择文件==
+
+![image-20240331153647008](imge/PySide6.assets/image-20240331153647008.png)
+
+```python
+icon = QIcon()
+icon.addFile(u":/pic/images/open.jpg", QSize(), QIcon.Normal, QIcon.Off)
+self.fileOpenAction.setIcon(icon)
+
+
+icon1 = QIcon()
+icon1.addFile(u"images/close.jpg", QSize(), QIcon.Normal, QIcon.Off)
+self.fileCloseAction.setIcon(icon1)
+
+icon2 = QIcon()
+icon2.addFile(u":/pic/images/new.jpg", QSize(), QIcon.Normal, QIcon.Off)
+self.fileNewAction.setIcon(icon2)
+```
+
+![image-20240331153717682](imge/PySide6.assets/image-20240331153717682.png)
+
+#### 2、在窗体中添加图片
+
+窗体中添加Label控件，通过 pixmap 属性添加图片
+
+![image-20240331154327124](imge/PySide6.assets/image-20240331154327124.png)
+
+#### 3、转换资源文件
+
+[见](#转换qrc文件 "转换方法")
+
+导入方法,ui文件转换成py文件时会自动导入
+
+```python
+import apprcc_rc
+```
+
+# 五、基本窗口控件
+
+基本控件：一些简单的、容易使用的控件，主要是单一控件，可以呈现简单信息
+
+高级控件：相对复杂一些控件，如表格与多窗口（页面）控件，可以显示更多、更复杂的信息
+
+## 5.1 主窗口（QMainWindow/QWidget/QDialog）
+
+主窗口为用户提供了一个应用框架。它有自己的布局，可以在布局中添加控件。
+
+### 5.1.1 窗口类型
+
+Qt Designer可以创建3种窗口：
+
+- Dialog 对应的类 QDialog ，是对话窗口的基类，对话框用来执行短期任务、与用户进行互动，可以是模态的也可以是非模态的
+- Widget 对应的类 QWidget，主要用于嵌入窗口以及作为多窗口应用的子窗口，也可以作为主窗口使用
+- Main Window  对应的类 QMain Window， 包含菜单栏、工具栏、状态栏、标题栏等，是GUI程序主窗口
+
+使用原则如下：
+
+- 如果是主窗口，则使用QMain Window类
+- 如果是对话框，则使用QDialog类
+- 如果是嵌入窗口，则使用QWidge类
+
+### 5.1.2 创建主窗口
+
+一个程序包含一个或多个窗口或控件，必定有一个窗口是其它窗口的父类，将这个窗口成为主窗口（或顶层窗口）。
+
+其它窗口或控件继承主窗口，方便对他们进行管理，在需要的时候启动，不需要的时候删除。
+
+主窗口一般是QMainWindow的实例，用一个控件（QWidget）占位符来占着中心窗口，可以使用setCentralWidget()函数来设置中心窗口。
+
+![image-20240331164242563](imge/PySide6.assets/image-20240331164242563.png)
+
+```python
+self.centralwidget = QWidget(MainWindow)
+self.centralwidget.setObjectName(u"centralwidget")
+MainWindow.setCentralWidget(self.centralwidget)
+```
+
+QMainWindow中重要的函数：
+
+| 函数               | 描述                                                         |
+| :----------------- | ------------------------------------------------------------ |
+| addToolBar()       | 添加工具栏                                                   |
+| centralWidget()    | 返回中心窗口的一个控件，未设置时返回NULL                     |
+| menuBar()          | 返回主窗口的菜单栏                                           |
+| setCentralWidget() | 设置中心窗口的控件                                           |
+| setStatusBar()     | 设置状态栏                                                   |
+| statusBar()        | 获得状态栏对象后，调用状态栏对象的showMessage(message,int timeout=0)方法显示状态栏信息。<br>第一个参数：要显示的状态栏信息；<br>第二个参数：信息停留的时间，单位是毫秒，默认是0，表示一直显示状态栏信息 |
+
+**注意：**
+
+QMainWindow 不能用于设置布局（使用setLayout()函数），因为主窗口的程序默认已经有了自己的布局管理器。每个QMainWindow类都有一个中心控件QWidget（中心窗口），可以对该QWidget布局来实现对QMainWindow的布局，中心控件由setCentralWidget来添加。
+
+```python
+# 添加布局管理器
+layout = QVBoxLayout()
+widget = QWidget(self)
+widget.setLayout(layout)
+self.setCentralWidget(widget)
+```
+
+#### 案例：
+
+```python
+import sys
+
+from PySide6.QtGui import QGuiApplication, QIcon
+from PySide6.QtWidgets import (QApplication,
+                               QMainWindow,
+                               QVBoxLayout,
+                               QWidget, QPushButton, )
+from PySide6 import QtCore
+
+
+class MainWidget(QMainWindow):
+    def __init__(self, parent=None):
+        super(MainWidget, self).__init__(parent)
+        # 设置主窗口标签
+        self.setWindowTitle('QMainWindow 例子')
+        self.resize(800, 400)
+        # 状态栏
+        self.status = self.statusBar()
+
+        # 添加布局管理器
+        layout = QVBoxLayout()
+        widget = QWidget(self)
+        widget.setLayout(layout)
+        # Geometry 相对坐标系
+        widget.setGeometry(QtCore.QRect(200, 150, 200, 200))
+        # self.setCentralWidget(widget)
+        self.widget = widget
+
+        # 关闭窗口
+        self.button1 = QPushButton('关闭主窗口')
+        self.button1.clicked.connect(self.close)
+        layout.addWidget(self.button1)
+
+        # 主窗口居中显示
+        self.button2 = QPushButton('主窗口居中')
+        self.button2.clicked.connect(self.center)
+        layout.addWidget(self.button2)
+
+        # 显示图标
+        self.button3 = QPushButton('显示图标')
+        self.button3.clicked.connect(lambda: self.setWindowIcon(QIcon("../images/cartoon1.ico")))
+        self.button3.clicked.connect(lambda: self.button3.setIcon(QIcon("../images/cartoon2.ico")))
+        layout.addWidget(self.button3)
+        # 显示状态栏
+        self.button4 = QPushButton('显示状态栏')
+        self.button4.clicked.connect(
+            lambda: self.status.showMessage("这是我的状态栏提示，5秒钟后消失", 5000))
+        layout.addWidget(self.button4)
+
+        # 显示窗口坐标和大小
+        self.button5 = QPushButton('显示窗口坐标及大小')
+        self.button5.clicked.connect(self.show_geometry)
+        layout.addWidget(self.button5)
+
+    def center(self):
+        # 获取的屏幕大小是被缩放过的大小，比如我电脑125%的缩放，
+        # 1920*1080的屏幕大小，在程序中获得的屏幕大小是1536*864，
+        # 需要还原的话直接乘个缩放倍数1.25就行。
+        screen = QGuiApplication.primaryScreen().geometry()
+        size = self.geometry()
+        # move 方法：这个方法用于设置小部件的左上角的坐标位置，它需要两个参数，即横坐标和纵坐标。
+        # 使用 move 方法会改变小部件的位置，但不会改变其大小。
+        # 例如，widget.move(100, 100) 会将小部件的左上角移动到坐标 (100, 100)。
+        self.move((screen.width() - size.width()) / 2, (screen.height() - size.height()) / 2)
+
+    def show_geometry(self):
+        print('主窗口坐标信息，相对于屏幕：')
+        print('主窗口：x={}, y={},width={},heigh={}'.format(
+            self.x(), self.y(), self.width(), self.height()))
+        print('主窗口： geometry：x={}, y={},width={},heigh={}'.format(
+            self.geometry().x(), self.geometry().y(), self.geometry().width(), self.geometry().height()))
+        print('主窗口： frameGeometry：x={}, y={},width={},heigh={}'.format(
+            self.frameGeometry().x(), self.frameGeometry().y(), self.frameGeometry().width(),
+            self.frameGeometry().height()))
+
+        print('\n子窗口QWidget 坐标信息，相对于主窗口：')
+        print('子窗口：x={}, y={},width={},heigh={}'.format(
+            self.widget.x(), self.widget.y(), self.widget.width(), self.widget.height()))
+        print('子窗口： geometry：x={}, y={},width={},heigh={}'.format(
+            self.widget.geometry().x(), self.widget.geometry().y(), self.widget.geometry().width(),
+            self.widget.geometry().height()))
+        print('子窗口： frameGeometry：x={}, y={},width={},heigh={}'.format(
+            self.widget.frameGeometry().x(), self.widget.frameGeometry().y(), self.widget.frameGeometry().width(),
+            self.widget.frameGeometry().height()))
+
+
+if __name__ == '__main__':
+    app = QApplication(sys.argv)
+    myWin = MainWidget()
+    myWin.show()
+    sys.exit(app.exec())
+```
+
+#### 界面
+
+![image-20240331185857895](imge/PySide6.assets/image-20240331185857895.png)
+
+### 5.1.3 移动主窗口
+
+```python
+# 主窗口居中显示
+self.button2 = QPushButton('主窗口居中')
+self.button2.clicked.connect(self.center)
+layout.addWidget(self.button2)
+
+def center(self):
+    # 获取的屏幕大小是被缩放过的大小，比如我电脑125%的缩放，
+    # 1920*1080的屏幕大小，在程序中获得的屏幕大小是1536*864，
+    # 需要还原的话直接乘个缩放倍数1.25就行。
+    screen = QGuiApplication.primaryScreen().geometry()
+    # 获取窗口的位置及大小
+    size = self.geometry()
+    # move 方法：这个方法用于设置小部件的左上角的坐标位置，它需要两个参数，即横坐标和纵坐标。
+    # 使用 move 方法会改变小部件的位置，但不会改变其大小。
+    # 例如，widget.move(100, 100) 会将小部件的左上角移动到坐标 (100, 100)。
+    self.move((screen.width() - size.width()) / 2, (screen.height() - size.height()) / 2)
+```
+
+介绍：
+
+```python
+QGuiApplication.primaryScreen().geometry()
+```
+
+用来计算显示屏幕大大小，返回的是一个QRect类。
+
+QRect(int left, int top, int width, int height) ：
+
+- left、top 分别表示距离左侧和顶部的距离
+- width、height 分别表示 屏幕（窗口）的宽度和高度
+
+可以通过 QRect对象的 left()、top()、width()、 height() 函数获取值
+
+### 5.1.4 添加图标
+
+```python
+# 显示图标
+self.button3 = QPushButton('显示图标')
+self.button3.clicked.connect(lambda: self.setWindowIcon(QIcon("../images/cartoon1.ico")))
+self.button3.clicked.connect(lambda: self.button3.setIcon(QIcon("../images/cartoon2.ico")))
+layout.addWidget(self.button3)
+```
+
+分别使用setWindowIcon()、setIcon()对窗口、控件设置图标，但该方法需要一个QIcon类型的对象作为参数。在调用QIcon对象构造函数时，需要提供图标路径（相对路径或绝对路径）。
+
+![image-20240331191714252](imge/PySide6.assets/image-20240331191714252.png)
+
+### 5.15 显示状态栏
+
+```python
+# 显示状态栏
+self.button4 = QPushButton('显示状态栏')
+self.button4.clicked.connect(
+    lambda: self.status.showMessage("这是我的状态栏提示，5秒钟后消失", 5000))
+layout.addWidget(self.button4)
+```
+
+![image-20240331191828484](imge/PySide6.assets/image-20240331191828484.png)
+
+### 5.1.6 窗口坐标系统
+
+```python
+# 显示窗口坐标和大小
+self.button5 = QPushButton('显示窗口坐标及大小')
+self.button5.clicked.connect(self.show_geometry)
+layout.addWidget(self.button5)
+
+def show_geometry(self):
+    print('主窗口坐标信息，相对于屏幕：')
+    print('主窗口：x={}, y={},width={},heigh={}'.format(
+        self.x(), self.y(), self.width(), self.height()))
+    print('主窗口： geometry：x={}, y={},width={},heigh={}'.format(
+        self.geometry().x(), self.geometry().y(), self.geometry().width(), self.geometry().height()))
+    print('主窗口： frameGeometry：x={}, y={},width={},heigh={}'.format(
+        self.frameGeometry().x(), self.frameGeometry().y(), self.frameGeometry().width(),
+        self.frameGeometry().height()))
+
+    print('\n子窗口QWidget 坐标信息，相对于主窗口：')
+    print('子窗口：x={}, y={},width={},heigh={}'.format(
+        self.widget.x(), self.widget.y(), self.widget.width(), self.widget.height()))
+    print('子窗口： geometry：x={}, y={},width={},heigh={}'.format(
+        self.widget.geometry().x(), self.widget.geometry().y(), self.widget.geometry().width(),
+        self.widget.geometry().height()))
+    print('子窗口： frameGeometry：x={}, y={},width={},heigh={}'.format(
+        self.widget.frameGeometry().x(), self.widget.frameGeometry().y(), self.widget.frameGeometry().width(),
+        self.widget.frameGeometry().height()))
+```
+
+
+
+PySide 6 使用统一坐标系统来定位窗口的位置和大小：
+
+![image-20240331192514876](imge/PySide6.assets/image-20240331192514876.png)
+
+#### pos、geometry、frameGeometry函数区别：
+
+主窗口相对于屏幕，起点为屏幕左上角
+
+![image-20240331192632852](imge/PySide6.assets/image-20240331192632852.png)
+
+- X、Y、width、height：X、Y 不包含边框和标题栏，width、height 不包含边框和标题栏
+- pos：X、Y 不包含边框和标题栏,没有width、height
+- geometry：X、Y 包含边框和标题栏，width、height 不包含边框和标题栏
+- frameGeometry：X、Y 不包含边框和标题栏,width、height 包含边框和标题栏
+
+子窗口相对于父窗口，起点为父窗口的左上角，没有边框和标题栏 pos、geometry、frameGeometry 值都一样
+
+#### **其它坐标相关函数：**
+
+```
+QWidget.pos()  # x 和 y 的组合，返回 QtCore.QPoint(x, y)
+# width 和height 的组合，返回QtCore.QSize(width,height)，
+# QMainWindow/QWidget/QDialog 都可以调用 QWidget.size()
+*.size()  
+# 相当于 QWidget.frameGeometry().size()
+QWidget.geometry().size()，QWidget.frameGeometry().size()，QWidget.framesize()
+```
+
+#### **设置位置和尺寸：**
+
+```
+move(x, y)  # 操控的是x和y
+resize(width, height)  # 操控的是宽和高，不包括窗口边框。如果小于最小值，就无效
+setGeometry(x_noFrame, y_noFrame, width, height)  # 注意，此处参照为用户区域
+
+# 在show 之后设置
+adjustSize()  # 根据内容自适应大小。单次有效，在设置内容后面使用
+setFixedSize()  # 设置固定尺寸
+```
+
+#### **设置最大尺寸和最小尺寸：**
+
+```
+minimumWidth()		# 返回最小尺寸的宽度
+minimumHeight()		# 返回最小尺寸的高度
+minimumSize()		# 返回最小尺寸
+
+maximumWidth()		# 返回最大尺寸的宽度
+maximumHeight()		# 返回最大尺寸的高度
+maximumSize()		# 返回最大尺寸
+
+setMaximumWidth()	# 设置最大宽度
+setMaximumHeight()	# 设置最大高度
+setMaximumSize()	# 设置最大尺寸
+
+setMinimumWidth()	# 设置最小宽度
+setMinimumHeight()	# 设置最小高度
+setMinimumSize()	# 设置最小尺寸
+```
+
+## 5.2 标签（QLabel）
+
+QLabel对象作为一个占位符可以显示不可编辑的文本和图片，也可以放置一个GIF动画，还可以用作提示标记为其它控件。
+
+纯文本、链接、富文本都可以在标签上显示。
+
+QLabel是界面中的标签类，继承自QFrame。继承结构图：
+
+![image-20240331202433450](imge/PySide6.assets/image-20240331202433450.png)
+
+**常用函数**
+
+![image-20240331203127504](imge/PySide6.assets/image-20240331203127504.png)
+
+**常用信号**
+
+![image-20240331203325985](imge/PySide6.assets/image-20240331203325985.png)
+
+### 案例：QLabel标签的基本用法
+
+![image-20240331225348884](imge/PySide6.assets/image-20240331225348884.png)
+
+### 5.2.1 对齐
+
+setAlignment() 是QLabel、QLineEdit等控件通用的函数，用来设置文本的对齐方式，[详见](#5.2 标签（QLabel） "常用函数" )
+
+```python
+# 显示普通标签
+label_normal = QLabel(self)
+label_normal.setText("这是一个普通标签，居中")
+# 水平方向居中对齐
+label_normal.setAlignment(Qt.AlignCenter)
+```
+
+### 5.2.2 设置颜色
+
+```python
+# 背景标签
+label_color = QLabel(self)
+label_color.setText("这是一个有红色背景白色字体的标签，左对齐。")
+
+# 在QLabel类中使用QPalette类一定要设置，否则QPalette类无法管理颜色
+label_color.setAutoFillBackground(True)
+# QPalette类作为对话框或控件的调色板，管理着所有颜色信息
+palette = QPalette()
+# QPalette.Window 表示背景色
+palette.setColor(QPalette.Window, Qt.red)
+# QPalette.WindowText 前景色
+palette.setColor(QPalette.WindowText, Qt.white)
+label_color.setPalette(palette)
+
+# 水平方向左对齐
+label_color.setAlignment(Qt.AlignLeft)
+```
+
+### 5.2.3 显示HTML信息
+
+QLabel 可以兼容HTML格式，使用HTML可以呈现更丰富的文字形式。
+
+```python
+# HTML标签
+label_html = QLabel(self)
+label_html.setText("<a href='#'>这是一个html标签</a> <font color=red>hello <b>world</b> </font>")
+```
+
+### 5.2.4 滑动与单击事件
+
+```python
+# 滑过 QLabel绑定槽事件
+label_hover = QLabel(self)
+label_hover.setText("<a href='#'>指针滑过该标签触发事件</a>")
+label_hover.linkHovered.connect(self.link_hovered)
+
+# 单击 QLabel 绑定事件
+label_click = QLabel(self)
+label_click.setText("<a href='https://www.baidu.com'>单击可以打开百度</a>")
+label_click.linkActivated.connect(self.link_clicked)
+# 当单击标签中嵌入的超链接，并且希望在新窗口中打开该超链接时，
+# setOpenExternalLinks特性必须设置为True
+label_click.setOpenExternalLinks(True)
+
+def link_hovered(self):
+    print("指针滑过该标签触发事件。")
+
+def link_clicked(self):
+    # 设置了 setOpenExternalLinks(True)之后会自动屏蔽该信号
+    print("当单击 ‘单击可以打开百度’ 超链接时，触发事件。")
+```
+
+QLabel有两个常用信号，即linkHovered和linkActivated，当鼠标指针滑过超链接或单击超链接时才会触发。
+
+==注意：==
+
+- 只对超链接有效，即`<a href ='...'`带有href的HTML文本有效。
+
+- 如果设置了 setOpenExternalLinks(True)，则linkActivated信号不会起作用,上面代码不会触发link_clicked信号。
+
+- 当单击标签中嵌入的超链接，并且希望在新窗口中打开该超链接时，setOpenExternalLinks特性必须设置为True。
+
+### 5.2.5 加载图片和气泡提示QToolTip
+
+```python
+# 显示图片
+label_pic = QLabel(self)
+label_pic.setAlignment(Qt.AlignCenter)
+label_pic.setToolTip('这是一个图片标签')
+label_pic.setPixmap(QPixmap("images/cartoon1.ico"))
+```
+
+QLabel类： 
+
+- 使用 setPixmap()函数加载图片信息
+- 使用setToolTip()函数进行气泡提示，函数是QWidget的函数，任何继承QWidget类控件都可以使用。
+
+![image-20240331234642690](imge/PySide6.assets/image-20240331234642690.png)
+
+### 5.2.6 使用快捷键
+
+#### 案例：QLabel快捷键的基本用法
+
+QLabel快捷键本身没有太大意义，但可以通过伙伴关系（setBuddy）把指针快速切换到目标控件（如文本框）上，以便于使用快捷键操作。
+
+![image-20240331235258639](imge/PySide6.assets/image-20240331235258639.png)
+
+```python
+import sys
+
+from PyQt6.QtWidgets import QApplication
+from PySide6.QtWidgets import QDialog, QLabel, QLineEdit, QPushButton, QGridLayout
+
+
+class QLabelDemo(QDialog):
+    def __init__(self):
+        super().__init__()
+        self.setWindowTitle('QLabel 例子')
+        nameLb1 = QLabel('&Name', self)
+        nameEb1 = QLineEdit(self)
+        nameLb1.setBuddy(nameEb1)
+
+        nameLb2 = QLabel('&Password', self)
+        nameEb2 = QLineEdit(self)
+        nameLb2.setBuddy(nameEb2)
+
+        btnOk = QPushButton('&OK')
+        btnCancel = QPushButton('&Cancel')
+
+        mainLayout = QGridLayout(self)
+        mainLayout.addWidget(nameLb1, 0, 0)
+        mainLayout.addWidget(nameEb1, 0, 1, 1, 2)
+
+        mainLayout.addWidget(nameLb2, 1, 0)
+        mainLayout.addWidget(nameEb2, 1, 1, 1, 2)
+
+        mainLayout.addWidget(btnOk, 2, 1)
+        mainLayout.addWidget(btnCancel, 2, 2)
+
+
+if __name__ == '__main__':
+    app = QApplication(sys.argv)
+    labelDemo = QLabelDemo()
+    labelDemo.show()
+    sys.exit(app.exec())
+```
+

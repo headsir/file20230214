@@ -1336,3 +1336,9 @@ if __name__ == '__main__':
     sys.exit(app.exec())
 ```
 
+## 5.3 单行文本框（QLineEdit）
+
+QLabel通过QFrame继承QWidget，而QLineEdit直接继承QWidget，继承结构图：
+
+![image-20240401085124583](imge/PySide6.assets/image-20240401085124583.png)
+

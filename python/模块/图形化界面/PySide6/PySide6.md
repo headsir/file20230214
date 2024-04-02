@@ -1625,12 +1625,132 @@ if __name__ == "__main__":
 
 在通常情况下，需要对用户的输入做一些限制，如只允许输入整数、浮点数或其它自定义数据，验证器（QValidator）可以满足这些限制需求。验证器由 QValidator 控制。
 
-setValidator()  
-
-设置文本框的验证器（验证规则），将限制任意可能输入的文本。可用校验器如下：
+setValidator() 设置文本框的验证器（验证规则），将限制任意可能输入的文本。可用校验器如下：
 
 - QIntValidator：限制输入整数
 - QDoubleValidator：限制输入浮点数
 - QRegexpValidator：检查输入是否符合正则表达式
 
+**==QIntValidator设置范围无效==**
+
+> 使用QIntValidator对QLineEdeit需要限制0-255时发现使用QIntValidator(0,255)，没有生效，显示范围为0-999均可输入
+>
+> 解决方法：一般都是采用重写QValidator的成员函数validate和fixedup
+
 案例：QValldator验证器的使用方法
+
+![image-20240402153839427](imge/PySide6.assets/image-20240402153839427.png)
+
+```python
+import sys
+
+from PySide6.QtCore import QRegularExpression
+from PySide6.QtGui import QIntValidator, QDoubleValidator, QRegularExpressionValidator
+from PySide6.QtWidgets import QWidget, QFormLayout, QLineEdit, QApplication
+
+class lineEditDemo(QWidget):
+    def __init__(self):
+        super().__init__()
+        self.setWindowTitle('QLineEdit_QValidator 例子')
+        flo = QFormLayout()
+        self.setLayout(flo)
+
+        lineEdit_int = QLineEdit()
+        lineEdit_double = QLineEdit()
+        lineEdit_validator = QLineEdit()
+
+        flo.addRow("整型", lineEdit_int)
+        flo.addRow("浮点型", lineEdit_double)
+        flo.addRow("字母和数字", lineEdit_validator)
+
+        lineEdit_int.setPlaceholderText("整型")
+        lineEdit_double.setPlaceholderText("浮点型")
+        lineEdit_validator.setPlaceholderText("字母和数字")
+
+        # 整型 范围：[1, 99]
+        # BUG:只能限制数字长度
+        validator_int = QIntValidator(self)
+        validator_int.setRange(0, 255)
+
+        # 浮点型 范围：[-360, 360] 精度：小数点后2位
+        # BUG:只能限制数字长度
+        validator_double = QDoubleValidator(self)
+        validator_double.setRange(-360, 360)
+        validator_double.setNotation(QDoubleValidator.StandardNotation)
+        validator_double.setDecimals(2)
+
+        # 字符和数字
+        reg = QRegularExpression("[a-zA-Z0-9]+$")
+        validator = QRegularExpressionValidator(self)
+        validator.setRegularExpression(reg)
+
+        # 设置验证器
+        lineEdit_int.setValidator(validator_int)
+        lineEdit_double.setValidator(validator_double)
+        lineEdit_validator.setValidator(validator)
+
+
+if __name__ == '__main__':
+    app = QApplication(sys.argv)
+    myWin = lineEditDemo()
+    myWin.show()
+    sys.exit(app.exec())
+```
+
+### 5.3.9 限制输入：掩码
+
+要限制用户输入，除了可以使用验证器，还可以使用掩码，常见的由IP地址、MAC地址、日期、许可证号等。
+
+掩码由验码字符和分隔符字符串组成，后面可以跟一个分号和空白字符，空白字符在编辑后会从文本中删除。
+
+![image-20240402154507276](imge/PySide6.assets/image-20240402154507276.png)
+
+**案例：输入掩码IputMask**
+
+![image-20240402174311308](imge/PySide6.assets/image-20240402174311308.png)
+
+```python
+import sys
+from PySide6.QtWidgets import QWidget, QFormLayout, QLineEdit, QApplication
+
+class lineEditDemo(QWidget):
+    def __init__(self):
+        super().__init__()
+        self.setWindowTitle('QLineEdit 的输入掩码例子')
+
+        flo = QFormLayout()
+        self.setLayout(flo)
+
+        pIPLineEdit = QLineEdit()
+        pMACLineEdit = QLineEdit()
+        pDateLineEdit = QLineEdit()
+        pLicenseLineEdit = QLineEdit()
+
+        # IP地址，空白字符是“_” 000.000.000.000;_
+        pIPLineEdit.setInputMask("000.000.000.000;_")
+        # MAC地址 HH:HH:HH:HH:HH:HH;
+        pMACLineEdit.setInputMask("HH:HH:HH:HH:HH:HH;_")
+        # 日期，空白字符是空格 0000-00-00
+        pDateLineEdit.setInputMask("0000-00-00")
+        # 许可证号，空白字符是“_”，所有字母字符转换为大写
+        # >AAAAA-AAAAA-AAAAA-AAAAA-AAAAA;#
+        pLicenseLineEdit.setInputMask(">AAAAA-AAAAA-AAAAA-AAAAA-AAAAA;#")
+
+        flo.addRow("数字掩码", pIPLineEdit)
+        flo.addRow("MAC掩码", pMACLineEdit)
+        flo.addRow("日期掩码", pDateLineEdit)
+        flo.addRow("许可证掩码", pLicenseLineEdit)
+
+        pIPLineEdit.setToolTip("ip：192.168.*")
+        pMACLineEdit.setToolTip("mac：ac:be:ad:*")
+        pDateLineEdit.setToolTip("date：2020-01-01")
+        pLicenseLineEdit.setToolTip("许可证：HDFG-ADDB-*")
+
+
+if __name__ == '__main__':
+    app = QApplication(sys.argv)
+    myWin = lineEditDemo()
+    myWin.show()
+    sys.exit(app.exec())
+```
+

@@ -253,6 +253,18 @@ QT Designer提供了4种窗口布局方式：
 
 - Form Layout(表单布局)：控件以两列的形式布局在表单中，其中左列包含标签，右列包含输入控件
 
+  ```
+  # Form Layout(表单布局)：控件以两列的形式布局在表单中，
+  # 其中左列包含标签，右列包含输入控件
+  flo = QFormLayout()
+  
+  flo.addRow("普通文本框，居中", lineEdit_normal)
+  flo.addRow(button, lineEdit_edit)
+  self.setLayout(flo)
+  ```
+
+  
+
 ![image-20240330080810541](imge/PySide6.assets/image-20240330080810541.png)
 
 常用布局一般有两种方式：
@@ -1338,7 +1350,287 @@ if __name__ == '__main__':
 
 ## 5.3 单行文本框（QLineEdit）
 
+QLineEdit类是一个单行文本框控件，可以输入单行字符串。如果需要输入多行字符串，则使用QTextEdit类。
+
 QLabel通过QFrame继承QWidget，而QLineEdit直接继承QWidget，继承结构图：
 
 ![image-20240401085124583](imge/PySide6.assets/image-20240401085124583.png)
 
+### **常用函数:**
+
+| 函数                        | 描述                                                         |
+| --------------------------- | ------------------------------------------------------------ |
+| setAlignment()              | 按固定值方式对齐文本。<br>- Qt.AlignLeft：水平方向靠左对齐<br>- Qt.AlignRight：水平方向靠右对齐<br>- Qt.AlignCenter：水平方向居中对齐<br>- Qt.AlignJustify：水平方向调整间距两端对齐<br>- Qt.AlignTop：垂直方向靠上对齐<br>- Qt.AlignBottom：垂直方向靠下对齐<br>- Qt.AlignVCenter：垂直方向居中对齐 |
+| clear()                     | 清除文本框中的内容                                           |
+| backspace()                 | 删除指针左侧的字符或选中的文本                               |
+| del_()                      | 删除指针右侧的字符或选中的文本                               |
+| copy()                      | 复制文本框中的内容                                           |
+| cut()                       | 剪切文本框中的内容                                           |
+| paste()                     | 粘贴文本框内容                                               |
+| isUndoAvailabQLineEdit()    | 是否可以执行撤销动作                                         |
+| undo()                      | 撤销                                                         |
+| redo()                      | 重做                                                         |
+| setDragEnabQLineEditd(True) | 设置文本可拖拽                                               |
+| setEchoMode()               | 设置文本框的显示格式。允许输入的文本框显示格式的值可以是:<br>- QLineEdit.Normal：正常显示输入的字符，此为默认选项<br>- QLineEdit.NoEcho：不显示任何输入的字符，常用于密码类型的输入，并且密码长度需要保密<br>- QLineEdit.Password：显示与平台相关的密码掩码字符，Windows 常用的是星号<br>- QLineEdit.PasswordEchoOnEdit：在编辑时短暂显示该字符，然后迅速将该字符显示为掩码字符 |
+| setPlaceholderText()        | 设置文本框浮显文字                                           |
+| setMaxLength()              | 设置文本框允许输入的最大字符数，默认情况下，单行编辑控件的文本长度限制为 32767，获取单行编辑控件的文本长度限定的函数为：maxLength() |
+| setReadOnly(True)           | 设置文本框是只读的                                           |
+| setText()                   | 设置文本框中的内容                                           |
+| text()                      | 返回文本框中的内容                                           |
+| setDragEnabled()            | 设置文本框是否接受拖动                                       |
+| selectAll()                 | 全选                                                         |
+| setFocus()                  | 得到焦点                                                     |
+| setInputMask()              | 设置掩码                                                     |
+| setValidator()              | 设置文本框的验证器（验证规则），将限制任意可能输入的文本。可用校验器如下：<br>- QIntValidator：限制输入整数<br>- QDoubleValidator：限制输入浮点数<br>- QRegexpValidator：检查输入是否符合正则表达式 |
+
+### **指针操作函数**
+
+| 函数                               | 描述                                             |
+| ---------------------------------- | ------------------------------------------------ |
+| cursorBackward(mark=True, steps=0) | 向左移动step个字符，当mark为True时带选中效果     |
+| cursorForward(mark=True, steps=0)  | 向右移动step个字符，当mark为True时带选中效果     |
+| cursorWordBackward(mark=True)      | 向左移动一个单词的长度，当mark为True时带选中效果 |
+| cursorWordForward(mark=True)       | 向右移动一个单词的长度，当mark为True时带选中效果 |
+| home(mark=True)                    | 指针移到行首，当mark为True时带选中效果           |
+| end(mark=True)                     | 指针移到行尾，当mark为True时带选中效果           |
+| setCursorPosition(pos=8)           | 指针移到指定位置（如果pos为小数则向下取整）      |
+| cursorPosition()                   | 获取指针的位置                                   |
+| setFocus()                         | 获取输入焦点                                     |
+| hasFocus()                         | 查询是否获取输入焦点，返回 bool 类型             |
+
+
+
+### **常用信号：**
+
+| 信号                                          | 说明                                                         |
+| --------------------------------------------- | ------------------------------------------------------------ |
+| textChanged                                   | 当修改文本内容时，这个信号会被发射                           |
+| textEdited(text)                              | 当文本被编辑时，就会发射这个信号，通过setText()函数更改文本，不会触发此信号 |
+| returnPressed                                 | 光标在行编辑框内时，点击**回车键**即发射信号，**注意：**编辑行设置了validator()或inputMask()，只有当输入在inputMask()之后，并且validator()返回QValidator.Acceptable时，才会发射。 |
+| selectionChanged                              | 当选择的文本内容改变了，这个信号就会被发射                   |
+| editingFinished                               | 当按返回或者**回车键**时，或者行编辑失去焦点时，这个信号会被发射 |
+| cursorPositionChanged(int oldPos, int newPos) | 当焦点，即**光标**位置改变就发射信号,前一个位置由oldPos给出，新位置由newPos给出 |
+| inputRejected                                 | 当用户输入不合法字符时，将发出此信号。前提要 setValidator() 等设置合法字符范围，**Qt 5.12 版本新增**。 |
+
+### 案例：QLineEdit的基本用法
+
+QLineEdit类的很多函数和QLabel类的函数一样，如对齐、颜色设置、tooltip设置等。但二者也存在不同之处，如QLineEdit类不支持HTML显示，没有滑动信号和单击信号。
+
+![image-20240401153147712](imge/PySide6.assets/image-20240401153147712.png)
+
+### 5.3.1 对齐、tooltip和颜色设置
+
+对齐、tooltip、颜色设置与QLabel类一致，设置颜色有差异：
+
+- 背景色：QLabel类 QPalette.Window ，QLineEdit类 QPalette.Base
+- 前景色时，QLabel类 QPalette.WindowText，QLineEdit类 QPalette.Text
+
+```python
+# 正常文本框,对齐，tooltip
+lineEdit_normal = QLineEdit()
+# 设置内容
+lineEdit_normal.setText("122")
+# 居中
+lineEdit_normal.setAlignment(Qt.AlignCenter)
+# 气泡提示
+lineEdit_normal.setToolTip("这是一个普通文本框")
+flo.addRow("普通文本框，居中", lineEdit_normal)
+
+# 显示颜色
+lineEdit_color = QLineEdit()
+# 设置内容
+lineEdit_color.setText("显示红色背景白色字体")
+# 设置颜色
+lineEdit_color.setAutoFillBackground(True)
+palette = QPalette()
+palette.setColor(QPalette.Base, Qt.red)
+palette.setColor(QPalette.Text, Qt.white)
+lineEdit_color.setPalette(palette)
+# 左对齐
+lineEdit_color.setAlignment(Qt.AlignLeft)
+flo.addRow("显示颜色，左对齐", lineEdit_color)
+```
+
+### 5.3.2 占位提示符、限制输入长度、限制编辑
+
+- 占位提示符：文本框中有提示文本，当输入内容后提示文本自动消失并被输入的值替代，使用setPlaceholderText设置
+- 限制输入长度：使用setMaxLength设置
+- 限制编辑：使用setReadOnly(True)设置
+
+```python
+# 占位提示符，限制长度
+lineEdit_maxLength = QLineEdit()
+# 设置文本框浮显文字
+lineEdit_maxLength.setPlaceholderText("最多输入5个字符")
+lineEdit_maxLength.setMaxLength(5)
+flo.addRow("最多输入5个字符", lineEdit_maxLength)
+
+# 只读文本
+lineEdit_readOnly = QLineEdit()
+lineEdit_readOnly.setReadOnly(True)
+lineEdit_readOnly.setText("只读文本，不能编辑")
+flo.addRow("只读文本", lineEdit_readOnly)
+```
+
+### 5.3.3 移动指针
+
+移动指针涉及焦点：
+
+- setFocus表示获取焦点
+- hasFocus表示是否获取到焦点
+- setCursorPosition(1)表示设置文本框当前指针的位置为1
+- cursorForward(bool mask, int steps=1)表示向前（向右）移动指针，mark为True 选中移动的字符，steps 移动字符数量
+
+[相关函数参见](# 指针操作函数 "指针函数")
+
+```python
+# 移动光标
+lineEdit_cursor = QLineEdit()
+lineEdit_cursor.setText("单击左边按钮向右移动光标")
+lineEdit_cursor.setFocus()
+lineEdit_cursor.setCursorPosition(1)
+button = QPushButton("点我右移光标")
+self.lineEdit_cursor = lineEdit_cursor
+button.clicked.connect(self.move_cursor)
+flo.addRow(button, lineEdit_cursor)
+
+def move_cursor(self):
+    # cursorForward(mark = True, steps = 0)
+    # 向右移动step个字符，当mark为True时带选中效果
+    self.lineEdit_cursor.cursorForward(True, 2)
+```
+
+### 5.3.4 编辑
+
+删除文本 按钮触发槽函数QLineEdit.clear()把文本框所有内容删除
+
+```python
+# 编辑文本
+lineEdit_edit = QLineEdit()
+lineEdit_edit.setText("编辑文本")
+button2 = QPushButton("删除文本")
+button2.clicked.connect(lambda: lineEdit_edit.clear())
+flo.addRow(button2, lineEdit_edit)
+```
+
+### 5.3.5 相关信号与槽
+
+使用textChanged信号，当修改文本内容时，就会触发槽函数，修改标签的结果。
+
+[参见](#”常用信号：" "信号")
+
+```python
+# 槽函数
+lineEdit_change = QLineEdit()
+lineEdit_change.setPlaceholderText("输入文本框会改变左侧标签")
+lineEdit_change.setFixedWidth(200)
+label = QLabel("槽函数应用")
+lineEdit_change.textChanged.connect(
+    lambda: label.setText("更新标签：" + lineEdit_change.text()))
+flo.addRow(label, lineEdit_change)
+```
+
+### 5.3.6 快捷键
+
+默认快捷键如下表，此外，还提供了一个上下文菜单（在单击鼠标右键时调用），其中显示了一些编辑选项。
+
+| 快捷键           | 作用                         |
+| ---------------- | ---------------------------- |
+| ←                | 将指针向左移动一个字符       |
+| Shift + ←        | 向左移动一个字符并选择文本   |
+| →                | 将指针向右移动一个字符       |
+| Shift + →        | 向右移动一个字符并选择文本   |
+| Home             | 将指针移到行首               |
+| End              | 将指针移到行尾               |
+| Backspace        | 删除指针左侧的字符           |
+| Ctrl + Backspace | 删除指针左侧的单词           |
+| Delete           | 删除指针右侧的字符           |
+| Ctrl + Delete    | 删除指针右侧的单词           |
+| Ctrl + A         | 全选                         |
+| Ctrl + C         | 将选定的文本复制到剪贴板中   |
+| Ctrl + Insert    | 将选定的文本复制到剪贴板中   |
+| Ctrl + K         | 删除到行尾                   |
+| Ctrl + V         | 将剪贴板文本粘贴到行编辑器中 |
+| Shift + Insert   | 将剪贴板文本粘贴到行编辑器中 |
+| Ctrl + X         | 剪贴所选中文本               |
+| Shift + Delete   | 剪贴所选中文本               |
+| Ctrl + Z         | 撤销上次的操作               |
+| Ctrl + Y         | 重做上次撤销的操作           |
+
+![image-20240401172317100](imge/PySide6.assets/image-20240401172317100.png "上下文菜单")
+
+### 5.3.7 隐私保护：回显模式
+
+在网页中输入密码之后会显示 `*`，对用户隐私进行保护，在PySide中通过回显模式（EchoMode）来设置。
+
+[具体设置参见](#常用函数:  "setEchoMode()")
+
+案例：回显模式的显示效果
+
+```python
+# -*- coding: utf-8 -*-
+
+'''
+    【简介】
+	PySide6中 QLineEdit.EchoMode效果例子
+  
+'''
+
+from PySide6.QtWidgets import QApplication, QLineEdit, QWidget, QFormLayout
+import sys
+
+
+class lineEditDemo(QWidget):
+    def __init__(self, parent=None):
+        super(lineEditDemo, self).__init__(parent)
+        self.setWindowTitle("QLineEdit_EchoMode例子")
+
+        flo = QFormLayout()
+        pNormalLineEdit = QLineEdit()
+        pNoEchoLineEdit = QLineEdit()
+        pPasswordLineEdit = QLineEdit()
+        pPasswordEchoOnEditLineEdit = QLineEdit()
+
+        flo.addRow("Normal", pNormalLineEdit)
+        flo.addRow("NoEcho", pNoEchoLineEdit)
+        flo.addRow("Password", pPasswordLineEdit)
+        flo.addRow("PasswordEchoOnEdit", pPasswordEchoOnEditLineEdit)
+
+        pNormalLineEdit.setPlaceholderText("Normal")
+        pNoEchoLineEdit.setPlaceholderText("NoEcho")
+        pPasswordLineEdit.setPlaceholderText("Password")
+        pPasswordEchoOnEditLineEdit.setPlaceholderText("PasswordEchoOnEdit")
+
+        # 设置显示效果
+        pNormalLineEdit.setEchoMode(QLineEdit.Normal)
+        pNoEchoLineEdit.setEchoMode(QLineEdit.NoEcho)
+        pPasswordLineEdit.setEchoMode(QLineEdit.Password)
+        pPasswordEchoOnEditLineEdit.setEchoMode(QLineEdit.PasswordEchoOnEdit)
+
+        self.setLayout(flo)
+
+
+if __name__ == "__main__":
+    app = QApplication(sys.argv)
+    win = lineEditDemo()
+    win.show()
+    sys.exit(app.exec())
+```
+
+效果：
+
+![image-20240401181410192](imge/PySide6.assets/image-20240401181410192.png)
+
+### 5.3.8 限制输入：验证器
+
+在通常情况下，需要对用户的输入做一些限制，如只允许输入整数、浮点数或其它自定义数据，验证器（QValidator）可以满足这些限制需求。验证器由 QValidator 控制。
+
+setValidator()  
+
+设置文本框的验证器（验证规则），将限制任意可能输入的文本。可用校验器如下：
+
+- QIntValidator：限制输入整数
+- QDoubleValidator：限制输入浮点数
+- QRegexpValidator：检查输入是否符合正则表达式
+
+案例：QValldator验证器的使用方法

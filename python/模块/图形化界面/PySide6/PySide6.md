@@ -1788,3 +1788,61 @@ if __name__ == '__main__':
 | toMarkdown()   | 返回纯Markdown格式。如果随后调用toMarkdown()，则返回的文本可能会有所不同，但含义会尽可能保留 |
 | clear()        | 清除多行文本框中的内容                                       |
 
+**案例：QTextEdit控件的使用方法**
+
+![image-20240403160601601](imge/PySide6.assets/image-20240403160601601.png)
+
+#### **显示纯文本**
+
+```python
+# 显示文本
+self.btn_plain = QPushButton('显示纯文本')
+self.btn_plain.clicked.connect(self.btn_plain_Clicked)
+layout.addWidget(self.btn_plain)
+
+def btn_plain_Clicked(self):
+    self.textEdit.setFontItalic(True)  # 斜体
+    # setFontWeight()函数，Qt中控制字符粗细使用与OpenType兼容的从1到1000的权重等级。
+    self.textEdit.setFontWeight(QFont.ExtraBold)  # 加粗
+    self.textEdit.setFontUnderline(True)  # 下划线
+    self.textEdit.setFontFamily('宋体')  # 字体
+    self.textEdit.setFontPointSize(15)  # 字体大小
+    self.textEdit.setTextColor(QColor(200, 75, 75))  # 字体颜色
+    # setPlainText()设置多行文本。参数可以是纯文本或HTML，
+    # setText()函数相当于setHtml()函数和setPlainText()函数的复合体，Qt会识别正确的格式
+    # self.textEdit.setText('Hello Qt for Python!\n 单击按钮')
+    self.textEdit.setPlainText('Hello Qt for Python!\n 单击按钮')
+```
+
+![image-20240403164314837](imge/PySide6.assets/image-20240403164314837.png)
+
+Qt 控制字体粗细的权重表:
+
+| 属性             | 值   | 描述 |
+| ---------------- | ---- | ---- |
+| QFont.Thin       | 100  | 100  |
+| QFont.ExtraLight | 200  | 200  |
+| QFont.Light      | 300  | 300  |
+| QFont.Normal     | 400  | 400  |
+| QFont.Medium     | 500  | 500  |
+| QFont.DemiBold   | 600  | 600  |
+| QFont.Bold       | 700  | 700  |
+| QFont.ExtraBold  | 800  | 800  |
+| QFont.Black      | 900  | 900  |
+
+#### 显示HTML
+
+```python
+# 显示HTML
+self.btn_html = QPushButton('显示HTML')
+self.btn_html.clicked.connect(self.btn_html_Clicked)
+layout.addWidget(self.btn_html)
+
+def btn_html_Clicked(self):
+    a = ''
+    with open('../support/myhtml.html', 'r', encoding='utf-8') as f:
+        a = f.read()
+    self.textEdit.setHtml(a)
+
+```
+

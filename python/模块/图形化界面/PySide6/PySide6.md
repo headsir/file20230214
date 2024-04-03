@@ -1754,3 +1754,37 @@ if __name__ == '__main__':
     sys.exit(app.exec())
 ```
 
+## 5.4 多行文本框（QTextEdit/QPlainTextEdit）
+
+- QTextEdit：支持富文本，可以设置丰富的格式，适用于大多数多行文本任务
+- QPlainTextEdit：仅支持纯文本，其引擎专门优化纯文本，速度更快，更适用于处理大型文本文档
+
+为了使多行文本自动匹配滚动条，两者都继承自QAbstractScrollArea。
+
+![image-20240403101435185](imge/PySide6.assets/image-20240403101435185.png)
+
+### 5.4.1 QTextEdit
+
+> **介绍**
+
+​		QTextEdit是一种高级WYSIWYG查看器/编辑器，支持使用HTML样式的标记或Markdown格式的富文本。经过优化，使用QTextEdit可以处理大型文档并快速响应用户输入。
+
+​		QTextEdit适用于段落和字符，段落是经过格式化的字符串，将其自动换行以适合窗口小部件的宽度。在默认情况下，阅读纯文本时，一个换行符表示一个段落。一个文档包含零个或多个段落。段落中的单词根据段落对齐的方式对齐。段落之间用强制换行符分隔。段落中的每个字符都有其自己的属性，如字体和颜色。
+
+​		使用QTextEdit可以显示图像、列表和表格。如果文本太大而无法在文本编辑的视图中查看，则会出现滚动条。文本编辑可以加载纯文本文件和富文本文件。富文本可以使用HTML 4 标记的子集来描述。如果只需要显示一小段富文本，则使用QLabel。
+
+> 常用函数
+
+​		QTextEdit的大部分函数和QLineEdit的基本相同，区别主要在QTexteEdit支持富文本
+
+| 函数           | 描述                                                         |
+| -------------- | ------------------------------------------------------------ |
+| setPlainText() | 设置多行文本框中的文本内容                                   |
+| setText()      | 设置多行文本。参数可以是纯文本或HTML，<br>setText()函数相当于setHtml()函数和setPlainText()函数的复合体，Qt会识别正确的格式 |
+| toPlainText()  | 返回多行文本框中的文本内容                                   |
+| setHtml()      | 设置多行文本框的内容为HTML文档，HTML文档用于描述网页         |
+| toHtml()       | 返回多行文本框中的HTML文档                                   |
+| setMarkdown()  | 输入文本会被解析为Markdown格式的富文本，这个函数会删除之前的文本，以及撤销/重做历史记录。Markdown字符串中包含的 HTML 的解析与setHtml 中的处理相同，但是不支持HTML文档内的Markdown格式 |
+| toMarkdown()   | 返回纯Markdown格式。如果随后调用toMarkdown()，则返回的文本可能会有所不同，但含义会尽可能保留 |
+| clear()        | 清除多行文本框中的内容                                       |
+

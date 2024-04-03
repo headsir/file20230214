@@ -184,6 +184,10 @@ print('Extension:', path.suffix)
 from pathlib import Path
 
 # 创建新目录
+# 当文件夹不存在时，直接使用.mkdir(),若该文件夹存在或者创建多级路径会失败，抛出异常
+# .mkdir(exist_ok=True)创建单个文件夹，如果存在则忽略，多级同上
+# .mkdir(exist_ok=True，parents=True)创建多级路径，存在则忽略
+
 new_dir = Path('/home/user/new_directory')
 new_dir.mkdir(parents=True, exist_ok=True)
 

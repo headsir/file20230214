@@ -1846,3 +1846,20 @@ def btn_html_Clicked(self):
 
 ```
 
+![image-20240403170919283](imge/PySide6.assets/image-20240403170919283.png)
+
+**显示MarkDown**
+
+```python
+# 显示markdown
+self.btn_markdown = QPushButton('显示markdown')
+self.btn_markdown.clicked.connect(self.btn_markdown_Clicked)
+layout.addWidget(self.btn_markdown)
+
+def btn_markdown_Clicked(self):
+    with open('../support/myMarkdown.md', 'r', encoding='utf8') as f:
+        a = f.read()
+    self.textEdit.setMarkdown(a)
+```
+
+![image-20240403171120963](imge/PySide6.assets/image-20240403171120963.png)

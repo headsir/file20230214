@@ -1920,3 +1920,19 @@ if __name__ == '__main__':
 **效果:**
 
 ![image-20240409155107674](imge/PySide6.assets/image-20240409155107674.png)
+
+### 5.4.3 快捷键
+
+QTextEdit和QPlain既可以作为阅读器，也可以作为编辑器，为了方便操作，Qt为它们绑定了一些默认的快捷键，
+
+- 作为只读使用时（setReadOnly(True)）,按键绑定仅限于导航，并且只能使用鼠标选择文本
+
+  ![image-20240409162642232](imge/PySide6.assets/image-20240409162642232.png)
+
+- 作为编辑器使用时，部分快捷键绑定如下，需要注意的是，上下文菜单也提供了一些按键选项
+
+  ![image-20240409170017078](imge/PySide6.assets/image-20240409170017078.png)
+
+![image-20240409170044076](imge/PySide6.assets/image-20240409170044076.png)
+
+### 5.4.4 QSyntaxHighlighter 文本高亮

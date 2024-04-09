@@ -1848,7 +1848,7 @@ def btn_html_Clicked(self):
 
 ![image-20240403170919283](imge/PySide6.assets/image-20240403170919283.png)
 
-**显示MarkDown**
+#### **显示MarkDown**
 
 ```python
 # 显示markdown
@@ -1863,3 +1863,60 @@ def btn_markdown_Clicked(self):
 ```
 
 ![image-20240403171120963](imge/PySide6.assets/image-20240403171120963.png)
+
+### 5.4.2 QPlainTextEdit
+
+> 介绍：
+
+​			QPlainTextEdit和QTextEdit共用的方法很多，只不过QPlainTextEdit简化了文本处理方式，处理文字的性能更强大。
+
+**案例：QPlainTextEdit控件的使用方法**
+
+```python
+import sys
+
+from PySide6.QtGui import QFont
+from PySide6.QtWidgets import QWidget, QPlainTextEdit, QVBoxLayout, QPushButton, QApplication
+
+
+class TextEditDemo(QWidget):
+    def __init__(self):
+        super().__init__()
+        self.setWindowTitle('QPlainTextEdit 例子')
+        self.resize(300, 270)
+
+        self.textEdit = QPlainTextEdit()
+        # 布局管理
+        layout = QVBoxLayout()
+        layout.addWidget(self.textEdit)
+        # 显示文本
+        self.btn_plain = QPushButton('显示纯文本')
+        self.btn_plain.clicked.connect(self.btn_plain_Clicked)
+        layout.addWidget(self.btn_plain)
+
+        self.setLayout(layout)
+
+    def btn_plain_Clicked(self):
+        # 与QTextEdit不同，
+        # QPlainTextEdit没有setFontItalic()这种直接控制字体的函数，所以通过OFont间接控制
+        font = QFont()
+        # 字体
+        font.setFamily("Courier")
+        # 字体宽度相等
+        font.setFixedPitch(True)
+        # 字体大小
+        font.setPointSize(14)
+        self.textEdit.setFont(font)
+        self.textEdit.setPlaceholderText("Hello Qt for Python!\n单击按钮")
+
+
+if __name__ == '__main__':
+    app = QApplication(sys.argv)
+    myWin = TextEditDemo()
+    myWin.show()
+    sys.exit(app.exec())
+```
+
+**效果:**
+
+![image-20240409155107674](imge/PySide6.assets/image-20240409155107674.png)

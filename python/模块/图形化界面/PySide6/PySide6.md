@@ -2123,6 +2123,20 @@ self.editor = QTextEdit()
 # PythonHighlighter 继承QSyntaxHighlighter
 # 并重新实现highlightBlock()函数
 highlighter = PythonHighlighter(self.editor.document())
+# PyQt6中 
+self.highlighter = PythonHighlighter(self.editor.document())
 ```
 
-在此之后，highlightBlock()函数将在必要时自动调用。在j
+在此之后，highlightBlock()函数将在必要时自动调用。在highlightBlock()函数中实现语法高亮的关键在于setFormat()函数，该函数把QTextCharFormat格式（包含字体和颜色）应用到文本的特定位置：
+
+```python
+setFormat(self, start: int, count: int, color: PySide6.QtGui.QColor) -> None
+setFormat(self, start: int, count: int, font: PySide6.QtGui.QFont) -> None
+setFormat(self, start: int, count: int, format: PySide6.QtGui.QTextCharFormat) -> None
+```
+
+其他需要注意的是，可以使用previousBlockState()函数查询前一个文本块的结束状态。在解析块后，可以使用setCurrentBlockState()函数保存最后一个状态。函数currentBlockState()和previousBlockState()返回一个int值。如果未设置状态，则返回值为-1。
+
+### 5.4.5 QTextBrowser
+
+QTextBrowser是QTextEdit的只读模式，并在QTextEdit的基础上添加了一些导航功能，以便用户可以跟踪超文本文档中的链接，方便页面跳转。如果要实现可编辑的文本编辑器，则需要使用QTextEdit或QPlainTextEdit。如果只是显示一小段富文本，则使用QLabel。

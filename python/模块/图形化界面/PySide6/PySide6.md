@@ -314,19 +314,18 @@ self.doubleSpinBox_returns_min.setGeometry(QRect(138, 244, 53, 20))
   		...
           # 添加布局管理器
           layout = QVBoxLayout()
-          widget = QWidget(self)
+          widget = QWidget()
           widget.setLayout(layout)
           # Geometry 相对坐标系,设置widget位置及大小
           widget.setGeometry(QtCore.QRect(200, 150, 200, 200))
-          # self.setCentralWidget(widget)
-          self.widget = widget
+          self.setCentralWidget(widget)
   
           # 关闭窗口
           self.button1 = QPushButton('关闭主窗口')
           self.button1.clicked.connect(self.close)
           layout.addWidget(self.button1)
   ```
-
+  
 - QWidget窗口中添加布局管理器
 
   ```python
@@ -2140,3 +2139,106 @@ setFormat(self, start: int, count: int, format: PySide6.QtGui.QTextCharFormat) -
 ### 5.4.5 QTextBrowser
 
 QTextBrowser是QTextEdit的只读模式，并在QTextEdit的基础上添加了一些导航功能，以便用户可以跟踪超文本文档中的链接，方便页面跳转。如果要实现可编辑的文本编辑器，则需要使用QTextEdit或QPlainTextEdit。如果只是显示一小段富文本，则使用QLabel。
+
+QTextBrowser是QTextEdit的子类，因此，QTextEdit的一些函数(如setHtml()或setPlainText()) QTextBrowser都可以使用。但QTextBrowser也实现了setSource()函数，可以更好地追踪文档的载入路径。
+
+![image-20240410171909733](imge/PySide6.assets/image-20240410171909733.png)
+
+为了实现导航功能，QTextBrowser类提供了backward()函数和forward()函数，用于实现后退和前进功能。另外，使用home()函数可以跳转到第一个载入文件。
+当用户单击一个链接时，会触发anchorClicked信号；如果页面发生跳转，则触发historyChanged信号。
+
+**案例：**
+
+注意：文件路径 `\`，用`/` 程序异常
+
+```python
+import os
+import sys
+import urllib
+
+from PySide6.QtCore import QUrl
+from PySide6.QtWidgets import (QMainWindow, QLineEdit, QTextBrowser, QVBoxLayout, QApplication, QWidget, QPushButton,
+                               QFrame, QHBoxLayout)
+os.chdir(os.path.dirname(__file__))
+
+class TextBrowserDemo(QMainWindow):
+    def __init__(self):
+        super().__init__()
+        self.initUI()
+
+    def initUI(self):
+        self.lineEdit = QLineEdit()
+        self.lineEdit.setPlaceholderText("在这里添加你想要的数据，按 Enter 键确认")
+        # returnPressed 回车信号
+        self.lineEdit.returnPressed.connect(self.append_text)
+
+        self.textBrowser = QTextBrowser()
+        self.textBrowser.setAcceptRichText(True)  # 接受富文本
+        self.textBrowser.setOpenExternalLinks(True)  # 打开外部链接
+        self.textBrowser.setSource(QUrl(r"..\support\textBrowser.html"))
+        self.textBrowser.anchorClicked.connect(
+            lambda url: self.statusBar().showMessage('你单击了 url' + urllib.parse.unquote(url.url()), 3000))
+        self.textBrowser.historyChanged.connect(self.show_anchor)
+
+        self.back_btn = QPushButton("Back")
+        self.forward_btn = QPushButton("Forward")
+        self.home_btn = QPushButton("Home")
+        self.clear_btn = QPushButton("Clear")
+
+        self.back_btn.pressed.connect(self.textBrowser.backward)
+        self.forward_btn.pressed.connect(self.textBrowser.forward)
+        self.clear_btn.pressed.connect(self.clear_text)
+        self.home_btn.pressed.connect(self.textBrowser.home)
+
+
+        layout = QVBoxLayout()
+        layout.addWidget(self.textBrowser)
+        layout.addWidget(self.lineEdit)
+        frame = QFrame()
+        layout.addWidget(frame)
+
+        self.text_show = QTextBrowser()
+        layout.addWidget(self.text_show)
+        self.text_show.setMaximumHeight(70)
+
+        layout_frame = QHBoxLayout()
+        layout_frame.addWidget(self.back_btn)
+        layout_frame.addWidget(self.forward_btn)
+        layout_frame.addWidget(self.home_btn)
+        layout_frame.addWidget(self.clear_btn)
+        frame.setLayout(layout_frame)
+
+        widget = QWidget()
+        self.setCentralWidget(widget)
+        widget.setLayout(layout)
+
+        self.setWindowTitle("QTextBrowser 案例")
+        self.setGeometry(300, 300, 300, 300)
+        # self.show()
+
+    def append_text(self):
+        text = self.lineEdit.text()
+        self.textBrowser.append(text)
+        self.lineEdit.clear()
+
+    def show_anchor(self):
+        back = urllib.parse.unquote(self.textBrowser.historyUrl(-1).url())
+        now = urllib.parse.unquote(self.textBrowser.historyUrl(0).url())
+        forward = urllib.parse.unquote(self.textBrowser.historyUrl(1).url())
+        _str = f'上一个 url: {back},<br>当前 url: {now},<br>下一个 url: {forward}'
+        self.text_show.setText(_str)
+
+    def clear_text(self):
+        self.textBrowser.clear()
+
+
+if __name__ == '__main__':
+    app = QApplication(sys.argv)
+    myWin = TextBrowserDemo()
+    myWin.show()
+    sys.exit(app.exec())
+```
+
+**效果：**
+
+![image-20240410185639405](imge/PySide6.assets/image-20240410185639405.png)

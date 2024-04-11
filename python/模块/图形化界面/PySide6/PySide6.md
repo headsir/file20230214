@@ -2242,3 +2242,63 @@ if __name__ == '__main__':
 **效果：**
 
 ![image-20240410185639405](imge/PySide6.assets/image-20240410185639405.png)
+
+## 5.5 按钮类控件
+
+### 5.5.1 QAbstractButton
+
+在任何GUI设计中，按钮都是很重要的和常用的触发动作请求的方式，用来与用户进行交互操作。
+
+在PySide 6中，根据不同的使用场景可以将按钮划分为不同的表现形式。按钮的基类是QAbstractButton，提供了按钮的通用性功能。
+
+QAbstractButton为抽象类，不能实例化，必须由其他的按钮类继承自QAbstractButton，从而实现不同的功能、不同的表现形式。
+
+![image-20240411120048396](imge/PySide6.assets/image-20240411120048396.png)
+
+PySide 6中提供的按钮类主要有4个，分别为QPushButton、QToolButton、QRadioButton和QCheckBox。
+
+这些按钮类均继承自QAbstractButton，并且根据各自的使用场景通过图形展现出来。任何按钮都可以显示包含文本和图标的标签。setText()函数用于设置文本，setIcon()函数用于设置图标。如果禁用了按钮，则会更改其标签以使按钮具有“禁用”外观。
+
+QAbstractButton用于按钮的大多数状态，这些状态以上4个按钮类都可以继承。
+
+![image-20240411120513001](imge/PySide6.assets/image-20240411120513001.png)
+
+**注意:**与其他窗口小部件相反，从QAbstractButton类派生的按钮类在禁用时会接受鼠标和上下文菜单事件。
+
+isDown()和isChecked()之间的区别如下：
+
+- 当用户单击切换按钮时，首先按下该按钮(isDown()返回True)，然后将其释放到选中状态（isChecked()返回True）。
+
+- 当用户想要取消选中再次单击它时，该按钮首先移至按下状态(isDown()返回True)，然后移至未选中状态(isChecked()和isDown()均返回False)。
+
+QAbstractButton类提供的信号
+
+![image-20240411144856418](imge/PySide6.assets/image-20240411144856418.png)
+
+### 5.5.2 QPushButton
+
+QPushButton继承自QAbstractButton，其形状是长方形，可以显示文本标题和图标。
+
+QPushButton也是一种命令按钮，可以单击该按钮执行一些命令，或者响应一些事件。常见的按钮有“确认”、“申请”、“取消”、“关闭”、“是”和“否”等。QPushButton类的继承结构
+
+![image-20240411145801287](imge/PySide6.assets/image-20240411145801287.png)
+
+命令按钮通常通过文本来描述执行的动作，但有时也会通过快捷键来执行对应按钮的命令。
+
+#### 1.QPushButton类中常用的函数
+
+![image-20240411145956809](imge/PySide6.assets/image-20240411145956809.png)
+
+#### 2.QPushButton设置快捷键
+
+通过按钮名字可以为QPushButton设置快捷键，如名字为&Download的按钮的快捷键是Alt+D。
+
+> 其规则如下:
+
+如果想要实现快捷键为Alt+D，那么按钮的名字中就要有字母D，并且在字母D的前面加上“&”。这个字母D一般是按钮名称的首字母，在按钮显示时，“&”不会被显示出来，但字母D会显示一条下画线。如果只想显示“&”，那么需要像转义一样使用“&&”。如果读者想了解更多关于快捷键的使用，请参考OShortcut类。其核心代码如下：
+
+```python
+self.button= QPushButton("&Download")
+self.button.setDefault(True)
+```
+

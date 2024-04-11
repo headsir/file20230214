@@ -2151,6 +2151,9 @@ QTextBrowser是QTextEdit的子类，因此，QTextEdit的一些函数(如setHtml
 
 注意：文件路径 `\`，用`/` 程序异常
 
+- setOpenExternalLinks()函数开启外部链接
+- setSource()函数方便记录初始化URL，如果使用setHtml0)等函数则没有URL记录。当用户单击一个链接时，会触发anchorClicked信号，该信号会传递QUrl作为参数，使用urllib.parse.unquote()可以解码出正确的URL。
+
 ```python
 import os
 import sys
@@ -2295,10 +2298,194 @@ QPushButton也是一种命令按钮，可以单击该按钮执行一些命令，
 
 > 其规则如下:
 
-如果想要实现快捷键为Alt+D，那么按钮的名字中就要有字母D，并且在字母D的前面加上“&”。这个字母D一般是按钮名称的首字母，在按钮显示时，“&”不会被显示出来，但字母D会显示一条下画线。如果只想显示“&”，那么需要像转义一样使用“&&”。如果读者想了解更多关于快捷键的使用，请参考OShortcut类。其核心代码如下：
+如果想要实现快捷键为Alt+D，那么按钮的名字中就要有字母D，并且在字母D的前面加上“&”。这个字母D一般是按钮名称的首字母，在按钮显示时，“&”不会被显示出来，但字母D会显示一条下画线。如果只想显示“&”，那么需要像转义一样使用“&&”。如果读者想了解更多关于快捷键的使用，请参考QShortcut类。其核心代码如下：
 
 ```python
 self.button= QPushButton("&Download")
 self.button.setDefault(True)
+```
+
+**案例：QPushButton按钮的使用方法**
+
+- 设置图标
+- 保持状态
+- 回车功能
+- 禁用功能
+
+```python
+import sys
+
+from PySide6.QtGui import QIcon, QPixmap
+from PySide6.QtWidgets import QVBoxLayout, QHBoxLayout, QPushButton, QLabel
+from PySide6.QtWidgets import QWidget, QApplication
+
+
+class QPushButtonDemo(QWidget):
+    def __init__(self):
+        super().__init__()
+        self.setWindowTitle('Button demo')
+        layout = QVBoxLayout()
+        self.setLayout(layout)
+        self.label_show = QLabel('显示按钮信息')
+        layout.addWidget(self.label_show)
+
+        self.button1 = QPushButton('Button1')
+        # setCheckable() 设置按钮是否已经被选中，
+        # 如果设置为True，则表示按钮将保持已单击和释放状态
+        self.button1.setCheckable(True)
+        # toggle() 在按钮状态之间进行切换
+        self.button1.toggle()
+        self.button1.clicked.connect(lambda: self.button_click(self.button1))
+        layout.addWidget(self.button1)
+
+        # 按钮image多了图标，并且使用setIcon()函数接收QPixmap对象的图像文件作为输入参数
+        self.button_image = QPushButton('image')
+        self.button_image.setCheckable(True)
+        self.button_image.setIcon(QIcon(QPixmap(r'..\images\python.png')))
+        self.button_image.clicked.connect(lambda: self.button_click(self.button_image))
+        layout.addWidget(self.button_image)
+
+        # 按钮Disabled使用setEnabled0函数来禁用该按钮
+        self.button_disabled = QPushButton('Disabled')
+        self.button_disabled.setEnabled(False)
+        layout.addWidget(self.button_disabled)
+
+        self.button_shortcut = QPushButton('&Shortcut_Key')
+        # 在Qt中，当用户按下Enter键时，
+        # 设置autoDefault()为True且获得焦点的按钮会被按下;
+        # 在其他情况下，setDefault()函数的返回值为True的按钮(即默认按钮)会被按下。
+        # 效果一样
+        self.button_shortcut.setDefault(True)
+        self.button_shortcut.setCheckable(True)
+        self.button_shortcut.clicked.connect(lambda: self.button_click(self.button_shortcut))
+        layout.addWidget(self.button_shortcut)
+
+    def button_click(self, button):
+        if button.isChecked():
+            self.label_show.setText('你按下了 ' + button.text() + ' isChecked=True')
+        else:
+            self.label_show.setText('你按下了 ' + button.text() + ' isChecked=False')
+
+
+if __name__ == '__main__':
+    app = QApplication(sys.argv)
+    win = QPushButtonDemo()
+    win.show()
+    sys.exit(app.exec())
+```
+
+![image-20240411162943172](imge/PySide6.assets/image-20240411162943172.png)
+
+### 5.5.3 QRadioButton
+
+QRadioButton继承自QAbstractButton，提供了一组可供选择的按钮和文本标签，用户可以==选择其中一个选项==，标签用于显示对应的文本信息。单选按钮是一种开关按钮，可以切换为on或off，即checked或unchecked，主要为用户提供“多选一”的选择。QRadioButton类的继承结构
+
+![image-20240411164944931](imge/PySide6.assets/image-20240411164944931.png)
+
+QRadioButton是单选按钮控件，默认是独占的(Exclusive)。继承自同一个父类QAbstractButton的多个单选按钮属于同一个按钮组合，在单选按钮组合中，一次只能选择一个单选按钮。如果需要将多个独占的按钮进行组合，则需要将它们放在QGroupBox或QButtonGroup中。**QButtonGroup只是为了更容易地管理button事件，它不是一个控件和布局完全没有关系，使用layout无法对其进行管理。因此，如果想使用布局管理器对button进行管理，则建议使用QGroupBOX。**QGroupBox是QWidget的子类，而QButtonGroup和QWidget没有关系，layout没有办法接管。
+
+![image-20240411165149817](imge/PySide6.assets/image-20240411165149817.png)
+
+如果将单选按钮切换到on或off，就会发送toggled信号，绑定这个信号，在按钮状态发生变化时触发相应的行为。
+
+QRadioButton类中常用的函数
+
+![image-20240411165624069](imge/PySide6.assets/image-20240411165624069.png)
+
+在QRadioButton中
+
+- toggled信号是在切换单选按钮的状态(on或off)时发射的，
+- clicked信号则在每次单击单选按钮时都会发射。
+
+在实际中，一般只有状态改变时才有必要去响应，因此toggled信号更适合用于状态监控
+
+**案例：QRadloButton按钮的使用方法**
+
+![image-20240411180404218](imge/PySide6.assets/image-20240411180404218.png)
+
+```python
+import sys
+
+from PySide6.QtWidgets import QWidget, QApplication, QVBoxLayout, QLabel, QRadioButton, QHBoxLayout, QGroupBox, \
+    QButtonGroup
+
+
+class RadioButtonDemo(QWidget):
+    def __init__(self):
+        super().__init__()
+        self.setWindowTitle('RadioButton demo')
+        layout = QHBoxLayout()
+        self.setLayout(layout)
+
+        self.label = QLabel('显示按钮按下信息')
+        layout.addWidget(self.label)
+
+        # 默认分组
+        self.button1 = QRadioButton('按钮1')
+        # 默认 选中
+        self.button1.setChecked(True)
+        self.button1.toggled.connect(lambda: self.button_select(self.button1))
+        layout.addWidget(self.button1)
+
+        self.button2 = QRadioButton('按钮2')
+        self.button2.toggled.connect(lambda: self.button_select(self.button2))
+        layout.addWidget(self.button2)
+
+        # QGroupbox分组
+        # group_box1 = QGroupBox('QGroupbox')
+        group_box1 = QGroupBox('QGroupbox', self)
+        layout_group_box = QVBoxLayout()
+        self.button3 = QRadioButton('按钮3')
+        self.button3.setChecked(True)
+        self.button3.toggled.connect(lambda: self.button_select(self.button3))
+        layout_group_box.addWidget(self.button3)
+
+        self.button4 = QRadioButton('按钮4')
+        self.button4.toggled.connect(lambda: self.button_select(self.button4))
+        layout_group_box.addWidget(self.button4)
+        group_box1.setLayout(layout_group_box)
+
+        layout.addWidget(group_box1)
+
+        # button_group分组
+        button_group = QButtonGroup(self)
+        self.button5 = QRadioButton('按钮5')
+        self.button5.setChecked(True)
+        self.button5.toggled.connect(lambda: self.button_select(self.button5))
+        button_group.addButton(self.button5)
+        layout.addWidget(self.button5)
+
+        self.button6 = QRadioButton('按钮6')
+        self.button6.toggled.connect(lambda: self.button_select(self.button6))
+        button_group.addButton(self.button6)
+        layout.addWidget(self.button6)
+
+        # button_group分组-通过布局器
+        button_group2 = QButtonGroup(self)
+        layout_child = QVBoxLayout()
+        self.button7 = QRadioButton('按钮7')
+        self.button7.setChecked(True)
+        self.button7.toggled.connect(lambda: self.button_select(self.button7))
+        layout_child.addWidget(self.button7)
+
+        self.button8 = QRadioButton('按钮8')
+        self.button8.toggled.connect(lambda: self.button_select(self.button8))
+        layout_child.addWidget(self.button8)
+        button_group2.addButton(self.button7)
+        button_group2.addButton(self.button8)
+        layout.addLayout(layout_child)
+
+    def button_select(self, button):
+        if button.isChecked():
+            self.label.setText(button.text() + ' is selected')
+        else:
+            self.label.setText(button.text() + ' is deselected')
+
+
+if __name__ == '__main__':
+    app = QApplication(sys.argv)
+    win = RadioButtonDemo()
+    win.show()
+    sys.exit(app.exec())
 ```
 

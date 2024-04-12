@@ -2601,6 +2601,8 @@ QCommandLinkButton类的继承结构
 
 ![image-20240412174320653](imge/PySide6.assets/image-20240412174320653.png)
 
+- 按钮添加描述信息2种方法
+
 ```python
 import sys
 from pathlib import Path

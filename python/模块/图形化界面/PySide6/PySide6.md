@@ -2248,7 +2248,7 @@ if __name__ == '__main__':
 
 ## 5.5 按钮类控件
 
-### 5.5.1 QAbstractButton
+### 5.5.1 QAbstractButton 基类
 
 在任何GUI设计中，按钮都是很重要的和常用的触发动作请求的方式，用来与用户进行交互操作。
 
@@ -2260,7 +2260,7 @@ QAbstractButton为抽象类，不能实例化，必须由其他的按钮类继�
 
 PySide 6中提供的按钮类主要有4个，分别为QPushButton、QToolButton、QRadioButton和QCheckBox。
 
-这些按钮类均继承自QAbstractButton，并且根据各自的使用场景通过图形展现出来。任何按钮都可以显示包含文本和图标的标签。setText()函数用于设置文本，setIcon()函数用于设置图标。如果禁用了按钮，则会更改其标签以使按钮具有“禁用”外观。
+​		这些按钮类均继承自QAbstractButton，并且根据各自的使用场景通过图形展现出来。任何按钮都可以显示包含文本和图标的标签。setText()函数用于设置文本，setIcon()函数用于设置图标。如果禁用了按钮，则会更改其标签以使按钮具有“禁用”外观。
 
 QAbstractButton用于按钮的大多数状态，这些状态以上4个按钮类都可以继承。
 
@@ -2278,11 +2278,11 @@ QAbstractButton类提供的信号
 
 ![image-20240411144856418](imge/PySide6.assets/image-20240411144856418.png)
 
-### 5.5.2 QPushButton
+### 5.5.2 QPushButton 按钮
 
-QPushButton继承自QAbstractButton，其形状是长方形，可以显示文本标题和图标。
+​		QPushButton继承自QAbstractButton，其形状是长方形，可以显示文本标题和图标。
 
-QPushButton也是一种命令按钮，可以单击该按钮执行一些命令，或者响应一些事件。常见的按钮有“确认”、“申请”、“取消”、“关闭”、“是”和“否”等。QPushButton类的继承结构
+​		QPushButton也是一种命令按钮，可以单击该按钮执行一些命令，或者响应一些事件。常见的按钮有“确认”、“申请”、“取消”、“关闭”、“是”和“否”等。QPushButton类的继承结构
 
 ![image-20240411145801287](imge/PySide6.assets/image-20240411145801287.png)
 
@@ -2298,7 +2298,7 @@ QPushButton也是一种命令按钮，可以单击该按钮执行一些命令，
 
 > 其规则如下:
 
-如果想要实现快捷键为Alt+D，那么按钮的名字中就要有字母D，并且在字母D的前面加上“&”。这个字母D一般是按钮名称的首字母，在按钮显示时，“&”不会被显示出来，但字母D会显示一条下画线。如果只想显示“&”，那么需要像转义一样使用“&&”。如果读者想了解更多关于快捷键的使用，请参考QShortcut类。其核心代码如下：
+​		如果想要实现快捷键为Alt+D，那么按钮的名字中就要有字母D，并且在字母D的前面加上“&”。这个字母D一般是按钮名称的首字母，在按钮显示时，“&”不会被显示出来，但字母D会显示一条下画线。如果只想显示“&”，那么需要像转义一样使用“&&”。如果读者想了解更多关于快捷键的使用，请参考QShortcut类。其核心代码如下：
 
 ```python
 self.button= QPushButton("&Download")
@@ -2376,13 +2376,15 @@ if __name__ == '__main__':
 
 ![image-20240411162943172](imge/PySide6.assets/image-20240411162943172.png)
 
-### 5.5.3 QRadioButton
+### 5.5.3 QRadioButton 单选框
 
-QRadioButton继承自QAbstractButton，提供了一组可供选择的按钮和文本标签，用户可以==选择其中一个选项==，标签用于显示对应的文本信息。单选按钮是一种开关按钮，可以切换为on或off，即checked或unchecked，主要为用户提供“多选一”的选择。QRadioButton类的继承结构
+​		QRadioButton继承自QAbstractButton，提供了一组可供选择的按钮和文本标签，用户可以==选择其中一个选项==，标签用于显示对应的文本信息。单选按钮是一种开关按钮，可以切换为on或off，即checked或unchecked，主要为用户提供“多选一”的选择。
+
+QRadioButton类的继承结构
 
 ![image-20240411164944931](imge/PySide6.assets/image-20240411164944931.png)
 
-QRadioButton是单选按钮控件，默认是独占的(Exclusive)。继承自同一个父类QAbstractButton的多个单选按钮属于同一个按钮组合，在单选按钮组合中，一次只能选择一个单选按钮。如果需要将多个独占的按钮进行组合，则需要将它们放在QGroupBox或QButtonGroup中。**QButtonGroup只是为了更容易地管理button事件，它不是一个控件和布局完全没有关系，使用layout无法对其进行管理。因此，如果想使用布局管理器对button进行管理，则建议使用QGroupBOX。**QGroupBox是QWidget的子类，而QButtonGroup和QWidget没有关系，layout没有办法接管。
+​		QRadioButton是单选按钮控件，默认是独占的(Exclusive)。继承自同一个父类QAbstractButton的多个单选按钮属于同一个按钮组合，在单选按钮组合中，一次只能选择一个单选按钮。如果需要将多个独占的按钮进行组合，则需要将它们放在QGroupBox或QButtonGroup中。**QButtonGroup只是为了更容易地管理button事件，它不是一个控件和布局完全没有关系，使用layout无法对其进行管理。因此，如果想使用布局管理器对button进行管理，则建议使用QGroupBOX。**QGroupBox是QWidget的子类，而QButtonGroup和QWidget没有关系，layout没有办法接管。
 
 ![image-20240411165149817](imge/PySide6.assets/image-20240411165149817.png)
 
@@ -2403,11 +2405,16 @@ QRadioButton类中常用的函数
 
 ![image-20240411180404218](imge/PySide6.assets/image-20240411180404218.png)
 
+- 默认分组
+- QGroupBox分组，推荐
+- QButtonGroup分组
+  - 不使用布局
+  - 使用布局
+
 ```python
 import sys
 
-from PySide6.QtWidgets import QWidget, QApplication, QVBoxLayout, QLabel, QRadioButton, QHBoxLayout, QGroupBox, \
-    QButtonGroup
+from PySide6.QtWidgets import (QWidget, QApplication, QVBoxLayout, QLabel, QRadioButton, QHBoxLayout, QGroupBox, QButtonGroup)
 
 
 class RadioButtonDemo(QWidget):
@@ -2481,10 +2488,165 @@ class RadioButtonDemo(QWidget):
         else:
             self.label.setText(button.text() + ' is deselected')
 
-
 if __name__ == '__main__':
     app = QApplication(sys.argv)
     win = RadioButtonDemo()
+    win.show()
+    sys.exit(app.exec())
+```
+
+### 3.5.4 QCheckBox 复选框
+
+​		QCheckBox继承自QAbstractButton。QCheckBox提供了一组带文本标签的复选框，用户可以从中选择多个选项。
+
+​		和QPushButton一样，复选框可以显示文本或图标，其中，文本可以通过构造函数或setText()函数来设置，图标可以通过setIcon()函数来设置;可以通过在首选字符的前面加上“&”来指定快捷键。使用QButtonGroup或QGroupBox可以把许多复选框组织在一起。
+
+QCheckBox类的继承结构
+
+![image-20240412114809631](imge/PySide6.assets/image-20240412114809631.png)
+
+​		QCheckBox和QRadioButton都是选项按钮，因为它们都可以在on(选中)和ofF(未选中)之间切换。
+
+​		它们的区别在于对用户选择的限制:QRadioButton提供的是“多选一”的选择(排他性);QCheckBox提供的是“多选多”的选择(非排他性)。
+
+​		QCheckBox通常应用于需要用户选择一个或多个可用的选项的场景中。只要复选框被勾选或取消勾选，都会发射一个==stateChanged信号==。如果想在复选框状态改变时触发相应的行为，请发射这个信号并连接对应的行为，可以使用isChecked()函数来查询复选框是否被勾选。
+
+​		除了常用的勾选和未勾选两种状态，QCheckBox还提供了第3种状态(半选中)来表明“没有变化”。当需要为用户提供勾选或未勾选复选框的选择时，这种状态是很有用的。如果需要第3种状态，则可以通过setTriState()函数来使其生效，并使用checkState()函数来查询当前的切换状态
+
+**QCheckBox类中常用的函数**
+
+![image-20240412143854264](imge/PySide6.assets/image-20240412143854264.png)
+
+**三态复选框有3种状态**
+
+![image-20240412144105474](imge/PySide6.assets/image-20240412144105474.png)
+
+**案例: QCheckBox按钮的使用方法**
+
+![image-20240412164335608](imge/PySide6.assets/image-20240412164335608.png)
+
+```python
+import sys
+from pathlib import Path
+from PySide6.QtCore import Qt
+from PySide6.QtGui import QIcon, QPixmap
+from PySide6.QtWidgets import QCheckBox, QWidget, QApplication, QTextEdit, QVBoxLayout, QHBoxLayout
+
+
+class CheckBoxDemo(QWidget):
+    def __init__(self):
+        super().__init__()
+        self.setWindowTitle('checkbox demo')
+        layout = QVBoxLayout()
+        self.setLayout(layout)
+        self.textEdit = QTextEdit()
+        layout.addWidget(self.textEdit)
+
+        # stateChanged 信号
+        layout_child = QHBoxLayout()
+        self.checkBox1 = QCheckBox('&Checkbox1')
+        self.checkBox1.setChecked(True)
+        self.checkBox1.stateChanged.connect(lambda: self.button_click(self.checkBox1))
+        layout_child.addWidget(self.checkBox1)
+
+        # toggled 信号 设置状态 setChecked(True)
+        self.checkBox2 = QCheckBox('Checkbox2')
+        self.checkBox2.setChecked(True)
+        self.checkBox2.setIcon(QIcon(QPixmap(
+            Path(__file__).parent.parent.joinpath("images", "python.png"))))
+        self.checkBox2.toggled.connect(lambda: self.button_click(self.checkBox2))
+        layout_child.addWidget(self.checkBox2)
+        
+        # 3种状态 设置状态 setCheckState(Qt.PartiallyChecked)
+        self.checkBox3 = QCheckBox('tristateBox')
+        self.checkBox3.setTristate(True)
+        self.checkBox3.setCheckState(Qt.PartiallyChecked)
+        self.checkBox3.stateChanged.connect(lambda: self.button_click(self.checkBox3))
+        layout_child.addWidget(self.checkBox3)
+
+        layout.addLayout(layout_child)
+
+    def button_click(self, btn):
+        chk1Status = self.checkBox1.text() + ", isChecked=" + str(
+            self.checkBox1.isChecked()) + ", chekState=" + str(
+            self.checkBox1.checkState().name) + "\n"
+        chk2Status = self.checkBox2.text() + ", isChecked=" + str(
+            self.checkBox2.isChecked()) + ", chekState=" + str(
+            self.checkBox2.checkState().name) + "\n"
+        chk3Status = self.checkBox3.text() + ", isChecked=" + str(
+            self.checkBox3.isChecked()) + ", chekState=" + str(
+            self.checkBox3.checkState().name) + "\n"
+        click = "你单击了" + btn.text()
+        self.textEdit.setText(chk1Status + chk2Status + chk3Status + click)
+
+
+if __name__ == '__main__':
+    app = QApplication(sys.argv)
+    win = CheckBoxDemo()
+    win.show()
+    sys.exit(app.exec())
+```
+
+### 3.5.5 QCommandLinkButton
+
+​		QCommandLinkButton是Windows Vista引入的新控件。
+
+​		QCommandLinkButton是QPushButton的子类，适用于特殊的场景，如单击软件安装界面中的“下一步”按钮切换到其他窗口。它是QPushButton在特定场景下的替代品，在一般场景下没有必要使用。与QPushButton相比，QCommandLinkButton允许使用描述性文本。在默认情况下，QCommandLinkButton还带有一个箭头图标，表示按下该控件将打开另一个窗口或页面。
+
+QCommandLinkButton类的继承结构
+
+![image-20240412171144403](imge/PySide6.assets/image-20240412171144403.png)
+
+**案例：QCommandLnkButton按钮的使用方法**
+
+![image-20240412174320653](imge/PySide6.assets/image-20240412174320653.png)
+
+```python
+import sys
+from pathlib import Path
+
+from PySide6.QtGui import QPixmap, QIcon
+from PySide6.QtWidgets import (QWidget, QApplication,
+                               QLineEdit, QLabel, QHBoxLayout,
+                               QVBoxLayout, QCommandLinkButton)
+
+
+class QCommandLinkButtonDemo(QWidget):
+    def __init__(self):
+        super().__init__()
+        self.setWindowTitle('QCommandLnkButton demo')
+        layout = QVBoxLayout()
+        self.label_show = QLabel("显示按钮信息")
+        layout.addWidget(self.label_show)
+
+        self.button = QCommandLinkButton("默认按钮")
+        self.button.setCheckable(True)
+        # 切换按钮状态
+        self.button.toggle()
+        self.button.clicked.connect(lambda: self.button_click(self.button))
+        layout.addWidget(self.button)
+
+        self.button_descript = QCommandLinkButton("描述按钮", "描述信息")
+        self.button_descript.clicked.connect(lambda: self.button_click(self.button_descript))
+        layout.addWidget(self.button_descript)
+
+        self.button_image = QCommandLinkButton("图片按钮")
+        self.button_image.setCheckable(True)
+        self.button_image.setDescription("设置自定义图片")
+        image_path = Path(__file__).parent.parent / "images"
+        self.button_image.setIcon(QIcon(QPixmap(image_path.joinpath("python.png"))))
+        self.button_image.clicked.connect(lambda: self.button_click(self.button_image))
+        layout.addWidget(self.button_image)
+
+        self.setLayout(layout)
+
+    def button_click(self, btn):
+        self.label_show.setText("你按下了 " + btn.text() + " isChecked=" + str(btn.isChecked()))
+
+
+if __name__ == '__main__':
+    app = QApplication(sys.argv)
+    win = QCommandLinkButtonDemo()
     win.show()
     sys.exit(app.exec())
 ```

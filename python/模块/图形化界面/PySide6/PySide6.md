@@ -2495,7 +2495,7 @@ if __name__ == '__main__':
     sys.exit(app.exec())
 ```
 
-### 3.5.4 QCheckBox 复选框
+### 5.5.4 QCheckBox 复选框
 
 ​		QCheckBox继承自QAbstractButton。QCheckBox提供了一组带文本标签的复选框，用户可以从中选择多个选项。
 
@@ -2587,7 +2587,7 @@ if __name__ == '__main__':
     sys.exit(app.exec())
 ```
 
-### 3.5.5 QCommandLinkButton
+### 5.5.5 QCommandLinkButton
 
 ​		QCommandLinkButton是Windows Vista引入的新控件。
 
@@ -2653,3 +2653,111 @@ if __name__ == '__main__':
     sys.exit(app.exec())
 ```
 
+## 5.6 工具按钮(QToolButton)
+
+​		和QPushButton、QRadioButton和QCheckBox一样，QToolButton也继承自QAbstractButton。不过QToolButton比较特殊，不是传统意义上的按钮，既可以添加菜单栏，也可以作为工具栏使用，功能多、用途广。
+
+​		QToolButton是一种特殊按钮，可以用于快速访问特定命令或选项。与普通命令按钮相反，QToolButton通常不显示文本标签，而是显示图标。QToolButton的一种经典用法是作为选择工具，如绘图程序中的“笔”工具，以及窗口工具栏中的各种工具。
+
+QToolButton类的继承结构
+
+![image-20240415170048711](imge/PySide6.assets/image-20240415170048711.png)
+
+### **案例：QToolButton按钮的使用方法**
+
+
+
+```python
+
+
+class QToolButtonDemo(QMainWindow):
+    """
+    注意:QToolBar的addWidget()函数继承自QMainWindow，
+    因此，在新建窗口时需要新建一个主窗口，
+    而不是一个QWidget窗口,否则没有addWidgetO函数。
+    """
+
+    def __init__(self):
+        super().__init__()
+        self.setWindowTitle('QToolButton 例子')
+        widget = QWidget()
+        layout = QHBoxLayout()
+        widget.setLayout(layout)
+        self.setCentralWidget(widget)
+
+		......
+
+
+if __name__ == '__main__':
+    app = QApplication(sys.argv)
+    win = QToolButtonDemo()
+    win.show()
+    sys.exit(app.exec())
+
+```
+
+
+
+
+
+### 1.文本工具按钮
+
+正常的文本工具按钮和普通按钮一样,在**默认情况下**，OToolButton会显示一个凸起的按钮形态，这是正常的按钮形态。
+
+```pyton
+# 文本工具按钮
+tool_button = QToolButton(self)
+tool_button.setText('工具按钮')
+layout.addWidget(tool_button)
+```
+
+### 2.自动提升工具按钮
+
+也存在**另一种形态**，即自动提升(AutoRaise)，也就是==仅当鼠标指针指向该按钮时，该按钮才会进行3D渲染==，在正常情况下看起来像一个文本框。可以使用setAutoRaise(True)来开启自动提升。需要注意的是，当QToolButton在QToolBar中使用按钮时，自动提升功能会自动打开。
+
+```python
+# 自动提升
+tool_button_auto_raise = QToolButton(self)
+tool_button_auto_raise.setText('工具按钮-AutoRise')
+tool_button_auto_raise.setAutoRaise(True)
+layout.addWidget(tool_button_auto_raise)
+```
+
+### 3.图标工具按钮
+
+工具按钮的图标可以用QIcon设置。设置图标后会有一些样式呈现方式，可以通过setToolButtonStyle()来设置，这个继承自QMainWindow的函数用来描述应如何显示按钮的文本和图标，在默认情况下只显示图标。**需要注意的是，如果使用addWidget()函数添加QToolButton(如下面的toolbar通过addWidget()函数把QToolButton添加到工具栏中)，则该样式设量无效。**
+
+在Qt中，按钮的几种样式呈现方式
+
+| 按钮样式                    | 值   | 描述                                                         |
+| --------------------------- | ---- | ------------------------------------------------------------ |
+| Qt.ToolButtonIconOnly       | 0    | 仅显示图标，默认状态                                         |
+| Qt.ToolButtonTextOnly       | 1    | 仅显示文字                                                   |
+| Qt.ToolButtonTextBesideIcon | 2    | 文本出现在图标旁边                                           |
+| Qt.ToolButtonTextUnderIcon  | 3    | 文本出现在图标下方                                           |
+| Qt.ToolButtonFollowStyle    | 4    | 遵循系统风格设置。<br>在UNIX平台上，将使用桌面环境中的用户设置;<br>在其他平台上仅显示图标 |
+
+工具按钮的大小可以通过setIconSize(QSize)设置，该方法继承自QAbstractButton.
+
+```python
+# 图片工具按钮
+tool_button_pic = QToolButton(self)
+tool_button_pic.setText('工具按钮-图片')
+tool_button_pic.setIcon(QIcon(IMAGE_PATH.joinpath('python.png').__str__()))
+# 调整图片大小
+tool_button_pic.setIconSize(QSize(22, 22))
+tool_button_pic.setToolButtonStyle(Qt.ToolButtonTextUnderIcon)
+layout.addWidget(tool_button_pic)
+```
+
+**注意：**
+
+当工具按钮被嵌入QMainWindow中被==QToolBar接管时setToolButtonStyle()函数和setIconSize()函数将不起作用==，并且自动调整为QMainWindow的相关设置(请参考QMainWindow.setToolButtonStyle()函数和QMainWindow.setlconSize()函数)。
+
+### 4.箭头工具按钮
+
+除了可以显示图标，工具按钮还可以显示箭头符号，用setArrowType()函数设置。**需要注意的是，箭头的优先级是高于图标的优先级的，因此，设置了箭头就不会显示图标，并且如果样式风格设置为只显示文本就不会显示箭头。**在默认情况下只显示图标(箭头)。
+
+在Qt中，箭头的方向其实有很多种
+
+![image-20240415182317013](imge/PySide6.assets/image-20240415182317013.png)

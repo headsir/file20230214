@@ -2761,3 +2761,56 @@ layout.addWidget(tool_button_pic)
 在Qt中，箭头的方向其实有很多种
 
 ![image-20240415182317013](imge/PySide6.assets/image-20240415182317013.png)
+
+```python
+# 工具按钮 + 箭头
+tool_button_arrow = QToolButton(self)
+tool_button_arrow.setText('工具按钮-箭头')
+tool_button_arrow.setToolButtonStyle(Qt.ToolButtonTextBesideIcon)
+tool_button_arrow.setArrowType(Qt.DownArrow)
+layout.addWidget(tool_button_arrow)
+```
+
+### 5.菜单工具按钮
+
+工具按钮可以通过弹出菜单的方式提供其他选择，使用setMenu()函数设置弹出的菜单，使用setPopupMode()函数设置菜单显示的不同模式。默认模式是DelayedPopup，即按住按钮一段时间后，会弹出一个菜单。
+
+![image-20240416090749685](imge/PySide6.assets/image-20240416090749685.png)
+
+InstantPopup模式，按下按钮立即显示菜单。需要注意的是，setData()函数是为了和其他QAction进行区分，方便识别当前触发的动作，在信号与槽部分会用到。
+
+**显示效果：**
+
+![image-20240416101909925](imge/PySide6.assets/image-20240416101909925.png)
+
+```python
+# 菜单工具按钮
+tool_button_menu = QToolButton(self)
+tool_button_menu.setText("工具按钮-菜单")
+tool_button_menu.setAutoRaise(True)  # 自动提升
+tool_button_menu.setPopupMode(QToolButton.InstantPopup)  # 菜单显示模式
+layout.addWidget(tool_button_menu)
+# 以下是为tool_button_menu 添加的menu信息
+menu = QMenu(tool_button_menu)
+tool_button_menu.setMenu(menu)  # 添加菜单
+# -----------新建---------------------
+new_action = QAction("新建", menu)
+# setData()函数是为了和其他QAction进行区分，
+# 方便识别当前触发的动作，在信号与槽部分会用到
+new_action.setData("NewAction")
+menu.addAction(new_action)
+# -----------打开---------------------
+open_action = QAction("打开", menu)
+open_action.setData("OpenAction")
+menu.addAction(open_action)
+# -----------分隔符--------------------
+menu.addSeparator()
+# -----------添加子菜单-----------------
+sub_menu = QMenu(menu)
+sub_menu.setTitle("子菜单")
+recent_action = QAction("最近打开", sub_menu)
+recent_action.setData('RecentAction')
+sub_menu.addAction(recent_action)
+menu.addMenu(sub_menu)
+```
+

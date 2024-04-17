@@ -2540,6 +2540,48 @@ xiaohong.give_a_baby()
 生了一个小宝宝
 ```
 
+**多继承**
+
+```python
+class A(object):
+    def __init__(self, *args, **kwargs):
+        print("A")
+        super(A).__init__(*args, **kwargs)
+
+
+class B(object):
+    def __init__(self, *args, **kwargs):
+        print("B")
+        super(B).__init__(*args, **kwargs)
+
+
+class C(A):
+    def __init__(self, arg, *args, **kwargs):
+        print("C", "arg=", arg)
+        super(C, self).__init__(*args, **kwargs)
+
+
+class D(B):
+    def __init__(self, arg1, *args, **kwargs):
+        print("D", "arg=", arg1)
+        super(D, self).__init__(*args, **kwargs)
+
+
+class E(C, D):
+    """ 执行顺序 从左往右 """
+    def __init__(self, arg, arg1):
+        """
+        相当于重构了C、D 中的__init__方法,就不会执行C、D中的__init__方法
+        """
+        super(E, self).__init__(arg)  # 相当于执行下一个父类 C，等于下面注释
+        # C.__init__(self, arg)  # 调用父类方法
+        D.__init__(self, arg1)  # 调用父类方法
+        print(1)
+
+
+c = E("a", "b")
+```
+
 
 
 # 九、并发编程

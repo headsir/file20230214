@@ -2667,9 +2667,7 @@ QToolButton类的继承结构
 
 ### **案例：QToolButton按钮的使用方法**
 
-
-
-
+![image-20240417144305826](imge/PySide6.assets/image-20240417144305826.png)
 
 ```python
 
@@ -2850,9 +2848,71 @@ toolbar.addAction(open_btn)
 > - QToolButton还有自己的槽函数triggered(QAction)
 > - 这个槽函数只有当工具栏中的某个QAction被单击时才会发出信息，并传递QAction参数。
 >
-> 例如，当QToolButton中的某个QAction被单击时，QToolButton会触发triggered信号，并把该QAction作为参数传递给槽函数，通过解析QAction就可以知道单击的是哪个按钮。
+> 例如，当QToolButton中的某个==QAction被单击时，QToolButton会触发triggered信号==，并把该QAction作为参数传递给槽函数，通过解析QAction就可以知道单击的是哪个按钮。
+
+![image-20240417144240387](imge/PySide6.assets/image-20240417144240387.png)
+
+```python
+# 槽函数
+tool_button.clicked.connect(lambda: self.button_click(tool_button))
+tool_button_auto_raise.clicked.connect(lambda: self.button_click(tool_button_auto_raise))
+tool_button_pic.clicked.connect(lambda: self.button_click(tool_button_pic))
+tool_button_arrow.clicked.connect(lambda: self.button_click(tool_button_arrow))
+tool_button_bar1.clicked.connect(lambda: self.button_click(tool_button_bar1))
+tool_button_bar2.clicked.connect(lambda: self.button_click(tool_button_bar2))
+# QAction被单击时，会触发triggered信号
+new_btn.triggered.connect(lambda: self.button_click(new_btn))
+tool_button_menu.triggered.connect(self.action_call)
+
+def button_click(self, button):
+    self.label_show.setText("你按下了：" + button.text())
+
+def action_call(self, action):
+    self.label_show.setText("触发了菜单action：" + action.data())
+```
+
+## 5.7 下拉列表框(QComboBox)
+
+QComboBox是一个集按钮和下拉选项于一体的控件，也被称为下拉列表框(或组合框)。
+
+QComboBox提供了一种以占用最少屏幕空间的方式向用户显示选项列表的方法。
+
+QComboBox继承自QWidget
+
+![image-20240417144750408](imge/PySide6.assets/image-20240417144750408.png)
+
+QComboBox类最常见的是增、删、改、查，常见的函数
+
+![image-20240417150244006](imge/PySide6.assets/image-20240417150244006.png)
+
+### 案例：QComboBox按钮的使用方法
 
 
 
+### 5.7.1 查询
 
+**获取控件数据**
 
+![image-20240417155848583](imge/PySide6.assets/image-20240417155848583.png)
+
+```python
+def on_activate(self, index, combobox=None):
+    _str = f"""
+                信号 index:{index}；  # 信号返回值
+                currentIndex: {combobox.currentIndex()}；  # 选中项索引
+                信号 index==currentIndex：{index == combobox.currentIndex()}；
+                count：{combobox.count()}；  # 下拉列表框中的选项的数目
+                currentText: {combobox.currentText()}；  # 选中选项的文本
+                itemText: {combobox.itemText(index)}；   # 索引为index的item 的选项文本
+                currentData: {combobox.currentData()}；  # 选中选项的数据
+                itemData: {combobox.itemData(index)}；   # 索引为index的item 的选项数据
+                """
+    self.label.setText(_str)
+```
+
+### 5.7.2 增加
+
+- insertItem()函数来插入项目，作用是在给定的索引处插入图标、文本和userData(Qt中的QVariant实例，Python中可以是一个string)。insertltem()函数需要指定索引，如果索引大于或等于项目的总数，则将新项目追加到现有项目的列表中(也就是放在列表的最后)；如果索引为零或负数，则将新项目添加到现有项目的列表的前面。
+- addItem()函数，不指定索引，只进行追加操作。如果需要同时插入多个项目，则可以考虑使用
+- insertltems()函数
+- addItems()函数

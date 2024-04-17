@@ -3010,3 +3010,56 @@ layout.addRow(QLabel("允许修改2：验证器"), self.combobox_edit2)
 **注意:**可以使用setltemText()函数修改指定索引的项目，可以使用setCurrentlndex()函数设置当前索引的项目。
 
 在默认情况下，项目新增不允许重复，如果要开启重复，则可以设置setDuplicatesEnabled(True)。
+
+### 5.7.4 删除
+
+- removeltem(int index)函数 删除序号为 index 的项目
+
+- clear()函数 删除所有项目
+
+对于可编辑的下拉列表框，提供了clearEditText()函数，以在不更改下拉列表框中内容的情况下清除显示的字符串。
+
+![image-20240417174017506](imge/PySide6.assets/image-20240417174017506.png)
+
+```python
+# 删除项目
+layout_child = QHBoxLayout()
+layout.addRow(layout_child)
+self.button1 = QPushButton("删除项目")
+self.button2 = QPushButton("删除显示")
+self.button3 = QPushButton("删除所有")
+self.combobox_del = QComboBox(minimumWidth=200)
+self.combobox_del.setEditable(True)
+self.combobox_del.addItems(item_list)
+layout_child.addWidget(self.button1)
+layout_child.addWidget(self.button2)
+layout_child.addWidget(self.button3)
+layout_child.addWidget(self.combobox_del)
+self.button1.clicked.connect(lambda: self.combobox_del.removeItem(self.combobox_del.currentIndex()))
+self.button2.clicked.connect(lambda: self.combobox_del.clearEditText())
+self.button3.clicked.connect(lambda: self.combobox_del.clear())
+```
+
+### 5.7.5 信号与槽函数
+
+==当前项目发生更改==，则会发出3个信号
+
+- currentIndexChanged信号，信号源：编程和用户交互
+- currentTextChanged信号，信号源：编程和用户交互
+- activated信号，信号源：只会触发用户交互
+
+其它信号
+
+- highlighted信号
+- editTextChanged信号
+
+这些信号都有两个版本，即带有str参数和带有int参数。如果用户选择或高亮显示，则仅int参数发射信号。
+
+![image-20240417174433052](imge/PySide6.assets/image-20240417174433052.png)
+
+**既需要传递信号的参数，也需要传递自定义的参数。**可以使用两种方式来处理，分别是lammbda表达式和partial()函数
+
+- lambda表达式，x是信号的参数，self.combox_*是自定义参数。lambda表达式把这两个参数分别传递给on_activate的index参数和combobox参数。
+- partial()函数的args参数传递给on_activate的index，参数combobox传递给on_activate的combobox。
+
+两者的功能是一样的，lambda表达式更简洁易懂，而使用partial()函数可以解决更复杂的参数传递。使用partial函数需要导入from functools import partial。

@@ -737,6 +737,8 @@ if __name__ == '__main__':
 
 ### 4.3.3 使用信号/槽机制
 
+
+
 ## 4.4 菜单栏与工具栏
 
 ### 4.4.1 界面设计
@@ -2667,6 +2669,8 @@ QToolButton类的继承结构
 
 
 
+
+
 ```python
 
 
@@ -2674,7 +2678,7 @@ class QToolButtonDemo(QMainWindow):
     """
     注意:QToolBar的addWidget()函数继承自QMainWindow，
     因此，在新建窗口时需要新建一个主窗口，
-    而不是一个QWidget窗口,否则没有addWidgetO函数。
+    而不是一个QWidget窗口,否则没有addWidget()函数。
     """
 
     def __init__(self):
@@ -2813,4 +2817,42 @@ recent_action.setData('RecentAction')
 sub_menu.addAction(recent_action)
 menu.addMenu(sub_menu)
 ```
+
+### 6.嵌入工具栏QToolBar中
+
+QToolButton作为工具按钮，可以很好地嵌入工具栏QToolBar中。在正常情况下，工具栏中添加的按钮是一个QAction实例，通过addAction()函数添加。QToolButton是QWidget的子类，不是一个QAction，因此要使用addWidget()函数添加。
+
+![image-20240417101307719](imge/PySide6.assets/image-20240417101307719.png)
+
+```python
+# 工具按钮，嵌入toolbar中
+toolbar = self.addToolBar('File')
+# --------- addWidget添加工具按钮1 -------------------
+tool_button_bar1 = QToolButton(self)
+tool_button_bar1.setText("工具按钮-toolbar1")
+toolbar.addWidget(tool_button_bar1)
+# --------- addWidget添加工具按钮2 -------------------
+tool_button_bar2 = QToolButton(self)
+tool_button_bar2.setText("工具按钮-toolbar2")
+tool_button_bar2.setIcon(QIcon(IMAGE_PATH.joinpath("close.ico").__str__()))
+tool_button_bar2.setToolButtonStyle(Qt.ToolButtonTextUnderIcon)
+toolbar.addWidget(tool_button_bar2)
+# --------- addAction添加其它 QAction按钮 --------------
+new_btn = QAction(QIcon(IMAGE_PATH.joinpath("new.png").__str__()), "new_btn", self)
+toolbar.addAction(new_btn)
+open_btn = QAction(QIcon(IMAGE_PATH.joinpath("open.png").__str__()), "open_btn", self)
+toolbar.addAction(open_btn)
+```
+
+### 7.信号与槽
+
+> - 除了继承自QAbstractButton的4个槽函数(clicked()、pressed()、released()和toggled())
+> - QToolButton还有自己的槽函数triggered(QAction)
+> - 这个槽函数只有当工具栏中的某个QAction被单击时才会发出信息，并传递QAction参数。
+>
+> 例如，当QToolButton中的某个QAction被单击时，QToolButton会触发triggered信号，并把该QAction作为参数传递给槽函数，通过解析QAction就可以知道单击的是哪个按钮。
+
+
+
+
 

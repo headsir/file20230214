@@ -2912,7 +2912,101 @@ def on_activate(self, index, combobox=None):
 
 ### 5.7.2 增加
 
-- insertItem()函数来插入项目，作用是在给定的索引处插入图标、文本和userData(Qt中的QVariant实例，Python中可以是一个string)。insertltem()函数需要指定索引，如果索引大于或等于项目的总数，则将新项目追加到现有项目的列表中(也就是放在列表的最后)；如果索引为零或负数，则将新项目添加到现有项目的列表的前面。
-- addItem()函数，不指定索引，只进行追加操作。如果需要同时插入多个项目，则可以考虑使用
-- insertltems()函数
-- addItems()函数
+常用的添加函数分两类： add* 函数、insert* 函数
+
+#### 1 追加到**列表末尾**
+
+- addItem 函数添加**一个条目**到列表末尾
+
+  - addItem(text, userData)
+
+    ```
+     addItem 函数是将参数里 text 添加到列表末尾显示出来，userData 是附加的用户数据，可有可无。对于组合框的运用，一般是直接使用列表的序号或者列表的文本 text，如果需要用到序号、文本之外的复杂数据，设定 userData 一同添加到列表里。userData 不会显示出来，就是内存中的数据，知道序号之后，可以通过 itemData(index) 函数获取。
+    ```
+
+  - addItem(icon, text,userData)
+
+    ```
+    addItem 函数也是添加一个条目到列表末尾，但多一个显示图标 icon，图标和文本 text 会同时显示在组合框的下拉列表里面。
+    ```
+
+  userData(Qt中的QVariant实例，Python中可以是一个string)
+
+- addItems 是**批量**添加多个字符串到列表末尾，这种批量添加方式没有图标，也没有用户数据，就是将 texts 字符串列表添加到组合框下拉列表末尾。
+
+#### 2 将条目**插入到某个序号位置**
+
+insert* 系列函数其他参数含义与 add* 函数是一样的。
+
+```
+insertItem(index,text, userData)
+insertItem(index,icon,text,userData)
+insertItems(index,list)
+```
+
+- 如果 index 在合法的序号范围 0 到 count()-1，那么条目就正好从 index 位置插入，新的条目序号就是 index 序号开始。
+- 如果 index 是负数，那么插入到列表最前面。
+- 如果 index >= count()，那么会插入到列表最后面。
+
+```python
+item_list = ["C", "C++", "JavaScript", "Java", "Python", "C#", "Swift", "go", "Ruby", "Lua", "PHP"]
+data_list = [1972, 1983, 1995, 1991, 1992, 2000, 2014, 2009, 1995, 1993, 1995]
+
+# 增加单项，不带数据
+self.combobox_addOne = QComboBox(self, minimumWidth=200)
+for i in range(len(item_list)):
+    self.combobox_addOne.addItem(icon, item_list[i])
+#  -1，表示用户没有选，下拉框为空
+self.combobox_addOne.setCurrentIndex(-1)
+layout.addRow(QLabel("增加单项，不带数据"), self.combobox_addOne)
+
+# 增加单项，附带数据
+self.combobox_addData = QComboBox(self, minimumWidth=200)
+for i in range(len(data_list)):
+    self.combobox_addData.addItem(icon, item_list[i], data_list[i])
+self.combobox_addData.setCurrentIndex(-1)
+layout.addRow(QLabel("增加单项，附带数据"), self.combobox_addData)
+
+# 增加多项，不带数据
+self.combobox_addMore = QComboBox(self, minimumWidth=200)
+layout.addRow(QLabel("增加多项，不带数据"), self.combobox_addMore)
+self.combobox_addMore.addItems(item_list)
+self.combobox_addMore.setCurrentIndex(-1)
+```
+
+![image-20240417162743656](imge/PySide6.assets/image-20240417162743656.png)
+
+### 5.7.3 修改
+
+修改项目列表的前提是将setEditable设置为True。之后在下拉列表框中输入新字符串时按Enter键，系统就会自动将这个字符串增加到最后一项。这个默认策略是InsertAtBottom，可以使用setInsertPolicy()函数进行更改。
+
+![image-20240417163141664](imge/PySide6.assets/image-20240417163141664.png)
+
+也可以使用QValidator将输入限制为可编辑的下拉列表框，在默认情况下可以接受任何输入。
+
+![image-20240417165423361](imge/PySide6.assets/image-20240417165423361.png)
+
+```python
+# 允许修改1
+self.combobox_edit = QComboBox(self, minimumWidth=200)
+self.combobox_edit.setEditable(True)
+for i in range(len(item_list)):
+    self.combobox_edit.addItem(icon, item_list[i])
+self.combobox_edit.setInsertPolicy(QComboBox.InsertPolicy.InsertAfterCurrent)
+self.combobox_edit.setCurrentIndex(-1)
+layout.addRow(QLabel("允许修改1：默认"), self.combobox_edit)
+
+# 允许修改2
+self.combobox_edit2 = QComboBox(self, minimumWidth=200)
+self.combobox_edit2.setEditable(True)
+self.combobox_edit2.addItems(["1", "2", "3"])
+# 整数验证器
+pIntValidator = QIntValidator(self)
+pIntValidator.setRange(1, 99)
+self.combobox_edit2.setValidator(pIntValidator)
+layout.addRow(QLabel("允许修改2：验证器"), self.combobox_edit2)
+```
+
+**注意:**可以使用setltemText()函数修改指定索引的项目，可以使用setCurrentlndex()函数设置当前索引的项目。
+
+在默认情况下，项目新增不允许重复，如果要开启重复，则可以设置setDuplicatesEnabled(True)。

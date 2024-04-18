@@ -2887,6 +2887,137 @@ QComboBox类最常见的是增、删、改、查，常见的函数
 
 ### 案例：QComboBox按钮的使用方法
 
+![image-20240418150556367](imge/PySide6.assets/image-20240418150556367.png)
+
+```python
+import sys
+from pathlib import Path
+from functools import partial
+
+from PySide6.QtCore import QStringListModel
+from PySide6.QtGui import QIcon, QIntValidator
+from PySide6.QtWidgets import (QWidget, QApplication, QFormLayout, QLabel,
+                               QComboBox, QHBoxLayout, QPushButton,
+                               QSpacerItem, QSizePolicy)
+
+item_list = ["C", "C++", "JavaScript", "Java", "Python", "C#", "Swift", "go", "Ruby", "Lua", "PHP"]
+data_list = [1972, 1983, 1995, 1991, 1992, 2000, 2014, 2009, 1995, 1993, 1995]
+IMAGE_PATH = Path(__file__).parent.parent.joinpath("images")
+
+
+class Widget(QWidget):
+    def __init__(self, *args, **kwargs):
+        super(Widget, self).__init__(*args, **kwargs)
+        self.setWindowTitle("QComboBox 案例")
+
+        layout = QFormLayout(self)
+
+        self.label = QLabel("显示数据信息")
+        layout.addWidget(self.label)
+        icon = QIcon(str(IMAGE_PATH.joinpath("python.png")))  # 显示图标
+
+        layout.addItem(QSpacerItem(20, 20, QSizePolicy.Expanding, QSizePolicy.Minimum))
+
+        # 增加单项，不带数据
+        self.combobox_addOne = QComboBox(self, minimumWidth=200)
+        for i in range(len(item_list)):
+            self.combobox_addOne.addItem(icon, item_list[i])
+        self.combobox_addOne.setCurrentIndex(-1)
+        layout.addRow(QLabel("增加单项，不带数据"), self.combobox_addOne)
+
+        # 增加单项，附带数据
+        self.combobox_addData = QComboBox(self, minimumWidth=200)
+        for i in range(len(data_list)):
+            self.combobox_addData.addItem(icon, item_list[i], data_list[i])
+        self.combobox_addData.setCurrentIndex(-1)
+        layout.addRow(QLabel("增加单项，附带数据"), self.combobox_addData)
+
+        # 增加多项，不带数据
+        self.combobox_addMore = QComboBox(self, minimumWidth=200)
+        layout.addRow(QLabel("增加多项，不带数据"), self.combobox_addMore)
+        self.combobox_addMore.addItems(item_list)
+        self.combobox_addMore.setCurrentIndex(-1)
+
+        layout.addItem(QSpacerItem(20, 20, QSizePolicy.Expanding, QSizePolicy.Minimum))
+
+        # 允许修改1
+        self.combobox_edit = QComboBox(self, minimumWidth=200)
+        self.combobox_edit.setEditable(True)
+        for i in range(len(item_list)):
+            self.combobox_edit.addItem(icon, item_list[i])
+        self.combobox_edit.setInsertPolicy(QComboBox.InsertPolicy.InsertAfterCurrent)
+        self.combobox_edit.setCurrentIndex(-1)
+        layout.addRow(QLabel("允许修改1：默认"), self.combobox_edit)
+
+        # 允许修改2
+        self.combobox_edit2 = QComboBox(self, minimumWidth=200)
+        self.combobox_edit2.setEditable(True)
+        self.combobox_edit2.addItems(["1", "2", "3"])
+        # 整数验证器
+        pIntValidator = QIntValidator(self)
+        pIntValidator.setRange(1, 99)
+        self.combobox_edit2.setValidator(pIntValidator)
+        layout.addRow(QLabel("允许修改2：验证器"), self.combobox_edit2)
+
+        layout.addItem(QSpacerItem(20, 20, QSizePolicy.Expanding, QSizePolicy.Minimum))
+
+        # 删除项目
+        layout_child = QHBoxLayout()
+        layout.addRow(layout_child)
+        self.button1 = QPushButton("删除项目")
+        self.button2 = QPushButton("删除显示")
+        self.button3 = QPushButton("删除所有")
+        self.combobox_del = QComboBox(minimumWidth=200)
+        self.combobox_del.setEditable(True)
+        self.combobox_del.addItems(item_list)
+        layout_child.addWidget(self.button1)
+        layout_child.addWidget(self.button2)
+        layout_child.addWidget(self.button3)
+        layout_child.addWidget(self.combobox_del)
+        self.button1.clicked.connect(lambda: self.combobox_del.removeItem(self.combobox_del.currentIndex()))
+        self.button2.clicked.connect(lambda: self.combobox_del.clearEditText())
+        self.button3.clicked.connect(lambda: self.combobox_del.clear())
+
+        layout.addItem(QSpacerItem(20, 20, QSizePolicy.Expanding, QSizePolicy.Minimum))
+
+        # 模型接管，不带数据
+        self.combobox_model = QComboBox(self, minimumWidth=200)
+        self.tablemodel = QStringListModel(item_list)
+        self.combobox_model.setModel(self.tablemodel)
+        self.combobox_model.setCurrentIndex(-1)
+        layout.addRow(QLabel("模型接管，不带数据"), self.combobox_model)
+
+        # 信号与槽
+        self.combobox_addOne.activated.connect(lambda x: self.on_activate(x, self.combobox_addOne))
+        # 需要初始化父类，并传参
+        self.combobox_addData.activated.connect(partial(self.on_activate, *args, combobox=self.combobox_addData))
+        self.combobox_addMore.highlighted.connect(lambda x: self.on_activate(x, self.combobox_addMore))
+        self.combobox_edit.activated.connect(lambda x: self.on_activate(x, self.combobox_edit))
+        self.combobox_edit2.activated.connect(lambda x: self.on_activate(x, self.combobox_edit2))
+        self.combobox_del.activated.connect(lambda x: self.on_activate(x, self.combobox_del))
+        self.combobox_model.activated.connect(lambda x: self.on_activate(x, self.combobox_model))
+
+    def on_activate(self, index, combobox=None):
+        _str = f"""
+                信号 index:{index}；  # 信号返回值
+                currentIndex: {combobox.currentIndex()}；  # 选中项索引
+                信号 index==currentIndex：{index == combobox.currentIndex()}；
+                count：{combobox.count()}；  # 下拉列表框中的选项的数目
+                currentText: {combobox.currentText()}；  # 选中选项的文本
+                itemText: {combobox.itemText(index)}；   # 索引为index的item 的选项文本
+                currentData: {combobox.currentData()}；  # 选中选项的数据
+                itemData: {combobox.itemData(index)}；   # 索引为index的item 的选项数据
+                """
+        self.label.setText(_str)
+
+
+if __name__ == '__main__':
+    app = QApplication(sys.argv)
+    w = Widget()
+    w.show()
+    sys.exit(app.exec())
+```
+
 
 
 ### 5.7.1 查询
@@ -3063,3 +3194,209 @@ self.button3.clicked.connect(lambda: self.combobox_del.clear())
 - partial()函数的args参数传递给on_activate的index，参数combobox传递给on_activate的combobox。
 
 两者的功能是一样的，lambda表达式更简洁易懂，而使用partial()函数可以解决更复杂的参数传递。使用partial函数需要导入from functools import partial。
+
+```python
+# 信号与槽
+self.combobox_addOne.activated.connect(lambda x: self.on_activate(x, self.combobox_addOne))
+# 需要初始化父类，并传参
+self.combobox_addData.activated.connect(partial(self.on_activate, *args, combobox=self.combobox_addData))
+self.combobox_addMore.highlighted.connect(lambda x: self.on_activate(x, self.combobox_addMore))
+self.combobox_edit.activated.connect(lambda x: self.on_activate(x, self.combobox_edit))
+self.combobox_edit2.activated.connect(lambda x: self.on_activate(x, self.combobox_edit2))
+self.combobox_del.activated.connect(lambda x: self.on_activate(x, self.combobox_del))
+self.combobox_model.activated.connect(lambda x: self.on_activate(x, self.combobox_model))
+```
+
+### 5.7.6 模型/视图框架
+
+QComboBox使用模型/视图框架为弹出的列表存储项目。
+
+在默认情况下，可以基于QStandardItemModel存储项目，基于QListView子类显示弹出列表。可以通过QComboBox.model()和QComboBox.view()直接访问模型和视图。可以使用setModel()函数和setView()函数设置模型和视图。如果只涉及项目级别，则可以通过setItemData()函数和itemText()函数设置和获取项目数据。模型/视图的难度比QComboBox的大很多。
+
+QStringListModel接管模型
+
+```python
+# 模型接管，不带数据
+self.combobox_model = QComboBox(self, minimumWidth=200)
+self.tablemodel = QStringListModel(item_list)
+self.combobox_model.setModel(self.tablemodel)
+self.combobox_model.setCurrentIndex(-1)
+layout.addRow(QLabel("模型接管，不带数据"), self.combobox_model)
+```
+
+### 5.7.7 QFontComboBoX
+
+可以将QFontComboBox看作QComboBox和QFont的结合体，QFontComboBox是QComboBox的子类，以可视化的方式存储系统字体列表，方便用户选取。QFontComboBox经常用于工具栏，如使用一个QComboBox控制字体大小，使用两个QToo1Button控制粗体和斜体。QFontComboBox类的继承结构
+
+![image-20240418152623186](imge/PySide6.assets/image-20240418152623186.png)
+
+当用户选择新字体时，除了继承的currentIndexChanged(int)信号还会发射currentFontChanged(QFont)信号，这是QFontComboBox特有的信号。
+QFontComboBox提供了一些过滤选项，使用setWritingSystem(QFontDatabase)只**显示特定书写系统的字体**，如简体中文、韩文等，参数列表
+
+![image-20240418153014513](imge/PySide6.assets/image-20240418153014513.png)
+
+![image-20240418153202880](imge/PySide6.assets/image-20240418153202880.png)
+
+![image-20240418153305358](imge/PySide6.assets/image-20240418153305358.png)
+
+```python
+# 设置字体,仅限中文
+font2.setWritingSystem(QFontDatabase.SimplifiedChinese)
+```
+
+
+
+可以使用setFontFilters(QFontComboBox.FontFilters)来**过滤掉某些类型的字体**，如不可缩放字体或等宽字体，参数列表
+
+![image-20240418153423212](imge/PySide6.assets/image-20240418153423212.png)
+
+```python
+# 设置字体,等宽字体
+font3.setFontFilters(QFontComboBox.FontFilter.MonospacedFonts)
+```
+
+
+
+### 案例：QFontComboBox按钮的使用方法
+
+- QPlainTextEdit 可调整字体不能调整字体大小
+
+![image-20240418163911620](imge/PySide6.assets/image-20240418163911620.png)
+
+```python
+import sys
+from pathlib import Path
+
+from PySide6.QtGui import QFontDatabase, QIcon, QFont
+from PySide6.QtWidgets import (QComboBox, QMainWindow, QWidget, 
+                               QVBoxLayout, QTextBrowser, QApplication, QFontComboBox, 
+    							QPlainTextEdit, QTextEdit, QToolButton)
+
+IMAGE_PATH = Path(__file__).parent.parent.joinpath("images")
+
+
+class FontComboBoxDemo(QMainWindow):
+    def __init__(self, *args, **kwargs):
+        super(FontComboBoxDemo, self).__init__(*args, **kwargs)
+        self.setWindowTitle('QFontComboBox 案例')
+        widget = QWidget()
+        self.setCentralWidget(widget)
+        layout = QVBoxLayout()
+        # self.text_show = QTextBrowser()
+        # self.text_show = QPlainTextEdit()
+        self.text_show = QTextEdit()
+        layout.addWidget(self.text_show)
+        widget.setLayout(layout)
+
+        toolbar = self.addToolBar('toolbar')
+
+        # 设置字体,all
+        font = QFontComboBox()
+        font.currentFontChanged.connect(lambda font: self.text_show.setFont(font))
+        toolbar.addWidget(font)
+
+        # 设置字体,仅限中文
+        font2 = QFontComboBox()
+        font2.currentFontChanged.connect(lambda font: self.text_show.setFont(font))
+        font2.setWritingSystem(QFontDatabase.SimplifiedChinese)
+        toolbar.addWidget(font2)
+
+        # 设置字体,等宽字体
+        font3 = QFontComboBox()
+        font3.currentFontChanged.connect(lambda font: self.text_show.setFont(font))
+        font3.setFontFilters(QFontComboBox.FontFilter.MonospacedFonts)
+        toolbar.addWidget(font3)
+
+        # 设置字号 QPlainTextEdit 可调整字体不能调整字体大小
+        font_size_list = [str(i) for i in range(5, 40, 2)]
+        combobox = QComboBox(self, minimumWidth=60)
+        combobox.addItems(font_size_list)
+        combobox.setCurrentIndex(-1)
+        combobox.activated.connect(lambda x: self.set_fontSize(int(font_size_list[x])))
+        toolbar.addWidget(combobox)
+
+        # 加粗按钮
+        buttonBold = QToolButton()
+        buttonBold.setShortcut('Ctrl+B')
+        # 保持状态
+        buttonBold.setCheckable(True)
+        buttonBold.setIcon(QIcon(str(IMAGE_PATH.joinpath("Bold.png"))))
+        toolbar.addWidget(buttonBold)
+        buttonBold.clicked.connect(lambda: self.setBold(buttonBold))
+
+        # 倾斜按钮
+        buttonItalic = QToolButton()
+        buttonItalic.setShortcut("Ctrl+I")
+        buttonItalic.setCheckable(True)
+        buttonItalic.setIcon(QIcon(str(IMAGE_PATH.joinpath("Italic.png"))))
+        toolbar.addWidget(buttonItalic)
+        buttonItalic.clicked.connect(lambda: self.setItalic(buttonItalic))
+
+        self.text_show.setText("显示数据格式\n textEdit \n Python")
+
+    def setItalic(self, button):
+        if button.isChecked():
+            self.text_show.setFontItalic(True)
+        else:
+            self.text_show.setFontItalic(False)
+        self.text_show.setText(self.text_show.toPlainText())
+
+    def setBold(self, button):
+        if button.isChecked():
+            self.text_show.setFontWeight(QFont.Bold)
+        else:
+            self.text_show.setFontWeight(QFont.Normal)
+        self.text_show.setText(self.text_show.toPlainText())
+
+    def set_fontSize(self, x):
+        self.text_show.setFontPointSize(x)
+        self.text_show.setText(self.text_show.toPlainText())
+
+
+if __name__ == '__main__':
+    app = QApplication(sys.argv)
+    win = FontComboBoxDemo()
+    win.show()
+    sys.exit(app.exec())
+```
+
+## 5.8 微调框(QSpinBox/QDoubleSpinBox)
+
+QSpinBox、QDoubleSpinBox和QDateTimeEdit属于一类，它们都继承自QAbstractSpinBox。
+
+- QSpinBox：处理整数和离散值集(如年月)
+
+  > 用户可以通过单击调节按钮或键盘的↑/↓选择一个值，以增加/减小当前显示的值，也可以手动输入该值
+
+- QDoubleSpinBox：处理浮点数
+
+- QDateTimeEdit：处理日期时间
+
+QSpinBox类的继承结构（QDoubleSpinBox类的继承结构与此类似）
+
+![image-20240418164814581](imge/PySide6.assets/image-20240418164814581.png)
+
+### 案例：QSpinBox控件的使用方法
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

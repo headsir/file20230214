@@ -2409,6 +2409,12 @@ with pd.ExcelWriter(path_file, engine="openpyxl") as writer:
 
 利用 to_csv() 方法。
 
+```
+# utf-8-sig ： CSV UTF-8 (逗号分隔)(*.csv)
+# gbk ： CSV (逗号分隔)(*.csv)
+out_data.to_csv(path_filename, encoding="utf-8-sig", sep=",", index=False)
+```
+
 #### 9.2.1 设置文件导出路径
 
 通过参数 path_or_buf 设置文件导出路径，举例：df.to_excel(path_or_buf = "文件保存路径")

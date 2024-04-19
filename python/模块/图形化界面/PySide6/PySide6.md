@@ -3384,6 +3384,12 @@ QSpinBox类的继承结构（QDoubleSpinBox类的继承结构与此类似）
 
 
 
+### 5.8.1 步长和范围
+
+单击调节按钮或使用键盘上的↑/↓，将以singleStep()函数的大小为步长增加或减小当前值。如果要更改此行为，则可以通过setSingleStep()函数设置。使用setMinimum()函数、setMaximum()函数和setSingleStep()函数可以修改最小值、最大值及步长。使用setRange()函数可以修改范围。
+
+
+
 
 
 

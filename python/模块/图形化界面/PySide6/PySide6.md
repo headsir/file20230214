@@ -3378,31 +3378,151 @@ QSpinBox类的继承结构（QDoubleSpinBox类的继承结构与此类似）
 
 ### 案例：QSpinBox控件的使用方法
 
-
-
-
-
-
+![image-20240421165742543](imge/PySide6.assets/image-20240421165742543.png)
 
 ### 5.8.1 步长和范围
 
 单击调节按钮或使用键盘上的↑/↓，将以singleStep()函数的大小为步长增加或减小当前值。如果要更改此行为，则可以通过setSingleStep()函数设置。使用setMinimum()函数、setMaximum()函数和setSingleStep()函数可以修改最小值、最大值及步长。使用setRange()函数可以修改范围。
 
+```python
+# 步长和范围
+self.spinbox_int = QSpinBox()
+# --------值范围--------------------------
+self.spinbox_int.setRange(-20,20)
+# --------最小值--------------------------
+self.spinbox_int.setMinimum(-10)
+# --------步长--------------------------
+self.spinbox_int.setSingleStep(2)
+# --------显示值--------------------------
+self.spinbox_int.setValue(0)
+layout.addRow(QLabel("步长和范围："), self.spinbox_int)
+self.spinbox_int.valueChanged.connect(lambda: self.on_valuechange(self.spinbox_int))
+```
+
+### 5.8.2 循环
+
+QSpinBox在默认情况下的方向是单一的，使用setWrapping(True)支持循环。
+
+循环的含义如下:如果范围为0~99，并且当前值为99，则单击“向上”按钮给出0。查看是否支持循环使用Wrapping()函数，默认为False，开启循环后变成True。
+
+```python
+# 循环
+self.spinbox_wrap = QSpinBox()
+self.spinbox_wrap.setRange(-20, 20)
+self.spinbox_wrap.setSingleStep(5)
+
+self.spinbox_wrap.setWrapping(True)
+
+layout.addRow(QLabel("循环："), self.spinbox_wrap)
+self.spinbox_wrap.valueChanged.connect(lambda: self.on_valuechange(self.spinbox_wrap))
+```
+
+### 5.8.3 前缀、后缀与千位分隔符
+
+使用setPrefix()函数和setSuffix()函数可以在显示的值之前和之后附加任意字符串(如货币或度量单位)。获取前缀和后缀信息涉及如下方
+法。
+
+- 使用prefix()函数和suffix()函数仅获取前缀和后缀。
+- 使用text()函数可以获取包括前缀和后缀的文本
+- 使用cleanText()函数可以获取没有前缀和后缀，以及前后空白的文本。
+
+对于数值来说，有显示千位分隔符的需求，可以使用setGroupSeparatorShown属性开启。在默认情况下，此属性为False，在Qt 5.3中引入了这个属性。使用groupSeparatorChkBox决定是否开启千位分隔符。
+
+```python
+# 千位分隔符
+self.groupSeparatorSpinBox = QSpinBox()
+self.groupSeparatorSpinBox.setRange(-99999999, 99999999)
+self.groupSeparatorSpinBox.setValue(1000)
+# --------------开启千位符------------------------------------
+self.groupSeparatorSpinBox.setGroupSeparatorShown(True)
+# --------------创建复选框------------------------------------
+groupSeparatorChkBox = QCheckBox()
+groupSeparatorChkBox.setText("千位分隔符：")
+# --------------复选框 初始值为True----------------------------
+groupSeparatorChkBox.setChecked(True)
+layout.addRow(groupSeparatorChkBox, self.groupSeparatorSpinBox)
+# --------------复选框信号-------------------------------------
+groupSeparatorChkBox.toggled.connect(self.groupSeparatorSpinBox.setGroupSeparatorShown)
+self.groupSeparatorSpinBox.valueChanged.connect(lambda: self.on_valuechange(self.groupSeparatorSpinBox))
+```
+
+### 5.8.4 特殊选择
+
+除了数值范围，还可以通过setSpecialValueText()函数显示特殊选择。设置了该项，QSpinBox将在当前值等于minimum()时显示此文本而不是数字值。setSpecialValueText适用于一些特定场合的情景，如选择1~99为用户设置，选择文本(也就是0)委托系统设置:
+
+```python
+# 特殊文本
+label = QLabel("特殊文本：")
+self.spinbox_zoom = QSpinBox()
+self.spinbox_zoom.setRange(0, 1000)
+self.spinbox_zoom.setSingleStep(10)
+self.spinbox_zoom.setSuffix("%")
+self.spinbox_zoom.setSpecialValueText("Automatic")
+self.spinbox_zoom.setValue(100)
+layout.addRow(label, self.spinbox_zoom)
+self.spinbox_zoom.valueChanged.connect(lambda: self.on_valuechange(self.spinbox_zoom))
+```
+
+### 5.8.5 信号与槽
+
+在每次更改数值时，QSpinBox都会发出valueChanged信号和textChanged信号，前者提供一个int参数，后者提供一个str参数。可以使用value()函数获取当前值，并使用setValue()函数设置当前值。可以使用valueChanged信号来获取数值变化的信息。
+
+### 5.8.6 自定义显示格式
+
+如果使用prefix()函数、suffix()函数和specialValueText()函数无法满足要求，则可以通过子类继承QSpinBox并重新实现valueFromText()函数和textFromValue()函数来自定义显示方式。例如，下面是自定义QSpinBox的代码，允许用户输入图标的大小(如32像素x32像素)。
+
+### 案例：QSpinBox控件的自定义格式显示
+
+![image-20240421172710791](imge/PySide6.assets/image-20240421172710791.png)
+
+```python
+import sys
+
+from PySide6.QtCore import Qt, QRegularExpression
+from PySide6.QtWidgets import (QWidget, QApplication, QFormLayout, QLabel, QDoubleSpinBox, QSpinBox, QCheckBox)
 
 
+class myQSoinBox(QSpinBox):
+    def __init__(self):
+        super(myQSoinBox, self).__init__()
+
+    def valueFromText(self, text):
+        regExp = QRegularExpression("(\\d+)(\\s*[xx]\\s*\\d+)?")
+        math = regExp.match(text)
+        if math.isValid():
+            return math.captured(1).toInt()
+        return 0
+
+    def textFromValue(self, val):
+        return ("%s x %s" % (val, val))
 
 
+class SpinBoxDemo(QWidget):
+    def __init__(self, *args, **kwargs):
+        super(SpinBoxDemo, self).__init__(*args, **kwargs)
+        self.setWindowTitle('SpinBox 例子')
+        self.resize(300, 100)
+
+        layout = QFormLayout(self)
+        self.setLayout(layout)
+
+        self.label = QLabel("current value:")
+        # 对齐方式
+        self.label.setAlignment(Qt.AlignmentFlag.AlignLeft)
+        layout.addWidget(self.label)
+
+        self.spinBox = myQSoinBox()
+        layout.addRow(QLabel("自定义显示"), self.spinBox)
+        self.spinBox.valueChanged.connect(lambda: self.on_valuechange(self.spinBox))
+
+    def on_valuechange(self, spinbox):
+        self.label.setText("current value:" + str(spinbox.value()))
 
 
-
-
-
-
-
-
-
-
-
-
-
+if __name__ == '__main__':
+    app = QApplication(sys.argv)
+    win = SpinBoxDemo()
+    win.show()
+    sys.exit(app.exec())
+```
 

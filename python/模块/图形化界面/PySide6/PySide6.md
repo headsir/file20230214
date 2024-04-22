@@ -3368,7 +3368,7 @@ QSpinBox、QDoubleSpinBox和QDateTimeEdit属于一类，它们都继承自QAbstr
 
   > 用户可以通过单击调节按钮或键盘的↑/↓选择一个值，以增加/减小当前显示的值，也可以手动输入该值
 
-- QDoubleSpinBox：处理浮点数
+- QDoubleSpinBox：处理浮点数，默认显示2位小数
 
 - QDateTimeEdit：处理日期时间
 
@@ -3528,7 +3528,7 @@ if __name__ == '__main__':
 
 ### 案例：QDoubleSpInBox控件的使用方法
 
-与QSpinBox相比，使用QDoubleSpinBox可以显示浮点数，并且是通过setDecimals(int)设置的。
+与QSpinBox相比，使用QDoubleSpinBox可以显示浮点数，并且是通过setDecimals(int)设置的,默认显示2位小数。
 
 ![image-20240422170504501](imge/PySide6.assets/image-20240422170504501.png)
 

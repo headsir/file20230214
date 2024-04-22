@@ -3526,3 +3526,26 @@ if __name__ == '__main__':
     sys.exit(app.exec())
 ```
 
+### 案例：QDoubleSpInBox控件的使用方法
+
+与QSpinBox相比，使用QDoubleSpinBox可以显示浮点数，并且是通过setDecimals(int)设置的。
+
+![image-20240422170504501](imge/PySide6.assets/image-20240422170504501.png)
+
+```python
+......
+
+self.spinBox2 = QDoubleSpinBox()
+self.spinBox2.setDecimals(4)
+layout.addRow(QLabel("显示4位小数"), self.spinBox2)
+self.spinBox2.valueChanged.connect(lambda: self.on_valuechange(self.spinBox2))
+
+......
+
+def on_valuechange(self, spinbox):
+    self.label.setText("current value:" + str(spinbox.value()))
+    self.label2.setText("current value:" + str(spinbox.text()))
+    
+......    
+```
+

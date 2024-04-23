@@ -3582,3 +3582,148 @@ QDateTimeEdit、QDateEdit、QTimeEdit及QCalendarWidget只是时间和日期管�
 #### 1.时间和日期范围
 
 QDateTimeEdit的有效值的范围由属性minimumDateTime和maximumDateTime控制，也可以使用setDateRange()函数一次性设置两个属性。在默认情况下，100-9999年的任何日期时间都是有效的。除了用户手动指定的日期时间，还可以通过函数setDateTime()、setDate()和setTime()以编程的方式指定日期。
+
+同理，QDateEdit和QTimeEdit也一样
+
+![image-20240423162144787](imge/PySide6.assets/image-20240423162144787.png)
+
+```python
+# QDateTimeEdit示例
+vlayout.addWidget(QLabel("QDateTimeEdit 示例："))
+dateTimeEdit = QDateTimeEdit(QDateTime.currentDateTime(), self)
+dateTimeEdit01 = QDateTimeEdit(QDate.currentDate(), self)
+# -------------设置日期------------------------------------------
+dateTimeEdit01.setDate(QDate(2030, 12, 31))
+dateTimeEdit02 = QDateTimeEdit(QTime.currentTime(), self)
+vlayout.addWidget(dateTimeEdit)
+vlayout.addWidget(dateTimeEdit01)
+vlayout.addWidget(dateTimeEdit02)
+
+# QDateEdit 示例
+vlayout.addWidget(QLabel("QDateEdit 示例："))
+dateEdit = QDateEdit(QDate.currentDate())
+# -------------设置日期范围------------------------------------------
+dateEdit.setDateRange(QDate(2015, 1, 1), QDate(2030, 12, 31))
+vlayout.addWidget(dateEdit)
+
+# QTimeEdit 示例
+vlayout.addWidget(QLabel("QTimeEdit 示例"))
+timeEdit = QTimeEdit(QTime.currentTime())
+# -------------设置时间范围------------------------------------------
+timeEdit.setTimeRange(QTime(9, 0, 0, 0), QTime(16, 30, 0, 0))
+vlayout.addWidget(timeEdit)
+```
+
+#### 2.日期格式
+
+QDateTimeEdit通过setDisplayFormat()函数来设置显示的日期时间格式
+
+```python
+formatComboBox.addItems(
+    ["yyyy-MM-dd hh:mm:ss (zzz 'ms')",
+     "hh:mm:ss MM/dd/yyyy",
+     "hh:mm:ss dd/MM/yyyy",
+     "北京时间：hh:mm:ss",
+     "hh:mm ap",
+     "yyyy-MM-dd ddd"
+    ]
+)
+formatString = formatComboBox.currentText()
+meetingEdit.setDisplayFormat(formatString)
+```
+
+
+
+==**支持的日期格式**==
+
+![image-20240423165325465](imge/PySide6.assets/image-20240423165325465.png)
+
+**使用示例**
+
+![image-20240423165519815](imge/PySide6.assets/image-20240423165519815.png)
+
+==**支持的时间格式**==
+
+![image-20240423165742938](imge/PySide6.assets/image-20240423165742938.png)
+
+**使用示例**
+
+![image-20240423165909030](imge/PySide6.assets/image-20240423165909030.png)
+
+使用QComboBox来存储时间格式，选中任意格式就会在QDateTimeEdit中呈现出相应的效果。
+
+需要注意的是meetingEdit.displayedSections()&QDateTimeEdit.DateSections_Mask表示如果当前显示的日期时间包含日期，则为True，否则为False。
+
+![image-20240423183935993](imge/PySide6.assets/image-20240423183935993.png)
+
+```python
+# 设置日期时间格式
+vlayout.addWidget(QLabel("选择日期和时间格式："))
+meetingEdit = QDateTimeEdit(QDateTime.currentDateTime())
+formatComboBox = QComboBox()
+formatComboBox.addItems(
+    ["yyyy-MM-dd hh:mm:ss (zzz 'ms')",
+     "hh:mm:ss MM/dd/yyyy",
+     "hh:mm:ss dd/MM/yyyy",
+     "北京时间：hh:mm:ss",
+     "hh:mm ap",
+     "yyyy-MM-dd ddd"])
+formatComboBox.textActivated.connect(lambda: self.setFormatString(formatComboBox.currentText(),meetingEdit))
+vlayout.addWidget(meetingEdit)
+vlayout.addWidget(formatComboBox)
+
+def setFormatString(self, formatString, meetingEdit):
+    meetingEdit.setDisplayFormat(formatString)
+    # meetingEdit.displayedSections() & QDateTimeEdit.DateSections_Mask
+    # 表示如果当前显示的日期时间包含日期，则为True，否则为False。
+    if meetingEdit.displayedSections() & QDateTimeEdit.DateSections_Mask:
+        meetingEdit.setDateRange(QDate(2004, 11, 1), QDate(2005, 11, 30))
+    else:
+        meetingEdit.setTimeRange(QTime(0, 7, 20, 0), QTime(21, 0, 0, 0))
+```
+
+使用fromString()函数可以把字符串转换为时间，使用toString()函数可以把时间转换为字符串。
+
+QDateTime、QDate和QTime都可以使用fromString()函数及toString()函数。
+
+toString()函数支持两种参数(str和Qt.DateFormat)，使用str参数就可以传递格式。
+
+```python
+toString(self, format: PySide6.QtCore.Qt.DateFormat = PySide6.QtCore.Qt.DateFormat.TexeDate) -> str
+toString(self, format: str, cal: PySide6.QtCore.QCalendar = Default(QCalendar)) -> str
+```
+
+Qt.DateFormat参数默认使用的是Qt.TextDate，会显示英文简称，如“2020/3/6/周五13:05:51”会显示为“Fri Mar 6 13:05:51 2020”，而Ot.ISODate显示为“2021-03-06T13:05:51”，我们更倾向于采用Qt.ISODate的表示方式。
+
+另外，PySide 6也可以使用toPython()函数把Qt的时间类型转换为datetime类型。
+
+```
+def showDate(self, dateEdit):
+    # 当前日期时间
+    dateTime = dateEdit.dateTime().toString()
+    date = dateEdit.date().toString('yyyy-MM-dd')
+    time = dateEdit.time().toString()
+    # 最大最小日期时间
+    maxDateTime = dateEdit.maximumDateTime().toString("yyyy-MM-dd hh:mm:ss")
+    minDateTime = dateEdit.minimumDateTime().toString(Qt.ISODate)
+    # 最大最小日期
+    maxDate = dateEdit.maximumDate().toString(Qt.ISODate)
+    minDate = dateEdit.minimumDate().toString()
+    # 最大最小时间
+    maxTime = dateEdit.maximumDateTime().toString()
+    minTime = dateEdit.minimumDateTime().toString()
+
+    _str = f"""
+    当前日期时间：{dateTime}
+    当前日期：{date}
+    当前时间：{time}
+    最大日期时间：{maxDateTime}
+    最小日期时间：{minDateTime}
+    最大日期：{maxDate}
+    最小日期：{minDate}
+    最大时间：{maxTime}
+    最小时间：{minTime}
+    """
+    self.label.setText(_str)
+```
+

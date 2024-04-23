@@ -3549,3 +3549,36 @@ def on_valuechange(self, spinbox):
 ......    
 ```
 
+## 5.9 日期时间控件
+
+### 5.9.1 日期时间相关控件
+
+​		与日期时间相关的控件主要包括QDateTimeEdit、QDateEdit、QTimeEdit和QCalendarWidget。其中，QDateTimeEdit、QDateEdit和QTimeEdit属于一类，最常用的是QDateTimeEdit，用来呈现日期和时间。和QSpinBox一样，QDateTimeEdit也是QAbstractSpinBox的子类，因此，两者的呈现方式有些类似。QDateTimeEdit类的继承结构和效果
+
+![image-20240423095215022](imge/PySide6.assets/image-20240423095215022.png)
+
+QDateEdit和QTimeEdit都是QDateTimeEdit的子类，分别用于处理期和时间。也就是说，如果业务中只涉及时间不涉及日期，则可以考虑使用QTimeEdit，当然，也可以直接使用QDateTimeEdit。
+
+在实际处理中，也会用到QDateTime、QDate和QTime这些模块，它们分别是描述日期和时间、日期、时间的数据类。QDateTime类、QDate类和QTime类的继承结构
+
+![image-20240423095751977](imge/PySide6.assets/image-20240423095751977.png)
+
+这三者都不是QWidget的子类，不可以被用户看到(只有继承QWidget的类才能被用户看到)QDateTimeEdit、QDateEdit及QTimeEdit可以通过QDateTime、QDate及QTime管理日期和时间。
+
+QCalendarWidget是一个日历控件，提供了一个基于月份的视图，允许用户通过鼠标或键盘选择日期。QCalendarWidget是QWidget的子类，因此它的外观更像是一个窗口而不是QSpinBox。QCalendarWidget类的效果图
+
+![image-20240423113414223](imge/PySide6.assets/image-20240423113414223.png)
+
+继承结构
+
+![image-20240423113451403](imge/PySide6.assets/image-20240423113451403.png)
+
+QDateTimeEdit、QDateEdit、QTimeEdit及QCalendarWidget只是时间和日期管理的不同呈现方式而已，具体使用哪一个可以根据实际业务需求进行选择。另外，它们都可以通过QtDesigner来设计，并且使用起来也非常方便。
+
+### 5.9.2 QDateTmeEdit、QDateEdit和QTmeEdit
+
+### 案例：QDateTmeEdt控件的使用方法
+
+#### 1.时间和日期范围
+
+QDateTimeEdit的有效值的范围由属性minimumDateTime和maximumDateTime控制，也可以使用setDateRange()函数一次性设置两个属性。在默认情况下，100-9999年的任何日期时间都是有效的。除了用户手动指定的日期时间，还可以通过函数setDateTime()、setDate()和setTime()以编程的方式指定日期。

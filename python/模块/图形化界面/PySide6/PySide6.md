@@ -3697,6 +3697,8 @@ Qt.DateFormat参数默认使用的是Qt.TextDate，会显示英文简称，如�
 
 另外，PySide 6也可以使用toPython()函数把Qt的时间类型转换为datetime类型。
 
+![image-20240424100317402](imge/PySide6.assets/image-20240424100317402.png)
+
 ```
 def showDate(self, dateEdit):
     # 当前日期时间
@@ -3727,3 +3729,37 @@ def showDate(self, dateEdit):
     self.label.setText(_str)
 ```
 
+#### 3.使用弹出日历小部件
+
+可以将QDateTimeEdit配置为允许使用QCalendarWidget选择日期，这可以通过设置calendarPopup属性(使用setCalendarPopup()函数)来启用。此外，也可以通过setCalendarWidget()函数来使用自定义日历小部件，用作日历弹出窗口；使用calendarWidget()函数可以获取现有的日历小部件。
+
+![image-20240424094608839](imge/PySide6.assets/image-20240424094608839.png)
+
+```python
+# 弹出日历小部件
+vlayout.addWidget(QLabel("弹出日历小部件"))
+dateTimeEdit_cal = QDateTimeEdit(QDateTime.currentDateTime(), self)
+dateTimeEdit_cal.setCalendarPopup(True)
+vlayout.addWidget(dateTimeEdit_cal)
+```
+
+#### 4.信号与槽
+
+QDateTimeEdit类中常用的信号
+
+![image-20240424094932363](imge/PySide6.assets/image-20240424094932363.png)
+
+可以使用dateTimeChanged信号，通过lambda表达式来传递自定义参数，以及showDate()槽函数获取参数的详细信息
+
+```python
+# 信号与槽
+dateTimeEdit.dateTimeChanged.connect(lambda: self.showDate(dateTimeEdit))
+dateTimeEdit01.dateTimeChanged.connect(lambda: self.showDate(dateTimeEdit01))
+dateTimeEdit02.dateTimeChanged.connect(lambda: self.showDate(dateTimeEdit02))
+dateEdit.dateTimeChanged.connect(lambda: self.showDate(dateEdit))
+timeEdit.dateTimeChanged.connect(lambda: self.showDate(timeEdit))
+meetingEdit.dateTimeChanged.connect(lambda: self.showDate(meetingEdit))
+dateTimeEdit_cal.dateTimeChanged.connect(lambda: self.showDate(dateTimeEdit_cal))
+```
+
+### 5.9.3 QCalendarWidget

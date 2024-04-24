@@ -3739,6 +3739,7 @@ def showDate(self, dateEdit):
 # 弹出日历小部件
 vlayout.addWidget(QLabel("弹出日历小部件"))
 dateTimeEdit_cal = QDateTimeEdit(QDateTime.currentDateTime(), self)
+# ----------------启用日历小部件----------------------
 dateTimeEdit_cal.setCalendarPopup(True)
 vlayout.addWidget(dateTimeEdit_cal)
 ```
@@ -3763,3 +3764,156 @@ dateTimeEdit_cal.dateTimeChanged.connect(lambda: self.showDate(dateTimeEdit_cal)
 ```
 
 ### 5.9.3 QCalendarWidget
+
+QCalendarWidget是一个日历控件，提供了一个基于月份的视图，允许用户通过鼠标或键盘选择日期，默认选中的是今天的日期。
+
+```python
+# 创建日历控件
+vlayout.addWidget(QLabel("自定义日历小部件"))
+dateTimeEdit_cal1 = QDateTimeEdit(QDateTime.currentDateTime(), self)
+# ----------------启用日历小部件----------------------
+dateTimeEdit_cal1.setCalendarPopup(True)
+vlayout.addWidget(dateTimeEdit_cal1)
+# ---------------创建日历控件------------------------------
+calendar = QCalendarWidget()
+# -----------------添加日历控件-----------------------------
+dateTimeEdit_cal1.setCalendarWidget(calendar)
+```
+
+#### 1.基本信息
+
+在默认情况下，将选择今天的日期，并且用户可以使用鼠标和键盘选择日期，使用setSelectedDate()函数以编程方式选择日期，使用selectedDate()函数获取当前选择的日期。通过设置minimumDate属性和maximumDate属性可以将用户选择限制在给定的日期范围内，也可以使用setDateRange()函数一次性设置两个属性。可以分别使用函数monthShown()和yearShown()查看当前显示的月份和年份。
+在默认情况下不显示网格，可以使用setGridVisible()函数将gridVisible属性设置为True来**打开日历网格**
+
+```python
+# 网格线设置
+calendar.setGridVisible(True)
+```
+
+#### 2.行标题和列标题的信息
+
+新创建的日历窗口小部件的第1行标题默认使用缩写的日期名称，并且星期六和星期日都标记为红色。可以使用setHorizontalHeaderFormat()函数来修改显示类型，如传递参数QCalendarWidget.SingleLetterDayNames可以显示完整的日期名称。日历窗口第1行支持显示的各种格式
+
+![image-20240424112719043](imge/PySide6.assets/image-20240424112719043.png)
+
+```python
+# 标题设置
+# calendar.setHorizontalHeaderFormat(QCalendarWidget.HorizontalHeaderFormat.SingleLetterDayNames)  # 一
+# calendar.setHorizontalHeaderFormat(QCalendarWidget.HorizontalHeaderFormat.ShortDayNames)  # 周一
+# calendar.setHorizontalHeaderFormat(QCalendarWidget.HorizontalHeaderFormat.LongDayNames)  # 星期一
+calendar.setHorizontalHeaderFormat(QCalendarWidget.HorizontalHeaderFormat.NoHorizontalHeader)  # 标题隐藏
+```
+
+日历窗口小部件的第1列默认显示当年的第几周，可以使用setVerticalHeaderFormat()函数设置参数为QCalendarWidget.NoVerticalHeader来删除星期数。第1列标题可以显示的各种格式
+
+![image-20240424112845789](imge/PySide6.assets/image-20240424112845789.png)
+
+```PYTHON
+calendar.setVerticalHeaderFormat(QCalendarWidget.VerticalHeaderFormat.NoVerticalHeader)  # 删除星期数
+```
+
+#### 3.限制编辑
+
+如果要禁止用户选择，则需要把selectionMode属性设置为NoSelection，该属性默认为SingleSelection
+
+![image-20240424113320039](imge/PySide6.assets/image-20240424113320039.png)
+
+```PYTHON
+calendar.setSelectionMode(QCalendarWidget.SelectionMode.NoSelection)  # 禁止选择
+```
+
+#### 4.修改排列顺序
+
+可以使用setFirstDayOfWeek()函数更改第1列中的日期
+
+![image-20240424113908471](imge/PySide6.assets/image-20240424113908471.png)
+
+```python
+calendar.setFirstDayOfWeek(Qt.DayOfWeek.Thursday)  # 第一列日期为周四
+```
+
+#### 5.信号与槽
+
+QCalendarWidget类提供了4个信号，即selectionChanged、activated、currentPageChanged和clicked，这4个信号都可以响应用户交互
+
+```python
+activated(QDate date)
+clicked(QDate date)
+currentPageChanged(int year, int month)
+selectionChanged()
+```
+
+#### QCalendarWidget类中常用的函数
+
+![image-20240424114807150](imge/PySide6.assets/image-20240424114807150.png)
+
+#### 案例：QCalendarwidget控件的使用方法
+
+![image-20240424150853220](imge/PySide6.assets/image-20240424150853220.png)
+
+```python
+import sys
+
+from PySide6.QtCore import QDate, Qt
+from PySide6.QtWidgets import QWidget, QVBoxLayout, QDateTimeEdit, QCalendarWidget, QApplication, QLabel
+
+
+class CalendarExample(QWidget):
+    def __init__(self):
+        super().__init__()
+        self.setWindowTitle("Calendar 例子")
+        self.setGeometry(100, 100, 400, 350)
+        layout = QVBoxLayout()
+        self.setLayout(layout)
+
+        self.dateTimeEdit = QDateTimeEdit(self)
+        self.dateTimeEdit.setCalendarPopup(True)
+        layout.addWidget(self.dateTimeEdit)
+
+        self.cal = QCalendarWidget(self)
+        # 设置最小值
+        self.cal.setMinimumDate(QDate(1980, 1, 1))
+        # 设置最大值
+        self.cal.setMaximumDate(QDate(3000, 1, 1))
+        # 显示网格
+        self.cal.setGridVisible(True)
+        # 设置控件日期
+        self.cal.setSelectedDate(QDate(2010, 1, 30))
+        # 设置完整星期
+        self.cal.setHorizontalHeaderFormat(QCalendarWidget.HorizontalHeaderFormat.LongDayNames)
+        # 设置第一列星期
+        self.cal.setFirstDayOfWeek(Qt.DayOfWeek.Wednesday)
+        layout.addWidget(self.cal)
+        self.cal.move(20, 20)
+
+        self.label = QLabel('此处会显示选择日期信息')
+        layout.addWidget(self.label)
+
+        self.cal.clicked.connect(lambda: self.showDate(self.cal))
+        self.dateTimeEdit.dateChanged.connect(lambda x: self.cal.setSelectedDate(x))
+        self.cal.clicked.connect(lambda x: self.dateTimeEdit.setDate(x))
+
+    def showDate(self, cal):
+        date = cal.selectedDate().toString("yyyy-MM-dd dddd")
+        moth = cal.monthShown()
+        year = cal.yearShown()
+        _str = f"""
+    当前选择日期：{date};
+    当前选择月份：{moth};
+    当前选择年份：{year};       
+        """
+        self.label.setText(_str)
+
+
+if __name__ == "__main__":
+    app = QApplication(sys.argv)
+    win = CalendarExample()
+    win.show()
+    sys.exit(app.exec())
+```
+
+## 5.10 滑动控件
+
+QSlider、QScrollBar和QDial都是控制数值的经典小部件，三者的作用类似，效果图
+
+![image-20240424153720464](imge/PySide6.assets/image-20240424153720464.png)

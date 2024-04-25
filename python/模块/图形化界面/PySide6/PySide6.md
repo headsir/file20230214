@@ -2154,7 +2154,7 @@ QTextBrowser是QTextEdit的子类，因此，QTextEdit的一些函数(如setHtml
 注意：文件路径 `\`，用`/` 程序异常
 
 - setOpenExternalLinks()函数开启外部链接
-- setSource()函数方便记录初始化URL，如果使用setHtml0)等函数则没有URL记录。当用户单击一个链接时，会触发anchorClicked信号，该信号会传递QUrl作为参数，使用urllib.parse.unquote()可以解码出正确的URL。
+- setSource()函数方便记录初始化URL，如果使用setHtml())等函数则没有URL记录。当用户单击一个链接时，会触发anchorClicked信号，该信号会传递QUrl作为参数，使用urllib.parse.unquote()可以解码出正确的URL。
 
 ```python
 import os

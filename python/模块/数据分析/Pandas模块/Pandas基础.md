@@ -1087,6 +1087,12 @@ df1.reset_index(drop = True)
   df=df[df["GCI"].isin(df_3["GCI"].tolist())]
   ```
 
+- isna()，筛选空行，空行返回True
+
+  ```python
+  df = df[df["确认是否起租"].isna()]
+  ```
+
 ### 4.3 行列同时选择
 
 #### 4.3.1 普通索引 + 普通索引

@@ -3920,8 +3920,63 @@ QSlider、QScrollBar和QDial都是控制数值的经典小部件，三者的作�
 
 
 
-# 开发案例：
+QSlider、OScrollBar和QDial都继承自QAbstractSlider。QAbstractSlider是被设计为QScrollBar、QSlider和QDial之类的小部件的公共超类。以QSlider为例，其继承结构
 
-## 百度地图在线展示扇形图及热力图
+![image-20240513161230667](imge/PySide6.assets/image-20240513161230667.png)
 
-### 界面设计
+其他类的继承结构以此类推。
+
+### 5.10.1 QAbstractSlider
+
+QAbstractSlider是被设计为QScrollBar、QSlider和QDial之类的小部件的公共超类，其主要属性
+
+![image-20240513161428289](imge/PySide6.assets/image-20240513161428289.png)
+
+QAbstractSlider可以发射的信号
+
+| 信号            | 发射时间                                                     |
+| --------------- | ------------------------------------------------------------ |
+| valueChanged    | 如果启用了 tracking(默认设置)，则在拖动滑块时，滑块会发射 valueChanged 信号。如果禁用tracking，则仅当用户释放滑块时，滑块才会发射valueChanged信号 |
+| slidePressed    | 用户开始拖动滑块                                             |
+| slideMoved      | 用户拖动滑块                                                 |
+| slideReleased   | 用户释放滑块                                                 |
+| actionTriggered | 触发了滑块操作                                               |
+| rangeChanged    | 范围已更改                                                   |
+
+QAbstractSlider提供了一个虚拟的slideChange()函数，非常适合更新滑块的屏幕显示。通过调用triggerAction()函数，子类可以触发滑块动作。使用QStyle.sliderPositionFromValue()函数和QStyle.sliderValueFromPosition()函数可以帮助子类与样式将屏幕坐标映射到逻辑范围值。
+
+### 5.10.2 QSlider
+
+QSlider是用于控制有界值的经典小部件。用户可以沿水平或垂直凹槽移动滑动手柄，并将手柄的位置转换为合法范围内的整数值。有时这种方式比输入数字或使用SpinBox更加自然
+
+QSlider的大多数功能都是从父类QAbstractSlider继承的，QAbstractSlider常用的方法同样适用于OSlider。例如，使用setValue()函数可以将滑块直接设置为某个值，使用triggerAction()函数可以模拟单击的效果(对于快捷键很有用)，使用setSingleStep()函数和setPageStep()函数可以设置步长(前者对应方向键，后者对应翻页键)，使用setMinimum()函数和setMaximum()函数可以定义滚动条的范围。
+
+QSlider也有其独特的方法，如控制刻度线。使用setTickPosition()函数可以指示想要的刻度线，使用setTickInterval()函数可以指示想要的刻度线数。当前设置的刻度位置和间隔可以分别使用tickPosition()函数和tickInterval()函数查询。
+
+QSlider类中常用的函数
+
+| 函数              | 描述                                                         |
+| ----------------- | ------------------------------------------------------------ |
+| setMinimum()      | 设置滑动条控件的最小值                                       |
+| setMaximum()      | 设置滑动条控件的最大值                                       |
+| setSingleStep()   | 设置滑动条控件递增/递减的步长值                              |
+| setValue()        | 设置滑动条控件的值                                           |
+| value()           | 获得滑动条控件的值                                           |
+| setTickInterval() | 设置刻度间隔                                                 |
+| setTickPosition() | 设置刻度标记的位置，可以输入一个枚举值，这个枚举值用于指定刻度线相对于滑块和用户操作的位置。可以输入的枚举值如下。<br>- QSlider.NoTicks：不绘制任何刻度线。<br>- QSlider.TicksBothSides：在滑块的两侧绘制刻度线。<br>- QSlider.TicksAbove：在（水平）滑块上方绘制刻度线。<br>- QSlider.TicksBelow：在（水平）滑块下方绘制刻度线 |
+| setTickPosition() | - QSlider.TicksLeft：在（垂直）滑块左侧绘制刻度线<br>- QSlider.TicksRight：在（垂直）滑块右侧绘制刻度线 |
+
+QSlider可以以水平或垂直的方式显示，只需要传递相应的参数
+
+```python
+#水平滑块
+slider_horizon=QSlider(Qt.Horizontal)  
+#垂直滑块
+slider_vertical=QSlider(Qt.Vertical)
+```
+
+QSlider仅提供整数范围，如果这个范围非常大就很难精确化操作，使用QSlider可以从Tab键获得焦点，此时可以用鼠标滚轮和键盘来控制滑块，键盘方式:
+
+![image-20240513165505945](imge/PySide6.assets/image-20240513165505945.png)
+
+QSlider可以发射的信号请参考QAbstractSlider。

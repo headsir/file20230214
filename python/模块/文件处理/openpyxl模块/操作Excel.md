@@ -297,3 +297,37 @@ for row in ws.iter_rows(min_row=1, max_col=3, max_row=2, values_only=True):
 (None, None, None)
 (None, None, None)
 ```
+
+# 写入字典数据
+
+```
+from openpyxl import Workbook
+
+def save_to_execl(star_dict):
+    # 创建一个空的Excel文件
+    wb = Workbook()
+
+    # 选择当前工作表
+    ws = wb.active
+
+data = {
+    '姓名': ['张三', '李四', '王五'],
+    '年龄': [20, 25, 30],
+    '性别': ['男', '女', '男']
+}
+
+# 将数据写入工作表
+# 首先写入表头
+header = list(data.keys())
+for col in range(len(header)):
+    sheet.cell(row=1, column=col+1, value=header[col])
+
+# 再写入数据
+for row in range(len(data['姓名'])):
+    for col in range(len(header)):
+        sheet.cell(row=row+2, column=col+1, value=data[header[col]][row])
+
+# 保存工作簿
+workbook.save('data.xlsx')
+```
+

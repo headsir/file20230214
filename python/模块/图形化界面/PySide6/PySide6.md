@@ -3980,3 +3980,23 @@ QSlider仅提供整数范围，如果这个范围非常大就很难精确化操�
 ![image-20240513165505945](imge/PySide6.assets/image-20240513165505945.png)
 
 QSlider可以发射的信号请参考QAbstractSlider。
+
+# 其它
+
+## 播放音频文件
+
+```python
+# 声音实现，播放文件范围广，有延迟
+self.player = QMediaPlayer()
+self.player.setSource(QUrl.fromLocalFile(Settings.wav_filename))
+self.audio_output = QAudioOutput()
+self.audio_output.setVolume(100)
+self.player.setAudioOutput(self.audio_output)
+
+# 声音实现,只能播放wva文件，低延迟
+self.effect = QSoundEffect()
+self.effect.setSource(QUrl.fromLocalFile(Settings.wav_filename))
+self.effect.setLoopCount(1)
+self.effect.setVolume(10)
+```
+

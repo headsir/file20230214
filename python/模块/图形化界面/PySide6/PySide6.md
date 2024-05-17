@@ -1207,7 +1207,7 @@ QLabel是界面中的标签类，继承自QFrame。继承结构图：
 
 ![image-20240331225348884](imge/PySide6.assets/image-20240331225348884.png)
 
-### 5.2.1 对齐
+### 5.2.1 对齐及样式
 
 setAlignment() 是QLabel、QLineEdit等控件通用的函数，用来设置文本的对齐方式，[详见](#5.2 标签（QLabel） "常用函数" )
 
@@ -1217,6 +1217,11 @@ label_normal = QLabel(self)
 label_normal.setText("这是一个普通标签，居中")
 # 水平方向居中对齐
 label_normal.setAlignment(Qt.AlignCenter)
+
+# 样式
+font = QFont("",10)  # 字体 大小
+font.setBold(True)  # 加粗
+label.setFont(font)
 ```
 
 ### 5.2.2 设置颜色

@@ -4063,11 +4063,89 @@ if __name__ == '__main__':
 
 如果使用鼠标滚轮调整转盘，则每次滚动鼠标滚轮的变化值由wheelScrollLines*singleStep和pageStep的较小值确定。需要注意的是wheelScrollLines是QApplication的方法。
 
+```python
+min(SingleStep(3)*WheelScrollLines(2)，PageStep(5))=5; 鼠标滚轮滚动一次可移动5格
+min(SingleStep(1)*WheelScrollLines(2),PageStep(5))=2，鼠标滚轮滚动一次可移动2格
+```
+
 ### 案例：QDlal控件的使用方法
 
+![image-20240520164203552](imge/PySide6.assets/image-20240520164203552.png)
+
+```python
+import sys
+
+from PySide6.QtCore import Qt
+from PySide6.QtGui import QFont
+from PySide6.QtWidgets import QWidget, QApplication, QVBoxLayout, QLabel, QDial
 
 
+class DialDemo(QWidget):
+    def __init__(self):
+        super().__init__()
+        self.setWindowTitle('Qdial 例子')
 
+        layout = QVBoxLayout(self)
+        self.label = QLabel('Hello Qt for Python')
+        self.label.setAlignment(Qt.AlignCenter)
+        layout.addWidget(self.label)
+
+        # 普通QDial
+        self.dial1 = QDial()
+        self.dial1.setMinimum(10)
+        self.dial1.setMaximum(50)
+        self.dial1.setSingleStep(3)
+        self.dial1.setPageStep(5)
+        self.dial1.setValue(20)
+        layout.addWidget(self.dial1)
+
+        # 开启循环
+        self.dial_wrap = QDial()
+        self.dial_wrap.setRange(5, 25)
+        self.dial_wrap.setSingleStep(1)
+        self.dial_wrap.setPageStep(5)
+        self.dial_wrap.setValue(15)
+        self.dial_wrap.setWrapping(True)
+        self.dial_wrap.setMinimumHeight(100)
+        layout.addWidget(self.dial_wrap)
+
+        # 连接信号与槽
+        self.dial1.valueChanged.connect(lambda: self.valuechange(self.dial1))
+        self.dial_wrap.valueChanged.connect(lambda: self.valuechange(self.dial_wrap))
+
+    def valuechange(self, dial):
+        size = dial.value()
+        self.label.setText('选中大小：%d' % size)
+        self.label.setFont(QFont('Arial', size))
+
+
+if __name__ == '__main__':
+    app = QApplication(sys.argv)
+    win = DialDemo()
+    win.show()
+    sys.exit(app.exec())
+```
+
+### 5.10.4 QScrollBar
+
+在有限的空间下使用QScrollBar控件可以查看更多的信息。常见的场景之一是浏览器的滚动视图，通过鼠标滚轮可以进行滚动查看。QScrollBar很少单独使用，通常集成在其他控件中使用，从而实现更准确地导航。例如，需要显示大量文本而需要滚动视图显示的时候使用QTextEdit和QPlainTextEdit，需要在窗口中集成大量控件而需要滚动视图的时候使用QScrollArea。QTextEdit、QPlainTextEdit和QScrollArea都是QAbstractScrollArea的子类，可以根据需要自动开启滚动视图。如果Qt提供的控件无法满足需求，则可以结合QAbstractScrollArea和QScrollBar设置专门的小控件。
+
+滚动条通常包括4个单独的控件，分别为一个滑块a、两个滚动箭头b和一个页面控件c
+
+![image-20240520165635175](imge/PySide6.assets/image-20240520165635175.png)
+
+- 滑块a：滑块提供了一种快速跳转到文档任意位置的方法，但不支持在大型文档中进行精确导航。
+- 滚动箭头b：滚动箭头是按钮，可以用于精确导航到文档中的特定位置。连接到文本编辑器的垂直滚动条通常将当前位置上移或下移一个“行”，并小幅度调整滑块的位置。在编辑器和列表框中，“一行”可能表示一行文本；在图像查看器中，这可能意味着20像素。
+- 页面控件c：页面控件是在其上拖动滑块的区域(滚动条的背景)。单击此处可以将滚动条移向一个“页面”。该值通常与滑块的长度相同。
+
+和QSlider一样，setValue()、triggerAction()、setSingleStep()、setPageStep()、setMinimum()、setMaximum()等函数和←/→/PageUp/PageDown等快捷键同样适用于QScrollBar。需要注意的是，如果使用键盘控制，那么QScrollBar.focusPolicy()默认为Qt.NoFocus会导致无法获得焦点。可以使用setFocusPolicy()函数启用键盘与滚动条的交互。
+
+![image-20240520170514388](imge/PySide6.assets/image-20240520170514388.png)
+
+在许多常见的情况下，滚动条的范围可以根据文档的长度进行设置，并且规则很简单，可以参考如下等式:
+Document length=maximum()-minimum()+PageStep()
+
+### 案例： QScrolBar控件的使用方法
 
 
 

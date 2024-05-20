@@ -3968,8 +3968,7 @@ QSlider类中常用的函数
 | setValue()        | 设置滑动条控件的值                                           |
 | value()           | 获得滑动条控件的值                                           |
 | setTickInterval() | 设置刻度间隔                                                 |
-| setTickPosition() | 设置刻度标记的位置，可以输入一个枚举值，这个枚举值用于指定刻度线相对于滑块和用户操作的位置。可以输入的枚举值如下。<br>- QSlider.NoTicks：不绘制任何刻度线。<br>- QSlider.TicksBothSides：在滑块的两侧绘制刻度线。<br>- QSlider.TicksAbove：在（水平）滑块上方绘制刻度线。<br>- QSlider.TicksBelow：在（水平）滑块下方绘制刻度线 |
-| setTickPosition() | - QSlider.TicksLeft：在（垂直）滑块左侧绘制刻度线<br>- QSlider.TicksRight：在（垂直）滑块右侧绘制刻度线 |
+| setTickPosition() | 设置刻度标记的位置，可以输入一个枚举值，这个枚举值用于指定刻度线相对于滑块和用户操作的位置。可以输入的枚举值如下。<br>- QSlider.NoTicks：不绘制任何刻度线。<br>- QSlider.TicksBothSides：在滑块的两侧绘制刻度线。<br>- QSlider.TicksAbove：在（水平）滑块上方绘制刻度线。<br>- QSlider.TicksBelow：在（水平）滑块下方绘制刻度线<br>- QSlider.TicksLeft：在（垂直）滑块左侧绘制刻度线<br/>- QSlider.TicksRight：在（垂直）滑块右侧绘制刻度线 |
 
 QSlider可以以水平或垂直的方式显示，只需要传递相应的参数
 
@@ -3985,6 +3984,92 @@ QSlider仅提供整数范围，如果这个范围非常大就很难精确化操�
 ![image-20240513165505945](imge/PySide6.assets/image-20240513165505945.png)
 
 QSlider可以发射的信号请参考QAbstractSlider。
+
+### 案例: QSllder控件的使用方法
+
+![image-20240520101134532](imge/PySide6.assets/image-20240520101134532.png)
+
+```python
+import sys
+
+from PySide6.QtGui import QFont
+from PySide6.QtWidgets import QWidget, QApplication, QVBoxLayout
+from PySide6.QtCore import Qt
+from PySide6.QtWidgets import QLabel, QSlider
+
+
+class Slider(QWidget):
+    def __init__(self):
+        super().__init__()
+        self.setWindowTitle('QSlider 例子')
+        self.layout = QVBoxLayout()  # 垂直
+        self.setLayout(self.layout)
+
+        self.label = QLabel("Hello Qt for Python")
+        self.label.setAlignment(Qt.AlignCenter)
+        self.layout.addWidget(self.label)
+
+        # 水平滑块
+        self.slider_horizon = QSlider(Qt.Horizontal)
+        self.slider_horizon.setRange(10, 50)
+        # 设置滑动条控件递增/递减的步长值 通常对应用户按↓键
+        self.slider_horizon.setSingleStep(3)
+        # 通常对应用户按 PageUp键或PageDown 键的
+        self.slider_horizon.setPageStep(10)
+        # 设置初始值
+        self.slider_horizon.setValue(20)
+        # QSlider.TicksBelow：在（水平）滑块下方绘制刻度线
+        self.slider_horizon.setTickPosition(QSlider.TickPosition.TicksBelow)
+        self.layout.addWidget(self.slider_horizon)
+
+        # 垂直滑块
+        self.slider_vertical = QSlider(Qt.Vertical)
+        self.slider_vertical.setMinimum(5)
+        self.slider_vertical.setMaximum(25)
+        # 设置滑动条控件递增/递减的步长值 通常对应用户按↓键
+        self.slider_vertical.setSingleStep(1)
+        # 通常对应用户按 PageUp键或PageDown 键的
+        self.slider_vertical.setPageStep(5)
+        # 设置初始值
+        self.slider_vertical.setValue(15)
+        # QSlider.TicksBelow：在（水平）滑块下方绘制刻度线
+        self.slider_vertical.setTickPosition(QSlider.TickPosition.TicksRight)
+        # 设置刻度间隔
+        self.slider_vertical.setTickInterval(5)
+        # 设置最小高度
+        self.slider_vertical.setMinimumHeight(100)
+        self.layout.addWidget(self.slider_vertical)
+
+        # 连接信号与槽
+        self.slider_horizon.valueChanged.connect(lambda: self.valuechange(self.slider_horizon))
+        self.slider_vertical.valueChanged.connect(lambda: self.valuechange(self.slider_vertical))
+
+    def valuechange(self, slider):
+        size = slider.value()
+        self.label.setText("选中大小：%d" % size)
+        self.label.setFont(QFont("Arial", size))
+
+
+if __name__ == '__main__':
+    app = QApplication(sys.argv)
+    win = Slider()
+    win.show()
+    sys.exit(app.exec())
+```
+
+### 5.10.3 QDial
+
+当用户需要将值控制在特定范围内，并且该范围可以环绕(如角度范围为0°~359°)或对话框布局需要方形小部件时，可以使用QDial。QDial和QSlider都继承自QAbstractSlider，当QDial.wrapping()(是否开启循环)为False(默认设置)时，两者之间基本上没有区别。由于QDlal和QSllder的绝大部分方法、信号与都一样。
+
+如果使用鼠标滚轮调整转盘，则每次滚动鼠标滚轮的变化值由wheelScrollLines*singleStep和pageStep的较小值确定。需要注意的是wheelScrollLines是QApplication的方法。
+
+### 案例：QDlal控件的使用方法
+
+
+
+
+
+
 
 # 其它
 

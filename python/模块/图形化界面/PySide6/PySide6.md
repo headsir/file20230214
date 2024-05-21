@@ -4227,7 +4227,84 @@ QScrollArea继承自QAbstractScrollArea，同样继承自QAbstractScrollArea的�
 
 **关于获取QScrollArea**：可以使用父类QAbstractScrollArea的函数如使用函数verticalScrollBar()和horizontalScrollBar()分别获取垂直Scro1lBar和水平ScrollBar，关于QScro1lBar的所有内容都可以在这里处理。
 
+QAbstractScrollArea中有控制滚动条显示方式的方法，即setHorizontalScrollBarPolicy()和setVerticalScrollBarPolicy()。默认参数是Qt.ScrollBarAsNeeded，也就是按需开启滚动条，也可以传递其他参数
 
+![image-20240521170401389](imge/PySide6.assets/image-20240521170401389.png)
+
+### 案例： QScrollArea控件的使用方法
+
+![image-20240521180948549](imge/PySide6.assets/image-20240521180948549.png)
+
+```python
+import sys
+
+from PySide6.QtGui import QPixmap, Qt
+from PySide6.QtWidgets import QWidget, QApplication, QVBoxLayout, QLabel, QScrollArea, QMainWindow, QPushButton
+
+
+class QScrollAreaWindow(QMainWindow):
+    def __init__(self):
+        super().__init__()
+        self.setWindowTitle('QScrollArea 案例')
+
+        w = QWidget()
+        self.setCentralWidget(w)
+        layout = QVBoxLayout()
+        w.setLayout(layout)
+
+        # 创建一个QLabel滚动条
+        label_scroll = QLabel()
+        label_scroll.setPixmap(QPixmap('../images/boy.png'))
+        self.scroll1 = QScrollArea()
+        self.scroll1.setWidget(label_scroll)
+        layout.addWidget(self.scroll1)
+
+        # 获取QScrollArea 的 Widget
+        widget = self.scroll1.widget()
+        print(widget is label_scroll)
+
+        # 获取及处理QScrollArea的QScrollBar
+        # Qt.ScrollBarPolicy.ScrollBarAlwaysOn 始终显示滚动条
+        self.scroll1.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOn)
+        hScrollBar = self.scroll1.horizontalScrollBar()
+        vScrollBar = self.scroll1.verticalScrollBar()
+        vScrollBar.setSingleStep(5)
+        vScrollBar.setPageStep(50)
+        vScrollBar.setValue(200)
+        vScrollBar.setFocusPolicy(Qt.FocusPolicy.TabFocus)
+
+        # 创建一个QWidget 滚动条
+        self.scroll1Widget = QWidget()
+        self.scroll1Widget.setMinimumSize(500, 1000)
+        self.scroll2 = QScrollArea()
+        self.scroll2.setWidget(self.scroll1Widget)
+        layout.addWidget(self.scroll2)
+
+        # 对 QWidget 滚动条添加控件
+        layout_widget = QVBoxLayout()
+        self.scroll1Widget.setLayout(layout_widget)
+        label_pic = QLabel()
+        label_pic.setPixmap(QPixmap("../images/boy.png"))
+        layout_widget.addWidget(label_pic)
+        label_pic2 = QLabel()
+        label_pic2.setPixmap(QPixmap("../images/python.jpg"))
+        layout_widget.addWidget(label_pic2)
+        button = QPushButton("按钮")
+        button.clicked.connect(lambda: self.on_click(button))
+        layout_widget.addWidget(button)
+
+    def on_click(self, button):
+        self.statusBar().showMessage("你单击了%s" % button.text())
+
+
+if __name__ == '__main__':
+    app = QApplication(sys.argv)
+    win = QScrollAreaWindow()
+    win.show()
+    sys.exit(app.exec())
+```
+
+## 5.12 对话框类控件(QDialog族)
 
 
 

@@ -4147,6 +4147,96 @@ Document length=maximum()-minimum()+PageStep()
 
 ### 案例： QScrolBar控件的使用方法
 
+![image-20240521155244482](imge/PySide6.assets/image-20240521155244482.png)
+
+```python
+import sys
+
+from PySide6.QtGui import QFont, Qt, QPalette, QColor
+from PySide6.QtWidgets import QScrollBar, QWidget, QHBoxLayout, QLabel, QApplication
+
+
+class QScrollBarDemo(QWidget):
+    def __init__(self, parent=None):
+        super(QScrollBarDemo, self).__init__(parent)
+        self.setWindowTitle('QScrollBar 例子')
+        hbox = QHBoxLayout()
+        self.setLayout(hbox)
+
+        self.label = QLabel("拖动滑动条去改变颜色")
+        self.label.setFont(QFont('Arial', 16))
+        hbox.addWidget(self.label)
+
+        self.scrollbar1 = QScrollBar()
+        self.scrollbar1.setMaximum(255)
+        self.scrollbar1.sliderMoved.connect(self.sliderval)
+        hbox.addWidget(self.scrollbar1)
+
+        self.scrollbar2 = QScrollBar()
+        self.scrollbar2.setMaximum(255)
+        self.scrollbar2.setSingleStep(5)
+        self.scrollbar2.setPageStep(50)
+        self.scrollbar2.setValue(150)
+        # 小部件可以通过 Tab 键和单击接收焦点
+        self.scrollbar2.setFocusPolicy(Qt.FocusPolicy.StrongFocus)
+        # 拖动信号
+        self.scrollbar2.sliderMoved.connect(self.sliderval)
+        # 触发了滑块操作
+        self.scrollbar2.actionTriggered.connect(self.sliderval)
+        hbox.addWidget(self.scrollbar2)
+
+        self.scrollbar3 = QScrollBar()
+        self.scrollbar3.setMaximum(255)
+        self.scrollbar3.setSingleStep(5)
+        self.scrollbar3.setPageStep(50)
+        self.scrollbar3.setValue(100)
+        # 小部件通过 Tab键接收焦点
+        self.scrollbar3.setFocusPolicy(Qt.FocusPolicy.TabFocus)
+        # 用户拖动滑块
+        self.scrollbar3.sliderMoved.connect(self.sliderval)
+        # 改变值信号
+        self.scrollbar3.valueChanged.connect(self.sliderval)
+        hbox.addWidget(self.scrollbar3)
+
+    def sliderval(self):
+        value_tup = (self.scrollbar1.value(), self.scrollbar2.value(), self.scrollbar3.value())
+        _str = ("拖动滑动条去改变颜色：\n中间通过 Tab 键 or 单击获取焦点，"
+                "\n 右边只能通过 Tab 键获取焦点。\n当前选中(%d,%d,%d,)" % value_tup)
+        palette = QPalette()
+        palette.setColor(QPalette.WindowText, QColor(*value_tup, 255))
+        self.label.setPalette(palette)
+        self.label.setText(_str)
+
+
+if __name__ == '__main__':
+    app = QApplication(sys.argv)
+    win = QScrollBarDemo()
+    win.show()
+    sys.exit(app.exec())
+```
+
+## 5.11 区城滚动(QScrollArea)
+
+QScrollArea继承自QAbstractScrollArea，同样继承自QAbstractScrollArea的类还有QAbstractItemView、QGraphicsView、QMdiArea、QPlainTextEdit及QTextEdit，它们都有适合自己的滚动视图功能。QScrollArea的主要特点是可以通过setWidget()函数指定子窗口从而为子窗口提供滚动视图功能。例如，子窗口为了包含图片的QLabel，使用setWidget()函数自动让图片在需要的时候开启滚动视图功能。QScrollArea类的继承结构
+
+![image-20240521155833857](imge/PySide6.assets/image-20240521155833857.png)
+
+可以将QScrollArea看作QWidget和QScrollArea的混合体。因此，QScrollArea的使用方法主要围绕QWidget和QScrollArea展开。
+
+**关于获取QWldget**：使用widget()函数可以获取子窗口，使用setWidgetResizable()函数可以自动调整子窗口的大小。
+
+**关于获取QScrollArea**：可以使用父类QAbstractScrollArea的函数如使用函数verticalScrollBar()和horizontalScrollBar()分别获取垂直Scro1lBar和水平ScrollBar，关于QScro1lBar的所有内容都可以在这里处理。
+
+
+
+
+
+
+
+
+
+
+
 
 
 # 其它

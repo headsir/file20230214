@@ -4215,7 +4215,7 @@ if __name__ == '__main__':
     sys.exit(app.exec())
 ```
 
-## 5.11 区城滚动(QScrollArea)
+## 5.11 区域滚动(QScrollArea)
 
 QScrollArea继承自QAbstractScrollArea，同样继承自QAbstractScrollArea的类还有QAbstractItemView、QGraphicsView、QMdiArea、QPlainTextEdit及QTextEdit，它们都有适合自己的滚动视图功能。QScrollArea的主要特点是可以通过setWidget()函数指定子窗口从而为子窗口提供滚动视图功能。例如，子窗口为了包含图片的QLabel，使用setWidget()函数自动让图片在需要的时候开启滚动视图功能。QScrollArea类的继承结构
 
@@ -4305,6 +4305,72 @@ if __name__ == '__main__':
 ```
 
 ## 5.12 对话框类控件(QDialog族)
+
+QDialog是对话框窗口的基类，继承自QWidget，方便设计一些对话框窗口，继承结构
+
+![image-20240523153240131](imge/PySide6.assets/image-20240523153240131.png)
+
+QDialog有很多子类，如QColorDialog、QErrorMessageQFileDialog、QFontDialog、QInputDialog、QMessageBox、QProgressDialog和QWizard。QDialog也可以作为通用对话框使用。
+
+### 5.12.1 对话框简介
+
+对话框(QDialog)是顶层窗口，主要用于短期任务和与用户的简短通信。所谓的顶层窗口，就是可以显示在所有窗口的最前面(也有另一种说法，是指没有父类的窗口)。例如，有些警告窗口始终显示在屏幕顶端，直到被用户关闭。QDialog虽然是顶层窗口，但是也可以有父类窗口。和一般具有父类窗口的控件(如QLabel)不同，QDialog可以显示在屏幕的任何位置，而有父类的OLabe1只能在父窗口范围之内显示。如果QDialog有父类，则其启动默认位置在父窗口的中间，并共享父类的任务栏条目，否则默认启动位置在屏幕中间。既可以在初始化过程中传递父类，也可以使用setParent0)函数修改对话框的所有权。
+
+使用对话框会弹出一个窗口，这就涉及多窗口对焦点控制权的问题。例如，弹窗警告会阻止用户对程序的其他操作，除非关闭弹窗，利用查找功能进行查找的时候也可以对文档进行编辑。在Qt中解决这个问题的方法叫作模式对话框(Modal Dialog)和非模式(ModelessDialog)对话框。可以简单地理解为前一个场景是模式对话框，后一个场景是非模式对话框。
+
+### 5.12.2 模式对话框
+
+模式对话框会禁止对该程序的其他可见窗口操作。例如，打开文件的对话框就属于模式对话框，会阻止对程序进行其他操作。式对话框
+包含两个，分别是ApplicationModal(默认)和WindowModal。
+
+- ApplicationModal：用户必须先完成与对话框的交互并关闭它，然后才能访问应用程序中的任何其他窗口
+- WindowModal：仅阻止访问与该对话框关联的窗口，从而允许用户继续使用应用程序中的其他窗口。
+
+模式对话框可以通过setWindowModality()函数设置，该函数支持的3个参数
+
+![image-20240523154540174](imge/PySide6.assets/image-20240523154540174.png)
+
+
+
+显示模式对话框最常见的方法是调用exec()函数（这是使用Qt的C++方法，在PyOt 5/PySide2中是exec()函数，在PyOt5/PySide2中对应exec() 函数）。exec()函数将对话框显示为模式对话框，在用户将它关闭之前，该对话框一直处于阻塞状态。也就是说，如果对话框是ApplicationModal(默认值)，则用户在关闭对话框之前无法与同一应用程序中的任何其他窗口进行交互；如果对话框是WindowModal，则在打开对话框时仅阻止与父窗口的交互。
+
+当用户关闭对话框时，exec()函数将提供返回值1(Dialog.Rejected)或0(Dialog.Accepted)。在默认情况下，关闭对话框只返回0。如果要返回1，则可以新建一个名字为OK的按钮，并与函数Dialog.accept连接。同样，也可以新建一个Cancel按钮，并与槽函数Dialog.reject连接，或者可以使用槽函数Dialog.done自定义返回值。返回值只适用于模式对话框，非模式对话框没有返回值。也可以重新实现方法accept()、reject()或done()来修改对话框的关闭行为。另外，按Esc键也会调用reject()函数。
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

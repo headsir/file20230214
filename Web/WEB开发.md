@@ -2695,6 +2695,14 @@ jQuery是一个JavaScript第三方模块(第三方类库)
 
 - hasClass  检查属性是否存在
 
+- 修改属性
+
+  ```python
+  $('a').attr('href', 'http://www.new-url.com');
+  ```
+
+  
+
 ##### 操作值
 
 ```html

@@ -2,6 +2,8 @@
 
 官方文档：https://www.kancloud.cn/gnefnuy/pywinauto_doc
 
+参考文档：https://blog.csdn.net/qq_39147299/article/details/132409817
+
 # 一、安装模块
 
 ````

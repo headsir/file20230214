@@ -7068,7 +7068,7 @@ def hello_world():
 app.add_url_rule('/hello', 'hello', hello_world)
 ```
 
-## 5 变量规则
+## 5 动态路由-变量规则
 
 可以通过将可变部分添加到规则参数来动态构建URL。 这个变量部分被标记为`<variable-name>`。 它作为关键字参数传递给规则所关联的函数。
 
@@ -8332,6 +8332,1155 @@ url.rewrite-once = (
 
 # 五、Flask+Vue
 
+## flask与django区别
+
+django是个大而全的框架，flask是一个轻量级的框架
+
+- django内部为我们提供了非常多的组件：orm/session/cookie/admin/form/modelform/路由/视图/模板/中间件/分页/auth/contenttype/缓存/信号/多数据库连接
+- flask本身没有太多的功能：路由/视图/模板（jinja2）/session/中间件，第三方组件非常齐全。
+
+注意：django的请求处理是逐一封装和传递；flask的请求是利用上下文管理来实现的。
+
+## 1. flask快速使用
+
+**flask模块安装**
+
+```text
+pip install flask
+```
+
+### 1.1 依赖wsgi Werkzeug
+
+```text
+from werkzeug.serving import run_simple
+
+
+def func(environ, start_response):
+    print("请求来了")
+    pass
+
+
+if __name__ == '__main__':
+    run_simple("127.0.0.1", 5000, func)
+```
+
+```text
+from werkzeug.serving import run_simple
+
+
+class Flask(object):
+
+    def __call__(self, environ, start_response):
+        return "xx"
+
+
+app = Flask()
+
+if __name__ == '__main__':
+    run_simple("127.0.0.1", 5000, app)
+```
+
+```text
+from werkzeug.serving import run_simple
+
+
+class Flask(object):
+
+    def __call__(self, environ, start_response):
+        return "xx"
+
+    def run(self):
+        run_simple("127.0.0.1", 5000, self)  # self 指的是app对象
+
+
+app = Flask()
+
+if __name__ == '__main__':
+    app.run()
+```
+
+### 1.2 快速使用flask
+
+```python
+from flask import Flask
+
+app = Flask(__name__)
+
+
+@app.route("/index")
+def index():
+    return 'hello world'
+
+
+if __name__ == '__main__':
+    app.run()
+```
+
+**总结：**
+
+- flask框架是基于werkzeug的wsgi实现，flask自己没有wsgi。
+- 用户请求一旦到来，就会执行`app.__call__`方法。
+- 写flask标准流程
+
+### 1.3 用户登录示例
+
+```text
+from flask import Flask, render_template, jsonify, request, redirect
+
+# template_folder参数可以设置模板目录，默认：templates
+app = Flask(__name__, template_folder='templates')
+
+
+# 默认只支持GET请求
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    if request.method == 'GET':
+        # return '登录'  # HttpResponse
+        # return render_template('login.html')  # render
+        # return jsonify({'code': 1000, 'data': [1, 2, 3]})  # JsonResponse
+        return render_template('login.html')
+    # request.form 获取POST请求的返回值
+    user = request.form.get('user')
+    pwd = request.form.get('pwd')
+    if user == 'admin' and pwd == 'dsd':
+        return redirect('/index')
+    error = "用户名或密码错误"
+    return render_template('login.html', error=error)
+
+
+@app.route('/index')
+def index():
+    return "首页"
+
+
+if __name__ == '__main__':
+    app.run(debug=True)
+```
+
+### 1.4 用户编辑示例
+
+```text
+from flask import Flask, render_template, jsonify, request, redirect, url_for
+
+# template_folder参数可以设置模板目录，默认：templates
+app = Flask(__name__, template_folder='templates')
+
+DATA_DICI = {
+    1: {'name': '陈硕', 'age': 73},
+    2: {'name': '王洋', 'age': 84},
+}
+
+
+# 默认只支持GET请求
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    if request.method == 'GET':
+        # return '登录'  # HttpResponse
+        # return render_template('login.html')  # render
+        # return jsonify({'code': 1000, 'data': [1, 2, 3]})  # JsonResponse
+        return render_template('login.html')
+    # request.form 获取POST请求的返回值
+    user = request.form.get('user')
+    pwd = request.form.get('pwd')
+    if user == 'admin' and pwd == 'dsd':
+        return redirect('/index')
+    error = "用户名或密码错误"
+    return render_template('login.html', error=error)
+
+
+# endpoint 路由别名
+@app.route('/index', endpoint='idx')
+def index():
+    # return "首页"
+    data_dict = DATA_DICI
+    return render_template('index.html', data_dict=data_dict)
+
+
+@app.route('/edit', methods=['GET', 'POST'])
+def edit():
+    nid = request.args.get("nid")
+    # print(nid)
+    # return '修改'
+    nid = int(nid)
+    if request.method == 'GET':
+        info = DATA_DICI[nid]
+        return render_template('edit.html', info=info)
+
+    user = request.form.get('user')
+    age = request.form.get('age')
+    DATA_DICI[nid]['name'] = user
+    DATA_DICI[nid]['age'] = age
+    return redirect(url_for('idx'))
+
+
+# '/del/<nid>' 默认nid为字符串
+@app.route('/del/<int:nid>')
+def delete(nid):
+    # print(nid)
+    # return '删除'
+    del DATA_DICI[nid]
+    # return redirect('/index')
+    return redirect(url_for('idx'))
+
+
+if __name__ == '__main__':
+    app.run(debug=True) 
+```
+
+### 总结
+
+1、flask路由
+
+```text
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    pass
+```
+
+2、路由的参数
+
+```text
+# endpoint 路由别名,默认为函数名
+@app.route('/index', endpoint='idx')
+def index():
+    pass
+
+注意：endpoint不能重名
+```
+
+3、动态路由
+
+```text
+@app.route('/login')
+def login():
+    pass
+    
+@app.route('/index/<name>')
+def login(name):
+    pass
+    
+@app.route('/index/<int:nid>')
+def login(nid):
+    pass
+```
+
+4、获取提交的数据
+
+```text
+from flask import request
+
+@app.route('/index')
+def login():
+    request.args  # GET形式传递的参数
+    request.form  # POST形式提交的参数
+```
+
+5、返回数据
+
+```text
+@app.route('/index')
+def login():
+    return render_template("模板文件")
+    return jsonify()
+    return redirect('/index') # 或 return redirect(url_for('别名'))
+    return '.....'
+```
+
+6、模板处理
+
+```text
+{{ x }}
+
+{% for item in list %}
+    {{item}}
+{% endfor %}
+```
+
+7、jinja2注释
+
+```text
+{#   #}
+```
+
+### 1.5 用户会话信息session
+
+```text
+from flask import Flask, render_template, jsonify, request, redirect, url_for, session
+
+# template_folder参数可以设置模板目录，默认：templates
+app = Flask(__name__, template_folder='templates')
+
+# session flask放在用户浏览器中，django放在数据库中
+# 使用session必须设置secret_key
+app.secret_key = 'uoserrrhrhrjrjjjr'
+
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    if user == 'admin' and pwd == 'dsd':
+        # 设置session值
+        session['xxx'] = 'admin'
+    ......
+
+@app.route('/index', endpoint='idx')
+def index():
+    # session登录认证
+    username = session.get('xxx')
+    if not username:
+        return redirect(url_for('login'))
+    ......
+        
+@app.route('/edit', methods=['GET', 'POST'])
+def edit():
+    # session登录认证
+    username = session.get('xxx')
+    if not username:
+        return redirect(url_for('login'))
+    ......
+
+@app.route('/del/<int:nid>')
+def delete(nid):
+    # session登录认证
+    username = session.get('xxx')
+    if not username:
+        return redirect(url_for('login'))
+    ......
+
+if __name__ == '__main__':
+    app.run(debug=True)
+```
+
+**装饰器实现用户认证**
+
+```text
+from flask import Flask, render_template, jsonify, request, redirect, url_for, session
+import functools
+
+# template_folder参数可以设置模板目录，默认：templates
+app = Flask(__name__, template_folder='templates')
+
+# session 放在用户浏览器中
+app.secret_key = 'uoserrrhrhrjrjjjr'
+
+DATA_DICI = {
+    1: {'name': '陈硕', 'age': 73},
+    2: {'name': '王洋', 'age': 84},
+}
+
+
+def auth(func):
+    """
+    实现用户登录认证
+    """
+
+    @functools.wraps(func)
+    def wrapper(*args, **kwargs):
+        username = session.get('xxx')
+        if not username:
+            return redirect(url_for('login'))
+        return func(*args, **kwargs)
+
+    return wrapper
+
+
+# 默认只支持GET请求
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    if request.method == 'GET':
+        return render_template('login.html')
+    user = request.form.get('user')
+    pwd = request.form.get('pwd')
+    if user == 'admin' and pwd == 'dsd':
+        session['xxx'] = 'admin'
+        return redirect('/index')
+    error = "用户名或密码错误"
+    return render_template('login.html', error=error)
+
+
+@app.route('/index', endpoint='idx')
+@auth
+def index():
+    pass
+
+
+@app.route('/edit', methods=['GET', 'POST'])
+@auth
+def edit():
+    pass
+
+
+@app.route('/del/<int:nid>')
+@auth
+def delete(nid):
+    pass
+
+
+if __name__ == '__main__':
+    app.run(debug=True)
+
+```
+
+## 2. 蓝图(blue print)（标准目录结构）
+
+构建业务功能可拆分的目录结构。
+
+```text
+pro_excel
+    │  manage.py
+    │
+    └─pro_excel
+        │  __init__.py
+        │
+        ├─static
+        ├─templates
+        └─views  
+                my.py
+                wy.py
+
+注：适合中小型项目
+```
+
+manage.py
+
+```text
+from pro_excel import create_app
+
+app = create_app()
+if __name__ == '__main__':
+    app.run(debug=True)
+```
+
+`__init__.py`
+
+```text
+from flask import Flask
+from .views.my import xmy
+from .views.wy import xwy
+
+
+def create_app():
+    app = Flask(__name__)
+
+    @app.route('/index')
+    def index():
+        return 'index'
+
+    # URL无前缀
+    app.register_blueprint(xmy)
+    app.register_blueprint(xwy)
+    # url_prefix URL前缀
+    # app.register_blueprint(xmy, url_prefix='/web')
+    # app.register_blueprint(xwy, url_prefix='/admin')
+```
+
+my.py、wy.py
+
+```python
+from flask import Blueprint
+
+# 创建蓝图
+xmy = Blueprint('my', __name__)
+
+
+@xmy.route('/f1')
+def f1():
+    return 'f1'
+
+
+@xmy.route('/f2')
+def f2():
+    return 'f2'
+```
+
+## 3. 数据库连接池
+
+### 安装模块
+
+```
+pip install dbutils
+pip install pymysql
+```
+
+### 使用
+
+参考：https://www.cnblogs.com/wupeiqi/articles/8184686.html
+
+#### 数据库连接池
+
+```
+import pymysql
+from dbutils.pooled_db import PooledDB
+
+POOL = PooledDB(
+    creator=pymysql,  # 使用连接数据库的模块
+    maxconnections=6,  # 连接池允许的最大连接数，0和None 表示不限制连接数
+    mincached=2,  # 初始化时，连接池中至少创建的连接数，0表示不创建
+    blocking=True,  # 连接池中如果没有可用的连接后，是否阻塞等待，True，等待；False，不等待然后报错
+    ping=0,  # ping MySQL服务器，检查是否可用。如：0、None 不检查;1、default 发请求时ping;2 创建created时ping；4 执行sql语句时ping；7 每个环节ping。
+    host='127.0.0.1',
+    port=3306,
+    user='root',
+    passwd='qazwsx',
+    database='temp',
+    charset='utf8mb4'
+)
+
+def task(num):
+    # 去连接池中获取一个连接
+    conn = POOL.connection()
+    cursor = conn.cursor()
+    cursor.execute("select sleep(3);")
+    result = cursor.fetchall()
+    cursor.close()
+    # 将连接放回到连接池
+    conn.close()
+    print(num, '-------------->', result)
+
+
+# 多线程验证连接数验证 （jupyter 无法执行多线程）
+from threading import Thread
+
+for i in range(57):
+    t = Thread(target=task, args=(i,))
+    t.start()
+```
+
+#### 基于函数实现sqlhelper
+
+```python
+import pymysql
+from dbutils.pooled_db import PooledDB
+
+POOL = PooledDB(
+    creator=pymysql,  # 使用连接数据库的模块
+    maxconnections=6,  # 连接池允许的最大连接数，0和None 表示不限制连接数
+    mincached=2,  # 初始化时，连接池中至少创建的连接数，0表示不创建
+    blocking=True,  # 连接池中如果没有可用的连接后，是否阻塞等待，True，等待；False，不等待然后报错
+    ping=0,  # ping MySQL服务器，检查是否可用。如：0、None 不检查;1、default 发请求时ping;2 创建created时ping；4 执行sql语句时ping；7 每个环节ping。
+    host='127.0.0.1',
+    port=3306,
+    user='root',
+    passwd='qazwsx',
+    database='temp',
+    charset='utf8mb4'
+)
+
+
+def fetchall(sql, *args):
+    """ 获取所有数据 """
+    conn = POOL.connection()
+    cursor = conn.cursor()
+    cursor.execute(sql, args)
+    result = cursor.fetchall()
+    cursor.close()
+    conn.close()
+    return result
+
+
+def fetchone(sql, *args):
+    """ 获取单条数据 """
+    conn = POOL.connection()
+    cursor = conn.cursor()
+    cursor.execute(sql, args)
+    result = cursor.fetchone()
+    cursor.close()
+    conn.close()
+    return result
+```
+
+#### 基于类实现sqlhelper
+
+```python
+import pymysql
+from dbutils.pooled_db import PooledDB
+
+
+class SqlHelper(object):
+    def __init__(self):
+        self.pool = PooledDB(
+            creator=pymysql,  # 使用连接数据库的模块
+            maxconnections=6,  # 连接池允许的最大连接数，0和None 表示不限制连接数
+            mincached=2,  # 初始化时，连接池中至少创建的连接数，0表示不创建
+            blocking=True,  # 连接池中如果没有可用的连接后，是否阻塞等待，True，等待；False，不等待然后报错
+            ping=0,  # ping MySQL服务器，检查是否可用。如：0、None 不检查;1、default 发请求时ping;2 创建created时ping；4 执行sql语句时ping；7 每个环节ping。
+            host='127.0.0.1',
+            port=3306,
+            user='root',
+            passwd='qazwsx',
+            database='temp',
+            charset='utf8mb4'
+        )
+
+    def open(self):
+        conn = self.pool.connection()
+        cursor = conn.cursor()
+        return conn, cursor
+
+    def close(self, conn, cursor):
+        cursor.close()
+        conn.close()
+
+    def fetchall(self, sql, *args):
+        """ 获取所有数据 """
+        conn, cursor = self.open()
+        cursor.execute(sql, args)
+        result = cursor.fetchall()
+        self.close(conn, cursor)
+        return result
+
+    def fetchone(self, sql, *args):
+        """ 获取单条数据 """
+        conn, cursor = self.open()
+        cursor.execute(sql, args)
+        result = cursor.fetchone()
+        self.close(conn, cursor)
+        return result
+
+
+# 实现单例模式
+db = SqlHelper()
+```
+
+## 4. Flask对象
+
+### 静态文件的处理
+
+![image-20240529102439888](imge/WEB开发.assets/image-20240529102439888.png)
+
+**推荐**
+
+- 后台
+
+```python
+from flask import Flask, render_template
+
+app = Flask(__name__,
+            template_folder='templates',  # 模板
+            static_folder='static',  # 静态文件目录别名
+            static_url_path='/static'  # 静态文件路径
+            )
+
+
+@app.route('/index')
+def index():
+    return render_template('index.html')
+
+
+if __name__ == '__main__':
+    app.run(debug=True)
+```
+
+- 前端
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<h1>首页</h1>
+<img src="/static/img.png" alt="">
+<!-- 推荐 -->
+<img src="{{ url_for('static',filename='img.png')}}" alt="">
+</body>
+</html>
+```
+
+## 5. 配置文件
+
+### 5.1 在settings中导入
+
+```python
+try:
+    from .local_settings import *
+except ImportError:
+    pass
+```
+
+### 5.2 git
+
+git忽略文件.gitignore
+
+```
+# pycharm
+.idea/
+
+__pycache__/
+*.py[cod]
+*.$py.calss
+
+
+# config:
+local_config.ini
+localsettings.py
+
+# log文件
+log/
+
+# tests文件
+tests/
+
+# 数据库
+*.sqlite3
+
+```
+
+### 5.3 flask配置文件
+
+- 基于全局变量方式（Django的方式）
+
+  localsettings.py
+    ```text
+    DB_HOST = '127.0.0.1'
+  # MySQL数据库
+  DATABASES = {
+      "default": {
+          "ENGINE": "django.db.backends.mysql",
+          "NAME": "website",  # 数据库名字
+          "USER": "website",
+          "PASSWORD": "website123",
+          "HOST": "127.0.0.1",
+          "PORT": "3306",
+      }
+  }
+    ```
+  app.py
+  ```text
+  from flask import Flask
+  app = Flask(__name__)
+  # 加载配置文件:基于全局变量方式 app.config.from_object('config.settings')
+  # 读取配置文件：app.config["XX"]
+  app.config.from_object('config.settings')
+  # print(app.config["DB_HOST"])
+  print(app.config["DATABASES"])
+  ```
+- 基于类方式
+
+  settings.py
+  ```python
+  class BaseSettings(object):
+    """ 公共配置 """
+    DB_HOST = 'localhost'
+
+
+  class DevSettings(BaseSettings):
+      """ 测试配置 """
+      DB_HOST = 'localhost'
+
+
+  class ProdSettings(BaseSettings):
+      """ 正式配置 """
+      DB_HOST = 'localhost'
+  ```
+  app.py
+  ```text
+  from flask import Flask
+  app = Flask(__name__)
+  # 加载配置文件:基于类的方式 app.config.from_object('config.settings.DevSettings')
+  # 读取配置文件：app.config["XX"]
+  app.config.from_object('config.settings.DevSettings')
+  # app.config.from_object('config.settings.ProdSettings')
+  
+  print(app.config["DB_HOST"])
+  ```
+
+## 6.路由系统
+
+参考：https://www.cnblogs.com/wupeiqi/articles/7552008.html
+
+- 路由的两种写法:
+   ```text
+   # 方式一：
+   @app.route('/hello')
+   def hello_world():
+       return 'hello world'
+       
+   # 方式二：
+   def hello_world():
+       return 'hello world'
+   app.add_url_rule('/hello', 'hello', hello_world)
+   ```
+- 路由加载的源码流程
+  ```
+  - 将url和函数打包成为rule对象
+  - 将rule对象添加到map对象中
+  - app.url_map = map对象
+  ```
+- 动态路由
+  ```text
+  @app.route('/login')
+  def login():
+      pass
+      
+  @app.route('/index/<name>')
+  def login(name):
+      pass
+      
+  @app.route('/index/<int:nid>')
+  def login(nid):
+      pass
+  ```
+- 自定义正则路由
+  ```text
+  from flask import Flask, views, url_for
+  from werkzeug.routing import BaseConverter
+  
+  app = Flask(__name__)
+  
+  
+  class RegexConverter(BaseConverter):
+      """
+      自定义URL匹配正则表达式
+      """
+  
+    def __init__(self, map, regex):
+        super(RegexConverter, self).__init__(map)
+        self.regex = regex
+    
+    # 添加到flask中
+    app.url_map.converters['regex'] = RegexConverter
+  
+    @app.route('/index/<regex("\d+"):nid>')
+    def index(nid):
+        print(nid)
+        return 'Index'
+    
+    
+    if __name__ == '__main__':
+        app.run()
+  ```
+
+## 7.视图
+
+### 7.1 FBV
+
+```text
+ # 方式一：
+   @app.route('/hello')
+   def hello_world():
+       return 'hello world'
+       
+   # 方式二：
+   def hello_world():
+       return 'hello world'
+   app.add_url_rule('/hello', 'hello', hello_world)
+   
+```
+
+### 7.2 CBV
+
+```python
+from flask import Flask, render_template, views
+
+app = Flask(__name__)
+
+
+class UserView(views.MethodView):
+    # 不允许 post 访问
+    methods = ['GET']
+
+    def get(self, nid):
+        return 'get'
+
+    def post(self):
+        return 'post'
+
+
+app.add_url_rule('/user/int:nid', view_func=UserView.as_view('user'))  # UserView.as_view('user') 定义 endpoint
+
+if __name__ == '__main__':
+    app.run(debug=True)
+```
+
+## 8.模板
+
+### 8.1 基本用法
+
+flask比django更加接近python语法
+
+- 母版继承
+
+  layout.py
+  ```html
+  <!DOCTYPE html>
+  <html lang="en">
+  <head>
+      <meta charset="UTF-8">
+      <title>Title</title>
+  </head>
+  <body>
+  <h1>头</h1>
+  {% block content %} {% endblock %}
+  <h1>底</h1>
+  </body>
+  </html>
+  ```
+- 母版使用
+  ```html
+  {% extends 'layout.html' %}
+  
+  
+  {% block content %}
+    <!- flask取数据 ->
+    <h1>{{ nums[0] }}</h1>
+    <!- 引入html文件 ->
+    {% include 'form.html' %}
+    <!- 引用函数 ->
+    {{f("张三")}}
+  {% endblock %}
+  ```
+- 视图
+  ```text
+  from flask import Flask, render_template
+  
+  app = Flask(__name__)
+  
+  def func(arg):
+      return f'Hello World!' + arg
+  
+  
+  @app.route('/md')
+  def index():
+      nums = [11, 222, 33]
+      return render_template('md.html', nums=nums, f=func)
+  
+  if __name__ == '__main__':
+      app.run(debug=True)
+  ```
+
+### 8.2 定义全局模板方法
+
+  ```text
+  from flask import Flask, render_template
+  app = Flask(__name__)
+  
+  # html文件可以直接引用
+  # {{ func("张三") }}
+  @app.template_global()
+  def func(arg):
+      return 'hello world' + arg
+  # html文件可以直接引用
+  # {{ "张三"|x1("李四") }}
+  @app.template_filter()
+  def x1(arg,name):
+      return 'hello world' + arg + name
+  @app.route('/md/hg')
+  def index():
+      return render_template('md_hg.html')
+  if __name__ == '__main__':
+      app.run(debug=True)
+  ```
+
+<font color='red' >**注意：**</font> 在蓝图中注册时，应用范围只有本蓝图
+
+## 9.特殊装饰器-类似于django中间件
+
+类似于django中间件
+
+```text
+from flask import Flask, render_template
+
+app = Flask(__name__)
+
+
+@app.before_request
+def f1():
+    print(1)
+
+
+@app.after_request
+def f10(response):
+    print(10)
+    return response
+
+
+@app.route('/index')
+def index():
+    print(index)
+    return render_template('index.html')
+
+
+if __name__ == '__main__':
+    app.run(debug=True)
+```
+
+<font color='red' >**注意：**</font> before_request、after_request在蓝图中注册时，应用范围只有本蓝图
+
+## 10.上下文管理
+
+### 10.1 栈
+
+用列表实现堆栈
+
+```text
+使用列表方法实现堆栈非常容易，最后插入的最先取出（“后进先出”）。把元素添加到堆栈的顶端，使用 append() 。
+从堆栈顶部取出元素，使用 pop() ，不用指定索引。例如：
+stack = [3, 4, 5]
+==============插入===================
+stack.append(6)
+stack.append(7)
+stack
+++++++++++++++++++++++++++++++++++++
+[3, 4, 5, 6, 7]
+===============取出==================
+stack.pop()
+++++++++++++++++++++++++++++++++++++
+7
+===============显示==================
+stack
+++++++++++++++++++++++++++++++++++++
+[3, 4, 5, 6]
+```
+### 10.2 面向对象
+```python
+class Foo(object):
+
+    # 当尝试给对象的属性赋值时，会自动调用这个方法。
+    def __setattr__(self, key, value):
+        print(key, value)
+
+    # 当尝试访问对象的不存在的属性时，会自动调用这个方法。
+    def __getattr__(self, item):
+        print(item)
+
+    def __delattr__(self, item):
+        print(item)
+
+
+obj = Foo()
+obj.x = 123
+print(obj.x)
+```
+**attr的应用**
+```python
+class Local(object):
+    def __init__(self):
+        # self.storage = {}
+        # 在对象中维护字典 storage
+        object.__setattr__(self, "storage", {})
+
+    # 当尝试给对象的属性赋值时，会自动调用这个方法。
+    def __setattr__(self, key, value):
+        self.storage[key] = value
+        # super().__setattr__(key, value)
+
+    # 当尝试访问对象的不存在的属性时，会自动调用这个方法。
+    def __getattr__(self, item):
+        return self.storage.get(item)
+
+
+local = Local()
+local.x1 = 123
+print(local.x1)
+```
+### 10.3 线程唯一标识
+```python
+import threading
+from threading import get_ident
+
+
+def task(w):
+    ident = get_ident()
+    print(f"{w}=============={ident}")
+
+
+for i in range(20):
+    t = threading.Thread(target=task, args=(i,))
+    t.start()
+```
+### 10.4 自定义threading.local
+```python
+import threading
+
+"""
+storage = {
+    11111:{"x1":0},
+    11112:{"x1":1},
+    11113:{"x1":2},
+    11114:{"x1":3},
+    11115:{"x1":4},
+}
+"""
+
+
+class Local(object):
+    def __init__(self):
+        object.__setattr__(self, "storage", {})
+
+    def __setattr__(self, key, value):
+        ident = threading.get_ident()
+        if ident in self.storage:
+            self.storage[ident][key] = value
+        else:
+            self.storage[ident] = {key: value}
+
+    def __getattr__(self, item):
+        ident = threading.get_ident()
+        if ident not in self.storage:
+            return
+        return self.storage[ident].get(item, None)
+
+
+local = Local()
+
+
+def task(args):
+    local.x1 = args
+    print(local.x1)
+
+
+for i in range(5):
+    t = threading.Thread(target=task, args=(i,))
+    t.start()
+```
+### 10.5 加强版threading.local
+```python
+import threading
+
+"""
+storage = {
+    11111:{"x1":[]},
+    11112:{"x1":[]},
+    11113:{"x1":[]},
+    11114:{"x1":[]},
+    11115:{"x1":[]},
+    11116:{"x1":[4]},
+}
+"""
+
+
+class Local(object):
+    def __init__(self):
+        object.__setattr__(self, "storage", {})
+
+    def __setattr__(self, key, value):
+        ident = threading.get_ident()
+        if ident in self.storage:
+            self.storage[ident][key].append(value)
+        else:
+            self.storage[ident] = {key: [value, ]}
+
+    def __getattr__(self, item):
+        ident = threading.get_ident()
+        if ident not in self.storage:
+            return
+        return self.storage[ident][item][-1]
+
+
+local = Local()
+
+
+def task(args):
+    local.x1 = args
+    print(local.x1)
+
+
+for i in range(5):
+    t = threading.Thread(target=task, args=(i,))
+    t.start()
+```
+## 11.源码初识
 
 
 

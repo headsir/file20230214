@@ -8332,6 +8332,8 @@ url.rewrite-once = (
 
 # 五、Flask+Vue
 
+## Flask后台开发
+
 ## flask与django区别
 
 django是个大而全的框架，flask是一个轻量级的框架
@@ -8721,20 +8723,25 @@ if __name__ == '__main__':
 
 ## 2. 蓝图(blue print)（标准目录结构）
 
+### 按功能划分（小蓝图）
+
 构建业务功能可拆分的目录结构。
 
 ```text
 pro_excel
-    │  manage.py
-    │
-    └─pro_excel
-        │  __init__.py
-        │
-        ├─static
-        ├─templates
-        └─views  
-                my.py
-                wy.py
+│  manage.py
+├─config
+│  settings.py
+└─pro_excel
+    │  __init__.py
+    ├─static
+    ├─templates
+    │  ├─account
+    │  │   login.html
+    │  └─admin
+    └─views
+       account.py
+       admin.py
 
 注：适合中小型项目
 ```
@@ -8749,46 +8756,124 @@ if __name__ == '__main__':
     app.run(debug=True)
 ```
 
+settings.py
+
+```python
+参见 5.配置文件
+```
+
 `__init__.py`
 
 ```text
-from flask import Flask
-from .views.my import xmy
-from .views.wy import xwy
+from flask import Flask, render_template
 
 
 def create_app():
     app = Flask(__name__)
+    app.config.from_object('config.settings')
+    app.secret_key = 'asadsdsddsdsdad'
 
-    @app.route('/index')
-    def index():
-        return 'index'
-
+    from .views.account import account
+    from .views.admin import admin
+    # ====================================蓝图注册========================
     # URL无前缀
-    app.register_blueprint(xmy)
-    app.register_blueprint(xwy)
+    # app.register_blueprint(account)
+    # app.register_blueprint(admin)
     # url_prefix URL前缀
-    # app.register_blueprint(xmy, url_prefix='/web')
-    # app.register_blueprint(xwy, url_prefix='/admin')
+    app.register_blueprint(account, url_prefix='/account')
+    app.register_blueprint(admin, url_prefix='/admin')
+    return app
 ```
 
-my.py、wy.py
+account.py、admin.py
+
+```python
+from flask import Blueprint, render_template
+
+account = Blueprint('account', __name__)
+
+@account.route('/login')
+def login():
+    return render_template("account/login.html")
+
+# strict_slashes 可以使结尾斜杠不严格
+@account.route('/f2', strict_slashes=False)
+def f2():
+    return 'f2'
+
+```
+
+### 分结构划分（大蓝图）
+
+```text
+bigblue
+│  manage.py
+├─bigblue
+│  │  __init__.py
+│  ├─account
+│  │  │  __init__.py
+│  │  │  
+│  │  ├─static
+│  │  ├─templates
+│  │  │      login.html
+│  │  └─views
+│  │        forget.py
+│  │        user.py       
+│  ├─admin
+│  │  │  __init__.py
+│  │  ├─static
+│  │  ├─templates
+│  │  └─views         
+│  └─templates
+│       login.html
+│        公共templates      
+└─config
+     settings.py
+```
+
+manage.py
+
+```text
+from pro_excel import create_app
+
+app = create_app()
+if __name__ == '__main__':
+    app.run(debug=True)
+```
+
+settings.py
+
+```python
+参见 5.配置文件
+```
+
+`__init__.py`
+
+```python
+from flask import Flask
+
+def create_app():
+    app = Flask(__name__)
+    app.config.from_object('config.settings')
+    app.secret_key = 'asadsdsddsdsdad'
+
+    from .account import account
+    from .admin import admin
+
+    # 注册蓝图
+    app.register_blueprint(account)
+    app.register_blueprint(admin)
+    return app
+```
+
+account/`__init__.py`
 
 ```python
 from flask import Blueprint
 
-# 创建蓝图
-xmy = Blueprint('my', __name__)
+account = Blueprint('account', __name__, template_folder='templates')
 
-
-@xmy.route('/f1')
-def f1():
-    return 'f1'
-
-
-@xmy.route('/f2')
-def f2():
-    return 'f2'
+from .views import forget
 ```
 
 ## 3. 数据库连接池
@@ -9062,19 +9147,18 @@ tests/
   class BaseSettings(object):
     """ 公共配置 """
     DB_HOST = 'localhost'
-
-
+      
   class DevSettings(BaseSettings):
-      """ 测试配置 """
-      DB_HOST = 'localhost'
-
-
+    """ 测试配置 """
+    DB_HOST = 'localhost'
+  
   class ProdSettings(BaseSettings):
-      """ 正式配置 """
-      DB_HOST = 'localhost'
+     """ 正式配置 """
+     DB_HOST = 'localhost'
   ```
   app.py
-  ```text
+  
+  ```python
   from flask import Flask
   app = Flask(__name__)
   # 加载配置文件:基于类的方式 app.config.from_object('config.settings.DevSettings')
@@ -9084,6 +9168,8 @@ tests/
   
   print(app.config["DB_HOST"])
   ```
+
+  
 
 ## 6.路由系统
 
@@ -9482,7 +9568,1453 @@ for i in range(5):
 ```
 ## 11.源码初识
 
+### 11.1 项目启动阶段
 
+- 实例化Flask对象
+
+  ```python
+  app = Flask(__name__)
+  ```
+
+  ```python
+  1. 对app对象封装一些除初始化的值
+  	app.static_url_path
+      app.staic_folder
+      app.template_folder
+      app.view_functions = {}
+  2. 添加静态文件的路由
+  	self.add_url_rule(
+      	self.static_url_path + "/<path:filename>",
+      	endpoint="static",
+      	host=static_host,
+      	view_func=self.send_static_file,
+      	)
+  3. 实例化了url_map的对象，以后在map对象中放【/index/函数的对象映射】
+  	class Flask(object):
+          url_rule_class = Rule
+          url_map_class = Map
+          
+          def __init__(self...):
+              self.static_url_path
+              self.static_folder
+              self.template_folder
+              self.view_functions = {}
+              self.url_map = self.url_map_class()
+  	app = Flask()
+      app.view_functions
+  app.url_rule_class
+  ```
+
+- 加载配置文件（给app的config进行赋值）
+
+  ```python
+  from flask import Flask
+  
+  app = Flask(__name__,static_url_path='/xx')
+  
+  app.config.from_object('xx.xx')
+  ```
+
+  ```
+  1.读取配置文件中的所有键值对，并将键值对全部放到Config对象，（Config是一个字典）
+  2.把包含所有配置文件的Config对象，赋值给 app.config
+  ```
+
+- 添加路由映射
+
+  ```python
+  from flask import Flask
+  
+  app = Flask(__name__,static_url_path='/xx')
+  
+  @app.route('/index')
+  def index():
+      return 'hello world'
+  ```
+
+  ```
+  1. 将 url = /index 和 methods = [GET,POST] 和 endpoint = 'index' 封装到Rule对象
+  
+  2. 将Rule对象添加到 app.url_map中
+  
+  3. 把endpoint和函数的对应关系放到 app.view_functions中
+  ```
+
+- 截止目前
+
+  ```python
+  app.config
+  app.url_map
+  app.view_functions
+  ```
+
+- 运行flask
+
+  ```
+  app.run()
+  ```
+
+### 11.2 有用户到来
+
+- 创建ctx=RequestContext对象，其内部封装了Request对象和session数据
+
+- 创建app_ctx = AppContext对象，其内部封装了App和g
+
+- 然后ctx.push触发将ctx和app_ctx分别通过自己的LocalStack对象将其放到Local中，Local的本质是以线程ID为key，以{“stack”:[]}为value的字典
+
+  ```python
+  {
+      线程ID:{"stack":[ctx,]}
+  }
+  
+  {
+      线程ID:{"stack":[app_ctx,]}
+  }
+  ```
+
+  注意：以后再想要获取request/session/app/g时，都需要去local中获取
+
+- 执行所有的before_request函数
+- 执行视图函数
+- 执行所有after_request函数（session加密放到cookie中）
+- 销毁ctx和app_ctx
+
+### 11.3 使用：session、request、app、g
+
+- 偏函数
+
+  ```python
+  import functools
+  
+  def func(a1,a2):
+      print(a1,a2)
+      
+  new_func = functools.partial(func,123)
+  new_func(2)
+  ```
+
+- 私有成员
+
+  ```python
+  class Foo:
+      def __init__(self):
+          self.name = 'alex'
+          self.__age = 123
+  obj = Foo()
+  
+  print(obj.name)
+  print(obj._Foo__age)
+  ```
+
+- setattr
+- setitem
+
+```python
+# session，request，current_app，g 全部都是LocalProxy对象。
+session['x'] = 123       ctx.session['x'] = 123
+request.method			 ctx.request.method
+current_app.config       app_ctx.app.config
+g.x1                     app_ctx.g.x1
+```
+
+## 12 flask信号之扩展
+
+信号，是在flask框架中为我们预留的钩子，方便自定义操作
+
+```
+pip install blinker
+```
+
+根据flask项目的请求流程设置扩展点
+
+#### 中间件（基本不用）
+
+```python
+from flask import Flask, render_template
+
+app = Flask(__name__)
+
+
+@app.route('/index')
+def index():
+    print("nnnnn")
+    return render_template('index.html')
+
+
+@app.route('/order')
+def order():
+     print("mmm")
+    return render_template('order.html')
+
+
+class MyMiddleware():
+    def __init__(self, old_wsgi_app):
+        self.wsgi_app = old_wsgi_app
+
+    def __call__(self, *args, **kwargs):
+        print(123)
+        result = self.wsgi_app(*args, **kwargs)
+        print(456)
+        return result
+
+
+app.wsgi_app = MyMiddleware(app.wsgi_app)
+if __name__ == '__main__':
+    app.run(debug=True)
+    
+-----------------------------------------
+123
+nnnnn
+456
+```
+
+#### appcontext_pushed信号
+
+当app_ctx被push到local栈中之后，会触发appcontext_pushed信号，之前注册在这个信号中的方法就会被执行
+
+```python
+from flask import Flask, render_template
+from flask import signals
+
+app = Flask(__name__)
+
+@signals.appcontext_pushed.connect
+def f1(arg):
+    print('appcontext_pushed信号f1被触发', arg)
+
+
+@signals.appcontext_pushed.connect
+def f2(arg):
+    print('appcontext_pushed信号f2被触发', arg)
+
+
+@app.route('/index')
+def index():
+    print("nnnnn")
+    return render_template('index.html')
+
+
+@app.route('/order')
+def order():
+    print("mmm")
+    return render_template('order.html')
+
+
+if __name__ == '__main__':
+    app.run(debug=True)    
+--------------------------------
+appcontext_pushed信号f1被触发 <Flask '01中间件'>
+appcontext_pushed信号f2被触发 <Flask '01中间件'>
+mmm
+```
+
+#### 执行before_first_request扩展，3.0已移除
+
+#### request_started信号
+
+```python
+from flask import Flask, render_template
+from flask import signals
+
+app = Flask(__name__)
+
+
+@signals.request_started.connect
+def f4(arg):
+    print('request_started信号被触发', arg)
+
+
+@app.route('/index')
+def index():
+    print("nnnnn")
+    return render_template('index.html')
+
+
+@app.route('/order')
+def order():
+    print("mmm")
+    return render_template('order.html')
+
+
+if __name__ == '__main__':
+    app.run(debug=True)
+==========================================
+request_started信号被触发 <Flask '01中间件'>
+mmm
+```
+
+#### url_value_preprocessor 扩展
+
+```python
+from flask import Flask, render_template
+from flask import signals
+
+app = Flask(__name__)
+
+
+@app.url_value_preprocessor
+def f5(endpoint, args):
+    print(endpoint, args)
+    print('url_value_preprocessor')
+
+
+@app.before_request
+def f6():
+    print('before_request')
+
+
+@app.route('/index/<nid>')
+def index(nid):
+    print("index", nid)
+    return render_template('index.html')
+
+
+@app.route('/order')
+def order():
+    print("order")
+    return render_template('order.html')
+
+
+if __name__ == '__main__':
+    app.run(debug=True)
+    # app.__call__
+    
+-------------------
+index {'nid': '45'}
+url_value_preprocessor
+before_request
+index 45
+```
+
+#### before_request 扩展
+
+```python
+from flask import Flask, render_template
+from flask import signals
+
+app = Flask(__name__)
+
+@app.before_request
+def f6():
+    print('before_request')
+
+
+@app.route('/index/<nid>')
+def index(nid):
+    print("index", nid)
+    return render_template('index.html')
+
+
+@app.route('/order')
+def order():
+    print("order")
+    return render_template('order.html')
+
+
+if __name__ == '__main__':
+    app.run(debug=True)
+    # app.__call__
+    
+-------------------
+before_request
+index 45
+```
+
+
+
+#### before_render_template/template_rendered 信号
+
+**视图函数** 
+
+```python
+from flask import Flask, render_template
+from flask import signals
+
+app = Flask(__name__)
+
+
+@signals.before_render_template.connect
+def f7(app, template, context):
+    print(app, template, context)
+    print("f7")
+
+
+@signals.template_rendered.connect
+def f8(app, template, context):
+    print("f8")
+
+
+@app.route('/index/<int:nid>')
+def index(nid):
+    print("index", nid)
+    return render_template('index.html')
+
+
+@app.route('/order')
+def order():
+    print("order")
+    return render_template('order.html')
+
+
+if __name__ == '__main__':
+    app.run(debug=True)
+    # app.__call__
+------------------------
+index 8
+<Flask '01中间件'> 
+<Template 'index.html'> 
+{'g': <flask.g of '01中间件'>, 'request': <Request 'http://127.0.0.1:5000/index/8' [GET]>, 'session': <NullSession {}>}
+f7
+f8
+```
+
+#### after_request 扩展
+
+```python
+from flask import Flask, render_template, g
+from flask import signals
+
+app = Flask(__name__)
+
+
+@app.after_request
+def f9(response):
+    print("f9")
+    return response
+
+@app.route('/index/<int:nid>')
+def index(nid):
+    print("index", nid)
+    return render_template('index.html')
+
+
+@app.route('/order')
+def order():
+    print("order")
+    return render_template('order.html')
+
+
+if __name__ == '__main__':
+    app.run(debug=True)
+    # app.__call__
+-------------------
+index 8
+f9
+```
+
+#### request_finished 信号
+
+```python
+from flask import Flask, render_template, g
+from flask import signals
+
+app = Flask(__name__)
+
+@signals.request_finished.connect
+def f10(app, response):
+    print("f10")
+
+
+@app.route('/index/<int:nid>')
+def index(nid):
+    print("index", nid)
+    return render_template('index.html')
+
+
+@app.route('/order')
+def order():
+    print("order")
+    return render_template('order.html')
+
+
+if __name__ == '__main__':
+    app.run(debug=True)
+    # app.__call__
+------------------
+index 8
+f10
+```
+
+#### got_request_exception 异常扩展
+
+```python
+from flask import Flask, render_template, g
+from flask import signals
+
+app = Flask(__name__)
+
+@signals.got_request_exception.connect
+def f11(app, exception):
+    print("f11")
+
+@app.route('/index/<int:nid>')
+def index(nid):
+    print("index", nid)
+    return render_template('index.html')
+
+@app.route('/order')
+def order():
+    print("order")
+    return render_template('order.html')
+
+
+if __name__ == '__main__':
+    app.run(debug=True)
+    # app.__call__
+```
+
+#### teardown_request 扩展（结束时永远执行）
+
+```python
+from flask import Flask, render_template, g
+from flask import signals
+
+app = Flask(__name__)
+
+
+@app.teardown_request
+def f12(exc):
+    print("f12")
+
+
+@app.route('/index/<int:nid>')
+def index(nid):
+    print("index", nid)
+    return render_template('index.html')
+
+
+@app.route('/order')
+def order():
+    print("order")
+    return render_template('order.html')
+
+
+if __name__ == '__main__':
+    app.run(debug=True)
+```
+
+#### request_tearing_down 信号
+
+```python
+from flask import Flask, render_template, g
+from flask import signals
+
+app = Flask(__name__)
+
+@signals.request_tearing_down.connect
+def f13(app, exc):
+    print("f13")
+
+@app.route('/index/<int:nid>')
+def index(nid):
+    print("index", nid)
+    return render_template('index.html')
+
+@app.route('/order')
+def order():
+    print("order")
+    return render_template('order.html')
+
+if __name__ == '__main__':
+    app.run(debug=True)
+    # app.__call__
+```
+
+#### appcontext_popped 信号
+
+```python
+from flask import Flask, render_template, g
+from flask import signals
+
+app = Flask(__name__)
+
+
+@signals.appcontext_popped.connect
+def f14(app):
+    print("f14")
+
+
+@app.route('/index/<int:nid>')
+def index(nid):
+    print("index", nid)
+    return render_template('index.html')
+
+
+@app.route('/order')
+def order():
+    print("order")
+    return render_template('order.html')
+
+
+if __name__ == '__main__':
+    app.run(debug=True)
+    # app.__call__
+
+```
+
+**总结：**flask内部共用14+扩展点，其中有9个是信号
+
+```python
+template_rendered = _signals.signal("template-rendered")
+before_render_template = _signals.signal("before-render-template")
+request_started = _signals.signal("request-started")
+request_finished = _signals.signal("request-finished")
+request_tearing_down = _signals.signal("request-tearing-down")
+got_request_exception = _signals.signal("got-request-exception")
+appcontext_tearing_down = _signals.signal("appcontext-tearing-down")
+appcontext_pushed = _signals.signal("appcontext-pushed")
+appcontext_popped = _signals.signal("appcontext-popped")
+# 消息闪现信号
+message_flashed = _signals.signal("message-flashed")
+```
+
+## VUE前端开发
+
+关于vue.js的版本
+
+- vue2，经典版，绝大多数企业项目都使用vue2版本开发
+- vue3，新版本，未来趋势
+
+## 1.vue.js 初体验
+
+基于vue.js框架来编写项目需要以下几个步骤：
+
+- 导入vue.js包（CDN）
+
+  ```html
+  <!-- 开发环境版本，包含了有帮助的命令行警告 -->
+  <script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js"></script>
+  
+  <!-- 生产环境版本，优化了尺寸和速度 -->
+  <script src="https://cdn.jsdelivr.net/npm/vue@2"></script>
+  
+  # 当然，也可以将文件下载下来再通过本地导入
+  ```
+
+- 应用
+
+  ```html
+  <!DOCTYPE html>
+  <html lang="en">
+  <head>
+      <meta charset="UTF-8">
+      <title>Title</title>
+      <!--    1.引入vue.js文件-->
+      <!--    <script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js"></script>-->
+      <script src="vue.js"></script>
+  </head>
+  <body>
+  <!-- 2.指定区域，该区域的内容希望由vue.js来接管 -->
+  <div id="app">
+      <h1>欢迎学习Vue.js</h1>
+      <div>我叫{{ name }},微信{{wechat}}</div>
+      <input type="button" value="点我" v-on:click="clickMe">
+  </div>
+  
+  <script>
+      // 3.创建Vue对象，并关联指定HTML区域。
+      var app = new Vue({
+          el: '#app',
+          data: {
+              name: '吴佩其',
+              wechat: 'wupeiqi999'
+          },
+          methods: {
+              clickMe: function () {
+                  // 获取this.name
+                  // 修改this.name = 'xx'
+                  this.name = "alex";
+                  this.wechat = "wupeiqi6666";
+  
+              }
+          }
+      })
+  </script>
+  </body>
+  </html>
+  ```
+
+  后期编写前端代码使用IDE：WebStom
+
+## 2、vue常见指令
+
+想要使用vue.js开发，就必须学会vue.js中提供的指令。
+
+### 2.1 插值表达
+
+一般在显示文本内容的标签中使用。
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script src="vue.js"></script>
+</head>
+<body>
+<div id="app">
+    <div>我叫{{name}}，我喜欢{{hobby}}，邮箱：{{dataInfo.email}}</div>
+    <ul>
+        <li>{{'李杰'}}</li>
+        <li>{{'李杰' + "土鳖"}}</li>
+        <li>{{base + 1 + 1}}</li>
+        <li>{{1==1 ? "李杰":"alex"}}</li>
+    </ul>
+    <ul>
+        <li>{{ condition?"李杰":"alex"}}</li>
+    </ul>
+    <input type="button" value="点我" v-on:click="clickMe">
+</div>
+
+<script>
+    var app = new Vue({
+        el: "#app",
+        data: {
+            name: '吴佩其',
+            hobby: '篮球',
+            dataInfo: {
+                id: 1,
+                email: "xxx.com"
+            },
+            condition: false,
+            base: 1
+        },
+        methods: {
+            clickMe: function () {
+                this.name = "范日天";
+                this.condition = true;
+                this.dataInfo.email = "wupeiqi@live.com";
+                this.base += 100;
+            }
+        }
+    })
+</script>
+</body>
+</html>
+```
+
+### 2.2 v-bind指令，单向绑定
+
+一般用于对标签中的属性进行操作
+
+```python
+<!DOCTYPE html>
+<html lang="en" xmlns:v-bind="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script src="vue.js"></script>
+    <style>
+        .ig {
+            border: 2px solid red;
+            width: 20%;
+            height: 20%;
+        }
+
+        .info {
+            color: red;
+        }
+
+        .danger {
+            font-size: 10px;
+        }
+    </style>
+</head>
+<body>
+<div id="app">
+    <img src="xx.png" class="ig"/>
+    <img alt="" v-bind:src="imageUrl" v-bind:class="cls"/>
+    <!--    多个属性 -->
+    <h1 v-bind:class="{info:v1,danger:v2}">你好</h1>
+    <h1 v-bind:class="clsDict">clsDict</h1>
+
+    <h2 v-bind:class="[a1,a2]"> 数组 </h2>
+    <h2 v-bind:class="[1==1?a1:'y',a2]"> 三联表达式 </h2>
+
+    <h3 style="color: red;font-size: 19px">属性</h3>
+    <h3 v-bind:style="{color: clr,fontSize: size + 'px'}"> 动态属性 </h3>
+
+    <input type="button" value="点我" v-on:click="clickMe">
+</div>
+
+<script>
+    var app = new Vue({
+        el: '#app',
+        data: {
+            imageUrl: 'http://gips3.baidu.com/it/u=3886271102,3123389489&fm=3028&app=3028&f=JPEG&fmt=auto?w=1280&h=960',
+            cls: "ig",
+            v1: true,
+            v2: false,
+            clsDict: {
+                info: true,
+                danger: true,
+            },
+            a1: "info",
+            a2: "danger",
+            clr: "red",
+            size: "19",
+        },
+        methods: {
+            clickMe: function () {
+                this.v1 = false;
+
+            }
+        }
+    })
+</script>
+</body>
+</html>
+```
+
+**v-bind注意：**
+
+- 简写的格式：`:属性名=xx`，例如：
+
+  ```
+  <h1 v-bind:class="v1"></h1>
+  <h1 :class="v1"></h1>
+  <img :src="xx" />
+  ```
+
+- v-bind属于单向绑定（JS修改->HTML修改）。
+
+### 2.3 v-model指令，双向绑定
+
+一般用于在交互的表中使用，例如：input、select、textarea等。【双向绑定】
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script src="vue.js"></script>
+</head>
+<body>
+<div id="app">
+    <div>
+        用户名：<input type="text" v-model="info.user">
+    </div>
+    <div>
+        密码：<input type="password" v-model="info.pwd">
+    </div>
+    <div>
+        性别：
+        <input type="radio" v-model="info.sex" value="1">男
+        <input type="radio" v-model="info.sex" value="2">女
+    </div>
+    <div>
+        爱好：
+        <input type="checkbox" v-model="info.hobby" value="11">篮球
+        <input type="checkbox" v-model="info.hobby" value="22">足球
+        <input type="checkbox" v-model="info.hobby" value="33">乒乓球
+    </div>
+    <div>
+        城市：
+        <select v-model="info.city">
+            <option value="sh">上海</option>
+            <option value="bj">北京</option>
+            <option value="sz">深圳</option>
+        </select>
+    </div>
+    <div>
+        擅长领域：
+        <select v-model="info.company" multiple>
+            <option value="11">技术</option>
+            <option value="22">销售</option>
+            <option value="33">运营</option>
+        </select>
+    </div>
+    <div>
+        其他：<textarea v-model="info.more"></textarea>
+    </div>
+    <input type="button" value="注 册" v-on:click="clickMe">
+</div>
+
+<script>
+    var app = new Vue({
+        el: '#app',
+        data: {
+            info: {
+                user: "",
+                pwd: "",
+                sex: "2",
+                hobby: ["22"],
+                city: "sz",
+                company: ["22", "33"],
+                more: '...'
+            }
+        },
+        methods: {
+            clickMe: function () {
+                console.log(this.info);
+            },
+        }
+    })
+</script>
+</body>
+</html>
+```
+
+### 2.4 v-for指令
+
+用户数据进行循环并展示
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script src="vue.js"></script>
+</head>
+<body>
+<div id="app">
+    <ul>
+        <li v-for="item in dataList">{{item}}</li>
+    </ul>
+    <ul>
+        <li v-for="(item,idx) in dataList">{{idx}} - {{item}}</li>
+    </ul>
+    <ul>
+        <li v-for="(value,key) in dataDict">{{key}} - {{value}}</li>
+    </ul>
+    <ul>
+        <li v-for="(item,idx) in cityList">{{item.id}} - {{item.text}}</li>
+    </ul>
+
+    <ul>
+        <li v-for="(item,idx) in cityList">
+            <span v-for="(value,key) in item"> {{key}} | {{value}}<br></span>
+        </li>
+    </ul>
+</div>
+
+<script>
+    var app = new Vue({
+        el: "#app",
+        data: {
+            dataList: ["郭德纲", "于谦", "三哥"],
+            dataDict: {
+                id: 1,
+                age: 18,
+                name: "xxx"
+            },
+            cityList: [
+                {id: 11, text: "上海"},
+                {id: 12, text: "北京"},
+                {id: 13, text: "深圳"},
+            ]
+        }
+    })
+</script>
+</body>
+</html>
+```
+
+### 2.5 v-on指令
+
+事件相关的指令,简写：@
+
+```html
+<!DOCTYPE html>
+<html lang="en" xmlns:v-on="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script src="vue.js"></script>
+</head>
+<body>
+<div id="app">
+    <ul>
+        <li v-on:click="clickMe">点击</li>
+        <li @click="clickMe">点击</li>
+        <li v-on:dblclick="doSomething('双击')">双击</li>
+        <li v-on:mouseover="doSomething('进入')" v-on:mouseout="doSomething('离开')">进入&离开</li>
+    </ul>
+</div>
+
+<script>
+    var app = new Vue({
+        el: "#app",
+        data: {},
+        methods: {
+            clickMe: function () {
+                alert("点击了")
+            },
+            doSomething: function (msg) {
+                console.log(msg)
+            }
+        }
+    })
+</script>
+</body>
+</html>
+```
+
+### 案例：数据管理
+
+数据的管理包括对数据：展示、动态添加、删除、修改
+
+- 数据展示
+
+  ```html
+  <!DOCTYPE html>
+  <html lang="en">
+  <head>
+      <meta charset="UTF-8">
+      <title>Title</title>
+      <script src="vue.js"></script>
+      <style>
+          .penal {
+              border: 1px solid #dddddd;
+              margin: 20px 0 0 0;
+              padding: 10px;
+              border-bottom: 0;
+              background-color: #d9d9d9;
+          }
+          .table{
+              width: 100%;
+              border-collapse: collapse;
+              border-spacing: 0;
+          }
+          .table>tbody>tr>td,.table>tbody>tr>th,.table>thead>tr>th {
+              padding: 8px;
+              vertical-align: top;
+              border:1px solid #ddd;
+              text-align: center;
+          }
+      </style>
+  </head>
+  <body>
+  <div id="app">
+      <h3 class="penal">数据列表</h3>
+      <table class="table">
+          <thead>
+          <tr>
+              <th>姓名</th>
+              <th>年龄</th>
+          </tr>
+          </thead>
+          <tbody>
+          <tr v-for="item in dataList">
+              <td>{{item.name}}</td>
+              <td>{{item.age}}</td>
+          </tr>
+          </tbody>
+      </table>
+  </div>
+  <script>
+      var app = new Vue({
+          el: "#app",
+          data: {
+              dataList: [
+                  {"name": "吴佩其", "age": 19},
+                  {"name": "alex", "age": 89},
+              ]
+          }
+      })
+  </script>
+  </body>
+  </html>
+  ```
+
+- 数据删除
+
+  ```python
+  <!DOCTYPE html>
+  <html lang="en">
+  <head>
+      <meta charset="UTF-8">
+      <title>Title</title>
+      <script src="vue.js"></script>
+      <style>
+          .penal {
+              border: 1px solid #dddddd;
+              margin: 20px 0 0 0;
+              padding: 10px;
+              border-bottom: 0;
+              background-color: #d9d9d9;
+          }
+  
+          .table {
+              width: 100%;
+              border-collapse: collapse;
+              border-spacing: 0;
+          }
+  
+          .table > tbody > tr > td, .table > tbody > tr > th, .table > thead > tr > th {
+              padding: 8px;
+              vertical-align: top;
+              border: 1px solid #ddd;
+              text-align: center;
+          }
+      </style>
+  </head>
+  <body>
+  <div id="app">
+  
+      <h3 class="penal">表单区域</h3>
+      <div>
+          <div>
+              <label>姓名</label>
+              <input type="text" v-model="user">
+          </div>
+          <div>
+              <label>年龄</label>
+              <input type="text" v-model="age"/>
+              <input type="button" value="新建" @click="addUser"/>
+          </div>
+  
+      </div>
+  
+  
+      <h3 class="penal">数据列表</h3>
+      <table class="table">
+          <thead>
+          <tr>
+              <th>姓名</th>
+              <th>年龄</th>
+              <th>操作</th>
+          </tr>
+          </thead>
+          <tbody>
+          <tr v-for="(item,idx) in dataList">
+              <td>{{item.name}}</td>
+              <td>{{item.age}}</td>
+              <td>
+  <!--                <input type="button" value="删除" @click="deleteRow(idx)"/>-->
+                  <input type="button" value="删除" @click="deleteRow" :data-idx="idx"/>
+              </td>
+          </tr>
+          </tbody>
+      </table>
+  </div>
+  <script>
+      var app = new Vue({
+          el: "#app",
+          data: {
+              user: "",
+              age: "",
+              dataList: [
+                  {name: "吴佩其", age: 19},
+                  {name: "alex", age: 89},
+              ]
+          },
+          methods: {
+              addUser: function () {
+                  let row = {name: this.user, age: this.age};
+                  this.dataList.push(row);
+                  this.user = "";
+                  this.age = "";
+              },
+              // deleteRow: function (idx) {
+              //     // 根据索引删除dataList中的值
+              //     this.dataList.splice(idx, 1);
+              // },
+              deleteRow: function (event) {
+                  // 根据索引删除dataList中的值
+                  console.log(event)
+                  let idx = event.target.dataset.idx;
+                  this.dataList.splice(idx, 1);
+              }
+          }
+      })
+  </script>
+  </body>
+  </html>
+  ```
+
+- 数据编辑
+
+  ```python
+  <!DOCTYPE html>
+  <html lang="en">
+  <head>
+      <meta charset="UTF-8">
+      <title>Title</title>
+      <script src="vue.js"></script>
+      <style>
+          .penal {
+              border: 1px solid #dddddd;
+              margin: 20px 0 0 0;
+              padding: 10px;
+              border-bottom: 0;
+              background-color: #d9d9d9;
+          }
+  
+          .table {
+              width: 100%;
+              border-collapse: collapse;
+              border-spacing: 0;
+          }
+  
+          .table > tbody > tr > td, .table > tbody > tr > th, .table > thead > tr > th {
+              padding: 8px;
+              vertical-align: top;
+              border: 1px solid #ddd;
+              text-align: center;
+          }
+      </style>
+  </head>
+  <body>
+  <div id="app">
+  
+      <h3 class="penal">表单区域</h3>
+      <div>
+          <div>
+              <label>姓名</label>
+              <input type="text" v-model="user">
+          </div>
+          <div>
+              <label>年龄</label>
+              <input type="text" v-model="age"/>
+              <input type="button" :value="title" @click="addUser"/>
+          </div>
+  
+      </div>
+  
+  
+      <h3 class="penal">数据列表</h3>
+      <table class="table">
+          <thead>
+          <tr>
+              <th>姓名</th>
+              <th>年龄</th>
+              <th>操作</th>
+          </tr>
+          </thead>
+          <tbody>
+          <tr v-for="(item,idx) in dataList">
+              <td>{{item.name}}</td>
+              <td>{{item.age}}</td>
+              <td>
+                  <!--                <input type="button" value="删除" @click="deleteRow(idx)"/>-->
+                  <input type="button" value="删除" @click="deleteRow" :data-idx="idx"/>
+                  <input type="button" value="编辑" @click="editRow" :data-idx="idx"/>
+              </td>
+          </tr>
+          </tbody>
+      </table>
+  </div>
+  <script>
+      var app = new Vue({
+          el: "#app",
+          data: {
+              editIndex: undefined,
+              title: "新建",
+              user: "",
+              age: "",
+              dataList: [
+                  {name: "吴佩其", age: 19},
+                  {name: "alex", age: 89},
+              ]
+          },
+          methods: {
+              addUser: function () {
+                  if (this.editIndex) {
+                      // 修改
+                      this.dataList[this.editIndex].name = this.user;
+                      this.dataList[this.editIndex].age = this.age;
+                  } else {
+                      // 新增
+                      let row = {name: this.user, age: this.age};
+                      this.dataList.push(row);
+                  }
+                  this.user = "";
+                  this.age = "";
+                  this.editIndex = undefined;
+                  this.title = "新建";
+              },
+              // deleteRow: function (idx) {
+              //     // 根据索引删除dataList中的值
+              //     this.dataList.splice(idx, 1);
+              // },
+              deleteRow: function (event) {
+                  // 根据索引删除dataList中的值
+                  console.log(event)
+                  let idx = event.target.dataset.idx;
+                  this.dataList.splice(idx, 1);
+              },
+              editRow: function (event) {
+                  let idx = event.target.dataset.idx;
+                  let {name, age} = this.dataList[idx];
+                  this.user = name
+                  this.age = age;
+                  this.title = "编辑";
+                  this.editIndex = idx;
+              }
+          }
+      })
+  </script>
+  </body>
+  </html>
+  ```
+
+### 2.6 v-if指令
+
+条件判断
+
+```python
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script src="vue.js"></script>
+</head>
+<body>
+<div id="app">
+    <a v-if="isLogin">{{user}}</a>
+    <a v-else>登录</a>
+
+    <h1 v-if="v1">阿里无人区</h1>
+
+    <h1 v-if="v2">去西藏</h1>
+    <h1 v-else>去新疆</h1>
+
+    <div v-if='v3 === "北京"'>
+        <h1>天安门</h1>
+    </div>
+    <div v-else-if='v3 === "新疆"'>
+        <h1>乌鲁木齐</h1>
+    </div>
+    <div v-else-if='v3 === "西藏"'>
+        <h1>拉萨</h1>
+    </div>
+    <div v-else>
+        <h1>大理</h1>
+    </div>
+</div>
+<script>
+     app = new Vue({
+        el: "#app",
+        data: {
+            isLogin: false,
+            user: "吴佩其",
+            v1: false,
+            v2: true,
+            v3: "新疆",
+        }
+    });
+</script>
+</body>
+</html>
+```
+
+### 2.7 v-show
+
+根据条件显示和隐藏（标签都会渲染到页面）
+
+```python
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script src="vue.js"></script>
+    <style>
+        label {
+            width: 60px;
+            display: inline-block;
+            text-align: right;
+            margin-right: 8px;
+        }
+    </style>
+</head>
+<body>
+<div id="app">
+    <h1 v-show="v1">可可西里</h1>
+    <h1 v-show="!v1">罗布泊</h1>
+
+    <input type="button" value="密码登录" @click="isSms=false"/>
+    <input type="button" value="短信登录" @click="isSms=true"/>
+
+    <div v-show="isSms">
+        <p>
+            <label>手机号</label>
+            <input type="text" placeholder="手机号"/>
+        </p>
+        <p>
+            <label>验证码</label>
+            <input type="text" placeholder="验证码"/>
+        </p>
+    </div>
+    <div v-show="!isSms">
+        <p>
+            <label>用户名</label>
+            <input type="text" placeholder="用户名">
+        </p>
+        <p>
+            <label>密码</label>
+            <input type="text" placeholder="密码">
+        </p>
+    </div>
+</div>
+<script>
+    app = new Vue({
+        el: "#app",
+        data: {
+            v1: false,
+            isSms: false,
+        }
+    });
+</script>
+</body>
+</html>
+```
+
+### axios库
+
+是一个HTTP库，发送Http请求
+
+使用 npm: 
+
+```
+$ npm install axios
+```
+
+使用 bower: 
+
+```
+$ bower install axios
+```
+
+使用 cdn: 
+
+```
+<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+```
+
+使用：
+
+```html
+<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+<script>
+    axios({
+        method:"post",
+        url:"https://api.luf...ord/login/",
+        params:{
+            v1:123,
+            v2:456
+        },
+        data:{
+            name:"吴佩其",
+            pwd:"123",
+        },
+        headers:{
+            "Content-Type":"application/json"
+        }
+    }).then(function(res){
+        console.log(res.data);
+    }).catch(function(error){
+        console.log(error);
+    })
+</script>
+```
+
+### 案例：用户登录
 
 
 

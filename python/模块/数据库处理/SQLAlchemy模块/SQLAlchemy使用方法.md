@@ -194,11 +194,14 @@ class Student(Base):
 student1 = Student(id=1001, name='ling', age=25, address="beijing")
 student2 = Student(id=1002, name='molin', age=18, address="jiangxi")
 student3 = Student(id=1003, name='karl', age=16, address="suzhou")
-
+# 也可以通过字典
 session.add_all([student1, student2, student3])
 session.commit()
 session.close()
+
 ```
+
+
 
 ## 1.8 查询
 

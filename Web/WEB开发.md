@@ -10168,6 +10168,104 @@ appcontext_popped = _signals.signal("appcontext-popped")
 message_flashed = _signals.signal("message-flashed")
 ```
 
+## 13 flask API扩展-restful
+
+**安装**
+
+```
+pip install Flask-RESTful
+```
+
+**最简单的使用**
+
+```
+from flask import Flask
+from flask_restful import Api,Resource
+
+app = Flask(__name__)
+api = Api(app)
+
+class HelloWorld(Resource):
+    def get(self):
+        return {'hello': 'world'}
+
+api.add_resource(HelloWorld, '/')
+
+if __name__ == '__main__':
+    app.run(debug=True)
+```
+
+**RESTFUL API的要素**
+
+![image-20240603162353608](imge/WEB开发.assets/image-20240603162353608.png)
+
+**添加路由**
+
+```
+from flask import Flask, request
+from flask_restful import Resource, Api
+
+app = Flask(__name__)
+api = Api(app)
+todos = {
+    "todo1": "Remember the milk"
+}
+
+
+class TodoSimple(Resource):
+    def get(self, todo_id):
+        print(todos)
+        return {todo_id: todos[todo_id]}
+
+    def put(self, todo_id):
+        todos[todo_id] = request.form['data']
+        return {todo_id: todos[todo_id]}
+
+
+class Todo1(Resource):
+    def get(self):
+        ## Default to 200 OK
+        return {'task': 'Hello world'}
+
+
+class Todo2(Resource):
+    def get(self):
+        ## Set the response code to 201
+        return {'task': 'Hello world'}, 201
+
+
+class Todo3(Resource):
+    def get(self):
+        ## Set the response code to 201 and return custom headers
+        return {'task': 'Hello world'}, 201, {'Etag': 'some-opaque-string'}
+
+
+api.add_resource(TodoSimple, '/<string:todo_id>')
+api.add_resource(Todo1, '/todo/1')
+api.add_resource(Todo2, '/todo/2')
+api.add_resource(Todo3, '/todo/3')
+if __name__ == '__main__':
+    app.run(debug=True)
+```
+
+**访问数据库**
+
+```
+sqlalchemy
+flask-sqlalchemy
+mysqlclient
+```
+
+
+
+
+
+
+
+
+
+
+
 ## VUE前端开发
 
 关于vue.js的版本

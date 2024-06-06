@@ -10273,196 +10273,161 @@ mysqlclient
 - vue2，经典版，绝大多数企业项目都使用vue2版本开发
 - vue3，新版本，未来趋势
 
-## 1.vue.js 初体验
+## VUE3.0准备工作
 
-基于vue.js框架来编写项目需要以下几个步骤：
+安装 node.js  https://nodejs.org/en/download/prebuilt-installer
 
-- 导入vue.js包（CDN）
+创建项目
 
-  ```html
-  <!-- 开发环境版本，包含了有帮助的命令行警告 -->
-  <script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js"></script>
-  
-  <!-- 生产环境版本，优化了尺寸和速度 -->
-  <script src="https://cdn.jsdelivr.net/npm/vue@2"></script>
-  
-  # 当然，也可以将文件下载下来再通过本地导入
+- cmd 运行
+
+  ```
+  npm create vue@latest
   ```
 
-- 应用
+  ![image-20240606151300298](imge/WEB开发.assets/image-20240606151300298.png)
 
-  ```html
-  <!DOCTYPE html>
-  <html lang="en">
-  <head>
-      <meta charset="UTF-8">
-      <title>Title</title>
-      <!--    1.引入vue.js文件-->
-      <!--    <script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js"></script>-->
-      <script src="vue.js"></script>
-  </head>
-  <body>
-  <!-- 2.指定区域，该区域的内容希望由vue.js来接管 -->
-  <div id="app">
-      <h1>欢迎学习Vue.js</h1>
-      <div>我叫{{ name }},微信{{wechat}}</div>
-      <input type="button" value="点我" v-on:click="clickMe">
-  </div>
-  
-  <script>
-      // 3.创建Vue对象，并关联指定HTML区域。
-      var app = new Vue({
-          el: '#app',
-          data: {
-              name: '吴佩其',
-              wechat: 'wupeiqi999'
-          },
-          methods: {
-              clickMe: function () {
-                  // 获取this.name
-                  // 修改this.name = 'xx'
-                  this.name = "alex";
-                  this.wechat = "wupeiqi6666";
-  
-              }
-          }
-      })
-  </script>
-  </body>
-  </html>
+- 安装依赖并启动服务器
+
+  ```
+  npm install
+  npm run dev
   ```
 
-  后期编写前端代码使用IDE：WebStom
+- 推荐IDE和工具
 
-## 2、vue常见指令
+  推荐的 IDE 配置是 [Visual Studio Code](https://code.visualstudio.com/) + [Vue - Official 扩展](https://marketplace.visualstudio.com/items?itemName=Vue.volar)
+
+## VUE项目目录结构
+
+![image-20240606153257567](imge/WEB开发.assets/image-20240606153257567.png)
+
+
+
+## vue常见指令
 
 想要使用vue.js开发，就必须学会vue.js中提供的指令。
 
-### 2.1 插值表达
+### 文本插值
 
-一般在显示文本内容的标签中使用。
+最基本的数据绑定形式是文本插值，它使用的是“Mustache”语法 (即双大括号)：
 
 ```html
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-    <script src="vue.js"></script>
-</head>
-<body>
-<div id="app">
-    <div>我叫{{name}}，我喜欢{{hobby}}，邮箱：{{dataInfo.email}}</div>
-    <ul>
-        <li>{{'李杰'}}</li>
-        <li>{{'李杰' + "土鳖"}}</li>
-        <li>{{base + 1 + 1}}</li>
-        <li>{{1==1 ? "李杰":"alex"}}</li>
-    </ul>
-    <ul>
-        <li>{{ condition?"李杰":"alex"}}</li>
-    </ul>
-    <input type="button" value="点我" v-on:click="clickMe">
-</div>
+<template>
+<h3>模板语法</h3>
+<p>{{ msg }}</p>
+<p>{{ hello }}</p>
+
+</template>
 
 <script>
-    var app = new Vue({
-        el: "#app",
-        data: {
-            name: '吴佩其',
-            hobby: '篮球',
-            dataInfo: {
-                id: 1,
-                email: "xxx.com"
-            },
-            condition: false,
-            base: 1
-        },
-        methods: {
-            clickMe: function () {
-                this.name = "范日天";
-                this.condition = true;
-                this.dataInfo.email = "wupeiqi@live.com";
-                this.base += 100;
-            }
-        }
-    })
+export default{
+  data(){
+    return{
+      msg:"神奇的语法",
+      hello:"hello word"
+    }
+  }
+}
 </script>
-</body>
-</html>
 ```
 
-### 2.2 v-bind指令，单向绑定
+### 使用 JavaScript 表达式
+
+每个绑定仅支持**单一表达式**，也就是一段能够被求值的 JavaScript 代码。一个简单的判断方法是是否可以合法地写在 `return` 后面。
+
+```
+<template>
+<h3>模板语法</h3>
+<h4>使用 JavaScript 表达式</h4>
+<p>{{ number + 1 }}</p>
+<p>{{ ok ? 'Yes':'No' }}</p>
+<p>{{ message.split("").reverse().join("") }}</p>
+</template>
+
+<script>
+export default{
+  data(){
+    return{
+      number:10,
+      ok:true,
+      message:"大家好",
+    }
+  }
+}
+</script>
+```
+
+**无效**：
+
+```
+<!-- 这是一个语句，而非表达式 -->
+{{ var a = 1 }}
+
+<!-- 条件控制也不支持，请使用三元表达式 -->
+{{ if (ok) { return message } }}
+```
+
+### v-html指令，原始 HTML
+
+双大括号会将数据解释为纯文本，而不是 HTML。若想插入 HTML，你需要使用 `v-html` 指令
+
+```
+<template>
+<h3>模板语法</h3>
+<p v-html="rawHtml"></p>
+</template>
+
+<script>
+export default{
+  data(){
+    return{
+      rawHtml:"<a href='https://www.baidu.com'>百度一下</a>"
+    }
+  }
+}
+</script>
+```
+
+### v-bind指令，属性绑定
 
 一般用于对标签中的属性进行操作
 
+`v-bind` 指令指示 Vue 将元素的  属性 与组件的 值 属性保持一致。如果绑定的值是 `null` 或者 `undefined`，那么该 属性 将会从渲染的元素上移除。
+
 ```python
-<!DOCTYPE html>
-<html lang="en" xmlns:v-bind="http://www.w3.org/1999/xhtml">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-    <script src="vue.js"></script>
-    <style>
-        .ig {
-            border: 2px solid red;
-            width: 20%;
-            height: 20%;
-        }
+<template>
+<h4>v-bind 指令</h4>
+<div v-bind:class="cls">属性绑定</div>
+<div :class="cls">简化属性绑定</div>
+<div :id="id">同名属性绑定</div>
+<div :id>简化同名属性绑定</div>
+<div v-bind:id>简化同名属性绑定</div>
 
-        .info {
-            color: red;
-        }
+<h5>v-bind 指令:布尔值</h5>
+<button :disabled="isButtonDisabled">Button</button>
+<button :disabled="! isButtonDisabled">Button</button>
 
-        .danger {
-            font-size: 10px;
-        }
-    </style>
-</head>
-<body>
-<div id="app">
-    <img src="xx.png" class="ig"/>
-    <img alt="" v-bind:src="imageUrl" v-bind:class="cls"/>
-    <!--    多个属性 -->
-    <h1 v-bind:class="{info:v1,danger:v2}">你好</h1>
-    <h1 v-bind:class="clsDict">clsDict</h1>
+<h5>v-bind 指令:动态绑定多个值</h5>
+<div v-bind="objectofAttrs">动态绑定多个值</div>
 
-    <h2 v-bind:class="[a1,a2]"> 数组 </h2>
-    <h2 v-bind:class="[1==1?a1:'y',a2]"> 三联表达式 </h2>
-
-    <h3 style="color: red;font-size: 19px">属性</h3>
-    <h3 v-bind:style="{color: clr,fontSize: size + 'px'}"> 动态属性 </h3>
-
-    <input type="button" value="点我" v-on:click="clickMe">
-</div>
+</template>
 
 <script>
-    var app = new Vue({
-        el: '#app',
-        data: {
-            imageUrl: 'http://gips3.baidu.com/it/u=3886271102,3123389489&fm=3028&app=3028&f=JPEG&fmt=auto?w=1280&h=960',
-            cls: "ig",
-            v1: true,
-            v2: false,
-            clsDict: {
-                info: true,
-                danger: true,
-            },
-            a1: "info",
-            a2: "danger",
-            clr: "red",
-            size: "19",
-        },
-        methods: {
-            clickMe: function () {
-                this.v1 = false;
-
-            }
-        }
-    })
+export default{
+  data(){
+    return{
+      cls:"active",
+      id:"appclass",
+      isButtonDisabled:false,
+      objectofAttrs:{
+          id: 'container  re',
+          class: 'wrapper'
+      }
+    }
+  }
+}
 </script>
-</body>
-</html>
 ```
 
 **v-bind注意：**
@@ -10555,61 +10520,80 @@ mysqlclient
 </html>
 ```
 
-### 2.4 v-for指令
+### v-for指令
 
-用户数据进行循环并展示
+用户数据进行循环并展示，我们可以使用 `v-for` 指令基于一个数组来渲染一个列表。`v-for` 指令的值需要使用 `item in items` 形式的特殊语法，其中 `items` 是源数据的数组，而 `item` 是迭代项的**别名**
 
 ```html
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-    <script src="vue.js"></script>
-</head>
-<body>
-<div id="app">
-    <ul>
-        <li v-for="item in dataList">{{item}}</li>
-    </ul>
-    <ul>
-        <li v-for="(item,idx) in dataList">{{idx}} - {{item}}</li>
-    </ul>
-    <ul>
-        <li v-for="(value,key) in dataDict">{{key}} - {{value}}</li>
-    </ul>
-    <ul>
-        <li v-for="(item,idx) in cityList">{{item.id}} - {{item.text}}</li>
-    </ul>
-
-    <ul>
-        <li v-for="(item,idx) in cityList">
-            <span v-for="(value,key) in item"> {{key}} | {{value}}<br></span>
-        </li>
-    </ul>
+<template>
+<hr>
+<h3>列表渲染</h3>
+<p v-for="item in names">{{ item }}</p>
+<h4>复杂数据</h4>
+<div v-for="item in result">
+    <p>{{ item.id }}</p>
+    <p>{{ item.title }}</p>
 </div>
 
+<h4>支持索引</h4>
+<p v-for="(item,index) in names">{{index}} - {{item}}</p>
+
+<h4>支持使用of代提in迭代</h4>
+<p v-for="(item,index) of names">{{index}} - {{item}}</p>
+
+
+<h4>遍历对象</h4>
+<p v-for="user of usefInfo">{{user}}</p>
+
+<p v-for="(value,key,index) of usefInfo">{{index}}-{{ key }}-{{ value }}</p>
+<p v-for="(value,key) of usefInfo">{{ key }}-{{ value }}</p>
+</template>
+
 <script>
-    var app = new Vue({
-        el: "#app",
-        data: {
-            dataList: ["郭德纲", "于谦", "三哥"],
-            dataDict: {
-                id: 1,
-                age: 18,
-                name: "xxx"
-            },
-            cityList: [
-                {id: 11, text: "上海"},
-                {id: 12, text: "北京"},
-                {id: 13, text: "深圳"},
-            ]
+export default{
+    data(){
+        return{
+            names:["百战程序员","尚学堂","IT"],
+            result:[
+                {
+                    "id":0,
+                    "title":"ceshi1",
+                    "avator":"备注1"
+                },
+                {
+                    "id":1,
+                    "title":"ceshi2",
+                    "avator":"备注2"
+                },
+                {
+                    "id":2,
+                    "title":"ceshi3",
+                    "avator":"备注3"
+                },
+            ],
+            usefInfo:{
+                name:"nam",
+                age:19,
+            }
         }
-    })
+    }
+}
 </script>
-</body>
-</html>
 ```
+
+#### 通过 key 管理状态
+
+Vue 默认按照“就地更新”的策略来更新通过 `v-for` 渲染的元素列表。当数据项的顺序改变时，Vue 不会随之移动 DOM 元素的顺序，而是就地更新每个元素，确保它们在原本指定的索引位置上渲染。
+
+为了给 Vue 一个提示，以便它可以跟踪每个节点的标识，从而重用和重新排序现有的元素，你需要为每个元素对应的块提供一个唯一的 `key` 属性
+
+
+
+
+
+
+
+
 
 ### 2.5 v-on指令
 
@@ -10950,58 +10934,48 @@ mysqlclient
   </html>
   ```
 
-### 2.6 v-if指令
+### v-if指令
 
-条件判断
+条件判断，`v-if` 指令会基于表达式值的真假来移除/插入该元素。
+
+- v-if
+- v-else
+- v-else-if
 
 ```python
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-    <script src="vue.js"></script>
-</head>
-<body>
-<div id="app">
-    <a v-if="isLogin">{{user}}</a>
-    <a v-else>登录</a>
+<template>
+<hr>
+<h4>条件渲染</h4>
+<h5> v-if ...</h5>
+<div v-if="flag">{{ flag}} 你能看见我</div>
 
-    <h1 v-if="v1">阿里无人区</h1>
+<h5> v-if ... v-else ... </h5>
+<div v-if="flag">{{ flag}} 你能看见我</div>
+<div v-else>{{ flag}} v-else</div>
 
-    <h1 v-if="v2">去西藏</h1>
-    <h1 v-else>去新疆</h1>
+<h5> v-if ... v-else-if ... v-else ...</h5>
+<div v-if="type==='A'">A</div>
+<div v-else-if = "type==='B'">B</div>
+<div v-else-if = "type==='C'">C</div>
+<div v-else>Not A/B/C</div>
 
-    <div v-if='v3 === "北京"'>
-        <h1>天安门</h1>
-    </div>
-    <div v-else-if='v3 === "新疆"'>
-        <h1>乌鲁木齐</h1>
-    </div>
-    <div v-else-if='v3 === "西藏"'>
-        <h1>拉萨</h1>
-    </div>
-    <div v-else>
-        <h1>大理</h1>
-    </div>
-</div>
+<h5> v-Show</h5>
+<div v-show="flag">{{ flag}} 你能看见我</div>
+</template>
+
 <script>
-     app = new Vue({
-        el: "#app",
-        data: {
-            isLogin: false,
-            user: "吴佩其",
-            v1: false,
-            v2: true,
-            v3: "新疆",
+export default {
+    data(){
+        return{
+            flag:true,
+            type:"A",
         }
-    });
+    }
+}
 </script>
-</body>
-</html>
 ```
 
-### 2.7 v-show
+### v-show
 
 根据条件显示和隐藏（标签都会渲染到页面）
 

@@ -10632,9 +10632,95 @@ export default{
 
 `key` 绑定的值期望是一个基础类型的值，例如字符串或 number 类型。不要用对象作为 `v-for` 的 key。
 
+#### 数组变化侦测
+
+##### 变更方法
+
+Vue 能够侦听响应式数组的变更方法，并在它们被调用时触发相关的更新。这些变更方法包括：
+
+- `push()`
+- `pop()`
+- `shift()`
+- `unshift()`
+- `splice()`
+- `sort()`
+- `reverse()`
+
+```
+<template>
+<h4>数组变化侦听</h4>
+<button @click="addListHandle">添加数据</button>
+<ul>
+    <li v-for="(item,index) of names" :key="index">{{ item }}</li>
+</ul>
+</template>
+
+<script>
+export default{
+    data(){
+        return{
+            names:["百战程序员","尚学堂","IT"],
+        }
+    },
+    methods:{
+        addListHandle(){
+            // 引起UI自动更新
+            this.names.push("sakura")
+            // 不会引起UI自动更新
+            //this.names.concat(["sakura3"])
+            //console.log(this.names.concat(["sakura3"]))
+        }
+    }
+}
+</script>
+```
+
+##### 替换一个数组
+
+变更方法，顾名思义，就是会对调用它们的原数组进行变更。相对地，也有一些不可变 (immutable) 方法，例如 `filter()`，`concat()` 和 `slice()`，这些都不会更改原数组，而总是**返回一个新数组**。当遇到的是非变更方法时，我们需要将旧的数组替换为新的：
+
+```
+<template>
+<h4>数组变化侦听</h4>
+<button @click="addListHandle">添加数据</button>
+<ul>
+    <li v-for="(item,index) of names" :key="index">{{ item }}</li>
+</ul>
+</template>
+
+<script>
+export default{
+    data(){
+        return{
+            names:["百战程序员","尚学堂","IT"],
+        }
+    },
+    methods:{
+        addListHandle(){
+            // 引起UI自动更新
+            // this.names.push("sakura")
+            // 不会引起UI自动更新
+            this.names.concat(["sakura3"])
+            console.log(this.names.concat(["sakura3"]))
+        }
+    }
+}
+</script>
+```
+
+### 计算属性
+
+模板中的表达式虽然方便，但也只能用来做简单的操作。如果在模板中写太多逻辑，会让模板变得臃肿，难以维护。比如说，我们有这样一个包含嵌套数组的对象：
 
 
-### 2.5 v-on指令，监听事件
+
+
+
+
+
+
+
+### v-on指令，监听事件
 
 我们可以使用 `v-on` 指令 (简写为 `@`) 来监听 DOM 事件，并在事件触发时执行对应的 JavaScript。用法：`v-on:click="handler"` 或 `@click="handler"`。
 

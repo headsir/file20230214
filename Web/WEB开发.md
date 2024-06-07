@@ -10520,7 +10520,7 @@ export default{
 </html>
 ```
 
-### v-for指令
+### v-for指令，列表渲染
 
 用户数据进行循环并展示，我们可以使用 `v-for` 指令基于一个数组来渲染一个列表。`v-for` 指令的值需要使用 `item in items` 形式的特殊语法，其中 `items` 是源数据的数组，而 `item` 是迭代项的**别名**
 
@@ -10587,6 +10587,198 @@ Vue 默认按照“就地更新”的策略来更新通过 `v-for` 渲染的元�
 
 为了给 Vue 一个提示，以便它可以跟踪每个节点的标识，从而重用和重新排序现有的元素，你需要为每个元素对应的块提供一个唯一的 `key` 属性
 
+```vue
+<template>
+<h4>Key属性添加到v-for中</h4>
+<!-- 不建议用index,因为index在对象变化时，会发生变化 -->
+<!-- 建议使用每条数据的唯一索引 -->
+<P v-for="(item,index) of names" :key="index">{{ item }}</P>
+<P v-for="item of result" :key="item.id">{{ item.title }}</P>
+</template>
+
+<script>
+export default{
+    data(){
+        return{
+            names:["百战程序员","尚学堂","IT"],
+            result:[
+                {
+                    "id":0,
+                    "title":"ceshi1",
+                    "avator":"备注1"
+                },
+                {
+                    "id":1,
+                    "title":"ceshi2",
+                    "avator":"备注2"
+                },
+                {
+                    "id":2,
+                    "title":"ceshi3",
+                    "avator":"备注3"
+                },
+            ],
+        }
+    }
+}
+</script>
+```
+
+==注意==
+
+`key` 在这里是一个通过 `v-bind` 绑定的特殊 attribute。
+
+推荐在任何可行的时候为 `v-for` 提供一个 `key` attribute。
+
+`key` 绑定的值期望是一个基础类型的值，例如字符串或 number 类型。不要用对象作为 `v-for` 的 key。
+
+
+
+### 2.5 v-on指令，监听事件
+
+我们可以使用 `v-on` 指令 (简写为 `@`) 来监听 DOM 事件，并在事件触发时执行对应的 JavaScript。用法：`v-on:click="handler"` 或 `@click="handler"`。
+
+事件处理器 (handler) 的值可以是：
+
+1. **内联事件处理器**：事件被触发时执行的内联 JavaScript 语句 (与 `onclick` 类似)。
+2. **方法事件处理器**：一个指向组件上定义的方法的属性名或是路径。
+
+#### 内联事件处理器
+
+内联事件处理器通常用于简单场景，例如：
+
+```vue
+<template>
+    <hr>
+<h3>事件监听</h3>
+<h4>内联事件处理器</h4>
+<button v-on:click="count++">Add</button>
+<p>{{count}}</p>
+</template>
+
+<script>
+export default {
+    data(){
+        return{
+            count:0,
+        }
+    }
+}
+</script>
+```
+
+##### 事件参数
+
+事件参数可以获取event对象和通过事件传递数据
+
+```vue
+<template>
+    <hr>
+    <h4>事件参数 event</h4>
+    <button v-on:click="addCount">Add</button>
+    <p>Count is: {{ count }}</p>
+
+    <h4>事件参数 传递参数</h4>
+    <p @click="getNameHandler(item)" v-for="(item,index) of names" :key="index">{{ item }}</p>
+
+    <h4>事件参数 传递参数过程中获取 event</h4>
+    <p @click="getNameHandler(item,$event)" v-for="(item,index) of names" :key="index">{{ item }}</p>
+
+</template>
+
+<script>
+export default {
+    data() {
+        return {
+            count: 0,
+            names: ["iwen", "ime", "frank"]
+        }
+    },
+    methods: {
+        // 获取event对象
+        addCount(e) {
+            // Vue中的event对象，就是原生JS的Event对象
+            e.target.innerHTML = "Add" + this.count
+            this.count += 1
+        },
+        // 传递参数，传递参数过程中获取 event
+        getNameHandler(name,e) {
+            console.log(name);
+            console.log(e);
+        }
+    }
+}
+</script>
+```
+
+#### 方法事件处理器
+
+随着事件处理器的逻辑变得愈发复杂，内联代码方式变得不够灵活。因此 `v-on` 也可以接受一个方法名或对某个方法的调用。
+
+```vue
+<template>
+<h4>方法事件处理器</h4>
+<button @click="">Add</button>
+<p>{{count}}</p>
+</template>
+
+<script>
+export default {
+    data(){
+        return{
+            count:0,
+        }
+    },
+    // 所有的方法或者函数都放在这里
+    methods:{
+        addCount(){
+            // 读取到data里面的数据的方案：this.count
+            this.count+=1
+        }
+    }
+}
+</script>
+```
+
+#### 事件修饰符
+
+在处理事件时调用 `event.preventDefault()` 或 `event.stopPropagation()` 是很常见的。尽管我们可以直接在方法内调用，但如果方法能更专注于数据逻辑而不用去处理 DOM 事件的细节会更好。
+
+为解决这一问题，Vue 为 `v-on` 提供了**事件修饰符**。修饰符是用 `.` 表示的指令后缀，包含以下这些：
+
+- `.stop`  阻止事件冒泡，子元素不触发父元素
+- `.prevent`  阻止默认事件
+- `.self`
+- `.capture`
+- `.once`  事件只会触发一次
+- `.passive`
+- `enter`  回车事件触发
+
+```vue
+<template>
+    <h4>事件修饰符</h4>
+    <!-- 点击默认跳转  -->
+     <!-- .preven 相当于 e.preventDefault() -->
+    <a @click.prevent="clickHandle" href="https://www.baidu.com">百度一下</a>
+
+</template>
+
+<script>
+export default {
+    data() {
+        return {
+        }
+    },
+    methods: {
+        clickHandle(e){
+            // 阻止默认事件
+            // e.preventDefault();
+            console.log("点击了");
+        }
+    }
+}
+</script>
+```
 
 
 
@@ -10595,9 +10787,8 @@ Vue 默认按照“就地更新”的策略来更新通过 `v-for` 渲染的元�
 
 
 
-### 2.5 v-on指令
 
-事件相关的指令,简写：@
+
 
 ```html
 <!DOCTYPE html>
@@ -10934,7 +11125,7 @@ Vue 默认按照“就地更新”的策略来更新通过 `v-for` 渲染的元�
   </html>
   ```
 
-### v-if指令
+### v-if指令，条件渲染
 
 条件判断，`v-if` 指令会基于表达式值的真假来移除/插入该元素。
 
@@ -10975,7 +11166,7 @@ export default {
 </script>
 ```
 
-### v-show
+### v-show指令，条件渲染
 
 根据条件显示和隐藏（标签都会渲染到页面）
 

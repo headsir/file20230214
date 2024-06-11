@@ -10442,63 +10442,67 @@ export default{
 
 - v-bind属于单向绑定（JS修改->HTML修改）。
 
-### 2.3 v-model指令，双向绑定
+### v-model指令，表单输入绑定
 
 一般用于在交互的表中使用，例如：input、select、textarea等。【双向绑定】
 
 ```html
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-    <script src="vue.js"></script>
-</head>
-<body>
-<div id="app">
+<template>
+    <hr>
+    <h3>表单输入绑定</h3>
+    <h4>输入框</h4>
+    <form>
+        <input type="text" v-model="message">
+        <p>{{ message }}</p>
+    </form>
+    <h4>其他</h4>
     <div>
-        用户名：<input type="text" v-model="info.user">
+        <div>
+            用户名：<input type="text" v-model="info.user">
+        </div>
+        <div>
+            密码：<input type="password" v-model="info.pwd">
+        </div>
+        <div>
+            性别：
+            <input type="radio" v-model="info.sex" value="1">男
+            <input type="radio" v-model="info.sex" value="2">女
+        </div>
+        <div>
+            爱好：
+            <input type="checkbox" v-model="info.hobby" value="11">篮球
+            <input type="checkbox" v-model="info.hobby" value="22">足球
+            <input type="checkbox" v-model="info.hobby" value="33">乒乓球
+        </div>
+        <div>
+            城市：
+            <select v-model="info.city">
+                <option value="sh">上海</option>
+                <option value="bj">北京</option>
+                <option value="sz">深圳</option>
+            </select>
+        </div>
+        <div>
+            擅长领域：
+            <select v-model="info.company" multiple>
+                <option value="11">技术</option>
+                <option value="22">销售</option>
+                <option value="33">运营</option>
+            </select>
+        </div>
+        <div>
+            其他：<textarea v-model="info.more"></textarea>
+        </div>
+        <input type="button" value="注 册" v-on:click="clickMe">
     </div>
-    <div>
-        密码：<input type="password" v-model="info.pwd">
-    </div>
-    <div>
-        性别：
-        <input type="radio" v-model="info.sex" value="1">男
-        <input type="radio" v-model="info.sex" value="2">女
-    </div>
-    <div>
-        爱好：
-        <input type="checkbox" v-model="info.hobby" value="11">篮球
-        <input type="checkbox" v-model="info.hobby" value="22">足球
-        <input type="checkbox" v-model="info.hobby" value="33">乒乓球
-    </div>
-    <div>
-        城市：
-        <select v-model="info.city">
-            <option value="sh">上海</option>
-            <option value="bj">北京</option>
-            <option value="sz">深圳</option>
-        </select>
-    </div>
-    <div>
-        擅长领域：
-        <select v-model="info.company" multiple>
-            <option value="11">技术</option>
-            <option value="22">销售</option>
-            <option value="33">运营</option>
-        </select>
-    </div>
-    <div>
-        其他：<textarea v-model="info.more"></textarea>
-    </div>
-    <input type="button" value="注 册" v-on:click="clickMe">
-</div>
+
+</template>
 
 <script>
-    var app = new Vue({
-        el: '#app',
-        data: {
+export default {
+    data() {
+        return {
+            message: "",
             info: {
                 user: "",
                 pwd: "",
@@ -10507,18 +10511,40 @@ export default{
                 city: "sz",
                 company: ["22", "33"],
                 more: '...'
-            }
-        },
-        methods: {
-            clickMe: function () {
-                console.log(this.info);
             },
         }
-    })
+    },
+    methods: {
+        clickMe: function () {
+            console.log(this.info);
+        },
+    }
+}
 </script>
-</body>
-</html>
 ```
+
+#### 修饰符
+
+##### `.lazy` 
+
+默认情况下，`v-model` 会在每次 `input` 事件后更新数据 (IME 拼字阶段的状态例外)。你可以添加 `lazy` 修饰符来改为在每次 `change` 事件后更新数据(失去焦点时)：
+
+```vue
+<!-- 在 "change" 事件后同步更新而不是 "input" -->
+<input v-model.lazy="msg" />
+```
+
+##### `.number`
+
+如果你想让用户输入自动转换为数字，你可以在 `v-model` 后添加 `.number` 修饰符来管理输入：
+
+
+
+##### `.trim`
+
+如果你想要默认自动去除用户输入内容中两端的空格，你可以在 `v-model` 后添加 `.trim` 修饰符：
+
+
 
 ### v-for指令，列表渲染
 
@@ -11005,7 +11031,7 @@ export default {
 
 - 方法：方法调用**总是**会在重渲染发生时再次执行函数。
 
-### Class 绑定
+### Class和style绑定
 
 数据绑定的一个常见需求场景是操纵元素的 CSS class 列表和内联样式。因为 `class` 和 `style` 都是 attribute，我们可以和其他 attribute 一样使用 `v-bind` 将它们和动态的字符串绑定。但是，在处理比较复杂的绑定时，通过拼接生成字符串是麻烦且易出错的。因此，Vue 专门为 `class` 和 `style` 的 `v-bind` 用法提供了特殊的功能增强。除了字符串外，表达式的值也可以是对象或数组。
 
@@ -11051,6 +11077,271 @@ export default {
 }
 </style>
 ```
+
+
+
+```vue
+<template>
+    <hr>
+    <h3>不推荐：Style绑定</h3>
+    <h4>绑定样式</h4>
+    <p :style="{ color: activeColor, fontSize: fontSize }">Style绑定</p>
+    <h4>绑定对象</h4>
+    <p :style="styleObject">Style绑定2</p>
+    <h4>绑定数组</h4>
+    <p :style="[styleObject]">Style绑定3</p>
+</template>
+
+<script>
+export default {
+    data() {
+        return {
+            activeColor: "green",
+            fontSize: '30px',
+            styleObject: {
+                color: 'red',
+                fontSize: '30px',
+            }
+        }
+    }
+}
+</script>
+```
+
+### 侦听器
+
+我们可以使用 `watch` 选项在每次响应式属性发生变化时触发一个函数。
+
+```vue
+<template>
+    <hr>
+    <h3>侦听器</h3>
+    <!-- 响应式数据 -->
+    <p>{{ message }}</p>
+    <button @click="updateHandle">修改数据</button>
+
+</template>
+
+<script>
+export default {
+    data() {
+        return {
+            message: "Hello"
+        }
+    },
+    methods: {
+        updateHandle() {
+            this.message = "World"
+        }
+    },
+    watch:{
+        // 与data里面的变量名保持一致
+        // newValue 改变之后的数据
+        // oldValue 改变之前的数据
+        message(newValue,oldValue){
+            console.log(newValue,oldValue);
+        }
+    }
+}
+
+</script>
+```
+
+### 模板引用-获取DOM操作
+
+虽然 Vue 的声明性渲染模型为你抽象了大部分对 DOM 的直接操作，但在某些情况下，我们仍然需要直接访问底层 DOM 元素。要实现这一点，我们可以使用特殊的 `ref` attribute：
+
+挂载结束后引用都会被暴露在 `this.$refs` 之上
+
+```vue
+<template>
+    <hr>
+    <h3>模板引用</h3>
+    <div ref="container" class="container">{{ content }}</div>
+    <input type="text" ref="username">
+    <button @click="getElementHandle"> 获取元素 </button>
+
+</template>
+
+<script>
+/**
+ * 内容改变：{{ 模板语法 }}
+ * 属性改变：v-bind:指令
+ * 事件：v-on:click
+ * 
+ * 如果没有特别的需求，不要操作DOM
+ */
+export default {
+    data() {
+        return {
+            content: "内容"
+        }
+    },
+    methods: {
+        getElementHandle() {
+            // innerHTML：原生JS的属性
+            this.$refs.container.innerHTML = "哈哈哈哈哈";
+            console.log(this.$refs.username.value);
+        }
+    }
+}
+
+</script>
+```
+
+## vue 组件
+
+组件最大的优势就是可复用性。
+
+当使用构建步骤时，我们一般会将 Vue 组件定义在一个单独的 `.vue` 文件中，这被叫做单文件组件 (简称 SFC)：
+
+**组件组成结构**
+
+```vue
+<template>
+<div class="container">{{ message }}</div>
+</template>
+<script>
+export default {
+    data(){
+        return{
+            message:"组件基础组成"
+        }
+    }
+}
+</script>
+
+<style>
+.container{
+    font-size: 30px;
+    color: red;
+}
+</style>
+```
+
+**引入组件**
+
+选项式
+
+![image-20240611174004706](imge/WEB开发.assets/image-20240611174004706.png)
+
+### 组件注册
+
+一个 Vue 组件在使用前需要先被“注册”，这样 Vue 才能在渲染模板时找到其对应的实现。组件注册有两种方式：全局注册和局部注册
+
+#### 全局注册
+
+在main.js文件中注册
+
+```vue
+
+import { createApp } from 'vue'
+import App from './App.vue'
+import Header from "./pages/Header.vue"
+
+const app = createApp(App)
+// 在这中间写组件的注册
+
+// 全局注册
+app.component("Header",Header)
+
+app.mount('#app')
+```
+
+#### 局部注册
+
+全局注册虽然很方便，但有以下几个问题：
+
+1. 全局注册，但并没有被使用的组件无法在生产打包时被自动移除 (也叫“tree-shaking”)。如果你全局注册了一个组件，即使它并没有被实际使用，它仍然会出现在打包后的 JS 文件中。
+2. 全局注册在大型项目中使项目的依赖关系变得不那么明确。在父组件中使用子组件时，不太容易定位子组件的实现。和使用过多的全局变量一样，这可能会影响应用长期的可维护性。
+
+相比之下，局部注册的组件需要在使用它的父组件中显式导入，并且只能在该父组件中使用。它的优点是使组件之间的依赖关系更加明确，并且对 tree-shaking 更加友好。
+
+局部注册需要使用 `components` 选项：
+
+```vue
+<template>
+    <div class="main">
+        <h3>Main</h3>
+        <Article />
+        <Article />
+    </div>
+</template>
+<script>
+import Article from "./Article.vue"
+export default {
+    components: {
+        Article
+    }
+}
+</script>
+<style scoped>
+.main {
+    float: left;
+    width: 70%;
+    height: 400px;
+    border: 5px solid #999;
+    box-sizing: border-box;
+    /* border-top: 0px; */
+}
+</style>
+```
+
+#### 组件传递数据__Props
+
+组件与组件之间不是完全独立的，而是有交集的，那就是组件与组件之间是可以传递数据的，传递数据的解决方案就是 props。
+
+**传递数据**
+
+```vue
+<template>
+    <h3>Parent</h3>
+    <Child title="Parent 数据" :model="message"/>
+</template>
+<script>
+  import Child from "./Child.vue"
+export default{
+  
+    data(){
+        return{
+            message:"Parent 数据!",
+        }
+    },
+    components:{
+        Child
+    }
+}
+</script>
+```
+
+**接收数据**
+
+```vue
+<template>
+    <h3>Child</h3>
+    <p>{{ title }}</p>
+    <p>{{ model }}</p>
+</template>
+<script>
+export default{
+    data(){
+        return{   
+        }
+    },
+    props:["title","model"]
+}
+</script>
+```
+
+> ==注意事项：==
+>
+> 所有的 props 都遵循着**单向绑定**原则，props 因父组件的更新而变化，自然地将新的状态向下流往子组件，而不会逆向传递。这避免了子组件意外修改父组件的状态的情况，不然应用的数据流将很容易变得混乱而难以理解。
+>
+> 另外，每次父组件更新后，所有的子组件中的 props 都会被更新到最新值，这意味着你**不应该**在子组件中去更改一个 prop。若你这么做了，Vue 会在控制台上向你抛出警告。
+
+
+
+
 
 
 

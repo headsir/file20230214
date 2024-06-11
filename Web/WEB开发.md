@@ -10708,18 +10708,6 @@ export default{
 </script>
 ```
 
-### 计算属性
-
-模板中的表达式虽然方便，但也只能用来做简单的操作。如果在模板中写太多逻辑，会让模板变得臃肿，难以维护。比如说，我们有这样一个包含嵌套数组的对象：
-
-
-
-
-
-
-
-
-
 ### v-on指令，监听事件
 
 我们可以使用 `v-on` 指令 (简写为 `@`) 来监听 DOM 事件，并在事件触发时执行对应的 JavaScript。用法：`v-on:click="handler"` 或 `@click="handler"`。
@@ -10866,11 +10854,203 @@ export default {
 </script>
 ```
 
+### v-if指令，条件渲染
 
+条件判断，`v-if` 指令会基于表达式值的真假来移除/插入该元素。
 
+- v-if
+- v-else
+- v-else-if
 
+```python
+<template>
+<hr>
+<h4>条件渲染</h4>
+<h5> v-if ...</h5>
+<div v-if="flag">{{ flag}} 你能看见我</div>
 
+<h5> v-if ... v-else ... </h5>
+<div v-if="flag">{{ flag}} 你能看见我</div>
+<div v-else>{{ flag}} v-else</div>
 
+<h5> v-if ... v-else-if ... v-else ...</h5>
+<div v-if="type==='A'">A</div>
+<div v-else-if = "type==='B'">B</div>
+<div v-else-if = "type==='C'">C</div>
+<div v-else>Not A/B/C</div>
+
+<h5> v-Show</h5>
+<div v-show="flag">{{ flag}} 你能看见我</div>
+</template>
+
+<script>
+export default {
+    data(){
+        return{
+            flag:true,
+            type:"A",
+        }
+    }
+}
+</script>
+```
+
+### v-show指令，条件渲染
+
+根据条件显示和隐藏（标签都会渲染到页面）
+
+```python
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script src="vue.js"></script>
+    <style>
+        label {
+            width: 60px;
+            display: inline-block;
+            text-align: right;
+            margin-right: 8px;
+        }
+    </style>
+</head>
+<body>
+<div id="app">
+    <h1 v-show="v1">可可西里</h1>
+    <h1 v-show="!v1">罗布泊</h1>
+
+    <input type="button" value="密码登录" @click="isSms=false"/>
+    <input type="button" value="短信登录" @click="isSms=true"/>
+
+    <div v-show="isSms">
+        <p>
+            <label>手机号</label>
+            <input type="text" placeholder="手机号"/>
+        </p>
+        <p>
+            <label>验证码</label>
+            <input type="text" placeholder="验证码"/>
+        </p>
+    </div>
+    <div v-show="!isSms">
+        <p>
+            <label>用户名</label>
+            <input type="text" placeholder="用户名">
+        </p>
+        <p>
+            <label>密码</label>
+            <input type="text" placeholder="密码">
+        </p>
+    </div>
+</div>
+<script>
+    app = new Vue({
+        el: "#app",
+        data: {
+            v1: false,
+            isSms: false,
+        }
+    });
+</script>
+</body>
+</html>
+```
+
+### 计算属性
+
+模板中的表达式虽然方便，但也只能用来做简单的操作。如果在模板中写太多逻辑，会让模板变得臃肿，难以维护。
+
+```
+<template>
+    <hr>
+    <h3>计算属性</h3>
+    <p>{{ itbaizhan.name }}</p>
+    <h4>未使用计算属性</h4>
+    <p>{{ itbaizhan.content.length > 0 ? "Yes" : "No" }}</p>
+    <h4>使用计算属性</h4>
+    <p>{{ itbaizhanContent }}</p>
+    <h4>使用函数</h4>
+    <p>{{ itbaizhanContents() }}</p>
+</template>
+<script>
+export default {
+    data() {
+        return {
+            itbaizhan: {
+                name: "百战程序员",
+                content: ["前端", "Java", "python"]
+            }
+        }
+    },
+    // 计算属性
+    computed: {
+        itbaizhanContent() {
+            return this.itbaizhan.content.length > 0 ? "Yes" : "No"
+        },
+    },
+    // 函数或者方法
+    methods: {
+        itbaizhanContents() {
+            return this.itbaizhan.content.length > 0 ? "Yes" : "No"
+        },
+    }
+}
+</script>
+```
+
+**区别：**
+
+- 计算属性：**计算属性值会基于其响应式依赖被缓存**。一个计算属性仅会在其响应式依赖更新时才重新计算。
+
+- 方法：方法调用**总是**会在重渲染发生时再次执行函数。
+
+### Class 绑定
+
+数据绑定的一个常见需求场景是操纵元素的 CSS class 列表和内联样式。因为 `class` 和 `style` 都是 attribute，我们可以和其他 attribute 一样使用 `v-bind` 将它们和动态的字符串绑定。但是，在处理比较复杂的绑定时，通过拼接生成字符串是麻烦且易出错的。因此，Vue 专门为 `class` 和 `style` 的 `v-bind` 用法提供了特殊的功能增强。除了字符串外，表达式的值也可以是对象或数组。
+
+```vue
+<template>
+    <br>
+    <h3>Class样式绑定</h3>
+    <p :class="{ 'active': isActive, 'text-danger': hasError }">样式</p>
+    <h4>多个对象绑定</h4>
+    <p :class="classObject">多个对象绑定</p>
+    <h4>绑定数组</h4>
+    <p :class="[arrActive,arrHasError]">绑定数组</p>
+    <p :class="[isActive ? 'active':'text-danger']">绑定数组 根据条件渲染</p>
+    <h4>数组和对象嵌套</h4>
+    <p :class="[{'active':isActive},arrHasError]">绑定数组 根据条件渲染</p>
+
+</template>
+
+<script>
+export default {
+    data() {
+        return {
+            isActive: true,
+            hasError: true,
+            classObject:{
+                'active': true,
+                'text-danger': true,
+            },
+            arrActive:"active",
+            arrHasError: 'text-danger',
+        }
+    }
+}
+</script>
+
+<style>
+.active {
+    font-size: 30px;
+}
+
+.text-danger {
+    color: red;
+}
+</style>
+```
 
 
 
@@ -11210,109 +11390,6 @@ export default {
   </body>
   </html>
   ```
-
-### v-if指令，条件渲染
-
-条件判断，`v-if` 指令会基于表达式值的真假来移除/插入该元素。
-
-- v-if
-- v-else
-- v-else-if
-
-```python
-<template>
-<hr>
-<h4>条件渲染</h4>
-<h5> v-if ...</h5>
-<div v-if="flag">{{ flag}} 你能看见我</div>
-
-<h5> v-if ... v-else ... </h5>
-<div v-if="flag">{{ flag}} 你能看见我</div>
-<div v-else>{{ flag}} v-else</div>
-
-<h5> v-if ... v-else-if ... v-else ...</h5>
-<div v-if="type==='A'">A</div>
-<div v-else-if = "type==='B'">B</div>
-<div v-else-if = "type==='C'">C</div>
-<div v-else>Not A/B/C</div>
-
-<h5> v-Show</h5>
-<div v-show="flag">{{ flag}} 你能看见我</div>
-</template>
-
-<script>
-export default {
-    data(){
-        return{
-            flag:true,
-            type:"A",
-        }
-    }
-}
-</script>
-```
-
-### v-show指令，条件渲染
-
-根据条件显示和隐藏（标签都会渲染到页面）
-
-```python
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-    <script src="vue.js"></script>
-    <style>
-        label {
-            width: 60px;
-            display: inline-block;
-            text-align: right;
-            margin-right: 8px;
-        }
-    </style>
-</head>
-<body>
-<div id="app">
-    <h1 v-show="v1">可可西里</h1>
-    <h1 v-show="!v1">罗布泊</h1>
-
-    <input type="button" value="密码登录" @click="isSms=false"/>
-    <input type="button" value="短信登录" @click="isSms=true"/>
-
-    <div v-show="isSms">
-        <p>
-            <label>手机号</label>
-            <input type="text" placeholder="手机号"/>
-        </p>
-        <p>
-            <label>验证码</label>
-            <input type="text" placeholder="验证码"/>
-        </p>
-    </div>
-    <div v-show="!isSms">
-        <p>
-            <label>用户名</label>
-            <input type="text" placeholder="用户名">
-        </p>
-        <p>
-            <label>密码</label>
-            <input type="text" placeholder="密码">
-        </p>
-    </div>
-</div>
-<script>
-    app = new Vue({
-        el: "#app",
-        data: {
-            v1: false,
-            isSms: false,
-        }
-    });
-</script>
-</body>
-</html>
-```
 
 ### axios库
 

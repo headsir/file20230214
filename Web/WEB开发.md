@@ -11371,7 +11371,7 @@ export default {
 - **Array **
 - **Object **
 - **Boolean**
-- **function**
+- **Function**
 
 ##### Prop 校验
 

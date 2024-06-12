@@ -11287,7 +11287,9 @@ export default {
 </style>
 ```
 
-#### 组件传递数据__Props
+### 组件传递数据__Props
+
+**父传子**
 
 组件与组件之间不是完全独立的，而是有交集的，那就是组件与组件之间是可以传递数据的，传递数据的解决方案就是 props。
 
@@ -11296,7 +11298,7 @@ export default {
 ```vue
 <template>
     <h3>Parent</h3>
-    <Child title="Parent 数据" :model="message"/>
+    <Child title="Parent 数据" :model="message" :age="age" :names="names" :userInfo="userInfo"  :bool="bool"/>
 </template>
 <script>
   import Child from "./Child.vue"
@@ -11304,7 +11306,19 @@ export default{
   
     data(){
         return{
+            // 字符串
             message:"Parent 数据!",
+            // 数字类型
+            age:20,
+            // 数组类型
+            names:["iwen","imm","flask"],
+            // 对象类型
+            userInfo:{
+                name:"iwen",
+                age:20
+            },
+            // 布尔值类型
+            bool:false
         }
     },
     components:{
@@ -11321,14 +11335,22 @@ export default{
     <h3>Child</h3>
     <p>{{ title }}</p>
     <p>{{ model }}</p>
+    <p>{{ age }}</p>
+    <ul>
+        <li v-for="(item, index) of names" :key="index">{{ item }}</li>
+    </ul>
+    <p>{{ userInfo.name }}</p>
+    <p>{{ userInfo.age }}</p>
+    <p v-if="bool">bool 为 {{bool}}</p>
+    <p v-else>bool 为 {{ bool }}</p>
 </template>
 <script>
-export default{
-    data(){
-        return{   
+export default {
+    data() {
+        return {
         }
     },
-    props:["title","model"]
+    props: ["title", "model", "age", "names", "userInfo","bool"]
 }
 </script>
 ```
@@ -11338,6 +11360,59 @@ export default{
 > 所有的 props 都遵循着**单向绑定**原则，props 因父组件的更新而变化，自然地将新的状态向下流往子组件，而不会逆向传递。这避免了子组件意外修改父组件的状态的情况，不然应用的数据流将很容易变得混乱而难以理解。
 >
 > 另外，每次父组件更新后，所有的子组件中的 props 都会被更新到最新值，这意味着你**不应该**在子组件中去更改一个 prop。若你这么做了，Vue 会在控制台上向你抛出警告。
+
+##### 传递不同的值类型
+
+**任何**类型的值都可以作为 props 的值被传递。
+
+- **String**
+- **Number**
+
+- **Array **
+- **Object **
+- **Boolean**
+
+##### Prop 校验
+
+Vue 组件可以更细致地声明对传入的 props 的校验要求。
+
+- 类型校验
+- 默认值
+- 必选项
+
+```vue
+ props: {
+        title: {
+            type: [String, Number],
+            // 必选项
+            require:true
+        },
+        age: {
+            type: Number,
+            // 默认值,数字和字符串可以直接default,
+            // 但是如果是数组和对象，必须通过工厂函数返回默认值
+            default: 0
+        },
+        names:{
+            type:Array,
+            default(){
+                return ["空"]
+            }
+        }
+    }
+```
+
+### 组件事件_$emit
+
+**子传父**
+
+在组件的模板表达式中，可以直接使用 `$emit` 方法触发自定义事件
+
+触发自定义事件的目的是组件之间传递数据
+
+
+
+
 
 
 

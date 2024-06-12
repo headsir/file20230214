@@ -208,7 +208,7 @@ local_settings.py
 
 ![image-20230128114714232](imge/Python学习.assets/image-20230128114714232.png)
 
-### 2.4.1 python 配置
+### 2.4.2 python 配置
 
 #### 1、安装python 插件
 
@@ -257,6 +257,12 @@ indent-rainbow 缩进渲染
 "python"
 ]
 ```
+
+### 2.4.3 创建虚拟环境
+
+![image-20240612165100604](imge/Python学习.assets/image-20240612165100604.png)
+
+
 
 # 三、基本概念
 

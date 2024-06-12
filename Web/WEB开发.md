@@ -11371,6 +11371,7 @@ export default {
 - **Array **
 - **Object **
 - **Boolean**
+- **function**
 
 ##### Prop 校验
 
@@ -11409,6 +11410,112 @@ Vue 组件可以更细致地声明对传入的 props 的校验要求。
 在组件的模板表达式中，可以直接使用 `$emit` 方法触发自定义事件
 
 触发自定义事件的目的是组件之间传递数据
+
+**父组件**
+
+```vue
+<template>
+    <hr>
+    <h3>组件事件</h3>
+    <Child @someEvent="getHandle" />
+    <p>父元素：{{ message }}</p>
+</template>
+<script>
+import Child from "./Child.vue"
+export default {
+    data() {
+        return {
+            message: ""
+        }
+    },
+    components: {
+        Child
+    },
+    methods: {
+        getHandle(data) {
+            console.log("触发了", data)
+            this.message = data
+        }
+    }
+}
+</script>
+```
+
+**子组件**
+
+```vue
+<template>
+    <h3>Child</h3>
+    <button @click="clickEventHandle">传递数据</button>
+</template>
+<script>
+export default {
+    data(){
+        return{
+            
+        }
+    },
+    methods:{
+        // 自定义事件
+        clickEventHandle(){
+            this.$emit("someEvent","Child数据")
+        }
+    }
+}
+</script>
+```
+
+### 组件 v-model
+
+```vue
+<template>
+    <hr>
+    <h3>Main</h3>
+    <p>搜索数据：{{ search }}</p>
+    <SearchComponent @searchEvent="getSearch" />
+</template>
+<script>
+import SearchComponent from './SearchComponent.vue';
+export default {
+    data() {
+        return {
+            search: ""
+        }
+    },
+    components: {
+        SearchComponent
+    },
+    methods: {
+        getSearch(data) {
+            this.search = data;
+        }
+    }
+}
+</script>
+```
+
+
+
+```vue
+<template>
+    搜素：<input type="text" v-model="search">
+</template>
+<script>
+export default {
+    data() {
+        return {
+            search: ""
+        }
+    },
+    // 侦听器
+    watch:{
+        search(newValue,oldValue){
+            this.$emit("searchEvent",newValue)
+        }
+    }
+}
+</script>
+```
 
 
 

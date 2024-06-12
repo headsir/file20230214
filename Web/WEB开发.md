@@ -11297,32 +11297,42 @@ export default {
 
 ```vue
 <template>
+    <hr>
     <h3>Parent</h3>
-    <Child title="Parent 数据" :model="message" :age="age" :names="names" :userInfo="userInfo"  :bool="bool"/>
+    <Child title="Parent 数据" :model="message" :age="age" :names="names" :userInfo="userInfo" :bool="bool"
+        :onEvent="dataFn" />
+        <p>父元素：{{ function1 }}</p>
 </template>
 <script>
-  import Child from "./Child.vue"
-export default{
-  
-    data(){
-        return{
+import Child from "./Child.vue"
+export default {
+    data() {
+        return {
             // 字符串
-            message:"Parent 数据!",
+            message: "Parent 数据!",
             // 数字类型
-            age:20,
+            age: 20,
             // 数组类型
-            names:["iwen","imm","flask"],
+            names: ["iwen", "imm", "flask"],
             // 对象类型
-            userInfo:{
-                name:"iwen",
-                age:20
+            userInfo: {
+                name: "iwen",
+                age: 20
             },
             // 布尔值类型
-            bool:false
+            bool: false,
+            function1: "",
         }
     },
-    components:{
+    components: {
         Child
+    },
+    methods: {
+        // 间接实现了 子传父的操作
+        dataFn(data) {
+            console.log(data);
+            this.function1 = data
+        }
     }
 }
 </script>
@@ -11341,16 +11351,26 @@ export default{
     </ul>
     <p>{{ userInfo.name }}</p>
     <p>{{ userInfo.age }}</p>
-    <p v-if="bool">bool 为 {{bool}}</p>
+    <p v-if="bool">bool 为 {{ bool }}</p>
     <p v-else>bool 为 {{ bool }}</p>
+    <p>{{ onEvent('传递数据') }}</p>
 </template>
 <script>
 export default {
     data() {
         return {
+
         }
     },
-    props: ["title", "model", "age", "names", "userInfo","bool"]
+    props: {
+        title:String, 
+        model:String, 
+        age:Number, 
+        names:Array, 
+        userInfo:Object, 
+        bool:Boolean,
+        onEvent:Function
+    }
 }
 </script>
 ```
@@ -11493,6 +11513,22 @@ export default {
 }
 </script>
 ```
+
+### 透传 Attributes
+
+“透传 attribute”指的是传递给一个组件，却没有被该组件声明为 props或 emits的 attribute 或者 `v-on` 事件监听器。最常见的例子就是 `class`、`style` 和 `id`。
+
+当一个组件以单个元素为根作渲染时，透传的 attribute 会自动被添加到根元素上
+
+**基本不用**
+
+### 插槽 Slots
+
+组件能够接收任意类型的 JavaScript 值作为 props，但组件要如何接收模板内容呢？在某些场景中，我们可能想要为子组件传递一些模板片段，让子组件在它们的组件中渲染这些片段。
+
+
+
+
 
 
 

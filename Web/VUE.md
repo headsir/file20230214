@@ -36,7 +36,7 @@
 
 
 
-## vue常见指令
+## vue基础
 
 想要使用vue.js开发，就必须学会vue.js中提供的指令。
 
@@ -1383,7 +1383,7 @@ export default {
         <template v-slot:header>
             <p>具名插槽header</p>
         </template>
-        <template v-slot:main>
+        <template #main>
             <p>具名插槽main</p>
         </template>
     </SlotsTow>
@@ -1456,15 +1456,95 @@ export default {
 </script>
 ```
 
+### 组件生命周期
+
+每个 Vue 组件实例在创建时都需要经历一系列的初始化步骤，比如设置好数据侦听，编译模板，挂载实例到 DOM，以及在数据改变时更新 DOM。在此过程中，它也会运行被称为生命周期钩子的函数，让开发者有机会在特定阶段运行自己的代码。
+
+![image-20240617162243246](imge/VUE.assets/image-20240617162243246.png)
 
 
 
+```vue
+<template>
+    <h3>组件的生命周期</h3>
+    <p>{{ message }}</p>
+    <button @click="updateHabdle">更新数据</button>
+</template>
+<script>
+/**
+ *  生命周期函数
+ *      创建期：beforeCreate    created
+ *      挂载期：beforeMounte    mounted
+ *      更新期：beforeUpdate    updated
+ *      销毁期：beforeUnmount   unmounted
+ */
 
+export default {
+    data() {
+        return {
+            message: "更新之前",
+        }
+    },
+    methods: {
+        updateHabdle() {
+            this.message = "更新之后"
+        }
+    },
+    beforeCreate() {
+        console.log("组件创建之前");
+    },
+    created() {
+        console.log("组件创建之后");
+    },
+    beforeMount() {
+        console.log("组件渲染之前");
+    },
+    mounted() {
+        console.log("组件渲染之后");
+    },
+    beforeUpdate() {
+        console.log("组件更新之前");
+    },
+    updated() {
+        console.log("组件更新之后");
+    },
+    beforeUnmount() {
+        console.log("组件销毁之前");
+    },
+    unmounted() {
+        console.log("组件销毁之后");
+    }
+}
+</script>
+```
 
+#### 生命周期应用
 
+常用应用：
 
+- 通过ref获取元素DOM结构
+- 模拟网络请求渲染数据
 
+##### 通过ref获取元素DOM结构
 
+```vue
+<template>
+    <h3>组件生命周期函数应用</h3>
+    <p ref="name">百战程序员</p>
+</template>
+<script>
+export default{
+    beforeMount(){
+        console.log(this.$refs.name);  // undefined
+    },
+    mounted(){
+        console.log(this.$refs.name);
+    },
+}
+</script>
+```
+
+##### 模拟网络请求渲染数据
 
 
 

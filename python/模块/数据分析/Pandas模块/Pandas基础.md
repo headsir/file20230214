@@ -1260,6 +1260,10 @@ print(df.sort_values(by=["二", "四"], ascending=[True, False]))
   
     ```python
     df.insert(0, "确认是否起租", "")
+    
+    # 将列'B'插入到第二个位置（即'A'之后）
+    df.insert(1, 'B', df.pop('B'))
+    print(df)
     ```
   
   - 索引方式插入列：举例：df["新列列名"] = [插入列数据]

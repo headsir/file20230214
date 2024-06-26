@@ -69,6 +69,11 @@
 
 ![image-20240626141326533](imge/VSCode使用.assets/image-20240626141326533.png)
 
+```
+// 启用black格式化插件
+"editor.defaultFormatter": "ms-python.black-formatter",
+```
+
 
 
 

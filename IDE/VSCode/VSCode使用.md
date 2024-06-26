@@ -63,7 +63,11 @@
 ]
 ```
 
+## Black Formatter
 
+自动格式化 Python 代码，不好用
+
+![image-20240626141326533](imge/VSCode使用.assets/image-20240626141326533.png)
 
 
 

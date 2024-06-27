@@ -8020,8 +8020,6 @@ def login():
 <title>Flask消息闪现</title>
 </head>
    <body>
-
-
          {% with messages = get_flashed_messages() %}
           {% if messages %}
             <ul class=flashes>

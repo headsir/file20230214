@@ -1093,6 +1093,14 @@ df1.reset_index(drop = True)
   df = df[df["确认是否起租"].isna()]
   ```
 
+- contains()，筛选特定字符
+
+  ```
+  df = df[df["列名"].str.contains('a')]
+  ```
+
+  
+
 ### 4.3 行列同时选择
 
 #### 4.3.1 普通索引 + 普通索引

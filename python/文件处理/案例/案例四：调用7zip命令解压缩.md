@@ -1,6 +1,6 @@
 ## python调用7zip命令密码解压缩
 
-更新与20230531
+更新于20230531,20240719微调
 
 ```
 # coding = utf-8
@@ -58,13 +58,17 @@ class Call7Z:
                 # 拼接解压缩命令
                 sysstr = "\"" + self.zipSysDir + "\"" + " x " + "\"" + filepath + "\"" + " -o" + "\"" + outpath + "\"" + " -p" + password
                 # 执行解压缩命令
-                os.popen(sysstr)
+                # os.popen(sysstr)
+                # 20240719 优化代码
+                import subprocess
+                subprocess.run(sys_str, stdout=subprocess.PIPE)
             else:
                 files_er.append(file)
                 # print(f"{str(files_er)}不能解压缩")
                 # continue
-        # 抛出错误
-        raise Exception(f"{str(files_er)}不能解压缩")
+        if files_er:
+            # 抛出错误
+            raise Exception(f"{str(files_er)}不能解压缩")
 
     # 压缩
     def compress(self, outfile, *inputpath):
@@ -91,3 +95,13 @@ if __name__ == '__main__':
         print(e)
 
 ```
+
+更新与20240719
+
+优化了 解压缩，解压缩未完成 程序阻塞
+
+```
+import subprocess
+subprocess.run(sys_str, stdout=subprocess.PIPE)
+```
+

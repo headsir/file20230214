@@ -131,3 +131,62 @@ Ctrl + D 添加下一个匹配项
 
 ![image-20240626091258848](imge/VSCode使用.assets/image-20240626091258848-17193643807471.png)
 
+
+
+# git 使用
+
+### 配置git.exe
+
+注：不能配置到项目目录下，配置在用户配置下
+
+![image-20240719102446177](imge/VSCode使用.assets/image-20240719102446177.png)
+
+![image-20240719102518278](imge/VSCode使用.assets/image-20240719102518278.png)
+
+### 配置本地仓库
+
+![image-20240719102913129](imge/VSCode使用.assets/image-20240719102913129.png)
+
+![image-20240719102938241](imge/VSCode使用.assets/image-20240719102938241.png)
+
+### 配置远程仓库
+
+![image-20240719103325250](imge/VSCode使用.assets/image-20240719103325250.png)
+
+![image-20240719103412640](imge/VSCode使用.assets/image-20240719103412640.png)
+
+### 项目配置文件
+
+.gitignore
+
+忽略提交
+
+```
+# pycharm 自动生成的目录
+.idea/
+
+# python缓存文件
+__pycache__/
+*.py[cod]
+*.$py.calss
+
+# 配置文件
+.vscode
+.gitignore
+# 数据文件
+*.db
+
+# Django stuff:
+local_settings.py
+*.sqlite3
+
+# database migrations
+**/migrations/*.py
+!**/migrations/__init__.py
+
+# 临时文件
+1.*
+*.xlsx
+项目不相关文件，临时
+```
+

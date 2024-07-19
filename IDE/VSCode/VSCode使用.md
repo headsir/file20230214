@@ -157,7 +157,7 @@ Ctrl + D 添加下一个匹配项
 
 ### 项目配置文件
 
-.gitignore
+`.gitignore`
 
 忽略提交
 

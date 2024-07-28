@@ -7,14 +7,20 @@
 
 ## VUE3.0准备工作
 
-安装 node.js  https://nodejs.org/en/download/prebuilt-installer
+### 安装 node.js
 
-创建项目
+下载地址  https://nodejs.org/en/download/prebuilt-installer
+
+![image-20240728214343917](imge/VUE.assets/image-20240728214343917.png)
+
+### 创建项目
 
 - cmd 运行
 
   ```
-  npm create vue@latest
+  # 两种方式
+  npm create vue@latest  推荐
+  npm init vite@latest
   ```
 
   ![image-20240606151300298](imge/VUE.assets/image-20240606151300298.png)
@@ -30,9 +36,46 @@
 
   推荐的 IDE 配置是 [Visual Studio Code](https://code.visualstudio.com/) + [Vue - Official 扩展](https://marketplace.visualstudio.com/items?itemName=Vue.volar)
 
+### 项目打包
+
+```
+npm run build
+```
+
+## nginx 部署
+
+### 下载 nginx
+
+下载地址：https://nginx.org/en/download.html
+
+### 使用：解压缩
+
+### 服务器简单配置
+
+![image-20240728225631977](imge/VUE.assets/image-20240728225631977.png)
+
 ## VUE项目目录结构
 
 ![image-20240606153257567](imge/VUE.assets/image-20240606153257567.png)
+
+## VUE修改端口
+
+vite.config.js
+
+```javascript
+import { defineConfig } from 'vite'
+import vue from '@vitejs/plugin-vue'
+
+// https://vitejs.dev/config/
+export default defineConfig({
+  plugins: [vue()],
+  server:{
+    host:'0.0.0.0',
+    port:8088,
+    open:true  // 启动后打开浏览器
+  }
+})
+```
 
 
 
@@ -840,7 +883,7 @@ export default {
 </script>
 ```
 
-### 侦听器
+### 侦听器-watch
 
 我们可以使用 `watch` 选项在每次响应式属性发生变化时触发一个函数。
 
@@ -879,7 +922,7 @@ export default {
 </script>
 ```
 
-### 模板引用-获取DOM操作
+### 模板引用-获取DOM操作-ref
 
 虽然 Vue 的声明性渲染模型为你抽象了大部分对 DOM 的直接操作，但在某些情况下，我们仍然需要直接访问底层 DOM 元素。要实现这一点，我们可以使用特殊的 `ref` attribute：
 
@@ -1546,7 +1589,174 @@ export default{
 
 ##### 模拟网络请求渲染数据
 
+```html
+<template>
+    <h3>组件生命周期函数应用</h3>
+    <p ref="name">百战程序员</p>
+    <ul>
+        <li v-for="(item, index) of banner" :key="index">
+            <p>{{ item.url }}</p>
+            <p>{{ item.title }}</p>
+        </li>
+    </ul>
+</template>
+<script>
+export default {
+    data() {
+        return {
+            // 初始化
+            banner: []
+        }
+    },
+    // 创建之后
+    created() {
 
+    },
+    // 挂载之前
+    beforeMount() {
+        console.log(this.$refs.name);  // undefined
+    },
+    // 挂载之后
+    mounted() {
+        // 模拟网络请求 建议放到渲染之后
+        this.banner=[
+        { url: "https://www.henan100.com/news/2024/1204933.shtml", title: "重量级文物特展亮相2024河南省旅游发展大会" },
+        { url: "https://www.henan100.com/news/2024/1204943.shtml", title: "中国零售百强名单公布，河南3家企业上榜" },
+    ]
+        console.log(this.$refs.name);
+    },
+}
+</script>
+```
 
+### 动态组件
 
+有些场景会需要在两个组件间来回切换，比如 Tab 界面：
 
+通过 Vue 的 `<component>` 元素和特殊的 `is` attribute 实现的：
+
+```html
+<template>
+    <component :is="tabComponent"></component>
+    <button @click="changeHandle">切换组件</button>
+</template>
+<script>
+import ComponentA from "./ComponentA.vue"
+import ComponentB from "./ComponentB.vue"
+export default {
+    data() {
+        return {
+            // 必须赋值字符串
+            tabComponent: "ComponentA"
+        }
+    },
+    components: {
+        ComponentA,
+        ComponentB
+    },
+    methods: {
+        changeHandle() {
+            this.tabComponent = this.tabComponent == "ComponentA" ? "ComponentB" : "ComponentA"
+        }
+    }
+}
+</script>
+```
+
+在上面的例子中，被传给 `:is` 的值可以是以下几种：
+
+- 被注册的组件名
+- 导入的组件对象
+
+你也可以使用 `is` attribute 来创建一般的 HTML 元素。
+
+### 组件保持存活
+
+当使用 `<component :is="...">` 来在多个组件间作切换时，被切换掉的组件会被卸载。我们可以通过  [`<KeepAlive>`  组件](https://cn.vuejs.org/guide/built-ins/keep-alive.html)强制被切换掉的组件仍然保持“存活”的状态。
+
+```html
+<template>
+    <!-- <component :is="tabComponent"></component>
+    <button @click="changeHandle">切换组件</button> -->
+    
+    <keep-alive>
+    <component :is="tabComponent"></component>
+    </keep-alive>
+    <button @click="changeHandle">切换组件保持存活</button>
+</template>
+<script>
+import ComponentA from "./ComponentA.vue"
+import ComponentB from "./ComponentB.vue"
+export default {
+    data() {
+        return {
+            // 必须赋值字符串
+            tabComponent: "ComponentA"
+        }
+    },
+    components: {
+        ComponentA,
+        ComponentB
+    },
+    methods: {
+        changeHandle() {
+            this.tabComponent = this.tabComponent == "ComponentA" ? "ComponentB" : "ComponentA"
+        }
+    }
+}
+</script>
+```
+
+### 异步组件
+
+在大型项目中，我们可能需要拆分应用为更小的块，并仅在需要时再从服务器加载相关组件。Vue 提供了 [`defineAsyncComponent`](https://cn.vuejs.org/api/general.html#defineasynccomponent) 方法来实现此功能：
+
+```html
+<template>
+    <keep-alive>
+    <component :is="tabComponent"></component>
+    </keep-alive>
+    <button @click="changeHandle">切换组件保持存活</button>
+</template>
+<script>
+// 引入异步组件方法
+import {defineAsyncComponent } from 'vue'
+import ComponentA from "./ComponentA.vue"
+// import ComponentB from "./ComponentB.vue"
+// 异步加载组件 ComponentB
+const ComponentB = defineAsyncComponent(() => import("./ComponentB.vue"))
+export default {
+    data() {
+        return {
+            // 必须赋值字符串
+            tabComponent: "ComponentA"
+        }
+    },
+    components: {
+        ComponentA,
+        ComponentB
+    },
+    methods: {
+        changeHandle() {
+            this.tabComponent = this.tabComponent == "ComponentA" ? "ComponentB" : "ComponentA"
+        }
+    }
+}
+</script>
+```
+
+### 依赖注入
+
+通常情况下，当我们需要从父组件向子组件传递数据时，会使用 [props](https://cn.vuejs.org/guide/components/props.html)。想象一下这样的结构：有一些多层级嵌套的组件，形成了一棵巨大的组件树，而某个深层的子组件需要一个较远的祖先组件中的部分数据。在这种情况下，如果仅使用 props 则必须将其沿着组件链逐级传递下去，这会非常麻烦
+
+![image-20240728201430943](imge/VUE.assets/image-20240728201430943-17221688724331.png)
+
+这一问题被称为“prop 逐级透传”
+
+`provide` 和 `inject` 可以帮助我们解决这一问题。一个父组件相对于其所有的后代组件，会作为**依赖提供者**。任何后代的组件树，无论层级有多深，都可以**注入**由父组件提供给整条链路的依赖。
+
+![image-20240728201614787](imge/VUE.assets/image-20240728201614787-17221689760783.png)
+
+注意：
+
+​	只能上到下传递

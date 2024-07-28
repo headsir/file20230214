@@ -111,7 +111,9 @@
 			"# here put the import lib",
 			"$0"
 
+## 自动保存
 
+![image-20240728215606161](imge/VSCode使用.assets/image-20240728215606161.png)
 
 # 快捷操作：
 

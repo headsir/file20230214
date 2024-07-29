@@ -8271,6 +8271,58 @@ from yourapplication import app as application
 - Gevent
 - Twisted Web
 
+### uwsgi部署
+
+https://www.cnblogs.com/wangdianchao/p/16652799.html
+
+```
+[uwsgi]
+; 项目名
+project=flask_demo
+; 启动路由
+http=0.0.0.0:5000
+# 项目目录
+chdir = /opt/flask_demo/
+; 启动文件
+wsgi-file=test.py
+; 应用名 就是flask文件中的app
+callable=app
+; 启用process manager，管理worker进程，worker进程都是这个master进程的子进程
+master=True
+; 指定开启的工作进程数量（这里是开启2个工作进程）
+processes=2
+; 设置每个工作进程的线程数
+threads=2
+; 设置用于uwsgi包解析的内部缓存区大小为64k。默认是4k。
+buffer-size = 32768
+; 使进程在后台运行，并将日志打到指定的日志文件或者udp服务器
+; daemonize = /opt/flask_demo/uwsgi/uwsgi.log
+; 设置最大日志文件大小
+; log-maxsize = 5000000
+; 指定pid文件的位置，记录主进程的pid号。
+pidfile=/opt/flask_demo/uwsgi/uwsgi.pid
+; 当服务器退出的时候自动删除unix socket文件和pid文件。
+vacuum = true
+
+; 格式化日志打印
+logformat-strftime=true
+log-date=%%Y-%%m-%%d %%H:%%M:%%S
+log-format=[%(ftime)] pid: %(pid) %(addr) => host: %(host)%(uri)(%(method)) in %(secs)s %(status) total-size: %(size) bytes
+```
+
+
+
+```
+启动uwsgi服务
+uwsgi --ini uwsgi/uwsgi.ini
+重启uwsgi服务
+uwsgi --reload uwsgi/uwsgi.pid
+停止uwsgi服务
+uwsgi --stop uwsgi/uwsgi.pid
+```
+
+
+
 ## 19 FastCGI
 
 FastCGI是Web服务器(如nginix，lighttpd和Cherokee)上Flask应用程序的另一个部署选项。
@@ -8327,6 +8379,10 @@ url.rewrite-once = (
 ```
 
 请记住启用FastCGI，别名和重写模块。 该配置将应用程序绑定到`/yourapplication`。
+
+## 
+
+
 
 # 五、Flask+Vue
 

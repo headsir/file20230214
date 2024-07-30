@@ -6,6 +6,20 @@
 
 ![image-20220117164015304](imge\pipenv虚拟环境.assets\image-20220117164015304.png)
 
+### ubantu系统
+
+```
+vi ~/.profile
+
+添加 export PATH=$PATH:/home/zhaozheng/.local/bin$
+```
+
+
+
+
+
+
+
 ## 二、使用方法
 
 参考网站：

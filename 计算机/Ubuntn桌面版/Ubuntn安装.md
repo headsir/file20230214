@@ -105,6 +105,20 @@ $ git fetch origin
 $ git merge origin/master
 ```
 
+## python相关
+
+安装pip 
+
+```
+sudo apt install python3-pip
+```
+
+安装 `Uwsgi`
+
+```
+sudo apt install python3 uwsgi
+```
+
 
 
 

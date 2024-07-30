@@ -20,11 +20,12 @@
 
 `sudo  ./vmware-install.pl`
 
-### :four:解决不能拖拽及复制问题
+### :four:解决不能拖拽复制及共享问题
 
 ```
 sudo vi /etc/gdm3/custom.conf
 sudo apt install open-vm-tools-desktop
+sudo /usr/bin/vmhgfs-fuse .host:/ /mnt/hgfs -o subtype=vmhgfs-fuse,allow_other
 ```
 
 # 使用笔记

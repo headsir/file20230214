@@ -8275,16 +8275,26 @@ from yourapplication import app as application
 
 https://www.cnblogs.com/wangdianchao/p/16652799.html
 
+必须用pip  安装，可以安装到虚拟环境下
+
+先安装python3-pip【sudo apt install python3-pip】
+
+再安装uwsgi【pip3 install uwsgi】
+
 ```
 [uwsgi]
 ; 项目名
-project=flask_demo
+project=JiYuan_Web
 ; 启动路由
-http=0.0.0.0:5000
+http-socket  = :5002
+;socket=0.0.0.0:5002
 # 项目目录
-chdir = /opt/flask_demo/
+;chdir = /opt/flask_demo/
+chdir = /home/wt/JiYuan_Web
+# 虚拟环境目录
+home = /home/wt/.local/share/virtualenvs/JiYuan_Web-CBPFAp9J
 ; 启动文件
-wsgi-file=test.py
+wsgi-file=/home/wt/JiYuan_Web/manage.py
 ; 应用名 就是flask文件中的app
 callable=app
 ; 启用process manager，管理worker进程，worker进程都是这个master进程的子进程
@@ -8297,10 +8307,13 @@ threads=2
 buffer-size = 32768
 ; 使进程在后台运行，并将日志打到指定的日志文件或者udp服务器
 ; daemonize = /opt/flask_demo/uwsgi/uwsgi.log
+; daemonize = /home/wt/JiYuan_Web/uwsgi/uwsgi.log
 ; 设置最大日志文件大小
 ; log-maxsize = 5000000
 ; 指定pid文件的位置，记录主进程的pid号。
-pidfile=/opt/flask_demo/uwsgi/uwsgi.pid
+;pidfile=/opt/flask_demo/uwsgi/uwsgi.pid
+pidfile=/home/wt/JiYuan_Web/uwsgi/uwsgi.pid
+; 启动文件/uwsgi/uwsgi.pid
 ; 当服务器退出的时候自动删除unix socket文件和pid文件。
 vacuum = true
 
@@ -8308,6 +8321,7 @@ vacuum = true
 logformat-strftime=true
 log-date=%%Y-%%m-%%d %%H:%%M:%%S
 log-format=[%(ftime)] pid: %(pid) %(addr) => host: %(host)%(uri)(%(method)) in %(secs)s %(status) total-size: %(size) bytes
+
 ```
 
 
@@ -8315,13 +8329,45 @@ log-format=[%(ftime)] pid: %(pid) %(addr) => host: %(host)%(uri)(%(method)) in %
 ```
 启动uwsgi服务
 uwsgi --ini uwsgi/uwsgi.ini
+nohup uwsgi --ini uwsgi/uwsgi.ini 后台启动
 重启uwsgi服务
 uwsgi --reload uwsgi/uwsgi.pid
 停止uwsgi服务
 uwsgi --stop uwsgi/uwsgi.pid
+
+kill -9 pid 关闭服务 
 ```
 
+### Nginx配置
 
+/etc/nginx/sites-availabel/default(Nginx配置)
+
+https://www.bilibili.com/read/cv34765753/
+
+```
+# vim /etc/nginx/sites-available/JiYuanWeb
+upstream JiYuanWeb { server 0.0.0.0:5002; }
+server {
+        listen 80;
+        location /static { alias /home/wt/JiYuan_Web/static; }
+        location / {
+    		uwsgi_pass flask;
+            include uwsgi_params;
+        }
+}
+
+# 创建符号链接，将配置文件链接到Nginx的sites-enabled目录中
+sudo ln -s /etc/nginx/sites-available/flask /etc/nginx/sites-enabled/
+```
+
+停止服务
+
+```
+service nginx stop
+systemctl stop nginx
+```
+
+socket 验证失败。
 
 ## 19 FastCGI
 

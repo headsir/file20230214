@@ -50,9 +50,13 @@ npm run build
 
 ### 使用：解压缩
 
-### 服务器简单配置
+### windows服务器简单配置
 
 ![image-20240728225631977](imge/VUE.assets/image-20240728225631977.png)
+
+#### 命令
+
+![image-20240730194229327](imge/VUE.assets/image-20240730194229327.png)
 
 ## VUE项目目录结构
 

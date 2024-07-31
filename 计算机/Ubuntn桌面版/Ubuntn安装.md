@@ -23,7 +23,7 @@
 ### :four:解决不能拖拽复制及共享问题
 
 ```
-sudo vi /etc/gdm3/custom.conf
+sudo vi /etc/gdm3/custom.conf   WaylandEnable=false
 sudo apt install open-vm-tools-desktop
 sudo /usr/bin/vmhgfs-fuse .host:/ /mnt/hgfs -o subtype=vmhgfs-fuse,allow_other 添加到 ~/.bashrc
 添加执行 sudo 权限 

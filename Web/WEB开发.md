@@ -8273,6 +8273,8 @@ from yourapplication import app as application
 
 ### uwsgi部署
 
+不支持windows
+
 https://www.cnblogs.com/wangdianchao/p/16652799.html
 
 必须用pip  安装，可以安装到虚拟环境下
@@ -8337,6 +8339,23 @@ uwsgi --stop uwsgi/uwsgi.pid
 
 kill -9 pid 关闭服务 
 ```
+
+### waitress部署
+
+支持windows
+
+安装 pip install waitress
+
+```
+from waitress import serve
+from manage import app
+
+serve(app=app, host='0.0.0.0', port=5002)
+```
+
+
+
+
 
 ### Nginx配置
 

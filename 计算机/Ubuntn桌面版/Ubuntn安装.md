@@ -26,22 +26,6 @@
 sudo vi /etc/gdm3/custom.conf   WaylandEnable=false
 sudo apt install open-vm-tools-desktop
 sudo /usr/bin/vmhgfs-fuse .host:/ /mnt/hgfs -o subtype=vmhgfs-fuse,allow_other 添加到 ~/.bashrc
-添加执行 sudo 权限 
-
-要为 Ubuntu 用户增加权限，可以使用以下步骤：
-切换到 root 用户：使用以下命令切换到 root 用户：
-sudo su -
-添加用户：使用以下命令添加新用户（假设要添加的用户名为newuser）：
-adduser newuser
-将用户添加到 sudo 组：使用以下命令将用户添加到 sudo 组，以赋予其管理员权限：
-usermod -aG sudo newuser
-检查用户权限：可以使用以下命令查看新用户的权限：
-sudo -l -U newuser
-退出 root 用户：完成设置后，可以使用以下命令退出 root 用户：
-exit
-现在，新用户应该具有 sudo 权限，可以执行需要管理员权限的操作
-添加
-sudo /usr/bin/vmhgfs-fuse .host:/ /mnt/hgfs -o subtype=vmhgfs-fuse,allow_other 添加到 ~/.bashrc
 ```
 
 ### :five:添加管理员
@@ -53,6 +37,14 @@ sudo adduser new_user
 sudo usermod -a -G sudo new_user
 为新用户设置密码（如果你想要手动设置密码，而不是在创建时设置）:
 sudo passwd new_user
+```
+
+### :six: 避免每次都输入密码
+
+```
+sudo visudo
+
+<wt> ALL=(ALL) NOPASSWD:ALL
 ```
 
 

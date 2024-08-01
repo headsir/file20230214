@@ -8367,26 +8367,31 @@ https://www.bilibili.com/read/cv34765753/
 # vim /etc/nginx/sites-available/JiYuanWeb
 upstream JiYuanWeb { server 0.0.0.0:5002; }
 server {
-        listen 80;
+		# 80端口系统使用
+        listen 5001;
+        server_name localhost;
+        root /home/wt/JiYuan_Web;
         location /static { alias /home/wt/JiYuan_Web/static; }
         location / {
-    		uwsgi_pass flask;
-            include uwsgi_params;
+        	include uwsgi_params;
+    		uwsgi_pass 127.0.0.1:5002;
+           
         }
 }
 
 # 创建符号链接，将配置文件链接到Nginx的sites-enabled目录中
-sudo ln -s /etc/nginx/sites-available/flask /etc/nginx/sites-enabled/
+# sudo ln -s /etc/nginx/sites-available/JiYuanWeb /etc/nginx/sites-enabled/
 ```
 
 停止服务
 
 ```
+sudo nginx -t 配置文件测试
 service nginx stop
 systemctl stop nginx
 ```
 
-socket 验证失败。
+
 
 ## 19 FastCGI
 

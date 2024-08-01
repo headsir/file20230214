@@ -18,14 +18,24 @@
 
 ### :three:安装tool
 
-`sudo  ./vmware-install.pl`
+不用安装
 
 ### :four:解决不能拖拽复制及共享问题
 
 ```
-sudo vi /etc/gdm3/custom.conf   WaylandEnable=false
+sudo apt install open-vm-tools
 sudo apt install open-vm-tools-desktop
-sudo /usr/bin/vmhgfs-fuse .host:/ /mnt/hgfs -o subtype=vmhgfs-fuse,allow_other 添加到 ~/.bashrc
+sudo vi /etc/gdm3/custom.conf   WaylandEnable=false
+
+不用
+/usr/bin/vmhgfs-fuse .host:/ /home/wt/shares -o subtype=vmhgfs-fuse,allow_other 添加到 ~/.bashrc
+并修改 /etc/fuse.conf  user_allow_other
+
+使用 共享文件 vmware-hgfsclient 命令得到的目录
+if [ ! -d /home/wt/shares/共享文件 ]; then
+   /usr/bin/vmhgfs-fuse .host:/ /home/wt/shares -o subtype=vmhgfs-fuse
+fi
+
 ```
 
 ### :five:添加管理员

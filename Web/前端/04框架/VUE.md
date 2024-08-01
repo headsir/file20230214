@@ -58,6 +58,45 @@ npm run build
 
 ![image-20240730194229327](imge/VUE.assets/image-20240730194229327.png)
 
+### ubuntu配置
+
+/etc/nginx/sites-available,添加文件
+
+```
+# vim /etc/nginx/sites-available/JiYuanWeb
+# upstream JiYuanWeb { server 0.0.0.0:5002; }
+server {
+        listen 5001;
+        server_name localhost;
+        # root /home/wt/JiYuan_Web;
+        location /static { alias /home/wt/JiYuan_Web/static; }
+        location / {
+        	include uwsgi_params;
+    		uwsgi_pass 127.0.0.1:5002;           
+        }
+}
+
+# 创建符号链接，将配置文件链接到Nginx的sites-enabled目录中
+# sudo ln -s /etc/nginx/sites-available/JiYuanWeb /etc/nginx/sites-enabled/
+```
+
+访问静态资源 无权限
+
+```
+# user www-data;
+user root;
+```
+
+错误日志
+
+```
+/var/log/nginx/error.log
+```
+
+
+
+
+
 ## VUE项目目录结构
 
 ![image-20240606153257567](imge/VUE.assets/image-20240606153257567.png)

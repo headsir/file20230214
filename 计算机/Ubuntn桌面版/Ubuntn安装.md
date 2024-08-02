@@ -92,6 +92,16 @@ git config --global user.name "disguiser"
 git config --global user.email "978345836@qq.com"
 ```
 
+生成SSH公钥：
+
+公钥文件位置 `cat ~/.ssh/id_rsa.pub`
+
+```
+ssh-keygen -t rsa -C 978345836@qq.com
+```
+
+具体参考：[](D:\数据库\记事本\study-notes\github\github 公钥配置.md)
+
 创建文件夹并初始化 Git 存储库
 
 现在，让我们为项目创建一个新文件夹并初始化一个 Git存储库。
@@ -110,16 +120,6 @@ $ git commit -m "First Commit"
 ```
 
 此命令暂存所有更改，并提交描述更改的消息。
-
-生成SSH公钥：
-
-公钥文件位置 `cat ~/.ssh/id_rsa.pub`
-
-```
-ssh-keygen -t rsa -C 978345836@qq.com
-```
-
-具体参考：[](D:\数据库\记事本\study-notes\github\github 公钥配置.md)
 
 关联远程仓库
 
@@ -152,7 +152,7 @@ sudo apt install python3-pip
 安装 `Uwsgi`
 
 ```
-sudo apt install python3 uwsgi
+pip install uwsgi
 ```
 
 

@@ -54,7 +54,7 @@ npm run build
 
 ![image-20240728225631977](imge/VUE.assets/image-20240728225631977.png)
 
-#### 命令
+#### ubuntu命令
 
 ![image-20240730194229327](imge/VUE.assets/image-20240730194229327.png)
 
@@ -120,7 +120,7 @@ export default defineConfig({
 })
 ```
 
-
+# 选项式
 
 ## vue基础
 
@@ -1803,3 +1803,9 @@ export default {
 注意：
 
 ​	只能上到下传递
+
+# 组合式
+
+https://www.bilibili.com/video/BV1P4421D7Ap?p=9&vd_source=d6c3edd9a4f6205095ccfba6b2a61eec
+
+## 1.定义响应式reactive变量

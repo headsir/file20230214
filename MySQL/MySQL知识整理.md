@@ -1186,6 +1186,9 @@ SELECT col_1
 主键索引名为 pk_ 字段名；
 唯一索引名为 uk _字段名 ；
 普通索引名则为 idx _字段名；
+
+是否字段 使用is_字段名 类型为 tinyint 1表示是，0表示否
+
 ```
 
 必有字段
@@ -1194,7 +1197,7 @@ SELECT col_1
 pk_id 				int	主键索引,自增
 created_time		timestamp（CURRENT_TIMESTAMP）	创建日期，自动添加
 updated_time		timestamp（CURRENT_TIMESTAMP）	更新日期，自动更新
-delete_flag			tinyint	逻辑删除标识，0表示未删除，1表示已删除
+is_delete			tinyint	逻辑删除标识，0表示未删除，1表示已删除
 ```
 
 操作习惯
@@ -1202,7 +1205,7 @@ delete_flag			tinyint	逻辑删除标识，0表示未删除，1表示已删除
 ```
 避免使用ENUM数据类型
 字段定义为NOT NULL
-采用decimal类型（不丢失精度，禁止使用 float 和 double）
+采用decimal类型（不丢失精度，禁止使用 float 和 double），如果范围超过decimal，可以拆成整数与小数分开存储;
 
 单表索引不超过5个
 begin + commit 事务的习惯

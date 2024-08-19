@@ -1,3 +1,9 @@
+来源：https://www.yuque.com/chengxuyuanyideng/bu4rdb/eq7d76
+
+视频：https://www.bilibili.com/video/BV1P4421D7Ap?p=12&vd_source=d6c3edd9a4f6205095ccfba6b2a61eec
+
+时间：20240816
+
 # 环境搭建
 
 ## dev-tools安装
@@ -240,12 +246,6 @@ export default defineConfig({
 
 
 # Vue3 介绍
-
-来源：https://www.yuque.com/chengxuyuanyideng/bu4rdb/eq7d76
-
-视频：https://www.bilibili.com/video/BV1P4421D7Ap?p=12&vd_source=d6c3edd9a4f6205095ccfba6b2a61eec
-
-时间：20240816
 
 ## MVVM
 
@@ -2374,3 +2374,3282 @@ const hasError = $ref(true)
 ![image-20240816175659588](imge/Vue3.0.assets/image-20240816175659588.png)
 
 当 isActive 或者 hasError 变化时，class 属性值也将相应地更新。例如，如果 active 的值为 true，class 列表将变为"static active text-danger"。
+
+# Vue3 表单
+
+这节我们为大家介绍 Vue 表单上的应用。
+
+我们可以用 v-model 指令在表单 <input>、<textarea> 及 <select> 等元素上创建双向数据绑定。
+
+![image-20240819202626460](imge/Vue3.0.assets/image-20240819202626460.png)
+
+v-model 会根据控件类型自动选取正确的方法来更新元素。
+
+v-model 会忽略所有表单元素的 value、checked、selected 属性的初始值，使用的是 data 选项中声明初始值。
+
+v-model 在内部为不同的输入元素使用不同的属性并抛出不同的事件：
+
+- text 和 textarea 元素使用 value 属性和 input 事件；
+- checkbox 和 radio 使用 checked 属性和 change 事件；
+- select 字段将 value 作为属性并将 change 作为事件。
+
+实例中演示了 input 和 textarea 元素中使用 v-model 实现双向数据绑定：
+
+```vue
+<script setup>
+
+const userName = $ref('')
+
+</script>
+
+<template>
+
+<input type="text" v-model="userName" placeholder="请输入用户名...."><br/>
+刚刚输入的用户名:{{userName}}
+</template>
+```
+
+在文本区域 textarea 插值是不起作用，需要使用 v-model 来代替
+
+```vue
+<!-- 错误 -->
+<textarea>{{ text }}</textarea>
+
+<!-- 正确 -->
+<textarea v-model="text"></textarea>
+```
+
+
+
+```vue
+<script setup>
+
+const userName = $ref('')
+const password = $ref('')
+const age = $ref(0)
+const sex = $ref('')
+
+function save(){
+    console.log(userName)
+    console.log(password)
+    console.log(age)
+    console.log(sex)
+}
+
+</script>
+
+<template>
+
+    用户名：<input type="text" v-model="userName" /><br/>
+    密码：<input type="text" v-model="password" /><br/>
+    年龄：<input type="text" v-model="age" /><br/>
+    性别：<br/>
+    男：<input type="radio" v-model="sex" name="sex" value="男"/><br/>
+    女：<input type="radio" v-model="sex" name="sex" value="女"/><br/>
+    <button v-on:click="save" >提交</button>
+</template>
+
+```
+
+## 复选框
+
+复选框如果是一个为逻辑值，如果是多个则绑定到同一个数组：
+
+以下实例中演示了复选框的双向数据绑定：
+
+```vue
+<script setup>
+
+const checked = $ref(false)
+const checkedNames = $ref([])
+
+</script>
+
+<template>
+
+    <p>单个复选框：</p>
+    <input type="checkbox" id="checkbox" v-model="checked">
+    <label for="checkbox">{{ checked }}</label>
+
+    <p>多个复选框：</p>
+    <input type="checkbox" id="java" value="Java" v-model="checkedNames">
+    <label for="java">java</label>
+    <input type="checkbox" id="php" value="php" v-model="checkedNames">
+    <label for="php">php</label>
+    <input type="checkbox" id="python" value="python" v-model="checkedNames">
+    <label for="python">python</label>
+    <br>
+    <span>选择的值为: {{ checkedNames }}</span>
+</template>
+```
+
+
+
+```vue
+<script setup>
+
+const cck = $ref('') //如果是用单个值接收 是true/false 选中 未选择
+const ccn = $ref([]) //如果是用数组接收 接收到的是value值
+
+</script>
+
+<template>
+
+    如果是用单个值接收:<input type="checkbox" value="football" v-model="cck" />足球<br/>
+    结果：{{cck}}<br/>
+    如果是用数组接收：<br/>
+    <input type="checkbox" value="足球" v-model="ccn" />足球<br/>
+    <input type="checkbox" value="篮球" v-model="ccn" />篮球<br/>
+    <input type="checkbox" value="乒乓球" v-model="ccn" />乒乓球<br/>
+    <input type="checkbox" value="滑雪" v-model="ccn" />滑雪<br/>
+    <input type="checkbox" value="机车" v-model="ccn" />机车<br/>
+    结果：{{ccn}}
+</template>
+
+```
+
+## 单选按钮
+
+以下实例中演示了单选按钮的双向数据绑定：
+
+```vue
+<script setup>
+
+const sex = $ref('man')
+
+</script>
+
+<template>
+  <input type="radio" id="man" value="man" v-model="sex">
+  <label for="man">男</label>
+  <br>
+  <input type="radio" id="woman" value="woman" v-model="sex">
+  <label for="woman">女</label>
+  <br>
+  <span>选中值为: {{ sex }}</span>
+</template>
+
+```
+
+
+
+## select 列表
+
+以下实例中演示了下拉列表的双向数据绑定：
+
+```vue
+<script setup>
+
+const selected = $ref('')
+
+</script>
+
+<template>
+    <select v-model="selected">
+        <option value="足球">足球</option>
+        <option value="篮球">篮球</option>
+        <option value="乒乓球">乒乓球</option>
+    </select><br/>
+    选中的值：{{selected}}
+</template>
+
+```
+
+多选时会绑定到一个数组：
+
+```vue
+<script setup>
+
+const selected = $ref([])
+
+</script>
+
+<template>
+  <select v-model="selected"  multiple>
+    <option value="java">java</option>
+    <option value="php">php</option>
+    <option value="c">c</option>
+  </select>
+ 
+  <div id="output">
+      选择的语言是: {{selected}}
+  </div>
+</template>
+```
+
+使用 v-for 循环输出选项：
+
+```vue
+<script setup>
+
+const selected = $ref('java')
+const options = $ref([
+{ text: 'java语言', value: 'java' },
+{ text: 'php语言', value: 'php' },
+{ text: 'c语言', value: 'c' }
+])
+
+</script>
+
+<template>
+
+<select v-model="selected">
+    <option v-for="option in options" :value="option.value">
+      {{ option.text }}
+    </option>
+  </select>
+  <span>选择的是: {{ selected }}</span>
+
+</template>
+```
+
+
+
+```vue
+<script setup>
+
+const users = $ref([
+    {userName:'张三',password:'123456',age:20},
+    {userName:'李四',password:'123456',age:30},
+    {userName:'王五',password:'123456',age:40},
+    {userName:'赵六',password:'123456',age:50},
+    {userName:'小明',password:'123456',age:60}
+])
+const selected = $ref('')
+
+</script>
+
+<template>
+
+<select v-model="selected">
+    <option v-for="user in users" :value="user">{{user.userName}}</option>
+</select><br/>
+选中的值：{{selected}}
+
+</template>
+```
+
+# Vue3 组件
+
+## 组件介绍
+
+组件允许我们将 UI 划分为独立的、可重用的部分，并且可以对每个部分进行单独的思考。在实际应用中，组件常常被组织成层层嵌套的树状结构：
+
+![image-20240819204009426](imge/Vue3.0.assets/image-20240819204009426.png)
+
+这和我们嵌套 HTML 元素的方式类似，Vue 实现了自己的组件模型，使我们可以在每个组件内封装自定义内容与逻辑。
+
+## 定义一个组件
+
+当使用构建步骤时，我们一般会将 Vue 组件定义在一个单独的 .vue 文件中，这被叫做单文件组件 (简称 SFC)：
+
+```vue
+<script setup>
+const count = $ref(0)
+</script>
+
+<template>
+  <button @click="count++">点击我 {{ count }} 次数.</button>
+</template>
+```
+
+## 使用组件
+
+要使用一个子组件，我们需要在父组件中导入它。假设我们把计数器组件放在了一个叫做 ButtonCounter.vue 的文件中，这个组件将会以默认导出的形式被暴露给外部。
+
+App.vue
+
+```vue
+<script setup>
+import ButtonCounter from './ButtonCounter.vue'
+</script>
+
+<template>
+  <h1>使用子组件!</h1>
+  <ButtonCounter />
+</template>
+```
+
+通过 <script setup>，导入的组件都在模板中直接可用。
+
+组件可以被重用任意多次：
+
+```vue
+<script setup>
+import ButtonCounter from './ButtonCounter.vue'
+</script>
+
+<template>
+    <h1>使用子组件!</h1>
+    <ButtonCounter />
+    <ButtonCounter />
+    <ButtonCounter />
+</template>
+```
+
+> <font color='red'>**你会注意到，每当点击这些按钮时，每一个组件都维护着自己的状态，是不同的count。这是因为每当你使用一个组件，就创建了一个新的实例。**</font>
+
+## <font color='red'>组件名注意点</font>
+
+在单文件组件中，推荐为子组件使用 PascalCase 的标签名，以此来和原生的 HTML 元素作区分。虽然原生 HTML 标签名是不区分大小写的，但 Vue 单文件组件是可以在编译中区分大小写的。我们也可以使用 /> 来关闭一个标签。
+
+如果你是直接在 DOM 中书写模板 (例如原生 <template> 元素的内容)，模板的编译需要遵从浏览器中 HTML 的解析行为。在这种情况下，你应该需要使用 kebab-case 形式并显式地关闭这些组件的标签。
+
+```vue
+<!-- 如果是在 DOM 中书写该模板 -->
+<button-counter></button-counter>
+<button-counter></button-counter>
+<button-counter></button-counter>
+```
+
+## 样式scoped
+
+主组件如果不加scoped，并且子组件也不加，则会覆盖子组件的样式
+
+但是如果主组件加scoped则只会在当前组件中生效，如果子组件也加了也会有阻挡做种
+
+## 传参
+
+### 父组件给子组件传参：Prop传参
+
+#### Prop使用
+
+Props 是一种特别的 attributes，你可以在组件上声明注册。要传递给博客文章组件一个标题，我们必须在组件的 props 列表上声明它。这里要用到 defineProps 宏：
+
+BlogPost.vue
+
+```vue
+<script setup>
+defineProps(['title']) //定义一个变量用来接收父组件的数据
+</script>
+
+<template>
+  <h4>{{ title }}</h4>
+</template>
+```
+
+defineProps 是一个仅 <script setup> 中可用的编译宏命令，并不需要显式地导入。声明的 props 会自动暴露给模板。defineProps 会返回一个对象，其中包含了可以传递给组件的所有 props：
+
+BlogPost.vue
+
+```vue
+<script setup>
+const props = defineProps(['title']) //定义一个变量用来接收父组件的数据
+console.log(props.title)
+</script>
+
+<template>
+  <h4>{{ title }}</h4>
+</template>
+```
+
+App.vue
+
+```vue
+<script setup>
+import BlogPost from './BlogPost.vue'
+</script>
+
+<template>
+    <h1>使用子组件!</h1>
+<!-- 如果是在 DOM 中书写该模板 -->
+<blog-post title="来自父组件的消息"></blog-post>
+
+</template>
+
+```
+
+一个组件可以有任意多的 props，默认情况下，所有 prop 都接受任意类型的值。
+
+当一个 prop 被注册后，可以像这样以自定义 attribute 的形式传递数据给它：
+
+```vue
+<BlogPost title="张三正在学习vue" />
+<BlogPost title="李四正在学习vue" />
+<BlogPost title="王五正在学习vue" />
+```
+
+在实际应用中，我们可能在父组件中会有如下的一个博客文章数组：
+
+```vue
+const posts = $ref([
+  { id: 1, title: '张三正在学习vue' },
+  { id: 2, title: '李四正在学习vue' },
+  { id: 3, title: '王五正在学习vue' }
+])
+```
+
+这种情况下，我们可以使用 v-for 来渲染它们：
+
+```vue
+<script setup>
+import BlogPost from './BlogPost.vue'
+
+const posts = $ref([
+  { id: 1, title: '张三正在学习vue' },
+  { id: 2, title: '李四正在学习vue' },
+  { id: 3, title: '王五正在学习vue' }
+])
+
+</script>
+
+<template>
+<BlogPost
+  v-for="post in posts"
+  :key="post.id"
+  :title="post.title"
+ />
+
+</template>
+
+```
+
+#### Prop 名字格式
+
+如果一个 prop 的名字很长，应使用 camelCase【单驼峰】 形式，因为它们是合法的 JavaScript 标识符，可以直接在模板的表达式中使用，也可以避免在作为属性 key 名时必须加上引号。
+
+MyComponent.vue
+
+```vue
+<script setup>
+defineProps({
+  greetingMessage: String
+})
+</script>
+
+<template>
+<span>{{ greetingMessage }}</span>
+</template>
+```
+
+虽然理论上你也可以在向子组件传递 props 时使用 camelCase 形式 (使用 [DOM 模板](https://cn.vuejs.org/guide/essentials/component-basics.html#dom-template-parsing-caveats)时例外)，但实际上为了和 HTML attribute 对齐，我们通常会将其写为 kebab-case 形式：<font color='red'>【HTML属性不区分大小写 所以vue属性一致改为小写】</font>
+
+```vue
+<script setup>
+import MyComponent from './MyComponent.vue'
+</script>
+
+<template>
+<my-component greeting-message="hello" />
+</template>
+
+```
+
+对于组件名我们推荐使用 PascalCase，因为这提高了模板的可读性，能帮助我们区分 Vue 组件和原生 HTML 元素。然而对于传递 props 来说，使用 camelCase 并没有太多优势，因此我们推荐更贴近 HTML 的书写风格。
+
+#### 静态 vs. 动态 Prop
+
+至此，你已经见过了很多像这样的静态值形式的 props：
+
+```vue
+<BlogPost title="My journey with Vue" />
+```
+
+相应地，还有使用 v-bind 或缩写 : 来进行动态绑定的 props：
+
+```vue
+<!-- 根据一个变量的值动态传入 -->
+<BlogPost :title="post.title" />
+
+<!-- 根据一个更复杂表达式的值动态传入 -->
+<BlogPost :title="post.title + ' by ' + post.author.name" />
+```
+
+#### 传递不同的值类型
+
+在上述的两个例子中，我们只传入了字符串值，但实际上**任何**类型的值都可以作为 props 的值被传递。
+
+##### Number
+
+```vue
+<!-- 虽然 `42` 是个常量，我们还是需要使用 v-bind -->
+<!-- 因为这是一个 JavaScript 表达式而不是一个字符串 -->
+<BlogPost :likes="42" />
+
+<!-- 根据一个变量的值动态传入 -->
+<BlogPost :likes="post.likes" />
+```
+
+##### Boolean
+
+```vue
+<!-- 仅写上 prop 但不传值，会隐式转换为 `true` -->
+<BlogPost is-published />
+
+<!-- 虽然 `false` 是静态的值，我们还是需要使用 v-bind -->
+<!-- 因为这是一个 JavaScript 表达式而不是一个字符串 -->
+<BlogPost :is-published="false" />
+
+<!-- 根据一个变量的值动态传入 -->
+<BlogPost :is-published="post.isPublished" />
+```
+
+##### Array
+
+```vue
+<!-- 虽然这个数组是个常量，我们还是需要使用 v-bind -->
+<!-- 因为这是一个 JavaScript 表达式而不是一个字符串 -->
+<BlogPost :comment-ids="[234, 266, 273]" />
+
+<!-- 根据一个变量的值动态传入 -->
+<BlogPost :comment-ids="post.commentIds" />
+```
+
+##### Object
+
+```vue
+<!-- 虽然这个对象字面量是个常量，我们还是需要使用 v-bind -->
+<!-- 因为这是一个 JavaScript 表达式而不是一个字符串 -->
+<BlogPost
+  :author="{
+    name: 'Veronica',
+    company: 'Veridian Dynamics'
+  }"
+ />
+
+<!-- 根据一个变量的值动态传入 -->
+<BlogPost :author="post.author" />
+```
+
+#### 单向数据流
+
+所有的 props 都遵循着**单向绑定**原则，props 因父组件的更新而变化，自然地将新的状态向下流往子组件，而不会逆向传递。这避免了子组件意外修改父组件的状态的情况，不然应用的数据流将很容易变得混乱而难以理解。
+
+另外，每次父组件更新后，所有的子组件中的 props 都会被更新到最新值，这意味着你**不应该**在子组件中去更改一个 prop。若你这么做了，Vue 会在控制台上向你抛出警告：
+
+```vue
+const props = defineProps(['foo'])
+
+// ❌ 警告！prop 是只读的！
+props.foo = 'bar'
+```
+
+导致你想要更改一个 prop 的需求通常来源于以下两种场景
+
+**1.prop 被用于传入初始值；而子组件想在之后将其作为一个局部数据属性**。在这种情况下，最好是新定义一个局部数据属性，从 props 上获取初始值即可：
+
+```vue
+const props = defineProps(['initialCounter'])
+
+// 计数器只是将 props.initialCounter 作为初始值
+// 像下面这样做就使 prop 和后续更新无关了
+const counter = ref(props.initialCounter)
+```
+
+**2.需要对传入的 prop 值做进一步的转换**。在这种情况中，最好是基于该 prop 值定义一个计算属性：
+
+```vue
+const props = defineProps(['size'])
+
+// 该 prop 变更时计算属性也会自动更新
+const normalizedSize = computed(() => props.size.trim().toLowerCase())
+```
+
+#### props数据类型/校验
+
+当对象或数组作为 props 被传入时，虽然子组件无法更改 props 绑定，但仍然**可以**更改对象或数组内部的值。这是因为 JavaScript 的对象和数组是按引用传递，而对 Vue 来说，禁止这样的改动虽然可能，但有很大的性能损耗，比较得不偿失。
+
+这种更改的主要缺陷是它允许了子组件以某种不明显的方式影响父组件的状态，可能会使数据流在将来变得更难以理解。在最佳实践中，你应该尽可能避免这样的更改，除非父子组件在设计上本来就需要紧密耦合。在大多数场景下，子组件应该抛出一个事件来通知父组件做出改变。
+
+##### Prop 校验
+
+Vue 组件可以更细致地声明对传入的 props 的校验要求。比如我们上面已经看到过的类型声明，如果传入的值不满足类型要求，Vue 会在浏览器控制台中抛出警告来提醒使用者。这在开发给其他开发者使用的组件时非常有用。
+
+要声明对 props 的校验，你可以向 defineProps() 宏提供一个带有 props 校验选项的对象，例如：
+
+```vue
+defineProps({
+  // 基础类型检查
+  // （给出 `null` 和 `undefined` 值则会跳过任何类型检查）
+  propA: Number,
+  // 多种可能的类型
+  propB: [String, Number],
+  // 必传，且为 String 类型
+  propC: {
+    type: String,
+    required: true
+  },
+  // Number 类型的默认值
+  propD: {
+    type: Number,
+    default: 100
+  },
+  // 对象类型的默认值
+  propE: {
+    type: Object,
+    // 对象或数组的默认值
+    // 必须从一个工厂函数返回。
+    // 该函数接收组件所接收到的原始 prop 作为参数。
+    default(rawProps) {
+      return { message: 'hello' }
+    }
+  },
+  // 自定义类型校验函数
+  propF: {
+    validator(value) {
+      // The value must match one of these strings
+      return ['success', 'warning', 'danger'].includes(value)
+    }
+  },
+  // 函数类型的默认值
+  propG: {
+    type: Function,
+    // 不像对象或数组的默认，这不是一个工厂函数。这会是一个用来作为默认值的函数
+    default() {
+      return 'Default function'
+    }
+  }
+})
+```
+
+一些补充细节：
+
+- 所有 prop 默认都是可选的，除非声明了 required: true。
+- 除 Boolean 外的未传递的可选 prop 将会有一个默认值 undefined。
+- Boolean 类型的未传递 prop 将被转换为 false。这可以通过为它设置 default 来更改——例如：设置为 default: undefined 将与非布尔类型的 prop 的行为保持一致。
+- 如果声明了 default 值，那么在 prop 的值被解析为 undefined 时，无论 prop 是未被传递还是显式指明的 undefined，都会改为 default 值。
+
+当 prop 的校验失败后，Vue 会抛出一个控制台警告 (在开发模式下)。
+
+如果使用了基于类型的 prop 声明 ，Vue 会尽最大努力在运行时按照 prop 的类型标注进行编译。举例来说，defineProps<{ msg: string }> 会被编译为 { msg: { type: String, required: true }}。
+
+User.vue
+
+```vue
+<script setup>
+defineProps({
+    id:[String,Number],
+    name:{
+        type:String,
+        default:'小王',
+        validator(value){
+            return value === 'admin'
+        }
+    },
+    user:{
+        type:Object,
+        default(newUser){
+            return {id:10,userName:'test',password:'123456'}
+        }
+    },
+    m1:{
+        type:Function,
+        default(){
+            return '默认值'
+        }
+    }
+})
+
+</script>
+
+<template>
+{{ id }},{{ name }},{{ user }},{{ m1() }}
+</template>
+
+<style scoped>
+
+</style>
+```
+
+App.vue
+
+```vue
+<script setup>
+import User from './User.vue'
+const m1 = ()=>{
+    return 'm1...'
+}
+</script>
+
+<template>
+  <User id="abc" name="admin" :m1="m1"></User>
+</template>
+
+<style scoped>
+
+</style>
+
+```
+
+##### 运行时类型检查
+
+校验选项中的 type 可以是下列这些原生构造函数：
+
+- String
+- Number
+- Boolean
+- Array
+- Object
+- Date
+- Function
+- Symbol
+
+另外，type 也可以是自定义的类或构造函数，Vue 将会通过 instanceof 来检查类型是否匹配。例如下面这个类：
+
+```vue
+class Person {
+  constructor(firstName, lastName) {
+    this.firstName = firstName
+    this.lastName = lastName
+  }
+}
+```
+
+你可以将其作为一个 prop 的类型：
+
+```vue
+defineProps({
+  author: Person
+})
+```
+
+Vue 会通过 instanceof Person 来校验 author prop 的值是否是 Person 类的一个实例。
+
+##### Boolean 类型转换
+
+为了更贴近原生 boolean attributes 的行为，声明为 Boolean 类型的 props 有特别的类型转换规则。以带有如下声明的 <MyComponent> 组件为例：
+
+```vue
+defineProps({
+  disabled: Boolean
+})
+```
+
+该组件可以被这样使用：
+
+```vue
+<!-- 等同于传入 :disabled="true" -->
+<MyComponent disabled />
+
+<!-- 等同于传入 :disabled="false" -->
+<MyComponent />
+```
+
+当一个 prop 被声明为允许多种类型时，例如：
+
+```vue
+defineProps({
+  disabled: [Boolean, Number]
+})
+```
+
+无论声明类型的顺序如何，Boolean 类型的特殊转换规则都会被应用。
+
+### 子组件给父组件传参：监听事件
+
+两种方式：1、$emit方法，2、defineEmits方法
+
+#### $emit方法
+
+##### 父组件
+
+在父组件中定义:@getInfo，子组件通过$emit触发getInfo，可以调用geiInfo中的printInfo方法。
+
+ParentComponent.vue
+
+```vue
+<script setup lang="ts">
+import ChildComponent from "./ChildComponent.vue";
+
+function printInfo(userName,password,age){
+  console.log(userName)
+  console.log(password)
+  console.log(age)
+}
+
+</script>
+
+<template>
+  <h1>子组件给父组件传递参数</h1>
+  <ChildComponent @getInfo="printInfo"></ChildComponent>
+
+</template>
+
+```
+
+##### 子组件
+
+子组件通过$emit调用getInfo方法，可以传递参数
+
+ChildComponent.vue
+
+```vue
+<template>
+<button @click="$emit('getInfo','张三','123123',22)">传递参数</button>
+</template>
+
+<script setup lang="ts">
+
+</script>
+
+<style scoped>
+
+</style>
+```
+
+#### defineEmits 
+
+我们可以通过 defineEmits 宏来声明需要抛出的事件：类似于defineProps
+
+##### 父组件
+
+ParentComponent.vue
+
+```vue
+<script setup lang="ts">
+import ChildComponent from "./ChildComponent.vue";
+
+function printInfo(userName,password,age){
+  console.log(userName)
+  console.log(password)
+  console.log(age)
+}
+
+</script>
+
+<template>
+  <h1>子组件给父组件传递参数</h1>
+  <ChildComponent @getInfo="printInfo"></ChildComponent>
+
+</template>
+
+```
+
+##### 子组件
+
+ChildComponent.vue
+
+```vue
+<template>
+<button @click="large">defineEmits传递参数</button><br/>
+</template>
+
+<script setup lang="ts">
+const emit = defineEmits(['getInfo','setInfo'])
+
+function large(){
+  emit('getInfo','张三','123123',22)
+}
+
+</script>
+
+<style scoped>
+
+</style>
+```
+
+## Vue3 defineExposs
+
+defineExposs可以暴露属性、方法给父组件调用
+
+index.vue
+
+```vue
+<template>
+	<childDemo ref="child"></childDemo>
+</template>
+
+<script setup>
+  import childDemo from './childDemo.vue'
+	import { onMounted, ref } from 'vue';
+  //child可以直接获取childDemo中的数据
+	const child = ref(null)
+	
+	onMounted(()=>{
+		console.log(child.value.count)
+		console.log(child.value.str)
+		console.log(child.value)
+		
+		setInterval(()=>{
+			child.value.fn()
+		},1000)
+		
+	})
+</script>
+
+<style lang="scss" scoped>
+</style>
+```
+
+childDemo.vue
+
+```vue
+<template>
+	子组件,count:{{count}}
+</template>
+
+<script setup>
+	import { ref } from 'vue';
+	const count = ref(100);
+	const fn = function(){
+		count.value++
+	}
+	
+	defineExpose({
+		//count:count 和下面使用一样的
+		count,//暴露属性
+		str:'哈喽',//暴露属性
+		fn //暴露方法
+	})
+</script>
+
+<style lang="scss" scoped>
+</style>
+```
+
+## Vue3 动态组件
+
+通过component来动态控制页面切换。
+
+注：虽然动态组件可以切换页面布局，但是如果是布局最终还是通过路由去控制更加合理。
+
+创建system.vue、article.vue，以及改造App.vue
+
+system.vue
+
+```vue
+<template >
+  <div class="right">
+    system
+  </div>
+</template>
+
+<script setup lang="ts">
+
+</script>
+
+<style scoped>
+.right{
+  width: calc(100% - 200px);
+  height: calc(100vh);
+  background-color: aqua;
+  float: left;
+}
+</style>
+
+```
+
+article.vue
+
+```vue
+<template >
+  <div class="right">
+    article
+  </div>
+</template>
+
+<script setup lang="ts">
+
+</script>
+
+<style scoped>
+.right{
+  width: calc(100% - 200px);
+  height: calc(100vh);
+  background-color: #646cff;
+  float: left;
+}
+</style>
+
+```
+
+App.vue
+
+```vue
+<script setup>
+import {ref} from 'vue'
+import system from './system.vue';
+import article from './article.vue';
+
+let rightMain = ref('system')
+
+const comList = {system, article};
+
+function openMenu(m){ // 传递进来的就是组件名称
+    console.log(m)
+  rightMain.value = m
+}
+
+</script>
+
+<template>
+  <div class="left">
+    <button @click="openMenu('system')" >打开系统管理</button><br/>
+    <button @click="openMenu('article')" >打开文章管理</button><br/>
+  </div>
+
+  <component :is="comList[rightMain]"></component>
+
+</template>
+
+
+<style scoped>
+.left{
+  width: 200px;
+  height: calc(100vh);
+  background-color: coral;
+  float: left;
+}
+</style>
+```
+
+## Vue3 命名规范
+
+### 1、js中定义的变量
+
+必须全部一致
+
+### 2、html中的标签
+
+HTML attribute 名不区分大小写，因此浏览器将所有大写字符解释为小写。这意味着当你在 DOM 模板中使用时，驼峰 prop 名称和 event 处理器参数需要使用它们的 kebab-cased (横线字符分隔) 等效值：
+
+```vue
+import footerPage from "@/first/footerPage";
+
+<!-- 以下两种都是可以的:最好是用横线分割形式 -->
+<footer-page />
+<footerPage />
+    
+```
+
+## Vue3 插槽
+
+### 什么是插槽？
+
+我们知道，在vue中，引入的子组件标签中间是不允许写内容的。为了解决这个问题，官方引入了插槽(slot)的概念。
+
+插槽，其实就相当于占位符。它在组件中给你的HTML模板占了一个位置，让你来传入一些东西。插槽又分为**匿名插槽**、**具名插槽**以及**作用域插槽**。
+
+你可能不太明白，为什么我要给子组件中传入HTML，而不直接写在子组件中呢？答案是这样的。你可以想象一个场景，你有五个页面，这五个页面中只有一个区域的内容不一样，你会怎么去写这五个页面呢？复制粘贴是一种办法，但在vue中，插槽(slot)是更好的做法。
+
+在之前的章节中，我们已经了解到组件能够接收任意类型的 JavaScript 值作为 props，但组件要如何接收模板内容呢？在某些场景中，我们可能想要<font color='red'>**为子组件传递一些模板片段**</font>，让子组件在它们的组件中渲染这些片段。
+
+插槽的用途就和它的名字一样：有一个缺槽，我们可以插入一些东西。
+
+<font color='red'>**简单理解就是：在引入一个通用页面的时候，这个通用页面中有一小块是不太确定的，可以通过调用页面来动态改动。**</font>
+
+### vue的匿名插槽（默认插槽）
+
+父组件
+
+App.vue
+
+```vue
+
+<script setup>
+import Myslot from './components/myslot.vue';
+
+</script>
+
+<template>
+
+<Myslot>我是刚刚</Myslot>
+
+</template>
+
+```
+
+子组件
+
+myslot.vue
+
+```vue
+<script setup>
+
+</script>
+
+<template>
+  <slot></slot>
+</template>
+```
+
+### vue的具名插槽：有名字的插槽
+
+父组件
+
+```vue
+<myslot>
+  <template #one>我是具名插槽：用户名one</template>
+  <template #two>我是具名插槽：用户名tow</template>
+  <template #three>我是具名插槽：用户名three</template>
+  我是匿名插槽：刚刚
+</myslot>
+```
+
+子组件
+
+```vue
+<slot name="one"></slot>
+<slot></slot>
+<slot name="two"></slot>
+<slot name="three"></slot>
+```
+
+### vue的作用域插槽：传参
+
+作用域插槽：父组件可以通过插槽读到子组件对应插槽所带的数据
+
+**子组件向父组件传递参数**
+
+父组件
+
+```vue
+<mainslot>
+  <template #one="data">
+    <div>{{data.childData.message}}</div>
+  </template>
+
+  <template #default>猪猪是一只大肥猫</template>
+  <template #footer>猪猪是一只大肥猫</template>
+</mainslot>
+```
+
+子组件
+
+```vue
+<script setup>
+
+const one = $ref( {
+ message: '这是子组件所带的数据message',
+})
+
+</script>
+
+<template>
+    <slot name="one" :childData='one'></slot>
+    <slot></slot>
+    <slot name="footer"></slot>
+</template>
+```
+
+### 作业
+
+1、通过匿名插槽将如下信息放到子组件中：
+
+```vue
+<h1>我热爱VUE</h1>
+```
+
+2、通过具名插槽将如下信息放到子组件中：
+
+```vue
+<span>我正在学习VUE</span>
+```
+
+3、将子组件中的数据传递到父组件中：
+
+```vue
+user:{
+  userName:'张三',
+  age:22,
+  password:'123456'
+}
+```
+
+## Vue3 依赖注入
+
+### Prop 逐级透传问题
+
+通常情况下，当我们需要从父组件向子组件传递数据时，会使用 props。想象一下这样的结构：有一些多层级嵌套的组件，形成了一颗巨大的组件树，而某个深层的子组件需要一个较远的祖先组件中的部分数据。在这种情况下，如果仅使用 props 则必须将其沿着组件链逐级传递下去，这会非常麻烦：
+
+![image-20240819211810854](imge/Vue3.0.assets/image-20240819211810854.png)
+
+注意，虽然这里的 <Footer> 组件可能根本不关心这些 props，但为了使 <DeepChild> 能访问到它们，仍然需要定义并向下传递。如果组件链路非常长，可能会影响到更多这条路上的组件。这一问题被称为“prop 逐级透传”，显然是我们希望尽量避免的情况。
+
+provide 和 inject 可以帮助我们解决这一问题。 一个父组件相对于其所有的后代组件，会作为依赖提供者。任何后代的组件树，无论层级有多深，都可以注入由父组件提供给整条链路的依赖。
+
+![image-20240819211833240](imge/Vue3.0.assets/image-20240819211833240.png)
+
+### Provide (提供)
+
+要为组件后代提供数据，需要使用到 provide() 函数：
+
+```vue
+<script setup>
+import { provide } from 'vue'
+
+provide(/* 注入名 */ 'message', /* 值 */ 'hello!')
+</script>
+```
+
+如果不使用 <script setup>，请确保 provide() 是在 setup() 同步调用的：
+
+```vue
+import { provide } from 'vue'
+
+export default {
+  setup() {
+    provide(/* 注入名 */ 'message', /* 值 */ 'hello!')
+  }
+}
+```
+
+provide() 函数接收两个参数。第一个参数被称为注入名，可以是一个字符串或是一个 Symbol。后代组件会用注入名来查找期望注入的值。一个组件可以多次调用 provide()，使用不同的注入名，注入不同的依赖值。
+
+第二个参数是提供的值，值可以是任意类型，包括响应式的状态，比如一个 ref：
+
+```vue
+import { ref, provide } from 'vue'
+
+const count = ref(0)
+provide('key', count)
+```
+
+提供的响应式状态使后代组件可以由此和提供者建立响应式的联系。
+
+### 应用层 Provide
+
+除了在一个组件中提供依赖，我们还可以在整个应用层面提供依赖：
+
+```vue
+import { createApp } from 'vue'
+
+const app = createApp({})
+
+app.provide(/* 注入名 */ 'message', /* 值 */ 'hello!')
+```
+
+在应用级别提供的数据在该应用内的所有组件中都可以注入。这在你编写插件时会特别有用，因为插件一般都不会使用组件形式来提供值。
+
+### Inject (注入)
+
+要注入上层组件提供的数据，需使用 inject() 函数：
+
+```vue
+<script setup>
+import { inject } from 'vue'
+
+const message = inject('message')
+</script>
+```
+
+如果提供的值是一个 ref，注入进来的会是该 ref 对象，而不会自动解包为其内部的值。这使得注入方组件能够通过 ref 对象保持了和供给方的响应性链接。
+
+同样的，如果没有使用 <script setup>，inject() 需要在 setup() 内同步调用：
+
+```vue
+import { inject } from 'vue'
+
+export default {
+  setup() {
+    const message = inject('message')
+    return { message }
+  }
+}
+```
+
+#### 注入默认值
+
+默认情况下，inject 假设传入的注入名会被某个祖先链上的组件提供。如果该注入名的确没有任何组件提供，则会抛出一个运行时警告。
+
+如果在注入一个值时不要求必须有提供者，那么我们应该声明一个默认值，和 props 类似：
+
+```vue
+// 如果没有祖先组件提供 "message"
+// `value` 会是 "这是默认值"
+const value = inject('message', '这是默认值')
+```
+
+在一些场景中，默认值可能需要通过调用一个函数或初始化一个类来取得。为了避免在用不到默认值的情况下进行不必要的计算或产生副作用，我们可以使用工厂函数来创建默认值：
+
+```vue
+const value = inject('key', () => new ExpensiveClass())
+```
+
+### 和响应式数据配合使用
+
+当提供 / 注入响应式的数据时，建议尽可能将任何对响应式状态的变更都保持在供给方组件中。这样可以确保所提供状态的声明和变更操作都内聚在同一个组件内，使其更容易维护。
+
+有的时候，我们可能需要在注入方组件中更改数据。在这种情况下，我们推荐在供给方组件内声明并提供一个更改数据的方法函数：
+
+```vue
+<!-- 在供给方组件内 -->
+<script setup>
+import { provide, ref } from 'vue'
+
+const location = ref('North Pole')
+
+function updateLocation() {
+  location.value = 'South Pole'
+}
+
+provide('location', {
+  location,
+  updateLocation
+})
+</script>
+```
+
+```vue
+<!-- 在注入方组件 -->
+<script setup>
+import { inject } from 'vue'
+
+const { location, updateLocation } = inject('location')
+</script>
+
+<template>
+  <button @click="updateLocation">{{ location }}</button>
+</template>
+```
+
+最后，如果你想确保提供的数据不能被注入方的组件更改，你可以使用 readonly() 来包装提供的值。
+
+```vue
+<script setup>
+import { ref, provide, readonly } from 'vue'
+
+const count = ref(0)
+provide('read-only-count', readonly(count))
+</script>
+```
+
+### 使用 Symbol 作注入名
+
+至此，我们已经了解了如何使用字符串作为注入名。但如果你正在构建大型的应用，包含非常多的依赖提供，或者你正在编写提供给其他开发者使用的组件库，建议最好使用 Symbol 来作为注入名以避免潜在的冲突。
+
+我们通常推荐在一个单独的文件中导出这些注入名 Symbol：
+
+```vue
+// keys.js
+export const myInjectionKey = Symbol()
+```
+
+```vue
+// 在供给方组件中
+import { provide } from 'vue'
+import { myInjectionKey } from './keys.js'
+
+provide(myInjectionKey, { /*
+  要提供的数据
+*/ });
+```
+
+```vue
+// 注入方组件
+import { inject } from 'vue'
+import { myInjectionKey } from './keys.js'
+
+const injected = inject(myInjectionKey)
+```
+
+### 顶级传递:main.js文件中提供数据
+
+main.js提供数据
+
+```vue
+import { createApp } from 'vue'
+
+import App from './App.vue'
+
+const app = createApp(App)
+
+app.provide('message','这里是main.js的数据')
+
+app.mount('#app')
+
+```
+
+App.vue中使用
+
+```vue
+<script setup>
+import { provide, ref } from 'vue';
+
+const message = inject('message')
+</script>
+
+<template>
+App:{{message}}
+</template>
+
+<style scoped >
+
+</style>
+
+```
+
+### 提供多个数据
+
+App.vue
+
+```vue
+<script setup>
+import Child from './Child.vue'
+import { provide, ref } from 'vue';
+
+provide('data',{
+    name:'张三',
+    password:'123456'
+})
+
+</script>
+
+<template>
+
+</template>
+
+<style scoped >
+
+</style>
+
+```
+
+Child.vue
+
+```vue
+<script setup>
+import { inject } from 'vue';
+
+const message = inject('message')
+const {name,password,fn} = inject('data')
+</script>
+
+<template>
+<ul>
+  <li>child:{{message}}</li>
+  <li>name:{{name}}</li>
+  <li>password:{{password}}</li>
+</ul>
+</template>
+
+<style scoped >
+
+</style>
+
+```
+
+### 子组件控制父组件的方法以及数据变化
+
+```vue
+<script setup>
+import Child from './Child.vue'
+import { provide, ref } from 'vue';
+
+const name = ref('李四')
+
+const fn = ()=>{
+    console.log('abc')
+}
+
+provide('data',{
+    name:name,
+    password:'123456',
+    fn:fn
+})
+
+</script>
+
+<template>
+<Child></Child>
+父组件的name:{{name}}
+</template>
+
+<style scoped >
+
+</style>
+
+```
+
+Child.vue
+
+```vue
+<script setup>
+import { inject } from 'vue';
+
+const {name,password,fn} = inject('data')
+
+
+</script>
+
+<template>
+<input type="text" v-model="name"/><br/>
+<button @click="fn">点击</button>
+</template>
+
+<style scoped >
+
+</style>
+
+```
+
+### 综合案例
+
+ main.js
+
+```vue
+import { createApp } from 'vue'
+
+import App from './App.vue'
+
+const app = createApp(App)
+
+app.provide('appMsg','这里是app的数据')
+
+app.mount('#app')
+
+```
+
+App.vue
+
+```vue
+<script setup>
+import { inject, provide, ref } from 'vue';
+import Child from './Child.vue'
+
+const appMsg = inject('appMsg')
+
+const address = ref('App中提供的地址，这是动态变量，子组件child可以修改')
+
+const fn = (d)=>{
+    console.log('App.vue中的方法被调用了->'+d)
+}
+
+provide('AppData',{
+    name:'张三',
+    age:22,
+    address:address,
+    fn:fn
+})
+
+</script>
+
+<template>
+
+<ul>
+    <li>App.vue 从main.js中获取provide提供的数据:{{appMsg}}</li>
+    <li>App.vue 提供的地址:{{address}}</li>
+</ul>
+---------------------------------------------------------------<p/>
+<Child></Child>
+
+</template>
+
+<style scoped >
+
+</style>
+
+```
+
+Child.vue
+
+```vue
+<script setup>
+import { inject } from 'vue';
+
+const appMsg = inject('appMsg')
+
+const {name,age,address,fn} = inject('AppData')
+
+</script>
+
+<template>
+<ul>
+    <li>Child.vue 从main.js中获取provide提供的数据:{{appMsg}}</li>
+    <li>Child.vue 从App.vue中获取provide提供的数据:{{name}}、{{age}}</li>
+    <li>Child.vue 修改App.vue提供的数据:<input type="text" v-model='address'/></li>
+    <li>Child.vue <button @click="fn('ChildData')">调用App.vue中的fn方法</button></li>
+</ul>
+</template>
+
+<style scoped >
+
+</style>
+
+```
+
+# Vue3 生命周期钩子
+
+## 钩子函数
+
+> 每个 Vue 实例在被创建时都要经过一系列的初始化过程——例如，需要设置数据监听、编译模板、将实例挂载到 DOM 并在数据变化时更新 DOM 等。同时在这个过程中也会运行一些叫做生命周期钩子的函数，这给了用户在不同阶段添加自己的代码的机会。
+
+简单点来说，钩子函数就是你创建的Vue在初始化、更新数据、销毁时会被自动调用的函数。
+
+## VUE生命周期
+
+![image-20240819212638632](imge/Vue3.0.assets/image-20240819212638632.png)
+
+## 钩子函数运行
+
+通过v-if控制组件显示、隐藏，来实现挂载、卸载。
+
+```vue
+<script setup lang="ts">
+import top from './top.vue'
+
+import { onMounted,onUpdated,onUnmounted,onBeforeMount,onBeforeUpdate,onBeforeUnmount } from 'vue';
+//onMounted:挂载之后
+//onUpdated:更新dom之后
+//onUnmounted:卸载之后
+//onBeforeMount:挂载之前
+//onBeforeUpdate:更新dom之前
+//onBeforeUnmount:卸载之前
+
+onMounted(()=>{
+  console.log('onMounted');
+})
+
+onBeforeUpdate(()=>{
+  console.log('onBeforeUpdate');
+})
+
+onUpdated(()=>{
+  console.log('onUpdated');
+})
+
+let flag = $ref(true)
+
+onBeforeMount(()=>{
+  console.log('onBeforeMount:加载之前');
+})
+
+</script>
+
+<template>
+  <button @click="flag=!flag">点击显示隐藏</button>
+<h1 v-if="flag" >这里是H1</h1>
+  <top v-if="flag"></top>
+</template>
+
+```
+
+
+
+```vue
+<template>
+top....
+</template>
+
+<script setup lang="ts">
+import { onUnmounted,onBeforeUnmount } from 'vue';
+
+onBeforeUnmount(()=>{
+  console.log('onBeforeUnmount:卸载之前');
+})
+
+onUnmounted(()=>{
+  console.log('onUnmounted:卸载之后');
+})
+
+</script>
+
+<style scoped>
+
+</style>
+```
+
+## 需要使用选项式演示
+
+下面几个需要使用选项式才能实现
+
+### beforeCreate,created
+
+beforeCreate可以简单的理解为在数据初始化的之前被调用，这时候data和methods尚未没有数据。
+
+created可以理解为在数据初始化之后被调用，这时候data和methods已经被填充了相应的数据。
+
+```vue
+<template>
+
+</template>
+
+<script >
+export default {
+  data(){
+    return{
+      msg:"在这之间"       //添加msg数据
+    }
+  },
+  beforeCreate() {
+    console.log("=========beforeCreate==========")
+    console.log(this) // Proxy {…} 在执行 beforeCreate 时VUE对象已经创建好 data、methods中没有数据
+    console.log("this.msg= "+this.msg) // undefined
+    console.log("this.md= "+this.md) // undefined
+  },
+  created() {
+    console.log("=========created==========")
+    console.log(this) // Proxy {…}  在执行 created 时VUE对象已经创建好 data、methods中有数据
+    console.log("this.msg= "+this.msg) // 在这之间
+    console.log("this.md= "+this.md) // function () { [native code] }
+  },
+  methods: {
+    md: function(){}        //空方法
+  }
+}
+</script>
+
+<style scoped>
+
+</style>
+```
+
+结果显示在beforeCreate方法与create方法之间完成了资源的注入。
+
+# Vue3 路由
+
+## 脚手架中使用路由
+
+### 安装路由
+
+```
+npm install vue-router@4
+```
+
+### src下创建router.ts
+
+```
+// @ts-nocheck
+import { createRouter, createWebHistory } from 'vue-router'
+
+import index from './components/index.vue'
+import goods from "./components/goods.vue"
+
+// 创建路由实例对象
+const router = createRouter({
+    history: createWebHistory(),
+    routes: [
+        { path: '/', name:'index',component:index },
+        { path: '/goods', name:'goods',component:goods }
+    ],
+})
+
+export default router
+
+```
+
+### 修改main.ts
+
+```
+import { createApp } from 'vue'
+import App from './App.vue'
+import router from './router'
+
+const app = createApp(App)
+
+app.use(router)
+
+app.mount('#app')
+```
+
+### 修改App.vue
+
+```
+<template>
+  <router-view/>
+</template>
+
+<script setup>
+
+</script>
+```
+
+### src/components下新建index.vue、goods.vue文件
+
+router-link：会转换为a标签 to相当于href
+
+index.vue
+
+```
+<template>
+  <div>
+    <router-link to="/goods">商品列表</router-link><br/>
+  </div>
+</template>
+
+<script setup lang="ts">
+
+</script>
+
+<style scoped>
+
+</style>
+
+```
+
+goods.vue
+
+```
+<template>
+  <div>
+    goods....
+  </div>
+</template>
+
+<script setup lang="ts">
+
+</script>
+
+<style scoped>
+
+</style>
+```
+
+### 启动
+
+```
+npm run dev
+```
+
+### 访问
+
+http://localhost:5173/
+
+## History Api
+
+### 什么是History Api呢？
+
+History Api就是window对象通过history对象提供的一个属性和方法的集合，允许开发者基于js操作用户浏览历史的前进、后退、刷新等浏览历史操作，同时提供了对浏览记录栈的操作。
+
+### 1、back
+
+history.back()方法用来在不刷新页面的情况下基于浏览历史记录后退到上一个页面。
+
+a.html
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <a href="./b.html">b.html</a>
+</body>
+</html>
+```
+
+b.html
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <h1>Back</h1>
+    
+    <button onclick="goBack()">Go Back</button>
+  
+    <script>
+      function goBack() {
+        window.history.back();
+      }
+    </script>
+  </body>
+</html>
+```
+
+### 2、forward
+
+history.forward()方法用来在不刷新页面的情况下基于浏览记录前进到下一个页面。
+
+a.html
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>后退和前进导航</title>
+</head>
+
+
+<h1>后退和前进导航</h1>
+<a href="./b.html">b.html</a>
+<button onclick="goForward()">前进:需要已经访问过b.html</button>
+
+<script>
+  function goForward() {
+    window.history.forward();
+  }
+</script>
+</html>
+```
+
+b.html
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>后退和前进导航</title>
+</head>
+<body>
+  <h1>后退和前进导航示例</h1>
+  
+  <button onclick="goBack()">后退</button>
+
+  <script>
+    function goBack() {
+      window.history.back();
+    }
+
+  </script>
+</body>
+</html>
+```
+
+### 3、go
+
+history.go()方法有多种用法，可以实现back,forward的功能，还可以实现刷新当前页面的功能。
+
+后退
+
+```
+window.history.go(-1)
+```
+
+前进
+
+```
+window.history.go(1)
+```
+
+刷新当前页
+
+```
+window.history.go(0)
+```
+
+### 代码演示
+
+a.html
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <a href="b.html">打开B页面</a>
+    <h3>forward</h3>
+    <button id="forward">前进</button>
+    <h3>go前进</h3>
+    <button id="goForawrd">go前进</button>
+    <h3>刷新</h3>
+    <button id="reload">刷新</button>
+
+</body>
+<script>
+    // forward
+    const forward = document.getElementById('forward')
+    forward.addEventListener('click', () => {
+        window.history.forward();
+    })
+
+    const goForawrd = document.getElementById('goForawrd');
+    goForawrd.addEventListener('click', () => {
+    window.history.go(1)
+    })
+
+    const reload = document.getElementById('reload');
+    reload.addEventListener('click', function () {
+        window.history.go(0)
+    })
+</script>
+</html>
+```
+
+b.html
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <h3>back</h3>
+    <button id="back">返回</button>
+    <h3>go后退</h3>
+    <button id="goBack">go后退</button>
+</body>
+
+<script>
+    // 返回
+    const back = document.getElementById('back');
+    back.addEventListener('click', function () {
+        window.history.back()
+    })
+
+    const goBack = document.getElementById('goBack');
+    goBack.addEventListener('click', () => {
+        window.history.go(-1)
+    })
+
+</script>
+
+</html>
+```
+
+### 4、栈操作
+
+HTML5在History Api新增了pushState、replaceState用来对浏览记录栈的操作。
+
+##### 4.1、pushState
+
+history.pushState(state, title, url):用来在不刷新页面的情况下向浏览记录添加一条新记录。
+
+- state: 新记录state对象，可以用来传值。
+- title: 新记录的标题，目前好像被忽略没用。
+- url: 新记录的地址。
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <h3>添加记录</h3>
+    <button id="pushState">添加记录</button>
+</body>
+
+<script>
+    console.log('history:原来长度:'+window.history.length)
+    const pushState = document.getElementById('pushState');
+    pushState.addEventListener('click', () => {
+        const state = {
+        msg: 'test pushState'
+        }
+        // 添加
+        window.history.pushState(state, 'null', 'stateOne')
+        console.log('history:现在长度:'+window.history.length)
+    })
+</script>
+
+</html>
+```
+
+假如我们现在页面地址：http://127.0.0.1:5500/c.html
+
+执行完上面的操作，我们的地址将变为：http://127.0.0.1:5500/stateOne
+
+##### 4.2、replaceState
+
+history.replaceState(state, title, url):用来在不刷新页面的情况下，以当前url替换地址栏活动项state的url, 以当前state替换处于活动的state，并不添加新历史记录。
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <h3>替换记录</h3>
+    <button id="replaceState">替换记录</button>
+</body>
+
+<script>
+    console.log('history:原来长度:'+window.history.length)
+    const replaceState = document.getElementById('replaceState');
+    replaceState.addEventListener('click', () => {
+        const state = {
+        msg: 'test replaceState'
+        }
+        // 添加
+        window.history.replaceState(state, 'null', 'stateTwo')
+        console.log('history:现在长度:'+window.history.length)
+    })
+</script>
+
+</html>
+```
+
+假如我们现在的地址栏地址：http://127.0.0.1:5500/c.html
+
+执行上面的替换操作，地址栏将变为：http://127.0.0.1:5500/stateTwo, 此时，浏览记录history.length并不会发生变化。
+
+##### 4. 3、onpopstate事件
+
+onpopstate是window的事件处理对象，每当处于激活状态的历史记录条目发生变化时就会触发onpopstate事件。
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>onpopstate 示例</title>
+</head>
+<body>
+  <h1>onpopstate 示例</h1>
+  
+  <button onclick="goToPage('page1')">页面1</button>
+  <button onclick="goToPage('page2')">页面2</button>
+
+  <script>
+    // 监听 popstate 事件
+    window.onpopstate = function(event) {
+      if (event.state) {
+        console.log('当前历史记录状态对象:', event.state);
+      }
+    };
+
+    // 点击按钮后变更历史记录
+    function goToPage(page) {
+      // 假设每个页面有自己的状态对象
+      let stateObject = { page: page };
+      let pageTitle = `页面 ${page}`;
+      let url = `#${page}`;//手动添加一个#号
+
+      // 添加到历史记录中
+      history.pushState(stateObject, pageTitle, url);
+
+      // 更新页面内容或执行其他操作
+      console.log(`导航到 ${pageTitle}`);
+    }
+  </script>
+</body>
+</html>
+```
+
+解释
+
+- 在这个示例中，window.onpopstate 被设置为一个匿名函数，用于监听 popstate 事件。
+- 当用户点击按钮（通过 goToPage 函数）导致历史记录发生变化时，会调用 history.pushState 将新的状态对象和 URL 添加到历史记录中。
+- 如果用户在浏览器中使用前进或后退按钮导航，onpopstate 事件会被触发，并且可以在事件处理函数中访问到相关的状态信息。
+
+这样，通过 window.onpopstate 可以在 JavaScript 中更精确地控制和响应浏览器历史记录的变化。
+
+### 5、History Api的应用
+
+前端路由vue-router、react-router等都是基于History Api的实现，主要依赖pushState和replaceState在不刷新页面的情况下修改地址栏url，并根据活动state匹配渲染前端路由配置页面组件。
+
+## Vue3 History
+
+### 介绍
+
+createWebHashHistory 和 createWebHistory 是 Vue Router 4 中用于创建不同类型的路由历史模式的工厂函数。
+
+### 区别和选择
+
+- 哈希模式 (createWebHashHistory)：
+
+- - 不需要服务器配置，适合简单的单页应用。
+  - URL 中带有 # 符号，可能不够语义化。
+  - 兼容性较好，支持所有现代浏览器。
+
+- 历史模式 (createWebHistory)：
+
+- - URL 更加干净、语义化。
+  - 需要服务器端配置，以处理直接访问特定 URL 的请求。
+  - 兼容性良好，但在旧版 IE 中需要降级处理。
+
+通常情况下，如果你的应用是一个简单的 SPA 或者需要兼容性更好，可以选择哈希模式。如果你的应用可以在服务器上配置重定向，且更注重 URL 的语义化和干净性，可以选择历史模式。
+
+总结：哈希模式 (createWebHashHistory)会带有#号，第一次访问服务器会请求，再次访问则使用客户端本地缓存。
+
+### createWebHistory
+
+createWebHistory 是 Vue Router 提供的一种基于浏览器 history API 的路由模式，它使用了 HTML5 中的 history.pushState 和 history.replaceState 方法来实现路由跳转。这种模式可以使得 URL 更加直观，而且不会在 URL 中添加任何特殊字符。例如，我们可以将路由设置为 /home、/about 等等。
+
+
+
+使用 createWebHistory 可以通过以下方式创建一个路由：
+
+```vue
+import { createRouter, createWebHistory } from 'vue-router'
+import Home from '@/views/Home.vue'
+import About from '@/views/About.vue'
+
+const router = createRouter({
+  history: createWebHistory(),
+  routes: [
+    {
+      path: '/home',
+      name: 'home',
+      component: Home
+    },
+    {
+      path: '/about',
+      name: 'about',
+      component: About
+    }
+  ]
+})
+```
+
+在使用 createWebHistory 时，需要注意以下几点：
+
+1、在使用 createWebHistory 时，需要在服务器端进行一些配置。因为使用了 history API，如果直接在浏览器中刷新或直接访问某个路由，服务器将无法识别该路由，并返回 404 错误。因此，需要在服务器端配置，将所有的路由请求都返回首页，再由前端代码进行路由的匹配和处理。
+
+2、createWebHistory 只支持 HTML5 标准浏览器，对于老版本的浏览器无法使用。
+
+3、在开发环境下，我们需要将 webpack 的 historyApiFallback 属性设置为 true，以便在开发环境下正常使用路由。
+
+### createWebHashHistory
+
+createWebHashHistory 是 Vue Router 提供的一种基于浏览器 URL 的 hash 路由模式，它将路由添加到 URL 中的 hash 中，例如：/#/home、/#/about。这种模式可以避免服务器配置的问题，而且支持所有浏览器。但是，由于 URL 中添加了 hash，因此在搜索引擎的 SEO 优化中存在一些问题。
+
+使用 createWebHashHistory 可以通过以下方式创建一个路由：
+
+```vue
+import { createRouter, createWebHashHistory } from 'vue-router'
+import Home from '@/views/Home.vue'
+import About from '@/views/About.vue'
+
+const router = createRouter({
+  history: createWebHashHistory(),
+  routes: [
+    {
+      path: '/home',
+      name: 'home',
+      component: Home
+    },
+```
+
+## 路由请求参数
+
+### 官网文档
+
+[路由参数](https://router.vuejs.org/zh/guide/essentials/navigation.html#导航到不同的位置)
+
+### 案例代码
+
+[路由案例c.zip(5 KB) ](https://lark-assets-prod-aliyun.oss-cn-hangzhou.aliyuncs.com/yuque/0/2022/zip/23145762/1653498958960-f34b65bf-48b3-4e34-9473-4383d6518ca4.zip?OSSAccessKeyId=LTAI4GKnqTWmz2X8mzA1Sjbv&Expires=1724076716&Signature=cxA0CFThfwfZSzOeD9tRLgTPKqM%3D&response-content-disposition=attachment%3Bfilename*%3DUTF-8%27%27%25E8%25B7%25AF%25E7%2594%25B1%25E6%25A1%2588%25E4%25BE%258Bc.zip)
+
+### 路由传参有几种方式
+
+1、通过router-link to的形式
+2、通过router-link :to的形式
+3、通过a连接的形式
+4、通过编程形式，也就是router push的形式
+
+#### 1、通过router-link to的形式：直接请求参数
+
+这里需要注意的是：
+
+rest形式和问号？参数，获取参数不一样
+
+rest：{{ $route.params.id }}
+
+问号？：{{$route.query.id}}
+
+<font color='red'>**rest传参需要全部小写**</font>
+
+```vue
+<router-link to="/goods">商品列表</router-link><br/>
+<router-link to="/rest/user1/100">rest请求:/user1/100</router-link><br/>
+<router-link to="/rest/user2/100/张三/123456">rest请求:/rest/user2/100/张三/123456</router-link><br/>
+<router-link to="/query/goods1?id=100&userName=张三&password=123456">query 请求:/query/goods1?id=100&userName=张三&password=123456</router-link><br/>
+```
+
+路由：rest的路由需要添加占位
+
+```vue
+import { createRouter, createWebHistory } from 'vue-router'
+
+import index from './coms/index.vue'
+import goods from "./components/goods.vue"
+import user from "./components/user.vue"
+  
+import goods1 from "./components/goods1.vue"
+import user1 from "./components/user1.vue"
+import user2 from "./components/user2.vue"
+
+// 创建路由实例对象
+const router = createRouter({
+    history: createWebHistory(),
+    routes: [
+        { path: '/', name:'index',component:index },
+        { path: '/goods', name:'goods',component:goods },
+        { path: '/user', name:'user',component:user },
+      
+        { path: '/rest/user1/:id', name:'user1',component:user1 },
+        { path: '/rest/user2/:id/:username/:password', name:'user2',component:user2 },
+        { path: '/query/goods1', name:'goods1',component:goods1 }
+    ],
+})
+
+export default router
+```
+
+页面：
+
+user1.vue
+
+/rest/user1/100
+
+```vue
+<template>
+user1:<br/>
+ID:{{ $route.params.id }}
+</template>
+
+<script setup>
+import { useRoute } from "vue-router";
+
+const route = useRoute();
+const id = route.params.id
+
+console.log('id='+id)
+
+</script>
+
+<style scoped>
+
+</style>
+```
+
+user2.vue
+
+/rest/user2/100/张三/123456
+
+```vue
+<template>
+user2:<br/>
+ID:{{ $route.params.id }}<br/>
+username:{{ $route.params.username }}<br/>
+password:{{ $route.params.password }}
+</template>
+
+<script setup>
+import { useRoute } from "vue-router";
+const route = useRoute();
+const id = route.params.id
+const username = route.params.username
+const password = route.params.password
+
+console.log('id='+id)
+console.log('username='+username)
+console.log('password='+password)
+
+</script>
+
+<style scoped>
+
+</style>
+```
+
+goods1.vue
+
+从路由中获取useRoute，通过useRoute来获取参数赋值给属性。
+
+/query/goods1?id=100&userName=张三&password=123456
+
+```vue
+<template>
+  <div>
+    goods1....<br/>
+    goods1:<br/>
+    ID:{{$route.query.id}}<br/>
+    userName:{{$route.query.userName}}<br/>
+    password:{{$route.query.password}}<br/>
+    <h3>属性接收参数</h3>
+    id:{{id}}<br/>
+    userName:{{userName}}<br/>
+    password:{{password}}<br/>
+  </div>
+</template>
+
+<script setup>
+import { useRoute } from "vue-router";
+
+const route = useRoute();
+
+const id = route.query.id
+const userName = route.query.userName
+const password = route.query.password
+
+</script>
+
+```
+
+#### 2、通过router-link :to的形式：绑定参数
+
+问号形式：如果通过path，那么参数是通过query传递、获取
+
+rest形式：如果是通过name，那么参数是params传递、获取
+
+无参数形式
+
+```vue
+<!-- 这里用的是路由中的地址 query形式 -->
+<router-link :to="{ path: '/goods' }">商品列表</router-link><br/>
+
+<!-- 这里用的是路由中的名称 rest形式 -->
+<router-link :to="{ name: 'goods' }">商品列表</router-link><br/>
+```
+
+有参数
+
+```vue
+<!-- 问号 query 形式  -->
+<router-link :to="{ path: '/query/goods1', query: { id: 100,userName:'张三',password:'123456'  } }">query 请求:/query/goods1?id=100&userName=张三&password=123456</router-link><br/>
+
+<!-- 这里用的是路由中的名称 rest形式 -->
+<router-link :to="{ name: 'user1', params: { id: 100 } }">rest请求:/user1/100</router-link><br/>
+<!-- 用法同上 只不过参数增多 rest形式 -->
+<router-link :to="{ name: 'user2', params: { id: 100,username:'张三',password:'123456' } }">rest请求:/rest/user2/100/张三/123456</router-link><br/>
+
+```
+
+动态参数
+
+```vue
+<h3>通过router-link :to的形式 动态变量</h3>
+<router-link :to="{ path: '/query/goods1', query: { id: user.id,username:user.userName,password:user.password  } }">query 请求:/query/goods1?id=100&userName=张三&password=123456</router-link><br/>
+<router-link :to="{ name: 'user2', params: { id: user.id,username:user.userName,password:user.password } }">rest请求 通过name:/rest/user2/100/李四/123456</router-link><br/>
+
+<script setup lang="ts">
+import {ref} from 'vue'
+const user = ref({id:100,userName:'张三',password:'1234567890'})
+</script>
+```
+
+#### 3、通过a连接的形式
+
+需要配置history：
+
+[https://router.vuejs.org/zh/guide/essentials/history-mode.html#hash-%E6%A8%A1%E5%BC%8F](https://router.vuejs.org/zh/guide/essentials/history-mode.html#hash-模式)
+
+```javascript
+import { createRouter, createWebHashHistory } from 'vue-router'
+
+const router = createRouter({
+  history: createWebHashHistory(),
+  routes: [
+    //...
+  ],
+})
+```
+
+改成如下：
+
+```
+import { createRouter, createWebHistory } from 'vue-router'
+
+const router = createRouter({
+  history: createWebHistory(),
+  routes: [
+    //...
+  ],
+})
+```
+
+不推荐的用法
+
+```
+<h1>a链接传参:不推荐</h1>
+<a href="/query/goods1?id=100&userName=张三&password=123456">query 请求:/query/goods1?id=100&userName=张三&password=123456</a><br/>
+```
+
+#### 4、通过编程形式，也就是router push的形式
+
+如果通过path，那么参数是通过query传递、获取
+
+如果是通过name，那么参数是params传递、获取
+
+```
+<template>
+    <h1>编程形式</h1>
+    <button @click="m1">无参数</button><br/><br/>
+    <button @click="m2">path无参数</button><br/><br/>
+    <button @click="m3">rest有参数:/rest/user2/100/张三/123456</button><br/><br/>
+    <button @click="m4">问号形式有参数:/query/goods1?id=100&username=张三&password=123456</button><br/><br/>
+</template>
+
+<script setup>
+import { useRouter } from "vue-router";
+import {ref} from "vue";
+//初始化路由
+const router = useRouter();
+
+const myId = ref(100)
+const myUserName = ref('张三')
+const myPassword = ref('123456')
+
+    function m1(){
+      router.push('/goods')
+    }
+
+    function m2(){
+      router.push({ path: '/goods' })
+    }
+
+    function m3(){
+      // 命名的路由,并加上参数,让路由建立
+      router.push({ name: 'user2', params: { id: myId.value,username:myUserName.value,password:myPassword.value } })
+    }
+
+    function m4(){
+      // 带查询参数，结果是
+      router.push({ path: '/query/goods1', query: { id: myId.value,username:myUserName.value,password:myPassword.value } })
+    }
+</script>
+```
+
+## props接收参数
+
+### rest形式的参数
+
+**路由：需要加上 props: true**</font>
+
+router.js
+
+```javascript
+{ path: '/rest/user2/:id/:username/:password', name:'user2',component:user2,props:true },
+```
+
+子页面
+
+user2.vue
+
+```vue
+<template>
+  user2:<br/>
+  ID:{{ $route.params.id }}<br/>
+  userName:{{ $route.params.username }}<br/>
+  password:{{ $route.params.password }}
+  <h2>通过props接收参数</h2>
+  id:{{id}}<br/>
+  userName:{{username}}<br/>
+  password:{{password}}<br/>
+  <button @click="execFun">调用props中的数据</button>
+</template>
+
+<script setup>
+ const props = defineProps(['id','username','password'])
+
+ function execFun(){
+   console.log(props.id)
+   console.log(props.username)
+   console.log(props.password)
+ }
+ 
+</script>
+
+<style scoped>
+
+</style>
+```
+
+两种跳转链接：一个是数据写死，一个是动态绑定参数
+
+index.vue
+
+```vue
+<router-link to="/rest/user2/100/张三/123456">rest请求:/rest/user2/100/张三/123456</router-link><br/>
+<router-link :to="{ name: 'user2', params: { id: 100,username:'张三',password:'123456' } }">rest请求:/rest/user2/100/张三/123456</router-link><br/>
+```
+
+### query问号形式的参数
+
+<font color='red'>**路由配置：这里的id、userName是传过来的参数**</font>
+
+router.js
+
+```javascript
+{ path: '/query/goods1', name:'goods1',component:goods1 , props: route => ({ id: route.query.id,userName:route.query.userName,password:route.query.password })}
+```
+
+两种方式请求代码：直接写死，和动态传参
+
+```
+<router-link to="/query/goods1?id=200&userName=张三&password=123456789">query传参props接收参数</router-link><br/>
+<router-link :to="{ path: '/query/goods1', query: { id: 100,userName:'张三',password:'123456'  } }">query 请求:/query/goods1?id=100&userName=张三&password=123456</router-link><br/>
+```
+
+参数接收代码
+
+goods1.vue
+
+```vue
+<template>
+<div>
+    goods1....<br/>
+    id:{{ id }}<br/>
+    userName:{{ userName }}<br/>
+    password:{{ password }}<br/>
+</div>
+</template>
+
+<script setup>
+defineProps(['id','userName','password'])
+
+</script>
+```
+
+## 路由重定向
+
+重定向也是通过 routes 配置来完成，下面例子是从 /home 重定向到 /：
+
+```
+const routes = [{ path: '/home', redirect: '/' }]
+```
+
+重定向的目标也可以是一个命名的路由：
+
+```
+const routes = [{ path: '/home', redirect: { name: 'homepage' } }]
+```
+
+## 动态路由
+
+一、页面 settings.vue
+
+```vue
+<template>
+  settings....
+</template>
+
+<script setup>
+
+</script>
+
+<style scoped>
+
+</style>
+```
+
+二、路由文件中添加 router.js中添加即可
+
+```javascript
+router.addRoute({ path: '/settings', component: settings })
+```
+
+三、和导航守卫配合实现动态菜单
+
+```
+let routerMap = new Map();
+routerMap.set("settings", { path: '/settings', component: settings });
+
+router.addRoute(routerMap.get("settings"))
+```
+
+## 404 页面
+
+404配置：NotFound是一个vue的页面。
+
+ 404页面
+
+```
+{path:"/404",name:'NotFound',component:NotFound}
+```
+
+404匹配规则
+
+```
+{path: "/:catchAll(.*)",redirect: '/404'}// 不识别的path自动匹配404
+```
+
+## 嵌套路由
+
+### 介绍
+
+一些应用程序的 UI 由多层嵌套的组件组成。在这种情况下，URL 的片段通常对应于特定的嵌套组件结构，例如：
+
+```
+/user/johnny/profile                     /user/johnny/posts
++------------------+                  +-----------------+
+| User             |                  | User            |
+| +--------------+ |                  | +-------------+ |
+| | Profile      | |  +------------>  | | Posts       | |
+| |              | |                  | |             | |
+| +--------------+ |                  | +-------------+ |
++------------------+                  +-----------------+
+```
+
+通过 Vue Router，你可以使用嵌套路由配置来表达这种关系。
+
+### 使用场景
+
+当我们有一个系统，左侧是菜单，点击右侧可以切换功能，可以通过路由嵌套实现
+
+### router-view
+
+router-link 实现路由之间的跳转
+router-view 当你的路由path 与访问的地址相符时，会将指定的组件替换该 router-view
+
+#### 配置子路由
+
+```
+const routes = [
+  {
+    path: '/user/:id',
+    component: User,
+    children: [
+      {
+        // 当 /user/:id/profile 匹配成功
+        // UserProfile 将被渲染到 User 的 <router-view> 内部
+        path: 'profile',
+        component: UserProfile,
+      },
+      {
+        // 当 /user/:id/posts 匹配成功
+        // UserPosts 将被渲染到 User 的 <router-view> 内部
+        path: 'posts',
+        component: UserPosts,
+      },
+    ],
+  },
+]
+```
+
+### 案例1
+
+#### 路由配置
+
+router.js
+
+```javascript
+import { createRouter, createWebHistory } from 'vue-router'
+
+import user from '../components/User.vue'
+import profile from '../components/Profile.vue'
+import posts from '../components/Posts.vue'
+
+
+// 创建路由实例对象
+const router = createRouter({
+    history: createWebHistory(),
+    routes: [
+        {path:'/',redirect:{path:'/user'}},
+        { path: '/user', name:'user',component:user,
+            children: [
+                {
+                    path: '',
+                    name:'profileDefault',
+                    component: profile,
+                  },
+                {
+                  path: 'profile',
+                  name:'profile',
+                  component: profile,
+                },
+                {
+                  path: 'posts',
+                  name:'posts',
+                  component: posts,
+                },
+              ],
+
+         }
+    ],
+})
+
+export default router
+
+```
+
+#### 配置User.vue
+
+User.vue
+
+```
+<template>
+  <h1>用户界面</h1>
+  <router-link to="/user/profile">个人资料</router-link><br/>
+  <router-link to="/user/posts">个人邮箱列表</router-link><br/>
+
+  <!-- 子路由在这里展示 -->
+  <router-view/>
+</template>
+
+<script setup>
+
+</script>
+
+<style>
+
+</style>
+```
+
+#### 配置Profile.vue
+
+```
+<template>
+  <div>个人资料</div>
+</template>
+
+<script setup>
+
+</script>
+
+<style scoped>
+div{
+    width: 200px;
+    height: 200px;
+    background-color: aqua;
+}
+</style>
+```
+
+#### 配置Posts.vue
+
+```
+<template>
+    <div>个人邮件列表</div>
+</template>
+
+<script setup>
+
+</script>
+
+<style scoped>
+div{
+    width: 200px;
+    height: 200px;
+    background-color: rgb(95, 198, 54);
+}
+</style>
+```
+
+### 案例2
+
+#### 路由配置
+
+router.ts
+
+```
+// @ts-nocheck
+import { createRouter, createWebHistory } from 'vue-router'
+
+import home from './components/home.vue'
+import system from './components/system.vue'
+import menu from './components/menu.vue'
+import user from './components/user.vue'
+import logs from './components/logs.vue'
+
+// 创建路由实例对象
+const router = createRouter({
+    history: createWebHistory(),
+    routes: [
+        { path: '/', name:'home',component:home,
+            children:[
+                {path:'system',component:system},
+                {path:'menu',component:menu},
+                {path:'user',component:user},
+                {path:'logs',component:logs}
+            ]
+
+        },
+
+    ],
+})
+
+export default router
+
+```
+
+#### 创建界面
+
+home.vue
+
+```
+<template>
+  <div class="top">
+
+  </div>
+  <div class="menu">
+    <button class="menu_btn" @click="openRight('/system')">系统管理</button>
+    <button class="menu_btn" @click="openRight('/menu')">菜单管理</button>
+    <button class="menu_btn" @click="openRight('/user')">用户管理</button>
+    <button class="menu_btn" @click="openRight('/logs')">系统日志</button>
+
+    <router-link to="/system">系统管理</router-link><br/>
+    <router-link to="/menu">菜单管理</router-link><br/>
+    <router-link to="/user">用户管理</router-link><br/>
+    <router-link to="/logs">系统日志</router-link><br/>
+  </div>
+
+  <router-view/>
+</template>
+
+<script setup lang="ts">
+import { useRouter } from "vue-router"
+const router = useRouter()
+
+function openRight(url){
+  router.push(url)
+}
+</script>
+
+<style scoped>
+.top{
+  width: 100%;
+  height: 100px;
+  background-color: coral;
+}
+.menu{
+  width: 200px;
+  height: calc(100vh - 100px);
+  background-color: aqua;
+  float: left;
+}
+
+.menu_btn{
+  margin-left: 50px;
+  margin-top: 20px;
+  background-color: lemonchiffon;
+  border: 0px;
+  cursor: pointer;
+  width: 100px;
+  height: 40px;
+  text-decoration: none;
+}
+
+a{
+  margin-left: 50px;
+  margin-top: 20px;
+
+  display: block;
+  text-decoration: none;
+  width: 102px;
+  height: 42px;
+  background-color: #5cb85c;
+  text-align: center;
+  line-height: 42px;
+  color: white;
+  border-radius: 2px;
+  font-size: 12px;
+  border-width: 1px;
+  border-style: solid;
+  border-color: #5cb85c;
+}
+a:hover{
+  display: block;
+  text-decoration: none;
+  width: 100px;
+  height: 40px;
+  background-color: #7ad67a;
+  text-align: center;
+  line-height: 40px;
+  color: white;
+  border-radius: 2px;
+  font-size: 12px;
+
+}
+</style>
+```
+
+system.vue
+
+```
+<template>
+  <div class="right">
+    系统管理
+  </div>
+</template>
+
+<script setup lang="ts">
+
+</script>
+
+<style scoped>
+
+.right{
+  width: calc(100% - 200px);
+  height: calc(100vh - 100px);
+  background-color: cornflowerblue;
+  float: left;
+}
+</style>
+```
+
+menu.vue
+
+```
+<template>
+  <div class="right">
+    菜单
+  </div>
+</template>
+
+<script setup lang="ts">
+
+</script>
+
+<style scoped>
+
+.right{
+  width: calc(100% - 200px);
+  height: calc(100vh - 100px);
+  background-color: red;
+  float: left;
+}
+</style>
+```
+
+user.vue
+
+```
+<template>
+  <div class="right">
+    用户管理
+  </div>
+</template>
+
+<script setup lang="ts">
+
+</script>
+
+<style scoped>
+
+.right{
+  width: calc(100% - 200px);
+  height: calc(100vh - 100px);
+  background-color: gray;
+  float: left;
+}
+</style>
+```
+
+logs.vue
+
+```
+<template>
+  <div class="right">
+    日志
+  </div>
+</template>
+
+<script setup lang="ts">
+
+</script>
+
+<style scoped>
+
+.right{
+  width: calc(100% - 200px);
+  height: calc(100vh - 100px);
+  background-color: pink;
+  float: left;
+}
+</style>
+```
+
+#### 修改index.html
+
+```
+<style>
+  *{
+    margin: 0px;
+    padding: 0px;
+  }
+</style>
+```
+
+#### 演示代码下载
+
+```
+https://lark-assets-prod-aliyun.oss-cn-hangzhou.aliyuncs.com/yuque/0/2023/zip/23145762/1680705769258-2ce5acad-ca06-4acd-b13e-b045ff9a5c0f.zip?OSSAccessKeyId=LTAI4GKnqTWmz2X8mzA1Sjbv&Expires=1724077816&Signature=83fpbUNDXqaiW0rmKMOR%2FVvwt0Q%3D&response-content-disposition=attachment%3Bfilename*%3DUTF-8%27%27vue01.zip
+```
+
+## 路由守卫
+
+**作用：对路由进行权限控制**
+
+**分类：全局守卫、独享守卫、组件内守卫** 
+
+**全局守卫:**  
+
+​        可以使用 router.beforeEach 注册一个全局前置守卫： 全局前置守卫：初始化时执行、每次路由切换前执行
+
+​        可以使用 router.afterEach 注册一个全局后置守卫： 全局后置守卫：初始化时执行、每次路由切换后执行
+
+**守卫中的参数：**
+
+to: Route: 即将要进入的目标（路由对象）
+
+from: Route: 当前导航正要离开的路由【例如：登陆后跳转回之前访问的页面】
+
+next: Function:  调用该方法来控制接下来的行为（后置守卫中没有这个参数）
+
+### 全局守卫
+
+```
+//引入VueRouter
+import VueRouter from 'vue-router'
+// 引入组件
+import Home from '../pages/Home'
+import Message from '../pages/Message'
+ 
+//创建router实例对象，去管理一组一组的路由规则
+const router =  new VueRouter({
+    // 配置路由规则
+    routes: [
+        {
+            name: 'message',
+            path: "/message",
+            component: Message,
+            meta: {
+                isAuth: true,   // 配置是否需要
+                title: '信息'
+            }
+        },
+        {   
+            name: 'home',
+            path: "/home",
+            component: Home,
+            meta: {
+                title: '主页'
+            }
+            
+        }
+    ]
+})
+// 注册一个全局前置守卫
+router.beforeEach((to, from, next) => {
+    if(to.meta.isAuth) {    //判断当前路由是否需要进行权限控制
+        if(localStorage.getItem('name') === 'abc'){    //权限控制的具体规则
+            next()
+        }else {
+            alert("验证是失败")
+        }
+    } else {
+        next() // 放行
+    }
+})
+ 
+// 注册一个全局后置守卫
+router.afterEach((to) => {
+    if(to.meta.title) {
+        document.title = to.meta.title //修改网页的title
+    }else {
+        document.title = 'course_demo'
+    }
+})
+ 
+export default router
+```
+
+### 独享守卫
+
+用法与全局守卫一致。只是，将其写进其中一个路由对象中，只在这个路由下起作用
+
+beforeEnter(to, from, next) {}   设置在路由规则中
+
+注意：独享守卫只有前置守卫  但是可以和全局后置守卫配合使用
+
+```
+routes: [
+    {
+        name: 'message',
+        path: "/message",
+        component: Message,
+        meta: {
+            title: '信息'
+        },
+        // 只在当前路由规则里有效
+        beforeEnter(to, from, next) {
+            if (localStorage.getItem('name') === 'abc') {    //权限控制的具体规则
+                next()
+            } else {
+                alert("验证是失败")
+            }
+        }
+    },
+    
+   ···
+]
+```
+
+### 判断登录状态
+
+```
+
+// 全局路由导航守卫
+router.beforeEach((to, from, next) => {
+    
+    // 判断用户访问的是否为登录页
+    if (to.path === '/login' || to.path==='/regist') return next()
+    // 获取 token 值
+    const loginToken = localStorage.getItem('loginToken')
+    
+    if (!loginToken) {
+        next('/login')
+    } else {
+        next()
+    }
+})
+
+```
+
+## 嵌套路由实现复杂菜单
+
+```
+https://gitee.com/damoadmin/vue3_ts_menu
+```
+
+# localstorage
+
+## HTML API
+
+localstorage 在浏览器的 API 有两个：localStorage 和sessionStorage，存在于 window 对象中：localStorage 对应 window.localStorage，sessionStorage 对应 window.sessionStorage。
+
+localStorage 和 sessionStorage 的区别主要是在于其生存期。
+
+## 基本使用方法
+
+![image-20240819220324729](imge/Vue3.0.assets/image-20240819220324729.png)
+
+- 这里的作用域指的是：如何隔离开不同页面之间的localStorage（不能在百度的页面上能读到腾讯的localStorage）。
+- localStorage只要在相同的协议、相同的主机名、相同的端口下，就能读取/修改到同一份localStorage数据。
+- sessionStorage比localStorage更严苛一点，除了协议、主机名、端口外，还要求在同一窗口（也就是浏览器的标签页）下。
+
+## 生存期
+
+localStorage理论上来说是永久有效的，即不主动清空的话就不会消失，即使保存的数据超出了浏览器所规定的大小，也不会把旧数据清空而只会报错。但需要注意的是，在移动设备上的浏览器或各Native App用到的WebView里，localStorage都是不可靠的，可能会因为各种原因（比如说退出App、网络切换、内存不足等原因）被清空。
+sessionStorage的生存期顾名思义，类似于session，只要关闭浏览器（也包括浏览器的标签页），就会被清空。由于sessionStorage的生存期太短，因此应用场景很有限，但从另一方面来看，不容易出现异常情况，比较可靠。
+
+## 数据结构
+
+localstorage为标准的键值对（Key-Value,简称KV）数据类型，简单但也易扩展，只要以某种编码方式把想要存储进localstorage的对象给转化成字符串，就能轻松支持。举点例子：把对象转换成json字符串，就能让存储对象了；把图片转换成DataUrl（base64），就可以存储图片了。另外对于键值对数据类型来说，"键是唯一的"这个特性也是相当重要的，重复以同一个键来赋值的话，会覆盖上次的值
+
+```
+localStorage.setItem('zhangsan','张三')
+sessionStorage.setItem('sessionUser','李四')
+
+var  data = {name:"john"};
+data = JSON.stringify(data);
+localStorage.setItem("data1",data);
+    
+```
+
+```
+//存储在浏览器中 类似于cookie
+console.log(localStorage.getItem('zhangsan'))
+//类似于session 当前页面没有关闭 不同tab页中可以访问
+console.log(sessionStorage.getItem('sessionUser'))
+
+var str = localStorage.getItem("data1");
+var obj = JSON.parse(str);
+console.log(obj);
+    
+```
+
+## 删除
+
+```
+localStorage.removeItem('userName')
+localStorage.removeItem('password')
+this.$router.push('/login')
+```
+
+## 容量限制
+
+目前业界基本上统一为5M，已经比cookies的4K要大很多了
+
+## 域名限制
+
+由于浏览器的安全策略，localstorage是无法跨域的，也无法让子域名继承父域名的localstorage数据，这点跟cookies的差别还是蛮大的。

@@ -56,7 +56,7 @@ vue.code-snippets
 
 ```
 "Print to console":{
-    "prefix":"vue"
+    "prefix":"vue",
     "body": [
         "<template>\n",
         "</template>\n",
@@ -73,9 +73,11 @@ vue.code-snippets
 
 ### vscode语法提示
 
-安装Vetur
+推荐IDE和工具
 
-https://blog.csdn.net/qq_50564231/article/details/129102422
+推荐的 IDE 配置是 [Visual Studio Code](https://code.visualstudio.com/) + [Vue - Official 扩展](https://marketplace.visualstudio.com/items?itemName=Vue.volar)
+
+
 
 ## idea中配置
 
@@ -161,6 +163,8 @@ server {
 ```
 
 ## 配置"@"路径别名
+
+https://cn.vitejs.dev/config/
 
 ### 安装依赖
 

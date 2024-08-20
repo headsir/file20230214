@@ -5653,3 +5653,3278 @@ this.$router.push('/login')
 ## 域名限制
 
 由于浏览器的安全策略，localstorage是无法跨域的，也无法让子域名继承父域名的localstorage数据，这点跟cookies的差别还是蛮大的。
+
+# Vuex 状态管理
+
+## Vuex 是什么？
+
+Vuex 是一个专为 Vue.js 应用程序开发的**状态管理模式 + 库**。它采用集中式存储管理应用的所有组件的状态，并以相应的规则保证状态以一种可预测的方式发生变化。
+
+## 什么是“状态管理模式”？
+
+让我们从一个简单的 Vue 计数应用开始：
+
+```javascript
+const Counter = {
+  // 状态
+  data () {
+    return {
+      count: 0
+    }
+  },
+  // 视图
+  template: `
+    <div>{{ count }}</div>
+  `,
+  // 操作
+  methods: {
+    increment () {
+      this.count++
+    }
+  }
+}
+
+createApp(Counter).mount('#app')
+```
+
+这个状态自管理应用包含以下几个部分：
+
+- **状态**，驱动应用的数据源；
+- **视图**，以声明方式将**状态**映射到视图；
+- **操作**，响应在**视图**上的用户输入导致的状态变化。
+
+以下是一个表示“单向数据流”理念的简单示意：
+
+![image-20240820152253243](imge/Vue3.0.assets/image-20240820152253243.png)
+
+但是，当我们的应用遇到**多个组件共享状态**时，单向数据流的简洁性很容易被破坏：
+
+- 多个视图依赖于同一状态。
+- 来自不同视图的行为需要变更同一状态。
+
+对于问题一，传参的方法对于多层嵌套的组件将会非常繁琐，并且对于兄弟组件间的状态传递无能为力。
+
+对于问题二，我们经常会采用父子组件直接引用或者通过事件来变更和同步状态的多份拷贝。以上的这些模式非常脆弱，通常会导致无法维护的代码。
+
+因此，我们为什么不把组件的共享状态抽取出来，以一个全局单例模式管理呢？在这种模式下，我们的组件树构成了一个巨大的“视图”，不管在树的哪个位置，任何组件都能获取状态或者触发行为！
+
+通过定义和隔离状态管理中的各种概念并通过强制规则维持视图和状态间的独立性，我们的代码将会变得更结构化且易维护。
+
+这就是 Vuex 背后的基本思想，借鉴了 [Flux](https://facebook.github.io/flux/docs/overview)、[Redux](http://redux.js.org/) 和 [The Elm Architecture](https://guide.elm-lang.org/architecture/)。与其他模式不同的是，Vuex 是专门为 Vue.js 设计的状态管理库，以利用 Vue.js 的细粒度数据响应机制来进行高效的状态更新。
+
+如果你想交互式地学习 Vuex，可以看这个 [Scrimba 上的 Vuex 课程](https://scrimba.com/g/gvuex)，它将录屏和代码试验场混合在了一起，你可以随时暂停并尝试。
+
+![image-20240820152450034](imge/Vue3.0.assets/image-20240820152450034.png)
+
+## 什么情况下我应该使用 Vuex？
+
+Vuex 可以帮助我们管理共享状态，并附带了更多的概念和框架。这需要对短期和长期效益进行权衡。
+
+如果您不打算开发大型单页应用，使用 Vuex 可能是繁琐冗余的。确实是如此——如果您的应用够简单，您最好不要使用 Vuex。一个简单的 [store 模式](https://v3.cn.vuejs.org/guide/state-management.html#从零打造简单状态管理)就足够您所需了。但是，如果您需要构建一个中大型单页应用，您很可能会考虑如何更好地在组件外部管理状态，Vuex 将会成为自然而然的选择。引用 Redux 的作者 Dan Abramov 的话说就是：
+
+Flux 架构就像眼镜：您自会知道什么时候需要它。
+
+## Vuex的使用场景
+
+实际上在真是开发中我们可能会在下面这种情况使用它：
+
+1. 登录的状态、以及用户的信息
+2. 购物车的信息，收藏的信息等
+3. 用户的地理位置
+
+这些数据我们都可以放在Vuex中进行响应式的管理
+
+<font color='red'>可以当做session使用</font>
+
+![image-20240820152647657](imge/Vue3.0.assets/image-20240820152647657.png)
+
+## 安装
+
+```
+npm install vuex@next
+```
+
+## Vuex使用
+
+### Vuex组件之间传值
+
+#### 状态管理必要性分析
+
+Vuex 是一个专为 Vue.js 应用程序开发的**状态管理模式**。它采用集中式存储管理应用的所有组件的状态，并以相应的**规则**保证状态以一种可预测的方式发生变化。
+
+如果使用了Vuex，就可以**非常方便**的进行复杂的组件之间数据传递（非父子关系）
+
+
+
+![image-20240820153216649](imge/Vue3.0.assets/image-20240820153216649.png)
+
+总结：
+
+1. 所有组件的数据进行统一管理（存储和变更），每个组件内部就不再需要维护这些数据了
+2. 数据变更时，统一修改Store中数据即可，组件中用到这个数据的组件会自动更新（数据是响应式的）
+
+### Vuex介绍
+
+目标：熟悉Vuex是如何实现上述集中管理组件数据这种思想（模式）的
+
+![image-20240820153324205](imge/Vue3.0.assets/image-20240820153324205.png)
+
+- state 管理组件数据，管理的数据是响应式的，当数据改变时驱动视图更新。
+- mutations 更新数据，state中的数据只能使用mutations去改变数据（只能处理同步的场景）
+- actions 处理异步场景，处理成功后把数据提交给mutations，进而更新state
+- Devtools指的是浏览器的Vue插件调试工具，它可以监控到数据的所有变更操作。
+- getters相当于在State和组件之间添加一个环节（对state中的数据进行加工处理后再提供给组件）
+- getters不要修改state中的数据
+
+### 状态state
+
+#### 初始化状态
+
+状态state用于存储所有组件的数据。
+
+- 管理数据
+
+store.js中
+
+```javascript
+// 创建一个新的 store 实例
+const store = createStore({
+    state () {
+        return {
+            count: 0
+        }
+    }
+})
+```
+
+- 在组件获取state的数据：原始用法插值表达式
+
+index.vue中
+
+```
+<template>
+  <div>A组件 state的数据：{{$store.state.count}}</div>
+  <div>A组件 state的数据：{{count}}</div>
+</template>
+
+<script>
+export default {
+  name: "index",
+  // 把state中数据，定义在组件内的计算属性中
+  computed: {
+    // 1. 最完整的写法
+    // count: function () {
+    //   return this.$store.state.count
+    // },
+    // 2. 缩写
+    count () {
+      return this.$store.state.count
+    }
+  }
+// 不能使用剪头函数  this指向的不是vue实例
+
+}
+</script>
+
+<style scoped>
+
+</style>
+```
+
+#### 总结：
+
+1. state中的数据是自定义的，但是state属性名是固定的
+2. 获取数据可以通过 $store.state
+3. 可以使用计算属性优化模板中获取数据的方式
+4. 计算属性不可以使用箭头函数（箭头函数本身是没有this的，实际上用的是父级函数中的this）
+
+#### mapState
+
+目标：简化获取store数据的代码
+
+##### 1、使用：mapState(对象)
+
+```
+<template>
+  <div>A组件 state的数据：{{$store.state.count}}</div>
+  <div>A组件 state的数据：{{count}}</div>
+</template>
+
+<script>
+import { mapState } from 'vuex'
+
+export default {
+  name: "index",
+  // 使用mapState来生成计算属性  mapState函数返回值是对象
+  // 使用mapState使用对象传参
+  //******************下面1/2/3/4任意一个打开都可以获得数据*************
+  computed: mapState({
+    // 1. 基础写法 (state) 代表就是vuex申明的state
+    // count: function(state) {
+    //   return state.count
+    // }
+    // 2. 使用箭头函数
+    // count: state => state.count
+    // 3. vuex提供写法 (count是state中的字段名称)
+    // count: 'count',
+    // 4. 当你的计算属性 需要依赖vuex中的数据 同时  依赖组件中data的数据
+    count (state) {
+      return state.count
+    }
+  })
+
+// 不能使用剪头函数  this指向的不是vue实例
+
+}
+</script>
+
+<style scoped>
+
+</style>
+```
+
+##### 2、使用：mapState(数组)
+
+```
+<template>
+  <div>A组件 state的数据：{{$store.state.count}}</div>
+  <div>A组件 state的数据：{{count}}</div>
+</template>
+
+<script>
+import { mapState } from 'vuex'
+
+export default {
+  name: "index",
+  // 2、mapState参数是一个数组
+  computed: mapState(['count'])
+}
+</script>
+
+```
+
+##### 3、如果组件自己有计算属性，state的字段映射成计算属性
+
+```
+<template>
+  <div>A组件 state的数据：{{$store.state.count}}</div>
+  <div>A组件 state的数据：{{count}}</div>
+  <div>num = {{calcNum}}</div>
+</template>
+
+<script>
+import { mapState } from 'vuex'
+
+export default {
+  data(){
+    return{
+      num:10
+    }
+  },
+  name: "index",
+// 3、即在内部保留原有的计算属性，又要把store中的数据映射为计算属性
+  computed: {
+    // 组件自己的计算属性
+    calcNum () {
+      return this.num + 1
+    },
+    // 把mapState返回值那个对象进行展开操作（把对象的属性添加到该位置）
+    ...mapState(['count'])
+  }
+
+}
+</script>
+
+```
+
+##### 总结：
+
+1、是否组件的所有数据都应该放到Store中？不一定（数据仅仅需要在本组件使用，那么没有必要放到Store），放到Store中的数据一般需要多个组件共享。
+
+2、mapState
+
+- 基本使用
+- 简化用法
+- 自定义和映射计算属性结合。
+
+### 状态修改mutations
+
+#### 状态修改基本操作
+
+目标：Vuex规定必须通过mutation修改数据，不可以直接通过store修改状态数据。
+
+为什么要用mutation方式修改数据？Vuex的规定
+
+为什么要有这样的规定？统一管理数据，便于监控数据变化
+
+##### 1、定义状态修改函数
+
+store.js
+
+```
+import { createStore } from 'vuex'
+
+// 创建一个新的 store 实例
+const store = createStore({
+    state () {
+        return {
+            count: 0
+        }
+    },
+    // mutations是固定的，用于定义修改数据的动作（函数）
+    mutations: {
+        // 定义一个mutation，用于累加count值
+        // increment这个名字是自定义的
+        increment (state, payload) {
+            // state表示Store中所有数据
+            // payload表示组件中传递过来的数据
+            state.count = state.count + payload
+        },
+        decrement (state, payload) {
+            state.count = state.count - payload
+        }
+    }
+
+})
+
+export default store
+```
+
+##### 2、组件中调用
+
+index.vue
+
+```
+<template>
+  <div>A组件 state的数据：{{$store.state.count}}</div>
+  <button @click="handleClick1">handleClick1</button><br/>
+  <button @click="handleClick2">handleClick2</button>
+</template>
+
+<script>
+
+export default {
+
+  methods: {
+    handleClick1 () {
+      // 通过触发mutation修改state中的count的值
+      this.$store.commit('increment', 2)
+    },
+    handleClick2 () {
+      this.$store.commit('decrement', 1)
+    }
+  }
+}
+</script>
+```
+
+##### 总结：
+
+先定义（mutations），再出发 this.$store.commit(‘mutation的名称，参数’)
+
+mutation的本质就是方法，方法名称自定义，mutation函数内部负责处理的变更操作。
+
+一种操作就是一个mutation，不同的mutation处理不同的场景。
+
+#### mapMutations
+
+- 把vuex中的mutations的函数映射到组件的methods中
+- 通俗：通过mapMutations函数可以生成methods中函数
+
+```
+<template>
+  <div>A组件 state的数据：{{$store.state.count}}</div>
+  <button @click="increment(3)">increment</button><br/>
+  <button @click="decrement(4)">decrement</button>
+</template>
+
+<script>
+import { mapMutations } from 'vuex'
+
+export default {
+  methods: {
+    // 1、对象参数的写法
+    // ...mapMutations({
+    //   // 冒号右侧的increment是mutation的名称
+    //   // 冒号左侧的increment是事件函数的名称，可以自定义
+    //   increment: 'increment',
+    //   decrement: 'decrement'
+    // })
+    // 2、数组参数的写法（事件函数名称和mutation名称一致）
+    // ...mapMutations(['increment','decrement'])
+    // 3、这种写法和第2种等效
+    increment (param) {
+      // 点击触发该函数后要再次触发mutation的
+      this.$store.commit('increment', param)
+    },
+    decrement (param) {
+      // 点击触发该函数后要再次触发mutation的
+      this.$store.commit('decrement', param)
+    },
+
+  }
+
+}
+</script>
+
+```
+
+总结：
+
+1. mapMutations函数的作用：简化methods的定义
+2. 原始方式：通过$store.commit方法触发mutation
+3. 简写方式一：对象写法
+4. 简写方式二：数组写法
+
+### 异步操作action
+
+#### 异步获取数据
+
+目标：主要用于处理异步的任务
+
+##### 1、安装axios的包
+
+```
+npm install axios
+
+//导入包
+import axios from 'axios'
+```
+
+##### 2、定义获取数据方法
+
+store.js
+
+```
+import { createStore } from 'vuex'
+//导入包
+import axios from 'axios'
+
+// 创建一个新的 store 实例
+const store = createStore({
+    state () {
+        return {
+            list:[]
+        }
+    },
+    // mutations是固定的，用于定义修改数据的动作（函数）
+    mutations: {
+        updateList (state, payload) {
+            state.list = payload
+        }
+    },
+    // actions是固定的，用于定义异步操作的动作（函数）
+    actions: {
+        // 定义了一个action，用于查询接口数据
+        async queryData (context, payload) {
+            console.log(payload)
+            // 调用接口获取数据
+            const ret = await axios.get('http://test.zjie.wang/tab')
+            // 必须触发mutation修改list的值
+            // context类似于this.$store
+            context.commit('updateList', ret.data.list)
+        }
+    }
+})
+
+export default store
+
+```
+
+##### 3、组件使用
+
+index.vue
+
+```
+<template>
+  <div>A组件 state的数据：{{$store.state.list}}</div><br/>
+  <button @click="handleQuery">handleQuery</button>
+</template>
+
+<script>
+import { mapMutations } from 'vuex'
+
+export default {
+  methods: {
+    handleQuery () {
+      // 触发action(必须调用dispatch方法)
+      this.$store.dispatch('queryData', 111)
+    }
+  }
+}
+</script>
+```
+
+##### 总结：
+
+1. action的作用：处理异步任务，获取异步结果后，把数据交给mutation更新数据
+2. 触发action需要使用 this.$store.dispatch
+
+#### mapActions
+
+- mapActions辅助函数，把actions中的函数映射组件methods中
+- 通俗：通过mapActions函数可以生成methods中函数
+
+index.vue
+
+```
+<template>
+  <div>A组件 state的数据：{{$store.state.list}}</div><br/>
+  <button @click="queryData(111)">queryData</button>
+</template>
+
+<script>
+import { mapActions } from 'vuex'
+
+export default {
+  methods: {
+    // 相当于 methods申明了一个函数fn(num){ this.$store.dispatch('queryData', num)}
+// ...mapActions({
+//   fn: 'queryData'
+// })
+// 相当于 methods申明了一个函数getData(num){ this.$store.dispatch('getData', num)}
+    ...mapActions(['queryData'])
+
+  }
+}
+</script>
+
+```
+
+总结：
+
+1. 原始方式：this.$store.dispatch(‘queryData’, num)
+2. 简化方式一：对象
+3. 简化方式二：数组
+
+### getters用法
+
+目标：熟悉getters的应用场景和具体使用步骤
+
+#### 先定义getters
+
+```
+import { createStore } from 'vuex'
+//导入包
+import axios from 'axios'
+
+// 创建一个新的 store 实例
+const store = createStore({
+    state () {
+        return {
+            list: []
+        }
+    },
+    // mutations是固定的，用于定义修改数据的动作（函数）
+    mutations: {
+        updateList (state, payload) {
+            state.list = payload
+        }
+    },
+    // actions是固定的，用于定义异步操作的动作（函数）
+    actions: {
+        // 定义了一个action，用于查询接口数据
+        async queryData (context, payload) {
+            console.log(payload)
+            // 调用接口获取数据
+            const ret = await axios.get('http://test.zjie.wang/tab')
+            // 必须触发mutation修改list的值
+            // context类似于this.$store
+            context.commit('updateList', ret.data.list)
+        }
+    },
+    // 相当于state的计算属性（基于State处理成另外一份数据）
+    // getters的主要应用场景：模板中需要的数据和State中的数据不完全一样
+    // 需要基于state中的数据进行加工处理，形成一份新的的数据，给模板使用
+    getters: {
+        getPartList (state) {
+            return state.list.filter(item => {
+                return item.id > 1
+            })
+        }
+    }
+})
+
+export default store
+
+```
+
+#### 再使用getters
+
+```
+<template>
+  <div>A组件 state的数据：{{$store.state.list}}</div><br/>
+  <div> caleList = {{caleList}} </div>
+  <button @click="queryData(111)">queryData</button>
+</template>
+
+<script>
+import { mapActions } from 'vuex'
+
+export default {
+  methods: {
+    // 相当于 methods申明了一个函数fn(num){ this.$store.dispatch('queryData', num)}
+    // ...mapActions({
+    //   fn: 'queryData'
+    // })
+    // 相当于 methods申明了一个函数getData(num){ this.$store.dispatch('getData', num)}
+    ...mapActions(['queryData']),
+
+  },
+  computed:{
+    caleList () {
+      // 注意：获取getters的值，不需要加括号（当属性使用）
+      return this.$store.getters.getPartList
+    },
+  }
+}
+</script>
+
+```
+
+简化用法
+
+```
+<template>
+  <div>A组件 state的数据：{{$store.state.list}}</div><br/>
+  <div> getPartList = {{getPartList}} </div>
+  <button @click="queryData(111)">queryData</button>
+</template>
+
+<script>
+import { mapActions,mapGetters } from 'vuex'
+
+export default {
+  methods: {
+    // 相当于 methods申明了一个函数fn(num){ this.$store.dispatch('queryData', num)}
+    // ...mapActions({
+    //   fn: 'queryData'
+    // })
+    // 相当于 methods申明了一个函数getData(num){ this.$store.dispatch('getData', num)}
+    ...mapActions(['queryData']),
+
+  },
+// mapGetters的作用：把getters映射为计算属性
+  computed: {
+    ...mapGetters(['getPartList']),
+    // ...mapGetters({
+    //   calcList: 'getPartList'
+    // }),
+    // calcList () {
+    //   // 注意：获取getters的值，不需要加括号（当属性使用）
+    //   return this.$store.getters.getPartList
+    // },
+  }
+}
+</script>
+```
+
+### 总结：
+
+1. getters相当于在State和组件之间添加一个环节（对state中的数据进行加工处理后再提供给组件）
+2. getters不要修改state中的数据
+3. getters类似之前的计算属性（基于state中的数据进行计算）
+
+#### vuex
+
+vuex的核心思想：组件数据统一管理（统一存储，统一修改）
+
+vuex具体实现的核心概念
+
+#### state 用来保存组件的数据
+
+基本使用
+
+简化用法 mapState
+
+#### mutations 用来修改state中的数据（数据是响应式的）
+
+基本使用
+
+简化用法 mapMutations
+
+#### actions 用来处理异步任务，获取异步的结果，但是不可以修改数据
+
+基本使用
+
+简化用法 mapActions
+
+#### getters 用来处理state中的数据，方便给组件提供符合需求的数据格式
+
+基本使用
+
+简化用法 mapGetters
+
+# pina 状态管理
+
+## 什么是状态管理？
+
+理论上来说，每一个 Vue 组件实例都已经在“管理”它自己的响应式状态了。我们以一个简单的计数器组件为例：
+
+counter.vue
+
+```
+<script setup>
+import { ref } from 'vue'
+
+// 状态
+const count = ref(0)
+
+// 动作
+function increment() {
+  count.value++
+}
+</script>
+
+<!-- 视图 -->
+<template>{{ count }}</template>
+```
+
+它是一个独立的单元，由以下几个部分组成：
+
+- **状态**：驱动整个应用的数据源；
+- **视图**：对**状态**的一种声明式映射；
+- **交互**：状态根据用户在**视图**中的输入而作出相应变更的可能方式。
+
+下面是“单向数据流”这一概念的简单图示：
+
+![image-20240820155903608](imge/Vue3.0.assets/image-20240820155903608.png)
+
+然而，当我们有**多个组件共享一个共同的状态**时，就没有这么简单了：
+
+1. 多个视图可能都依赖于同一份状态。
+2. 来自不同视图的交互也可能需要更改同一份状态。
+
+对于情景 1，一个可行的办法是将共享状态“提升”到共同的祖先组件上去，再通过 props 传递下来。然而在深层次的组件树结构中这么做的话，很快就会使得代码变得繁琐冗长。这会导致另一个问题：[Prop 逐级透传问题](https://cn.vuejs.org/guide/components/provide-inject.html#prop-drilling)。
+
+对于情景 2，我们经常发现自己会直接通过模板引用获取父/子实例，或者通过触发的事件尝试改变和同步多个状态的副本。但这些模式的健壮性都不甚理想，很容易就会导致代码难以维护。
+
+一个更简单直接的解决方案是抽取出组件间的共享状态，放在一个全局单例中来管理。这样我们的组件树就变成了一个大的“视图”，而任何位置上的组件都可以访问其中的状态或触发动作。
+
+## 状态管理使用场景
+
+- 当一个组件需要多次派发事件时。例如购物车数量加减。
+- 跨组件共享数据、跨页面共享数据。例如订单状态更新。
+- 需要持久化的数据。例如登录后用户的信息。
+- 当您需要开发中大型应用，适合复杂的多模块多页面的数据交互，考虑如何更好地在组件外部管理状态时
+
+实际上在真是开发中我们可能会在下面这种情况使用它：
+
+1. 登录的状态、以及用户的信息
+2. 购物车的信息，收藏的信息等
+3. 用户的地理位置
+
+这些数据我们都可以放在状态管理中进行响应式的管理
+
+<font color='red'>可以当做session使用：状态管理数据刷新会恢复到初始值，需要做持久化操作。</font>
+
+![image-20240820160044747](imge/Vue3.0.assets/image-20240820160044747.png)
+
+## 为什么你应该使用 Pinia？
+
+Pinia 是 Vue 的专属状态管理库，它允许你跨组件或页面共享状态。如果你熟悉组合式 API 的话，你可能会认为可以通过一行简单的 export const state = reactive({}) 来共享一个全局状态。对于单页应用来说确实可以，但如果应用在服务器端渲染，这可能会使你的应用暴露出一些安全漏洞。 
+
+## 为什么取名 *Pinia*？
+
+Pinia (发音为 /piːnjʌ/，类似英文中的 “peenya”) 是最接近有效包名 piña (西班牙语中的 *pineapple*，即“菠萝”) 的词。 菠萝花实际上是一组各自独立的花朵，它们结合在一起，由此形成一个多重的水果。 与 Store 类似，每一个都是独立诞生的，但最终它们都是相互联系的。 它(菠萝)也是一种原产于南美洲的美味热带水果。
+
+## 对比 Vuex
+
+Pinia 起源于一次探索 Vuex 下一个迭代的实验，因此结合了 Vuex 5 核心团队讨论中的许多想法。最后，我们意识到 Pinia 已经实现了我们在 Vuex 5 中想要的大部分功能，所以决定将其作为新的推荐方案来代替 Vuex。
+
+与 Vuex 相比，Pinia 不仅提供了一个更简单的 API，也提供了符合组合式 API 风格的 API，最重要的是，搭配 TypeScript 一起使用时有非常可靠的类型推断支持。
+
+**优势：**
+
+- Vue2和Vue3都支持，这让我们同时使用Vue2和Vue3的小伙伴都能很快上手。
+- pinia中只有state、getter、action，抛弃了Vuex中的Mutation，Vuex中mutation一直都不太受小伙伴们的待见，pinia直接抛弃它了，这无疑减少了我们工作量。
+- pinia中action支持同步和异步，Vuex不支持
+- 良好的Typescript支持，毕竟我们Vue3都推荐使用TS来编写，这个时候使用pinia就非常合适了
+- 无需再创建各个模块嵌套了，Vuex中如果数据过多，我们通常分模块来进行管理，稍显麻烦，而pinia中每个store都是独立的，互相不影响。
+- 体积非常小，只有1KB左右。
+- pinia支持插件来扩展自身功能。
+- 支持服务端渲染。
+
+pinia的优点还有非常多，上面列出的主要是它的一些主要优点，更多细节的地方还需要大家在使用的时候慢慢体会。
+
+现有用户可能对 Vuex 更熟悉，它是 Vue 之前的官方状态管理库。由于 Pinia 在生态系统中能够承担相同的职责且能做得更好，**因此 Vuex 现在处于维护模式。它仍然可以工作，但不再接受新的功能。对于新的应用，建议使用 Pinia。**
+
+## 安装
+
+```
+npm install pinia
+```
+
+### 使用
+
+```
+import { createApp } from 'vue'
+import { createPinia } from 'pinia'
+import App from './App.vue'
+
+const pinia = createPinia()
+const app = createApp(App)
+
+app.use(pinia)
+app.mount('#app')
+```
+
+## Store
+
+Store 是什么？
+
+Store (如 Pinia) 是一个保存状态和业务逻辑的实体，它并不与你的组件树绑定。换句话说，**它承载着全局状态**。它有点像一个永远存在的组件，每个组件都可以读取和写入它。它有**三个概念**，<font color='red'>**state、getter 和 action，我们可以假设这些概念相当于组件中的data、 computed 和 methods。**</font>
+
+### 应该在什么时候使用 Store?
+
+一个 Store 应该包含可以在整个应用中访问的数据。这包括在许多地方使用的数据，例如显示在导航栏中的用户信息，以及需要通过页面保存的数据，例如一个非常复杂的多步骤表单。
+
+另一方面，你应该避免在 Store 中引入那些原本可以在组件中保存的本地数据，例如，一个元素在页面中的可见性。
+
+并非所有的应用都需要访问全局状态，但如果你的应用确实需要一个全局状态，那 Pinia 将使你的开发过程更轻松。
+
+### 定义 Store
+
+在深入研究核心概念之前，我们得知道 Store 是用 defineStore() 定义的，它的第一个参数要求是一个**独一无二的**名字：
+
+store.ts
+
+```
+import { defineStore } from 'pinia'
+
+// 你可以对 `defineStore()` 的返回值进行任意命名，但最好使用 store 的名字，同时以 `use` 开头且以 `Store` 结尾。(比如 `useUserStore`，`useCartStore`，`useProductStore`)
+// 第一个参数是你的应用中 Store 的唯一 ID。
+export const useStore = defineStore('main', {
+  // 其他配置...
+})
+```
+
+这个**名字** ，也被用作 *id* ，是必须传入的， Pinia 将用它来连接 store 和 devtools。为了养成习惯性的用法，将返回的函数命名为 *use...* 是一个符合组合式函数风格的约定。
+
+defineStore() 的第二个参数可接受两类值：Setup 函数或 Option 对象。
+
+定义变量count
+
+store.ts
+
+```
+export const useCounterStore = defineStore('counter', {
+  state: () => ({ count: 0 })
+})
+```
+
+### 使用 Store
+
+使用变量
+
+App.vue
+
+```
+<script setup>
+import { useCounterStore } from './store';
+
+const counter = useCounterStore()
+
+</script>
+
+<template>
+<button @click="counter.count++">点击累加</button><br/>
+{{ counter.count }}
+
+</template>
+```
+
+### 注意
+
+state变量值变化只在当前页面生效，其他页面还是会访问到原来初始化的值
+
+state中的变量可以和v-model配合使用
+
+## State
+
+在大多数情况下，state 都是你的 store 的核心。人们通常会先定义能代表他们 APP 的 state。在 Pinia 中，state 被定义为一个返回初始状态的函数。这使得 Pinia 可以同时支持服务端和客户端。
+
+### 直接修改 State 的值
+
+```
+<script setup>
+import { useCounterStore } from './store';
+
+const counter = useCounterStore()
+
+</script>
+
+<template>
+<button @click="counter.count++">点击累加</button><br/>
+{{ counter.count }}
+
+</template>
+```
+
+### 批量修改State的值
+
+在他的实例上有$patch方法可以批量修改多个值
+
+App.vue
+
+```
+<script setup>
+import { useCounterStore } from './store';
+
+const counter = useCounterStore()
+
+function change(){
+    counter.$patch({
+        count:100
+    })
+}
+
+</script>
+
+<template>
+<button @click="change">点击change</button><br/>
+{{ counter.count }}
+
+</template>
+
+```
+
+### 批量修改函数形式
+
+推荐使用函数形式 可以自定义修改逻辑
+
+App.vue
+
+```
+<script setup>
+import { useCounterStore } from './store';
+
+const counter = useCounterStore()
+
+function change(){
+    // counter.$patch({
+    //     count:100
+    // })
+    counter.$patch((state)=>{ //函数形式 可以自定义逻辑
+        state.count++
+    })
+}
+
+</script>
+
+<template>
+<button @click="change">点击change</button><br/>
+{{ counter.count }}
+
+</template>
+
+```
+
+### 通过原始对象修改整个实例
+
+$state您可以通过将store的属性设置为新对象来替换store的整个状态
+
+缺点就是必须修改整个对象的所有属性
+
+App.vue
+
+```
+<script setup>
+import { useCounterStore } from './store';
+
+const counter = useCounterStore()
+
+function change(){
+    // counter.$patch({
+    //     count:100
+    // })
+    // counter.$patch((state)=>{
+    //     state.count++
+    // })
+    counter.$state={
+        count:1000
+    }
+}
+
+</script>
+
+<template>
+<button @click="change">点击change</button><br/>
+{{ counter.count }}
+
+</template>
+
+```
+
+### 通过actions修改
+
+定义Actions
+
+在actions 中直接使用this就可以指到state里面的值
+
+store.ts
+
+```
+import { defineStore } from 'pinia'
+
+// 你可以对 `defineStore()` 的返回值进行任意命名，但最好使用 store 的名字，同时以 `use` 开头且以 `Store` 结尾。
+// (比如 `useUserStore`，`useCartStore`，`useProductStore`)
+// 第一个参数是你的应用中 Store 的唯一 ID。
+export const useCounterStore = defineStore('counter', {
+    state: () => ({ count: 0 }),
+    actions: {
+      increment() {
+        this.count++
+      },
+    },
+  })
+```
+
+使用方法直接在实例调用
+
+App.vue
+
+```
+<script setup>
+import { useCounterStore } from './store';
+
+const counter = useCounterStore()
+
+</script>
+
+<template>
+<button @click="counter.increment">点击累加</button><br/>
+{{ counter.count }}
+
+</template>
+
+```
+
+## Getter
+
+Getter 完全等同于 store 的 state 的计算属性。可以通过 defineStore() 中的 getters 属性来定义它们。**推荐**使用箭头函数，并且它将接收 state 作为第一个参数：
+
+store.ts
+
+```
+import { defineStore } from 'pinia'
+
+// 你可以对 `defineStore()` 的返回值进行任意命名，但最好使用 store 的名字，同时以 `use` 开头且以 `Store` 结尾。
+// (比如 `useUserStore`，`useCartStore`，`useProductStore`)
+// 第一个参数是你的应用中 Store 的唯一 ID。
+export const useCounterStore = defineStore('counter', {
+    state: () => ({ count: 0,price:500 }),
+    getters: {
+      double: (state) => state.count * 2,
+      totalPrice:(state)=> state.price * state.count
+    },
+    actions: {
+      increment() {
+        this.count++
+      },
+    },
+  })
+```
+
+
+
+App.vue
+
+```
+<script setup>
+import { useCounterStore } from './store';
+
+const counter = useCounterStore()
+
+function change(){
+    // counter.$patch({
+    //     count:100
+    // })
+    // counter.$patch((state)=>{
+    //     state.count++
+    // })
+    counter.$state={
+        count:1000
+    }
+}
+
+</script>
+
+<template>
+<button @click="counter.increment">点击累加</button><br/>
+<button @click="change">点击change</button><br/>
+{{ counter.count }}-{{ counter.double }}-{{ counter.totalPrice }}
+
+</template>
+```
+
+## API
+
+### 1.$reset
+
+重置store到他的初始状态
+
+用法一
+
+```
+<button @click="counter.$reset">重置</button><br/>
+```
+
+用法二
+
+```
+function reset(){
+    counter.$reset()
+}
+
+<button @click="reset">重置</button><br/>
+```
+
+### 2.订阅state的改变
+
+ 只要有state 的变化就会走这个函数
+
+放到App.vue的script中
+
+```
+counter.$subscribe((args,state)=>{
+   console.log(args,state);
+})
+```
+
+### 3.订阅Actions的调用
+
+ 只要有actions被调用就会走这个函数
+
+放到App.vue的script中
+
+```
+counter.$onAction((args)=>{
+   console.log(args);
+})
+```
+
+## 数据持久化
+
+如果是当做数据存储可以考虑sessionStorage、localStorage
+
+### 一.安装pinia-plugin-persist
+
+```
+npm install pinia-plugin-persist
+```
+
+### 二.挂载
+
+main.ts
+
+```
+import { createApp } from 'vue'
+import App from './App.vue'
+
+import { createPinia } from 'pinia'
+
+import piniaPluginPersist from 'pinia-plugin-persist'
+
+const pinia  = createPinia()
+
+pinia.use(piniaPluginPersist)
+
+const app = createApp(App)
+
+app.use(pinia )
+
+app.mount('#app')
+
+```
+
+### 三.使用方法
+
+<font color='red'>**在store.ts中添加persist**</font>
+
+enabled: true即表示开启数据缓存
+
+store.ts
+
+```
+export const useUserStore = defineStore({id: 'userId',
+  state: () => {
+    return {
+      userInfo:{
+        name:'Ghmin',
+        age:18,
+        sex:'男'
+        },
+      id:'666666'
+    }
+  },
+  // 开启数据缓存
+  persist: {
+    enabled: true
+  }
+})
+```
+
+这个时候数据默认是存在[sessionStorage](https://so.csdn.net/so/search?q=sessionStorage&spm=1001.2101.3001.7020) 里，需要修改的话如下：
+
+```
+persist: {
+  enabled: true,
+  strategies: [
+    {
+      key: 'userInfo',//设置存储的key
+      storage: localStorage,//表示存储在localStorage
+    }
+  ]
+}
+```
+
+默认所有 state 都会进行缓存,如果你不想所有的数据都持久化存储，那么可以通过 paths 指定要长久化的字段，其余的字段则不会进行长久化，如下:
+
+```
+persist: {
+  enabled: true,
+  strategies: [
+    {
+      storage: localStorage,
+      paths: ['id'],//指定要长久化的字段
+    }
+  ]
+}
+```
+
+# Vue3 异步交互 axios
+
+Vue 版本推荐使用 axios 来完成 ajax 请求。
+
+Axios 是一个基于 Promise 的 HTTP 库，可以用在浏览器和 node.js 中。
+
+Github开源地址：
+
+https://github.com/axios/axios
+
+中文文档：
+
+https://www.axios-http.cn/docs/intro
+
+## 安装
+
+```
+npm install axios
+```
+
+## 导入axios
+
+```
+import axios from "axios";
+```
+
+## 使用
+
+```
+<template>
+  <button @click="getData('/user/list')">获取数据</button>
+</template>
+
+<script setup>
+import axios from "axios";
+
+/**
+ * async 异步处理
+ * await 等待处理完成
+ */
+ async function getData(url){
+    var ret = ''
+    await axios.get('/api'+url).then(function (res) {
+        ret = res.data
+        console.log(res)
+    })
+    return ret
+}
+
+
+</script>
+
+<style scoped>
+
+</style>
+
+```
+
+## 封装axios
+
+### 创建remote.ts
+
+或者其他文件名
+
+```
+import axios from "axios";
+const server = 'http://localhost:8181'
+
+/**
+ * async 异步处理
+ * await 等待处理完成
+ */
+async function getData(url,param){
+    var ret = ''
+    await axios.get(server+url, {params: param}).then(function (res) {
+        ret = res.data
+    })
+    return ret
+}
+
+//post请求体传输数据
+async function postData(url,param){
+    var options = {  // 设置axios的参数
+        url: server+url,
+        data: param,
+        method: 'post',
+    }
+
+    var ret = ''
+    await axios(options).then(function (res) {
+        ret = res
+    })
+    return ret
+}
+
+//post表单形式提交 请求头传输数据
+async function postDataForm(url,param){
+  var options = {  // 设置axios的参数
+    url: server+url,
+    data: param,
+    method: 'post',
+    headers: {'Content-Type':'application/x-www-form-urlencoded'}
+  }
+
+  var ret = ''
+  await axios(options).then(function (res) {
+    ret = res
+  })
+  return ret
+}
+    
+
+async function uploadFile(url,param){
+    var options = {  // 设置axios的参数
+        url: server+url,
+        data: param,
+        method: 'post',
+        headers: {
+            'Content-Type': 'multipart/form-data'
+        }
+    }
+
+    var ret = ''
+    await axios(options).then(function (res) {
+        ret = res.data
+    })
+    return ret
+}
+
+// export:导出变量、函数
+export  {getData,postData,postDataForm,uploadFile}
+```
+
+### 使用
+
+```
+import {getData,postData,uploadFile} from '../common/remote'
+
+getData('/user/list',{current:current}).then(function (res) {
+    
+})
+
+postData('/user/delete',[id]).then(function (res) {
+
+})
+
+uploadFile(url,formData).then(function (res) {
+
+})
+```
+
+## Vite 解决跨域问题
+
+### Access-Control-Allow-Origin
+
+在写代码的时候出现上述跨域问题
+
+### 解决问题
+
+在工程文件夹的根目录修改vite.config.ts文件，写入代码：
+
+```
+import { defineConfig } from 'vite'
+import vue from '@vitejs/plugin-vue'
+
+// https://vitejs.dev/config/
+export default defineConfig({
+  plugins: [vue()],
+
+  server:{
+    proxy: { 
+      '/api': {
+        target: 'http://localhost:8080/',  //你要跨域访问的网址
+        changeOrigin: true,   // 允许跨域
+        rewrite: (path) => path.replace(/^\/api/, '') // 重写路径把路径变成空字符
+      }
+    }
+  }
+})
+
+```
+
+然后在需要发送请求的文件中写,就可以跨域请求数据了：
+
+```
+let data = await axios.get('/api/')  //结构赋值
+```
+
+通过配置options
+
+```
+var options = {  // 设置axios的参数
+  url: '/api/login',
+  data: {username:username.value,password:password.value},
+  method: 'post',
+  headers: {'Content-Type':'application/x-www-form-urlencoded'}
+}
+
+  axios(options).then((res: any)=>{
+      console.log(res);
+      if(res.data==='loginOK'){
+          router.push('/');
+      }else{
+          alert('账号密码错误');
+      }
+  })
+```
+
+在vite.config.js文件中的’/api’ 可以改成任意你想要的名字，只要把它重写成空字符，就无所谓的，还是原来的网址。
+
+## Servlet中使用
+
+### 1、安装axios
+
+```
+npm install axios
+```
+
+### 2、修改main.js
+
+导入axios，并且修改vue的默认地址配置，使用的时候直接：`this.$http.get`、`this.$http.post`
+
+```
+import { createApp } from 'vue'
+import App from './App.vue'
+import router from './router'
+import axios from 'axios'
+
+const app = createApp(App)
+
+axios.defaults.baseURL = 'http://localhost:8181/'
+app.config.globalProperties.$http = axios
+
+app.use(router)
+
+app.mount('#app')
+```
+
+### 3、get请求 参数在url后面
+
+login登录方法中添加如下代码：获取用户名、密码
+
+const self=this：在axios内部不能直接访问this，需要赋值给self，内部访问self
+
+```
+const self = this    
+var url = '/login?userName='+this.userName+'&password='+this.password    
+this.$http.get(url).then(function(res){
+if(res){
+  localStorage.setItem("userName",self.userName)
+  self.$router.push('/')
+}else{
+  localStorage.removeItem("userName")
+}
+})
+```
+
+### 4、get请求 参数通过params
+
+get请求另一种方式，在login页面的登录方法中，获取用户名、密码请求后端接口
+
+```
+const self = this
+this.$http.get('/login', {
+    params: {
+      userName: this.userName,
+      password:this.password
+    }
+}).then(function (res) {
+    if(res){
+      localStorage.setItem("userName",self.userName)
+      self.$router.push('/')
+    }else{
+      localStorage.removeItem("userName")
+    }
+})
+```
+
+### 5、post请求
+
+和get同理
+
+```
+const self = this
+this.$http({
+    url: '/login',
+    method: 'post',
+    data: {
+      userName: this.userName,
+      password:this.password
+    }
+})
+.then(function (res) {
+    if(res){
+      localStorage.setItem("userName",self.userName)
+      self.$router.push('/')
+    }else{
+      localStorage.removeItem("userName")
+    }
+})
+```
+
+### 6、servlet
+
+<font color='red'>浏览器请求不同的url地址的时候，有安全限制，需要服务提供方配置跨域允许访问，常见的就是前后端分离、nginx、cdn等等。。。</font>
+
+```
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+
+@WebServlet("/login")
+public class LoginServet extends HttpServlet {
+    @Override
+    protected void service(HttpServletRequest req, HttpServletResponse response) throws ServletException, IOException {
+        String userName = req.getParameter("userName");
+        String password = req.getParameter("password");
+
+        /* 允许跨域的主机地址 */
+        response.setHeader("Access-Control-Allow-Origin", "*");
+        /* 允许跨域的请求方法GET, POST, HEAD 等 */
+        response.setHeader("Access-Control-Allow-Methods", "*");
+        /* 重新预检验跨域的缓存时间 (s) */
+        response.setHeader("Access-Control-Max-Age", "4200");
+        /* 允许跨域的请求头 */
+        response.setHeader("Access-Control-Allow-Headers", "*");
+        /* 是否携带cookie */
+        response.setHeader("Access-Control-Allow-Credentials", "true");
+
+        response.getWriter().write("true");
+    }
+}
+```
+
+### 7、token使用
+
+由于前后端分离，没有session、cookie可以使用，所以需要开发人员自己模拟session，我们可以使用token关键字
+
+在servlet的登录方法中，登录成功返回token：token可以是任意数据，方便识别即可
+
+这里选用UUID生成32位随机数。
+
+```
+import com.alibaba.fastjson.JSON;
+
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
+
+@WebServlet("/login")
+public class LoginServlet extends HttpServlet {
+    @Override
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        String userName = req.getParameter("userName");
+        String password = req.getParameter("password");
+
+        Map<String,Object> maps = new HashMap<>();
+
+        if("admin".equals(userName) && "123456".equals(password)){
+            String token = UUID.randomUUID().toString().replace("-","");
+
+            maps.put("token",token);
+            maps.put("flag",true);
+
+            resp.getWriter().write(JSON.toJSONString(maps));
+        }else{
+            maps.put("flag",false);
+
+            resp.getWriter().write(JSON.toJSONString(maps));
+        }
+
+    }
+
+}
+
+```
+
+### 8、过滤器中获得token
+
+```
+String token = req.getHeader("token");
+```
+
+### 9、axios拦截器中配置token
+
+修改在main.js中，在axios的拦截器中判断是否有token，如果有，则添加到请求头上，每次发送请求会将token携带上，服务端从请求头上获取数据。
+
+```
+import { createApp } from 'vue'
+import App from './App.vue'
+import store from "@/store"; //导入src/store.js
+
+import router from './router' //导入router.js
+
+import axios from 'axios'
+
+const app = createApp(App)
+
+axios.defaults.baseURL = 'http://localhost:8181/'
+app.config.globalProperties.$http = axios
+
+// http request 拦截器
+axios.interceptors.request.use(
+    config => {
+        //debugger
+        if (localStorage.token) { //判断token是否存在
+            config.headers.token = localStorage.token;  //将token设置成请求头
+        }
+        return config;
+    },
+    err => {
+        return Promise.reject(err);
+    }
+);
+
+// 将 store 实例作为插件安装
+app.use(router)
+app.use(store)
+
+app.mount('#app')
+
+```
+
+## Servlet上传文件
+
+### 1、服务端
+
+```
+package com.manage.web;
+
+import com.alibaba.fastjson.JSON;
+
+import javax.servlet.ServletException;
+import javax.servlet.annotation.MultipartConfig;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.Part;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+
+@WebServlet("/upload")
+@MultipartConfig(location = "c:/aServer/upload",maxFileSize = 1024*1024*5,maxRequestSize = 1024*1024*5,fileSizeThreshold = 10)
+public class UploadServlet extends HttpServlet {
+    @Override
+    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        String userName = req.getParameter("userName");//可以获得请求参数
+
+        Collection<Part> parts = req.getParts();
+        List<String> urls = new ArrayList<>();
+
+        if(parts!=null){
+            for (Part part : parts) {
+                if(part.getSubmittedFileName()==null){
+                    break;
+                }
+                //提交的文件名 我们上传后在服务器上面 也保存为这个文件名
+                //当然如果文件太多 可以使用UUID作为文件名
+                String fileName = part.getSubmittedFileName();
+
+                //String toPath = "c:/b2b2c/aFile/"+fileName;
+
+                urls.add("http://localhost:8001/upload/"+fileName);
+
+                part.write(fileName);
+            }
+        }
+        resp.getWriter().write(JSON.toJSONString(urls));
+    }
+}
+
+```
+
+### 2、vue客户端
+
+这里需要注意：v-model不能作用于file，因为是只读的，可以通过v-on:change($event)，通过event拿到文件。
+
+之后构造FormData
+
+```
+<template>
+  <div class="top">
+    上传文件<br/>
+    <top></top>
+  </div>
+
+  <div class="left">
+    <menus></menus>
+  </div>
+
+  <div class="right">
+    <template v-if="urls.length==0">
+    <img src="../../assets/photo.jpg" style="width: 100px" @click="openItem()">
+    </template>
+    <template v-else>
+      <img :src="urls[0]" style="width: 100px" @click="openItem()">
+    </template>
+    <input style="display: none" type="file" @change="uploadPhoto($event)" ref="photo" name="photo" accept="image/jpg,image/jpeg"><br/>
+
+    用户名：<input type="text" v-model="userName"><br/>
+    选择文件:<input type="file" @change="getFile($event)" name="f1" accept="image/jpg,image/jpeg"><br/>
+    选择文件:<input type="file" @change="getFile($event)" name="f2"><br/>
+    选择文件:<input type="file" @change="getFile($event)" name="f3"><br/>
+    选择文件:<input type="file" @change="getFile($event)" name="f4"><br/>
+    选择文件:<input type="file" @change="getFile($event)" name="f5"><br/>
+    <input type="button" value="ajax上传" @click="ajaxUpload()">
+  </div>
+
+</template>
+
+<script>
+import menus from "@/components/menus";
+import top from "@/components/top";
+
+export default {
+  name: "list",
+  data(){
+    return{
+      userName:'',
+      files:[],
+      urls:[]
+    }
+  },
+  components:{
+    menus,top
+  },
+  methods:{
+    openItem(){
+      this.$refs.photo.click()
+    },
+    uploadPhoto(e){
+      var formData = new FormData();
+      formData.append('f1',e.target.files[0])
+
+      this.upload(formData)
+
+    },
+    getFile(e){
+      this.files.push(e.target.files[0])
+    },
+    upload(formData){
+      var options = {  // 设置axios的参数
+        url: '/upload',
+        data: formData,
+        method: 'post',
+        headers: {
+          'Content-Type': 'multipart/form-data'
+        }
+      }
+
+      const self = this
+      this.$http(options).then(function (res) {
+        self.urls = res.data
+        console.log(self.urls[0])
+      })
+    },
+    ajaxUpload(){
+      var formData = new FormData();
+      formData.append('f1',this.files[0])
+      formData.append('f2',this.files[1])
+      formData.append('f3',this.files[2])
+      formData.append('f4',this.files[3])
+      formData.append('f5',this.files[4])
+      formData.append('userName',this.userName)
+      this.upload(formData)
+
+    }
+  }
+}
+</script>
+
+<style scoped>
+
+</style>
+```
+
+### 3、页面布局
+
+![image-20240820170421212](imge/Vue3.0.assets/image-20240820170421212.png)
+
+## SpringBoot 跨域
+
+### 一、为什么会出现跨域问题
+
+出于浏览器的同源策略限制。同源策略（Sameoriginpolicy）是一种约定，它是浏览器最核心也最基本的安全功能，如果缺少了同源策略，则浏览器的正常功能可能都会受到影响。可以说Web是构建在同源策略基础之上的，浏览器只是针对同源策略的一种实现。
+
+**同源策略**
+
+> 同源策略会阻止一个域的javascript脚本和另外一个域的内容进行交互。所谓同源（即指在同一个域）就是两个页面具有相同的协议（protocol），主机（host）和端口号（port）
+
+### 二、什么是跨域
+
+举例说明:
+
+当一个请求url的协议、域名、端口三者之间任意一个与当前页面url不同即为跨域
+
+![image-20240820170639403](imge/Vue3.0.assets/image-20240820170639403.png)
+
+### 三、非同源限制
+
+【1】无法读取非同源网页的 Cookie、LocalStorage 和 IndexedDB
+
+【2】无法接触非同源网页的 DOM
+
+【3】无法向非同源地址发送 AJAX 请求
+
+### 四、java 后端 实现 CORS 跨域请求的方式
+
+对于 CORS的跨域请求，主要有以下几种方式可供选择：
+
+1. 返回新的CorsFilter
+2. 重写 WebMvcConfigurer
+3. 使用注解 @CrossOrigin
+4. 手动设置响应头 (HttpServletResponse)
+5. 自定web filter 实现跨域
+
+注意
+
+- CorFilter / WebMvConfigurer / @CrossOrigin 需要 SpringMVC 4.2以上版本才支持，对应springBoot 1.3版本以上
+- 上面前两种方式属于全局 CORS 配置，后两种属于局部 CORS配置。如果使用了局部跨域是会覆盖全局跨域的规则，所以可以通过 @CrossOrigin 注解来进行细粒度更高的跨域资源控制。
+- 其实无论哪种方案，最终目的都是修改响应头，向响应头中添加浏览器所要求的数据，进而实现跨域
+
+#### 1.返回新的 CorsFilter(全局跨域)
+
+在任意配置类，返回一个 新的 CorsFIlter Bean ，并添加映射路径和具体的CORS配置路径。
+
+```java
+@Configuration
+public class GlobalCorsConfig {
+    @Bean
+    public CorsFilter corsFilter() {
+        //1. 添加 CORS配置信息
+        CorsConfiguration config = new CorsConfiguration();
+        //放行哪些原始域
+        config.addAllowedOrigin("*");
+        //是否发送 Cookie
+        config.setAllowCredentials(true);
+        //放行哪些请求方式
+        config.addAllowedMethod("*");
+        //放行哪些原始请求头部信息
+        config.addAllowedHeader("*");
+        //暴露哪些头部信息
+        config.addExposedHeader("*");
+        //2. 添加映射路径
+        UrlBasedCorsConfigurationSource corsConfigurationSource = new UrlBasedCorsConfigurationSource();
+        corsConfigurationSource.registerCorsConfiguration("/**",config);
+        //3. 返回新的CorsFilter
+        return new CorsFilter(corsConfigurationSource);
+    }
+}
+
+```
+
+#### 2. 重写 WebMvcConfigurer(全局跨域)
+
+```java
+@Configuration
+public class CorsConfig implements WebMvcConfigurer {
+    @Override
+    public void addCorsMappings(CorsRegistry registry) {
+        registry.addMapping("/**")
+                //是否发送Cookie
+                .allowCredentials(true)
+                //放行哪些原始域
+                .allowedOriginPatterns("*")
+                .allowedMethods(new String[]{"GET", "POST", "PUT", "DELETE"})
+                .allowedHeaders("*")
+                .exposedHeaders("*");
+    }
+}
+```
+
+#### 3.使用注解 (局部跨域)
+
+在控制器(类上)上使用注解 @CrossOrigin:，表示该类的所有方法允许跨域。
+
+```java
+@RestController
+@CrossOrigin(origins = "*")
+public class HelloController {
+    @RequestMapping("/hello")
+    public String hello() {
+        return "hello world";
+    }
+}
+```
+
+在方法上使用注解 @CrossOrigin:
+
+```java
+@RequestMapping("/hello")
+    @CrossOrigin(origins = "*")
+     //@CrossOrigin(value = "http://localhost:8081") //指定具体ip允许跨域
+    public String hello() {
+        return "hello world";
+    }
+
+```
+
+#### 4. 手动设置响应头(局部跨域)
+
+使用 HttpServletResponse 对象添加响应头(Access-Control-Allow-Origin)来授权原始域，这里 Origin的值也可以设置为 “*”,表示全部放行。
+
+```java
+@RequestMapping("/index")
+public String index(HttpServletResponse response) {
+    response.addHeader("Access-Allow-Control-Origin","*");
+    return "index";
+}
+```
+
+#### 5. 使用自定义filter实现跨域
+
+##### SSM用法
+
+首先编写一个过滤器，可以起名字为MyCorsFilter.java
+
+```java
+package com.mesnac.aop;
+
+import java.io.IOException;
+import javax.servlet.Filter;
+import javax.servlet.FilterChain;
+import javax.servlet.FilterConfig;
+import javax.servlet.ServletException;
+import javax.servlet.ServletRequest;
+import javax.servlet.ServletResponse;
+import javax.servlet.http.HttpServletResponse;
+import org.springframework.stereotype.Component;
+@Component
+public class MyCorsFilter implements Filter {
+  public void doFilter(ServletRequest req, ServletResponse res, FilterChain chain) throws IOException, ServletException {
+    HttpServletResponse response = (HttpServletResponse) res;
+    response.setHeader("Access-Control-Allow-Origin", "*");
+    response.setHeader("Access-Control-Allow-Methods", "POST, GET, OPTIONS, DELETE");
+    response.setHeader("Access-Control-Max-Age", "3600");
+    response.setHeader("Access-Control-Allow-Headers", "x-requested-with,content-type");
+    chain.doFilter(req, res);
+  }
+  public void init(FilterConfig filterConfig) {}
+  public void destroy() {}
+}
+
+```
+
+在web.xml中配置这个过滤器，使其生效
+
+```java
+<!-- 跨域访问 START-->
+<filter>
+ <filter-name>CorsFilter</filter-name>
+ <filter-class>com.mesnac.aop.MyCorsFilter</filter-class>
+</filter>
+<filter-mapping>
+ <filter-name>CorsFilter</filter-name>
+ <url-pattern>/*</url-pattern>
+</filter-mapping>
+<!-- 跨域访问 END  -->
+
+```
+
+##### springboot可以简化
+
+```java
+import org.springframework.context.annotation.Configuration;
+import javax.servlet.*;
+import javax.servlet.annotation.WebFilter;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+@WebFilter(filterName = "CorsFilter ")
+@Configuration
+public class CorsFilter implements Filter {
+    @Override
+    public void doFilter(ServletRequest req, ServletResponse res, FilterChain chain) throws IOException, ServletException {
+        HttpServletResponse response = (HttpServletResponse) res;
+        response.setHeader("Access-Control-Allow-Origin","*");
+        response.setHeader("Access-Control-Allow-Credentials", "true");
+        response.setHeader("Access-Control-Allow-Methods", "POST, GET, PATCH, DELETE, PUT");
+        response.setHeader("Access-Control-Max-Age", "3600");
+        response.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+        chain.doFilter(req, res);
+    }
+}
+
+```
+
+## SpringBoot中使用
+
+### DataGetRequestController
+
+```java
+package com.boot.controller;
+
+import com.boot.entity.User;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.util.List;
+import java.util.Map;
+
+@RestController
+public class DataGetRequestController {
+
+    @GetMapping("/getInt")
+    public int getInt(int id){
+        return id;
+    }
+
+    @GetMapping(value = "/getBox")
+    public String getBox(String name,Integer id){
+        return "name = " + name + " id = " + id;
+    }
+
+    @GetMapping("/getRequestParam")
+    public String getRequestParam(@RequestParam(value = "rp",required = false) Integer id){
+        return "ID = " + id;
+    }
+
+    @GetMapping(value = "/getUser")
+    public User getUser(User user){
+        return user;
+    }
+
+    @GetMapping("/getIds")
+    public List<Long> getIds(@RequestParam List<Long> ids){
+        return ids;
+    }
+
+    @GetMapping(value = "/getMap")
+    public Map<String,Object> getMap(@RequestParam Map<String,Object> map){
+        return map;
+    }
+
+    @GetMapping(value = "/getObj")
+    public Object getObj(@RequestParam(name = "ik",required = true,defaultValue = "500") Integer id){
+        return id;
+    }
+
+    @GetMapping("/getArr")
+    public String[] getArr(String[] arr){
+        return arr;
+    }
+
+    @GetMapping(value = "/getList")
+    public List<String> getList(@RequestParam List<String> names){
+        return names;
+    }
+
+}
+
+
+```
+
+### DataPostRequestController
+
+```java
+package com.boot.controller;
+
+import com.boot.entity.User;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.util.List;
+import java.util.Map;
+
+@RestController
+public class DataPostRequestController {
+    //表单形式接收
+    @PostMapping("/postInt")
+    public int postInt(int id){
+        return id;
+    }
+
+    //表单形式接收
+    @PostMapping("/postBox")
+    public String postBox(String name,Integer id){
+        return "name = " + name +" id = " + id;
+    }
+
+    /**
+     * @RequestBody:
+     * 要求请求参数必须是在body中的
+     *
+     * 如果不加@RequestBody:
+     * 请求可以放在parameter、body中
+     * 复杂对象也是可以传的
+     * @param user
+     * @return
+     */
+    @PostMapping("/postUser")
+    public User postUser(@RequestBody User user){
+        return user;
+    }
+
+    //表单形式接收
+    @PostMapping("/postUserNoBody")
+    public User postUserNoBody( User user){
+        return user;
+    }
+
+    @PostMapping("/postIds")
+    public List<Integer> postIds(@RequestBody List<Integer> ids){
+        return ids;
+    }
+
+    @PostMapping("/postUsers")
+    public List<User> postUsers(@RequestBody List<User> users){
+        return users;
+    }
+
+    @PostMapping("/postMap")
+    public Map<String,Object> postMap(@RequestBody Map<String,Object> map){
+        return map;
+    }
+
+}
+
+
+```
+
+### axios get请求
+
+```javascript
+<script setup>
+
+import {getData,postData,uploadFile} from './remote.ts'
+
+getData('/getInt',{id:100}).then(function (res) {
+  console.log('getInt--->'+res)
+})
+
+getData('/getBox',{id:100,name:'张三'}).then(function (res) {
+  console.log('getBox--->'+res)
+})
+
+getData('/getRequestParam',{rp:100}).then(function (res) {
+  console.log('getRequestParam--->'+res)
+})
+
+getData('/getUser',{id:100,userName:'张三',password:'123456'}).then(function (res) {
+  console.log('getUser--->id:'+res.id+' userName:'+res.userName+' password:'+res.password)
+})
+
+getData('/getIds',{ids:'1,2,3,4,5'}).then(function (res) {
+  console.log('getIds--->'+res)
+  console.log('getIds--->'+res[3])
+})
+
+getData('/getMap',{id:100,userName:'张三',password:'123456'}).then(function (res) {
+  console.log('getMap--->id:'+res.id+' userName:'+res.userName+' password:'+res.password)
+})
+
+getData('/getArr',{arr:'张三,李四,王五'}).then(function (res) {
+  console.log('getArr--->'+res)
+})
+
+getData('/getList',{names:'张三,李四,王五'}).then(function (res) {
+  console.log('getList--->'+res)
+})
+
+</script>
+
+<template>
+
+</template>
+
+```
+
+### axios post请求
+
+```javascript
+<script setup>
+
+import {getData,postData,postDataForm,uploadFile} from './remote.ts'
+
+postDataForm('/postInt',{id:100}).then(function (res) {
+  console.log(res)
+  console.log('postInt--->'+res.data)
+})
+
+postDataForm('/postBox',{id:100,name:'李四'}).then(function (res) {
+  console.log(res)
+  console.log('postBox--->'+res.data)
+})
+
+postData('/postUser',{id:100,userName:'李四',password:'123456'}).then(function (res) {
+  console.log(res)
+  console.log('postUser--->id:'+res.data.id+' userName:'+res.data.userName+' password:'+res.data.password)
+})
+
+postDataForm('/postUserNoBody',{id:100,userName:'李四',password:'123456'}).then(function (res) {
+  console.log(res)
+  console.log('postUserNoBody--->id:'+res.data.id+' userName:'+res.data.userName+' password:'+res.data.password)
+})
+
+postData('/postIds',[1,2,3,4,5]).then(function (res) {
+  console.log(res)
+  console.log('postIds--->'+res)
+})
+
+postData('/postUsers',[{id:100,userName:'李四',password:'123456'},{id:101,userName:'王五',password:'123456'}]).then(function (res) {
+  console.log('----postUsers----')
+  console.log(res)
+  console.log('----postUsers----')
+})
+
+postData('/postMap',{id:100,userName:'李四',password:'123456'}).then(function (res) {
+  console.log('----postMap----')
+  console.log(res)
+  console.log('----postMap----')
+})
+</script>
+
+<template>
+
+</template>
+
+```
+
+## export
+
+ES中的模块导出导入
+
+说实话，在es中的模块，就非常清晰了。不过也有一些细节的东西需要搞清楚。
+
+比如 export 和 export default，还有 导入的时候，import a from ..,import {a} from ..，总之也有点乱，那么下面我们就开始把它们捋清楚吧。
+
+export 和 export default
+
+首先我们讲这两个导出，下面我们讲讲它们的区别
+
+export与export default均可用于导出常量、函数、文件、模块等
+
+在一个文件或模块中，export、import可以有多个，export default仅有一个
+
+通过export方式导出，在导入时要加{ }，export default则不需要
+
+export能直接导出变量表达式，export default不行。
+
+# Elementplus
+
+## 安装
+
+### 安装依赖
+
+官网文档
+
+https://element-plus.org/zh-CN/guide/installation.html
+
+```
+npm install element-plus
+```
+
+### 导入
+
+官网文档
+
+https://element-plus.org/zh-CN/guide/quickstart.html
+
+main.ts
+
+```
+import { createApp } from 'vue'
+import ElementPlus from 'element-plus'
+import 'element-plus/dist/index.css'
+import App from './App.vue'
+
+const app = createApp(App)
+
+app.use(ElementPlus)
+app.mount('#app')
+```
+
+### 例子
+
+其他组件参考官网：
+
+https://element-plus.org/zh-CN/component/button.html
+
+App.vue
+
+```
+<template>
+  <el-row class="mb-4">
+    <el-button>Default</el-button>
+    <el-button type="primary">Primary</el-button>
+    <el-button type="success">Success</el-button>
+    <el-button type="info">Info</el-button>
+    <el-button type="warning">Warning</el-button>
+    <el-button type="danger">Danger</el-button>
+  </el-row>
+
+  <el-row class="mb-4">
+    <el-button plain>Plain</el-button>
+    <el-button type="primary" plain>Primary</el-button>
+    <el-button type="success" plain>Success</el-button>
+    <el-button type="info" plain>Info</el-button>
+    <el-button type="warning" plain>Warning</el-button>
+    <el-button type="danger" plain>Danger</el-button>
+  </el-row>
+
+  <el-row class="mb-4">
+    <el-button round>Round</el-button>
+    <el-button type="primary" round>Primary</el-button>
+    <el-button type="success" round>Success</el-button>
+    <el-button type="info" round>Info</el-button>
+    <el-button type="warning" round>Warning</el-button>
+    <el-button type="danger" round>Danger</el-button>
+  </el-row>
+
+  <el-row>
+    <el-button :icon="Search" circle />
+    <el-button type="primary" :icon="Edit" circle />
+    <el-button type="success" :icon="Check" circle />
+    <el-button type="info" :icon="Message" circle />
+    <el-button type="warning" :icon="Star" circle />
+    <el-button type="danger" :icon="Delete" circle />
+  </el-row>
+
+  <el-row class="mb-4">
+    <el-button disabled>Default</el-button>
+    <el-button type="primary" disabled>Primary</el-button>
+    <el-button type="success" disabled>Success</el-button>
+    <el-button type="info" disabled>Info</el-button>
+    <el-button type="warning" disabled>Warning</el-button>
+    <el-button type="danger" disabled>Danger</el-button>
+  </el-row>
+
+  <el-row>
+    <el-button plain disabled>Plain</el-button>
+    <el-button type="primary" plain disabled>Primary</el-button>
+    <el-button type="success" plain disabled>Success</el-button>
+    <el-button type="info" plain disabled>Info</el-button>
+    <el-button type="warning" plain disabled>Warning</el-button>
+    <el-button type="danger" plain disabled>Danger</el-button>
+  </el-row>
+
+  <p>Basic link button</p>
+  <div class="flex justify-space-between mb-4 flex-wrap gap-4">
+    <el-button
+        v-for="button in buttons"
+        :key="button.text"
+        :type="button.type"
+        link
+    >{{ button.text }}</el-button
+    >
+  </div>
+
+  <p>Disabled link button</p>
+  <div class="flex justify-space-between flex-wrap gap-4">
+    <el-button
+        v-for="button in buttons"
+        :key="button.text"
+        :type="button.type"
+        link
+        disabled
+    >{{ button.text }}</el-button
+    >
+  </div>
+
+</template>
+
+<script setup lang="ts">
+import {
+  Check,
+  Delete,
+  Edit,
+  Message,
+  Search,
+  Star,
+} from '@element-plus/icons-vue'
+
+const buttons = [
+  { type: '', text: 'plain' },
+  { type: 'primary', text: 'primary' },
+  { type: 'success', text: 'success' },
+  { type: 'info', text: 'info' },
+  { type: 'warning', text: 'warning' },
+  { type: 'danger', text: 'danger' },
+] as const
+
+</script>
+
+<style scoped>
+
+</style>
+
+```
+
+## 布局
+
+官网：https://element-plus.gitee.io/zh-CN/component/container.html
+
+注意：布局类似于bootstrap，只给框架，不添加样式，背景色、高度、宽度可以自定义控制。
+
+复制出来的代码是没有颜色的
+
+添加样式颜色
+
+```
+<template>
+  <div class="common-layout">
+    <el-container>
+      <el-header>Header</el-header>
+      <el-main>Main</el-main>
+    </el-container>
+  </div>
+</template>
+
+<script setup lang="ts">
+
+</script>
+
+<style scoped>
+.el-header{
+  background-color: #646cff;
+}
+.el-main{
+  background-color: chocolate;
+}
+</style>
+```
+
+## Icon 图标
+
+### 安装
+
+```
+npm install @element-plus/icons-vue
+```
+
+### 注册所有图标
+
+从 @element-plus/icons-vue 中导入所有图标并进行全局注册
+
+```
+// main.ts
+
+// 如果您正在使用CDN引入，请删除下面一行。
+import * as ElementPlusIconsVue from '@element-plus/icons-vue'
+
+const app = createApp(App)
+for (const [key, component] of Object.entries(ElementPlusIconsVue)) {
+  app.component(key, component)
+}
+```
+
+### 基础用法
+
+这里的size、color值是需要手动添加的，官网例子中没有，需要注意下。
+
+```javascript
+<template>
+  <div>
+    <el-icon :size="size" :color="color" >
+      <Edit />
+    </el-icon>
+    <!-- 或者独立使用它，不从父级获取属性 -->
+    <Edit />
+  </div>
+
+</template>
+
+<script setup lang="ts">
+
+let size = $ref(20)
+let color = $ref('red')
+</script>
+
+<style scoped>
+
+</style>
+```
+
+# Vue3 setup
+
+## Vue3 setup
+
+### 为什么使用setup
+
+当项目变大时，一个方法（methods）、一个数据（data）、一张表，相同的逻辑代码出现在多个地方，给维护带来很大的不便。 setup的出现就是为了解决这个问题。
+
+setup可以当做方法形式使用，也可以放到script标签上
+
+### 创建vue3项目
+
+开始之前首先确认vue cli 版本
+
+```
+vue --version
+```
+
+安装 vue cli
+
+```
+npm install -g @vue/cli
+```
+
+创建基于vue3的项目：
+
+```
+vue create vue3
+```
+
+选择 vue3：
+
+![img](https://cdn.nlark.com/yuque/0/2023/png/23145762/1687067018349-5ee74eca-74b4-4a83-b4ee-a1f144c89b81.png)
+
+点击回车安装。
+
+### 在组件中编写setup方法
+
+```
+<template>
+  <div class="hello">
+    <h1>{{ name }}</h1>
+  </div>
+</template>
+<script>
+export default {
+  name: "App",
+  setup(msg) {
+    console.log(msg);
+    return { name:"张三" };
+  },
+};
+</script>
+<style scoped>
+</style>
+
+```
+
+如果一切正常，你将看到此输出：
+
+![image-20240820172818914](imge/Vue3.0.assets/image-20240820172818914.png)
+
+### setup生命周期
+
+#### 执行时机
+
+setup 会在 beforeCreate 之前执行。
+
+```
+<template>
+  <div class="hello">
+    <h1>{{ name }}</h1>
+  </div>
+</template>
+<script>
+export default {
+  name: "App",
+  setup(msg) {
+    console.log(msg);
+    return { name:"张三" };
+  },
+  beforeCreate(){
+    console.log("beforeCreate");
+  }
+};
+</script>
+<style scoped>
+</style>
+
+```
+
+![image-20240820172905184](imge/Vue3.0.assets/image-20240820172905184.png)
+
+#### setup 包含的生命周期
+
+onBeforeMount——挂载开始前调用
+
+onMounted——挂载后调用
+
+onBeforeUpdate——当响应数据改变，且重新渲染前调用
+
+onUpdated——重新渲染后调用
+
+onBeforeUnmount——Vue实例销毁前调用
+
+onUnmounted——实例销毁后调用
+
+onActivated——当keep-alive组件被激活时调用
+
+onDeactivated——当keep-alive组件取消激活时调用
+
+onErrorCaptured——从子组件中捕获错误时调用
+
+比如：onMounted：
+
+```
+<template>
+  <div class="hello">
+    <h1>{{ name }}</h1>
+  </div>
+</template>
+<script>
+import { onMounted } from 'vue'
+
+export default {
+  name: "App",
+  setup(msg) {
+    onMounted(()=>{
+      console.log("onMounted");
+    })
+
+    console.log(msg);
+    return { name:"张三" };
+  },
+  beforeCreate(){
+    console.log("beforeCreate");
+  }
+};
+</script>
+<style scoped>
+</style>
+
+```
+
+### setup使用ref对数据进行响应式绑定
+
+响应式绑定：使用ref
+
+```
+<template>
+  <div class="hello">
+    <h1>{{ name }}</h1>
+    <h5>count:{{count}}</h5>
+  </div>
+</template>
+<script>
+import { onMounted } from 'vue'
+
+export default {
+  name: "App",
+  setup(msg) {
+    onMounted(()=>{
+      console.log("onMounted");
+    })
+
+    console.log(msg);
+
+    //创建定时器增加count值
+    let count = 1;
+    setInterval(()=>{
+      count++
+    },1000)
+
+    return { name:"张三",count:count  };
+  },
+  beforeCreate(){
+    console.log("beforeCreate");
+  }
+};
+</script>
+<style scoped>
+</style>
+
+```
+
+虽然我们创建了定时器增加count的值，但视图并未发生变化。
+
+![image-20240820173025004](imge/Vue3.0.assets/image-20240820173025004.png)
+
+换成 ref 赋值：
+
+```
+<template>
+  <div class="hello">
+    <h1>{{ name }}</h1>
+    <h5>count:{{count}}</h5>
+  </div>
+</template>
+<script>
+import { ref,onMounted } from 'vue'
+
+export default {
+  name: "App",
+  setup(msg) {
+    onMounted(()=>{
+      console.log("onMounted");
+    })
+
+    console.log(msg);
+
+    //创建定时器增加count值
+    //创建定时器增加count值
+    let count = ref(1);
+    setInterval(()=>{
+      count.value++
+    },1000)
+    return { name:"张三",count:count  };
+  },
+  beforeCreate(){
+    console.log("beforeCreate");
+  }
+};
+</script>
+<style scoped>
+</style>
+
+```
+
+ref接受参数并返回它包装在一个带有value属性的对象中，然后可以使用该属性访问或改变反应变量的值
+
+别忘了引入ref：
+
+```
+import { ref,onMounted } from 'vue'
+```
+
+接下来视图的数据会一直变化。
+
+### setup使用watch和computed
+
+#### 对变化做出反应 watch
+
+使用 watch 监听count的变化：
+
+```
+<template>
+  <div class="hello">
+    <h1>{{ name }}</h1>
+    <h5>count:{{count}}</h5>
+  </div>
+</template>
+<script>
+import { ref,onMounted,watch  } from 'vue'
+
+export default {
+  name: "App",
+  setup(msg) {
+    onMounted(()=>{
+      console.log("onMounted");
+    })
+
+    console.log(msg);
+
+    //创建定时器增加count值
+    //创建定时器增加count值
+    let count = ref(1);
+    setInterval(()=>{
+      count.value++
+    },1000)
+
+    watch(count, (newValue, oldValue) => {
+      console.log(newValue,oldValue);
+      console.log(count.value);
+    });
+
+    return { name:"张三",count:count  };
+  },
+  beforeCreate(){
+    console.log("beforeCreate");
+  }
+};
+</script>
+<style scoped>
+</style>
+
+```
+
+#### 使用 computed 计算count的值：
+
+```
+let count2 = computed(()=>count.value*2);
+
+return { name:"张三",count:count2   };
+```
+
+数据将会展示出：2 4 6 8…
+
+### setup看起来似乎更笨重了
+
+当代码多的时候，看起来似乎没有解决问题，反而看起来很笨重。
+
+我们可以将代码分成多个部分并引入：
+
+新建 mycount.js 文件：
+
+```
+import { ref } from 'vue'
+export default function mycount(){
+    //创建定时器增加count值
+    let count = ref('1');
+    setInterval(()=>{
+        count.value++
+    },1000)
+    return{
+        count:count
+    }
+}
+
+```
+
+引入 mycount 文件：
+
+```
+<template>
+  <div class="hello">
+    <h1>{{ name }}</h1>
+    <h5>count:{{count}}</h5>
+  </div>
+</template>
+<script>
+import mycount from "@/assets/mycount";
+
+export default {
+  name: "App",
+  setup() {
+    let {count} = mycount();
+
+    return { name:"张三",count:count   };
+  },
+  beforeCreate(){
+    console.log("beforeCreate");
+  }
+};
+</script>
+<style scoped>
+</style>
+
+```
+
+count的值会实时变化并更新视图。
+
+### 关于 props 的值
+
+父组件给子组件传值 user:'anny'
+
+子组件setup可以取出该值：
+
+子组件
+
+```
+<template>
+  <div >
+    子组件
+  </div>
+</template>
+<script>
+
+export default {
+  name: "App",
+  props:{
+    user:String
+  },
+  setup(msg) {
+    console.log(msg.user)
+
+    return { name:"张三" };
+  },
+  beforeCreate(){
+    console.log("beforeCreate");
+  }
+};
+</script>
+<style scoped>
+</style>
+
+```
+
+父组件
+
+```
+<template>
+  <div class="hello">
+    <Hello user="张三"></Hello>
+  </div>
+</template>
+<script>
+import Hello from "@/components/Hello";
+
+export default {
+  name: "App",
+  components:{Hello}
+};
+</script>
+<style scoped>
+</style>
+
+```
+
+## Vue3 setup参数
+
+vue3中setup的两个参数 props，context (attrs，emit，slots)，vue3中的双向数据绑定自定义事件emit和v-model
+
+### setup函数
+
+有两个参数分别是props，context
+
+```
+setup(props,context){
+  console.log(props,context)
+}
+```
+
+### props参数
+
+props参数是一个对象，里面存有外部传入的属性
+
+#### 案例
+
+##### 第一种写法(用setup函数的方式)：
+
+父组件（这种写法父组件必须写components命名)
+
+```
+<template>
+  <div >
+    <h1>这是父组件的name：{{obj.name}}</h1>
+    <Box :age="obj.age" :name="obj.name"></Box>
+  </div>
+</template>
+<script>
+import Box from "@/components/Box";
+import {reactive} from "vue";
+
+export default {
+  name: "App",
+  components:{ //这种写法必须命名
+    Box
+  } ,
+  setup(){
+    let obj=reactive({name:"小狮子",age:18})
+    return {obj}
+  }
+};
+</script>
+<style scoped>
+</style>
+```
+
+子组件
+
+```
+<template>
+  <div >
+    <h1>33</h1>
+    <h2>这是子组件的age：{{age}}</h2>
+    <h3>这是子组件的name：{{name}}</h3>
+  </div>
+</template>
+<script>
+
+export default {
+  name: "App",
+  props:["age",'name'],
+  setup(props) {
+    console.log(props,666) //打印props属性
+  }
+};
+</script>
+<style scoped>
+</style>
+
+```
+
+此时效果如下，说明传值成功，且控制台打印：说明props参数为一个proxy对象，里面存有父组件传入的属性值
+
+![image-20240820180632746](imge/Vue3.0.assets/image-20240820180632746.png)
+
+##### 第二种方法（语法糖形式即setup写入script标签中）也可以传值，
+
+父组件：
+
+```
+<template>
+  <div>
+    <h1>这是父组件的name：{{obj.name}}</h1>
+    <Box :age="obj.age" :name="obj.name"></Box>
+
+  </div>
+</template>
+
+<script setup>
+import Box from "@/components/Box";
+
+import { reactive } from 'vue';
+let obj=reactive({name:"小狮子",age:18})
+</script>
+```
+
+子组件（此时需要自己在script标签中将值传进来用 defineProps([ ])  ）
+
+```
+<template>
+  <div>
+    <h1>33</h1>
+    <h2>这是子组件的age：{{obj.age}}</h2>
+    <h3>这是子组件的name：{{obj.name}}</h3>
+  </div>
+</template>
+
+<script setup>
+import {defineProps} from "vue";
+
+let obj=defineProps(["age","name"])
+console.log(obj)
+</script>
+```
+
+效果一样
+
+![image-20240820180810404](imge/Vue3.0.assets/image-20240820180810404.png)
+
+#### context (attrs，emit，slots)
+
+context：上下文对象
+
+- attrs: 值为对象，包含：组件外部传递过来，但没有在props配置中声明的属性
+- slots: 写入插槽的内容
+- emit: 自定义事件函数
+
+```
+setup(props,context){
+  console.log(context.attrs,context.emit,context.slots)
+}
+```
+
+### vue3中的双向数据绑定自定义事件emit和v-model
+
+#### emit自定义事件
+
+下面只阐述语法糖形式的内容即setup写入script标签中的写法
+
+注意：
+
+defineEmit  是vue3.2版本之前的用法
+    useContext 3.2 但是废弃了 useContext函数的返回值有{emit,attr,}
+    vue3.2版本之后用defineEmits
+
+案例：子组件向父组件传值
+
+父组件代码
+
+```
+<template>
+  <div>
+    <h1>这是父组件的name：{{obj.name}}</h1>
+    <!-- 绑定一个自定义事件 -->
+    <Box :age="obj.age" :name="obj.name" @mychange="fn"></Box>
+
+  </div>
+</template>
+
+<script setup>
+import Box from "./components/Box.vue"
+import { reactive } from 'vue';
+let obj=reactive({name:"小狮子",age:18})
+
+let fn=(arg1,arg2)=>{
+  obj.age=arg1
+  console.log("这是父组件的自定义事件","这是传入的值：",arg1,arg2)
+}
+</script>
+```
+
+子组件（defineEmits可以不引入，3.2版本之后自带）
+
+如果不用setup语法糖，用的setup函数中的参数context使用emit，即cotext.emit去使用
+
+```
+<template>
+  <div>
+    <h1>33</h1>
+    <h2>这是子组件的age：{{obj.age}}</h2>
+    <h3>这是子组件的name：{{obj.name}}</h3>
+    <button @click="fn1">触发自定义事件</button>
+  </div>
+</template>
+
+<script setup>
+import {defineEmits} from "vue" //可以不引入
+
+let obj=defineProps(["age","name"])
+
+let emit=defineEmits() //如果用的setup函数则是用cotext.emit去使用
+
+let fn1=()=>{
+  emit("mychange",11,22) //可以传参 //用setup函数则为context.emit("mychange",11,22)
+}
+
+</script>
+```
+
+效果图
+
+![image-20240820181016584](imge/Vue3.0.assets/image-20240820181016584.png)
+
+点击按钮后界面后控制台的内容为
+
+![image-20240820181035662](imge/Vue3.0.assets/image-20240820181035662-17241486430001.png)
+
+成功触发了自定义事件，还可以得出子组件向父组件传值可以用自定义事件
+
+#### v-model
+
+由上边的emit得知，v-model也是大致一样
+
+父组件
+
+```
+<HomeView v-model:title="bookTitle"></HomeView>
+```
+
+子组件
+
+1.接收参数：props:["title"] （在语法糖中则是用defineProps(["title"])）
+
+2.定义事件：emits: ['update:title'] 必须写update
+
+3.触发事件：this.$emit("update:title","子组件传递给父组件的值")
+
+重点举例：多个 v-model 绑定
+
+如：
+
+```
+<MyVmodel v-model="msg" v-model:msg2="msg2" v-model:msg3="msg3"></MyVmodel> 
+```
+
+父组件
+
+```
+<template>
+  <div>
+    <h1>这是父组件的msg:{{msg1}}--{{msg2}}--{{msg3}}</h1>
+    <!-- 绑定一个自定义事件 -->
+    <Box :age="obj.age" :name="obj.name"
+         v-model:msg1="msg1" v-model:msg2="msg2" v-model:msg3="msg3"></Box>
+
+  </div>
+</template>
+
+<script setup>
+import Box from "./components/Box.vue"
+import { reactive,ref} from 'vue';
+let obj=reactive({name:"小狮子",age:18})
+
+let msg1=ref("大牛")
+let msg2=ref("大狮")
+let msg3=ref("大羊")
+</script>
+```
+
+子组件
+
+```
+<template>
+  <div>
+
+    <h2>这是子组件的age：{{obj.age}}</h2>
+    <h3>这是子组件的name：{{obj.name}}</h3>
+    <h4>这是v-model传入的值：{{obj.msg1}}--{{obj.msg2}}--{{obj.msg3}}</h4>
+    <button @click="fn1">改变msg1</button>
+    <button @click="fn2">改变msg2</button>
+  </div>
+</template>
+
+<script setup>
+import {defineEmits} from "vue"
+
+let obj=defineProps(["age","name","msg1","msg2","msg3"])
+
+let emits=defineEmits()
+
+let fn1=()=>{
+  emits("update:msg1","小牛") //写多个传参，只生效第一个
+}
+let fn2=()=>{
+  emits("update:msg2","小狮") //写多个传参，只生效第一个
+}
+
+</script>
+```
+
+效果图
+
+![image-20240820181221163](imge/Vue3.0.assets/image-20240820181221163.png)
+
+当我们分别点击两个按钮时：
+
+![image-20240820181234516](imge/Vue3.0.assets/image-20240820181234516.png)
+
+说明双向数据绑定成功
+
+## 语法糖与函数区别
+
+[Vue3 script setup 语法糖详解 - 掘金](https://juejin.cn/post/7009282373476941831)
+
+[vue3中＜script setup＞ 和 setup函数的区别_setup语法糖与setup函数的区别_奥特曼　的博客-CSDN博客](https://blog.csdn.net/m0_46846526/article/details/126832370)
+
+# Vue3 部署
+
+打包部署到nginx
+
+打包命令
+
+```
+npm run build
+```
+
+配置nginx
+
+```
+server {
+    listen       8001;
+    server_name  localhost;
+
+    location / {
+        root   E:/java/07_vuejs/source/vue12/dist;
+        index  index.html;
+        add_header 'Access-Control-Allow-Origin' *;
+    }
+    error_page   500 502 503 504  /50x.html;
+    location = /50x.html {
+        root   html;
+    }
+}
+```
+

@@ -613,7 +613,7 @@ engine = create_engine('mysql+pymysql://root:qazwsx@localhost/试验库?charset=
 ```
 # 创建数据库连接,mysql用户名是root，密码是qazwsx，本地的数据库服务是localhost,数据库的名称试验库,数据库编码utf8
 import pymysql
-con = pymysql.connect(host=localhost, user=username, password=password, database=dbname, charset=‘utf8’, use_unicode=True)
+con = pymysql.connect(host=localhost, user=username, password=password, database=dbname, charset='utf8', use_unicode=True)
 ```
 
 
@@ -2121,6 +2121,21 @@ df["c"] = (df["a"]-df["b"]).dt.total_seconds() /3600
 ==============================================================================
                     a                   b    c
 0 2024-05-21 01:01:01 2024-05-21 04:01:01 -3.0
+```
+
+### 5.22 单列拆分多列
+
+```
+import pandas as pd
+
+df = pd.DataFrame({'a': ["1-2", "2-4", "3-5"], 'b': ["3-4", "5-6", "6-7"]})
+df[["c", "d"]] = df['a'].str.split("-", expand=True)
+print(df)
++++++++++++++++++++++++++
+     a    b  c  d
+0  1-2  3-4  1  2
+1  2-4  5-6  2  4
+2  3-5  6-7  3  5
 ```
 
 

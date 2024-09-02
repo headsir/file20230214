@@ -1131,6 +1131,8 @@ getattr(object, name[, default])
   3
   ```
 
+
+
 ## 4.17 print 函数
 
 print函数有四个参数：sep、end、file和flush
@@ -1186,6 +1188,34 @@ for i, j in enumerate(list):
 1 2
 2 3    
 ```
+
+## 4.19 `__getattribute__()`函数
+
+来源：https://mp.weixin.qq.com/s/Wm2INQrymrXWJtO3eMFOpg
+
+```
+class Maiyou:
+    def __init__(self,name, age, id_no):
+        self.name=name
+        self.age=age
+        self.id_no = id_no #深证号码
+
+    def __getattribute__(self, item):
+        """所有以id开头的属性都不能直接访问"""
+        if item.startswith('id'):
+            return '隐私属性，不能直接访问'
+        return object.__getattribute__(self,item) 
+
+
+m1 = Maiyou('Kevin', 18, '1234567890')
+print(m1.name)
+print(m1.age)
+
+# 这一行拦截访问！
+print(m1.id_no)
+```
+
+
 
 # 五、自定义函数
 

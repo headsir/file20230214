@@ -1066,6 +1066,26 @@ df1.reset_index(drop = True)
 
 - 正则选取：df[‘new_col’] = df[‘selected_col’].str.extract(‘正则表达式’, expand = True)
 
+  ```
+  Series.str.extract(pat, flags=0, expand=None)
+  参数的具体解释为：
+      pat：字符串或者正则表达式
+      flags：整型
+      expand：布尔值，是否返回DataFrame；T-是，F-否
+  ```
+
+  extract只返回第一个匹配到的字符；extractall将匹配所有返回的字符
+
+  ```
+  Series.str.extractall(pat, flags=0)
+  参数的具体解释为：
+      pat：字符串或者正则表达式
+      flags：整型
+  返回值一定是一个DataFrame数据框
+  ```
+
+  
+
 ### 4.2 行选择
 
 #### 4.2.1 选择某一行/某几行

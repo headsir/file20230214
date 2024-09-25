@@ -6,6 +6,31 @@
 
 ![image-20240621221435408](imge/VSCode使用.assets/image-20240621221435408.png)
 
+## Mypy Type Checker
+
+静态类型检查工具
+
+![image-20240925094319635](imge/VSCode使用.assets/image-20240925094319635.png)
+
+```
+ "mypy-type-checker.importStrategy": "useBundled",
+    "mypy-type-checker.args": [
+        "--follow-imports=skip",
+        "--ignore-missing-imports",
+        "--show-column-numbers",
+        "--allow-untyped-defs",
+        "--allow-subclassing-any",
+        "--allow-untyped-calls",
+        "--no-warn-no-return"
+    ],
+```
+
+
+
+
+
+
+
 ## One Dark Pro
 
 颜色主题插件
@@ -72,13 +97,41 @@
 ```
 // 启用black格式化插件
 "editor.defaultFormatter": "ms-python.black-formatter",
+
+//  禁止单双引号替换 --skip-string-normalization
+"black-formatter.args": ["--skip-string-normalization","--line-length","88"],
 ```
 
+## isort
 
+对py文件中的import排序
 
+![image-20240925093831698](imge/VSCode使用.assets/image-20240925093831698.png)
 
+```
+ # 配置为Black的规则
+ "isort.args":["--profile", "black"],
+```
 
+## Pylint
 
+Python代码静态分析工具。它能够检查代码质量、潜在错误、代码风格、复杂度等多个方面
+
+![image-20240925094247069](imge/VSCode使用.assets/image-20240925094247069.png)
+
+```
+"pylint.importStrategy": "useBundled",
+"pylint.args": [
+        "--disable=invalid-name,missing-module-docstring",
+        "--disable=W0612,W0631,W0703,W0621,W0613,W0611,W1308,C0411,C0111,C0103,C0301,C0304,C0305,E1101,R0913,R0914,R0915,R0903" ,
+    ]
+```
+
+## Pylance
+
+Python 语言服务器，可以利用语言服务器协议与 VS Code 进行通信。
+
+![image-20240925094447481](imge/VSCode使用.assets/image-20240925094447481.png)
 
 
 

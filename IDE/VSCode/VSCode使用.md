@@ -13,6 +13,7 @@
 ![image-20240925094319635](imge/VSCode使用.assets/image-20240925094319635.png)
 
 ```
+ // 配置
  "mypy-type-checker.importStrategy": "useBundled",
     "mypy-type-checker.args": [
         "--follow-imports=skip",
@@ -23,6 +24,11 @@
         "--allow-untyped-calls",
         "--no-warn-no-return"
     ],
+```
+
+```
+在Python中，#typeQ:ignore是一种类型注释，用于告诉Mypy类型检查器忽略特定的代码行或代码块。
+当你在代码中使用# type: ignore 时，Mypy将不会对该行或块进行类型检查。
 ```
 
 

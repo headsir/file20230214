@@ -364,6 +364,8 @@ DELETE FROM 表名【清空表】
 truncate  table 表名【清空表】
 DROP TABLE 表名  【删除数据表】
 
+ALTER TABLE 表名 DROP COLUMN 列名 【删除字段】
+
 ```
 
 ## 3.6 新建表

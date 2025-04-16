@@ -60,7 +60,7 @@ vue.code-snippets
     "body": [
         "<template>\n",
         "</template>\n",
-        "<script setup>\n",
+        "<script setup lang=\"ts\">\n",
         "</script>\n",
         "<style scoped>\n",
         "</style>",

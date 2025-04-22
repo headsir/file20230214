@@ -9,7 +9,7 @@
 菜鸟：https://www.runoob.com/vue3/vue3-tutorial.html
 ```
 
-# VUE3.0准备工作
+# 一、 VUE3.0准备工作
 
 ## 安装 node.js
 
@@ -77,6 +77,168 @@ plugins文件夹存放Vue插件，扩展应用功能。
 views文件夹存放视图组件，与路由直接关联。
 utils文件夹存放工具函数和辅助方法，提供通用功能。
 ```
+
+
+
+### tsconfig.json
+
+负责控制 TypeScript编译器的行为。
+
+> **根选项**
+> include：指定被编译文件所在的目录。
+> exclude：指定不需要被编译的目录。
+> extends：指定要继承的配置文件。
+> files：指定被编译的文件。
+> references：项目引用，是 TS 3.0 中的一项新功能，它允许将 TS 程序组织成更小的部分。
+> 使用小技巧：在填写路径时 ** 表示任意目录， * 表示任意文件。
+> compilerOptions：定义项目的运行时期望、JavaScript 的发出方式和位置以及与现有 JavaScript 代码的集成级别。
+
+常用的配置如下：
+
+```json
+{
+  "compilerOptions": {
+    // 目标代码(ts -> js(es5/6/7))
+    "target": "esnext",  
+    "allowJs": true, // 允许编译javascript文件。
+    "allowSyntheticDefaultImports": true,
+    "allowUnreachableCode": true, // 不报告执行不到的代码错误。
+    "allowUnusedLabels": false,	// 不报告未使用的标签错误
+    "alwaysStrict": false, // 以严格模式解析并为每个源文件生成 "use strict"语句
+    "baseUrl": ".",  // 文件路径在解析时,基本url,【工作根目录】
+    "declaration": true, // 是否自动创建类型声明文件
+    "declarationDir": "./lib", // 类型声明文件的输出目录
+    "esModuleInterop": true,
+    "experimentalDecorators": true, // 启用实验性的ES装饰器
+    "noImplicitAny": false, // 是否默认禁用 any
+    "removeComments": true, // 是否移除注释
+    "target": "esnext",// 编译的目标是什么版本的
+      
+    // "commonjs" 指定生成哪个模块系统代码
+    // export default/module.exports = {}
+    // es module 和 commonjs
+    // 目标代码需要使用的模块化方案(commonjs require/module.exports/es module import/export)
+    "module": "esnext", 
+    "moduleResolution": "node",  // 按照node的方式去解析模块 import "/index.node"
+    "jsx": "preserve",  // 对jsx进行怎么样的处理，在 .tsx文件里支持JSX
+    "importHelpers": true,  // 辅助的导入功能
+    "strict": true,  // 严格一些严格的检查(any)
+      
+    // 跳过一些库的类型检测 (axios -> 类型/ lodash -> @types/lodash / 其他的第三方)
+    // import { Person } from 'axios'
+    "skipLibCheck": true,
+    "suppressImplicitAnyIndexErrors": true,
+    "sourceMap": true,  // 是否生成map文件 要不要生成映射文件(ts -> js)
+    
+
+    // 指定具体要解析使用的类型
+    "types": ["webpack-env"],
+    // 指定模块的路径，和baseUrl有关联，和webpack中resolve.alias配置一样
+    "paths": {
+      "@/*": ["src/*"],
+      "@assets/*": ["src/assets/*"],
+      "@components/*": ["src/components/*"],
+      "@views/*": ["src/views/*"],
+      "@store/*": ["src/stores/*"],
+    },
+    // 编译过程中需要引入的库文件的列表
+    "lib": ["esnext", "dom", "dom.iterable", "scripthost"]
+  },
+    
+  // 指定一个匹配列表（属于自动指定该路径下的所有ts相关文件）
+  "include": [
+    "src/**/*.ts",
+    "src/**/*.tsx",
+    "src/**/*.vue",
+    "tests/**/*.ts",
+    "tests/**/*.tsx"
+  ],
+   // 指定不需要被编译的目录
+  "exclude": ["node_modules"]
+}
+```
+
+### vite.config.js(ts)
+
+官网：https://vitejs.dev/config/
+
+```javascript
+import { fileURLToPath, URL } from 'node:url'
+
+// 使用 defineConfig 帮手函数，这样不用 jsdoc 注解也可以获取类型提示
+import { defineConfig } from 'vite'
+import vue from '@vitejs/plugin-vue'
+import vueJsx from '@vitejs/plugin-vue-jsx'
+
+// 此处引用了path路径导向
+import path from "path"
+
+
+export default defineConfig({
+  // 查看 插件 API 获取 Vite 插件的更多细节 https://www.vitejs.net/guide/api-plugin.html
+  plugins: [vue(), vueJsx()],
+  // 在生产中服务时的基本路径
+  base: './',
+    
+  // 配置别名绝对路径  https://webpack.js.org/configuration/resolve/
+  resolve: {
+    // resolve.alias: 更轻松地为import或require某些模块创建别名
+    alias: {
+      // '@': fileURLToPath(new URL('./src', import.meta.url)),
+      // 如果报错__dirname找不到，需要安装node,执行npm install @types/node --save-dev
+      "@": path.resolve(__dirname, "./src"),
+      "@assets": path.resolve(__dirname, "./src/assets"),
+      "@components": path.resolve(__dirname, "./src/components"),
+      "@views": path.resolve(__dirname, "./src/views"),
+      "@store": path.resolve(__dirname, "./src/stores"),
+    },
+    // 忽略后缀名的配置选项, 添加 .vue 选项时要记得原本默认忽略的选项也要手动写入
+    extensions: ['.js', '.json', '.ts', '.vue'] 
+  },
+    
+  
+  // 打包相关配置 
+  // 参考资料：https://zhuanlan.zhihu.com/p/690208925
+  build: {
+    outDir: "dist",  // 与根相关的目录，构建输出将放在其中，如果目录存在，它将在构建之前被删除  @default 'dist'
+    rollupOptions: {  
+      // 单页面
+      input: './src/main.ts'  // 告诉Vite使用这个文件作为构建的入口
+      // 多页面配置  
+      // input: {
+        // main: './src/main.ts',
+        // another: './src/another_entry.ts'
+      // }
+    }  
+  },
+  
+  // 服务器配置  
+  server: {
+    https: false, // 是否开启 https
+    open: true, // 是否自动在浏览器中打开
+    port: 8001, // 端口号
+    host: "0.0.0.0",
+    // 跨域代理
+    proxy: {
+      '/api': {
+        target: "http://localhost:3000",  // 后台接口
+        changeOrigin: true,
+        // secure: false, // 如果是https接口，需要配置这个参数
+        // ws: true, //websocket支持
+        // 截取api，并用api代替
+        // rewrite: (path) => path.replace(/^\/api/, "/api"),
+      }
+    }
+  },
+
+  // 引入第三方的配置
+  optimizeDeps: {
+    include: [],
+  }
+})
+```
+
+
 
 ## 项目打包
 
@@ -148,6 +310,7 @@ user root;
 vue.code-snippets
 
 ```
+{
 "Print to console":{
     "prefix":"vue",
     "body": [
@@ -159,6 +322,7 @@ vue.code-snippets
         "</style>",
         ],
     "description":"Log output to console"
+}
 }
 ```
 
@@ -179,25 +343,6 @@ File-> Settings -> Tools -> Terminal -> Shell path中内容由cmd.exe修改为C:
 ### idea中vue.js插件
 
 ![image-20240816154607596](imge/Vue3.0.assets/image-20240816154607596.png)
-
-## vue修改端口
-
-vite.config.ts
-
-```javascript
-import { defineConfig } from 'vite'
-import vue from '@vitejs/plugin-vue'
-
-// https://vitejs.dev/config/
-export default defineConfig({
-  plugins: [vue()],
-  server:{
-    host:'0.0.0.0',
-    port:8088,
-    open:true //启动后打开浏览器
-  }
-})
-```
 
 ## typescript忽略类型检查
 
@@ -223,84 +368,80 @@ export default defineConfig({
 // @ts-check
 ```
 
-## 配置"@"路径别名
-
-https://cn.vitejs.dev/config/
-
 ## 安装依赖
 
 ```
 npm i @types/node
 ```
 
-## 修改vite.config.js
+# 二、基础语法
 
-```javascript
-import { defineConfig } from 'vite'
-import { resolve } from 'path'
+Vue.js 是一个渐进式 JavaScript 框架，主要用于构建用户界面。
 
-export default defineConfig {
-    // ...
-    resolve: {
-        alias: {
-            "@": resolve(__dirname, 'src'), // 路径别名
-        },
-        extensions: ['.js', '.json', '.ts'] // 使用路径别名时想要省略的后缀名，可以自己 增减
-    }
-    // ...
-}
-```
+Vue.js 基于组件化和响应式数据的理念，提供了一种简单高效的方式来构建用户界面。
 
-```javascript
-// @ts-nocheck
-import { defineConfig } from 'vite'
-import vue from '@vitejs/plugin-vue'
-import { resolve } from 'path'
+## Vue 单文件组件
 
-// https://vitejs.dev/config/
-export default defineConfig({
-  plugins: [
-    vue({
-      reactivityTransform: true
-    })
-  ],
-  resolve: {
-    alias: {
-      "@": resolve(__dirname, 'src'), // 路径别名
-    },
-    extensions: ['.js', '.json', '.ts'] // 使用路径别名时想要省略的后缀名，可以自己 增减
-  }
+Vue 单文件组件（Single File Component，简称 SFC）是 Vue.js 框架的文件格式，它允许开发者将 HTML、JavaScript 和 CSS 代码放在一个文件中，通常以 .vue 为文件后缀。
 
-})
-```
+单文件组件是一种可复用的代码组织形式，它将从属于同一个组件的 HTML、CSS 和 JavaScript 封装在使用 .vue 后缀的文件中。
 
-## 修改tsconfig.json
+## 1.创建 Vue 实例
 
-```javascript
-{
-    "compilerOptions" : {
-        // ...
-        "baseUrl": ".", // 用于设置解析非相对模块名称的基本目录，相对模块不会受到baseUrl的影响
-        "paths": { // 用于设置模块名到基于baseUrl的路径映射
-            "@/*": ["src/*"]
+创建一个 Vue 实例并将其挂载到一个 DOM 元素上。
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+</head>
+<body>
+    <div id="hello-vue">{{ message }}</div>
+    <script>
+        const { createApp,ref } = Vue
+        // 组合式
+        const HelloVueAppSetup = {
+            setup() {
+                const message = ref('Hello vue!')
+                return {message}
+             }
         }
-        // ...
-    }
+    // 创建应用实例
+    const app = createApp(HelloVueAppSetup)
+    // 挂载应用
+    app.mount('#hello-vue')
+    </script>
+</body>
+</html>
+```
+
+**HTML 部分说明：**
+
+```tex
+<div id="hello-vue">{{ message }}</div>:
+    这是一个 <div> 元素，它具有 id 为 hello-vue 。
+    在 Vue 应用中，这个 <div> 将会被 Vue 实例管理，并且会在数据发生变化时更新内容。
+{{ message }}:
+    这是 Vue.js 的模板语法，用于将 Vue 实例中的 message 数据绑定到页面上。
+    当 Vue 实例中的 message 数据变化时，页面上的内容也会随之更新。
+```
+
+**JavaScript 部分说明：**
+
+Vue 实例定义:
+
+```tex
+const HelloVueAppSetup = {
+            setup() {
+                const message = ref('Hello vue!')
+                return {message}
+             }
 }
-
 ```
 
-## vite忽略扩展名
+- `HelloVueAppSetup` 是一个普通的 JavaScript 对象，包含了 Vue 组件。
 
-```javascript
-// vite.config.js
-import { defineConfig } from 'vite'
-export default defineConfig({
-    // ...其他配置项
-    resolve: {
-      // 忽略后缀名的配置选项, 添加 .vue 选项时要记得原本默认忽略的选项也要手动写入
-      extensions: ['.mjs', '.js', '.ts', '.jsx', '.tsx', '.json', '.vue']
-    }
-  })
-```
-
+- `setup`函数来定义响应式数据`message`。
+- 使用`ref`来创建响应式数据`message`。
+- `setup`函数中返回`message`，这样就可以在模板中被访问和使用。

@@ -559,3 +559,210 @@ app.mount('#hello-vue')
 ## 5. 组件
 
 组件允许你使用小型、独立和通常可复用的组件构建大型应用。
+
+```vue
+ <div id="hello-vue">
+     <!-- 组件 -->
+     <my-component></my-component>
+</div>
+<script>
+    // 创建应用实例
+    const app = createApp({})
+    // 全局注册一个组件，使其在应用的任何地方都可以使用。
+    app.component('my-component', {
+        template: '<div>A custom component!</div>'
+    })
+    // 挂载应用
+    app.mount('#hello-vue')
+</script>
+```
+
+## 6. Props 和事件
+
+### Props
+
+Props 用于在组件之间传递数据。
+
+```vue
+ <div id="hello-vue">
+     <!-- 组件传参 -->
+     <blog-post title="My journey with Vue"></blog-post>
+</div>
+<script>
+    // 创建应用实例
+    const app = createApp({})
+    // 组件接收参数
+    app.component('blog-post', {
+    props: ['title'],
+    template: '<h3>{{ title }}</h3>'
+    })
+    // 挂载应用
+    app.mount('#hello-vue')
+</script>
+```
+
+### 事件
+
+子组件通过 emit 触发事件，父组件可以监听这些事件
+
+```vue
+<div id="hello-vue">
+    <button-counter @increment="incrementTotal"></button-counter>
+    <p>Total clicks: {{ total }}</p>
+</div>
+<script>
+    const { createApp,ref,computed } = Vue
+    // 组合式
+    const HelloVueAppSetup = {
+        setup() {
+			const total = ref(0)
+            const incrementTotal = () => total.value++
+            return {
+                total,incrementTotal
+            }
+        }
+    }
+    // 创建应用实例
+    const app = createApp(HelloVueAppSetup)
+    app.component('button-counter', {
+        template:'<button @click="increment">You clicked me {{ count }} times.</button>',
+        props: {
+            message: {
+            type: String,
+            required: true
+            }
+        },
+        setup(props, context) {
+            const count = ref(0)
+            const increment = () => {
+                count.value++
+                context.emit('increment')   
+            }
+            return { count,increment }
+        },
+    })
+
+    // 挂载应用
+    app.mount('#hello-vue')
+</script>
+```
+
+笔记:
+
+```tex
+vue3 setup函数:https://www.cnblogs.com/jocongmin/p/18682607
+```
+
+# 三、声明式渲染
+
+声明式渲染（Declarative Rendering）是指通过数据驱动视图的更新，而不是直接操作 DOM。
+
+声明式渲染让开发者可以更专注于业务逻辑，而不需要关心如何更新视图和 DOM。
+
+Vue3 的声明式渲染是一种基于模板的渲染方式，它允许开发者通过简洁的模板语法来描述页面的结构和数据绑定关系，而不需要直接操作 DOM。
+
+Vue3 的声明式渲染通过使用模板、指令（如 v-if、v-for、v-bind 等）以及响应式数据来简化 UI 更新过程。
+
+Vue 的声明式渲染让你只需要声明 UI 应该如何呈现，Vue 会根据数据的变化自动更新视图，当你改变数据时，视图会自动响应。
+
+Vue3 使用模板语法（类似 HTML）来描述 UI，模板中的表达式（如 {{ message }}）会绑定到组件的数据模型。
+
+## 1、数据绑定
+
+数据绑定是声明式渲染的核心。
+
+通过绑定数据，Vue 可以自动更新 DOM 元素的内容，避免了传统的手动 DOM 操作。
+
+### 插值表达式
+
+插值表达式是通过双花括号 {{ }} 来将组件的数据插入到 HTML 模板中。
+
+```vue
+<template>
+  <div>
+    <h1>{{ message }}</h1>
+  </div>
+</template>
+
+<script setup lang="ts">
+import { ref } from 'vue'
+const message = ref('Hello World')
+</script>
+```
+
+双花括号 {{ message }} 会渲染为 **Hello World**，并且当 message 的值改变时，视图会自动更新。
+
+在双花括号中的内容并不只限于标识符或路径——我们可以使用任何有效的 JavaScript 表达式。
+
+```vue
+<h1>{{ message.split('').reverse().join('') }}</h1>
+```
+
+### 属性绑定
+
+通过 v-bind 指令，你可以绑定 HTML 属性到组件的数据，这样可以使得 DOM 元素的属性（如 href、class、src）根据组件的状态动态更新。
+
+```vue
+<template>
+  <div>
+    <a v-bind:href="url">点我</a>
+  </div>
+</template>
+
+<script setup lang="ts">
+import { ref } from 'vue'
+const url = ref('https://www.baidu.com')
+</script>
+```
+
+v-bind:href 会将 url 数据绑定到 <a> 标签的 href 属性，当 url 发生变化时，href 会自动更新。
+
+## 条件渲染
+
+Vue 通过 v-if、v-else-if 和 v-else 指令实现条件渲染，根据某个数据条件来决定是否渲染某个 DOM 元素。
+
+```vue
+<template>
+  <div>
+    <p v-if="isVisible">这段文本是可见的</p>
+    <button @click="toggleVisibility">切换可见性</button>
+  </div>
+</template>
+
+<script setup lang="ts">
+import { ref } from 'vue'
+const isVisible = ref(true)
+const toggleVisibility = () => isVisible.value = !isVisible.value
+
+</script>
+```
+
+当 isVisible 为 true 时，<p> 标签会被渲染，当点击按钮时，isVisible 会反转，<p> 标签的显示与否也会自动改变。
+
+## 列表渲染
+
+使用 v-for 指令可以渲染一个列表。
+
+Vue 会根据数组的每一项渲染对应的 DOM 元素，并且在数组数据变化时，自动更新视图。
+
+```vue
+<template>
+  <div>
+    <ul>
+      <li v-for="item in items" :key="item.id">{{ item.name }}</li>
+    </ul>
+  </div>
+</template>
+
+<script setup lang="ts">
+import { reactive } from 'vue'
+const items = reactive([
+  { id: 1, name: 'Vue 3' },
+  { id: 2, name: 'JavaScript' },
+  { id: 3, name: 'HTML' }
+])
+
+</script>
+```
+
+v-for 会根据 items 数组渲染出一个列表。每个列表项都有一个 key 来帮助 Vue 跟踪每一项，从而提高渲染效率。

@@ -445,3 +445,117 @@ const HelloVueAppSetup = {
 - `setup`函数来定义响应式数据`message`。
 - 使用`ref`来创建响应式数据`message`。
 - `setup`函数中返回`message`，这样就可以在模板中被访问和使用。
+
+**执行过程**
+
+- 页面加载时，浏览器解析 HTML 和 JavaScript。
+- Vue.js 脚本执行时，创建了一个 Vue 应用实例，并将其绑定到 `<div id="hello-vue">` 元素上。
+- Vue 应用实例根据 `setup()` 中的初始数据，将 `message` 的值渲染到页面上的 `{{ message }}` 处。
+- 当 `message` 数据发生变化时（例如通过用户交互或异步操作），页面会自动更新以反映这些变化。
+
+## 2. 模板语法
+
+### 插值
+
+使用双大括号 {{ }} 来表示文本插值
+
+```vue
+<div>{{ message }}</div>
+```
+
+### 指令
+
+指令是带有前缀 `v- `的特殊属性，用于在模板中表达逻辑。
+
+`v-bind`: 动态绑定一个或多个特性，或一个组件 prop。
+
+```vue
+<a v-bind:href="url">Link</a>
+简写：
+<a :href="url">Link</a>
+```
+
+`v-if / v-else-if / v-else`: 条件渲染
+
+```vue
+<p v-if="visible">内容可见</p>
+<p v-else>内容不可见</p>
+```
+
+`v-for`: 列表渲染。
+
+```vue
+<ul>
+  <li v-for="item in items" :key="item.id">{{ item.text }}</li>
+</ul>
+```
+
+`v-model`: 双向数据绑定。
+
+```vue
+<input v-model="message" placeholder="edit me">
+<p>Message is: {{ message }}</p>
+```
+
+`v-on`: 事件监听器。
+
+```vue
+<button v-on:click="doSomething">Click me</button>
+简写：
+<button @click="doSomething">Click me</button>
+```
+
+## 3. 事件处理
+
+使用 v-on 指令来监听 DOM 事件，并在触发时执行一些 JavaScript 代码。
+
+```vue
+<div id="app">
+  <button @click="greet">Greet</button>
+</div>
+
+<script>
+ const { createApp } = Vue
+ // 组合式
+ const HelloVueAppSetup = {
+ setup() {
+   const greet = () => alert('Hello')
+   return { greet }
+   }
+ }
+// 创建应用实例
+const app = createApp(HelloVueAppSetup)
+// 挂载应用
+app.mount('#hello-vue')
+</script>
+```
+
+## 4. 计算属性
+
+计算属性是基于其依赖进行缓存的属性。计算属性只有在其相关依赖发生变化时才会重新计算。
+
+```vue
+<div id="hello-vue">
+    <!-- 计算属性 -->
+    <p>{{ reversedMessage }}</p>
+</div>
+<script>
+    const { createApp,ref,computed } = Vue
+    // 组合式
+    const HelloVueAppSetup = {
+        setup() {
+            const message = ref("Hello")
+            const reversedMessage = computed(() => message.value.split('').reverse().join(''))
+            return { reversedMessage }
+        }
+    }
+    // 创建应用实例
+    const app = createApp(HelloVueAppSetup)
+    // 挂载应用
+    app.mount('#hello-vue')
+</script>
+```
+
+## 5. 组件
+
+组件允许你使用小型、独立和通常可复用的组件构建大型应用。

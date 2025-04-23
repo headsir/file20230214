@@ -685,8 +685,8 @@ Vue3 使用模板语法（类似 HTML）来描述 UI，模板中的表达式（�
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
-const message = ref('Hello World')
+    import { ref } from 'vue'
+    const message = ref('Hello World')
 </script>
 ```
 
@@ -710,14 +710,14 @@ const message = ref('Hello World')
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
-const url = ref('https://www.baidu.com')
+    import { ref } from 'vue'
+    const url = ref('https://www.baidu.com')
 </script>
 ```
 
 v-bind:href 会将 url 数据绑定到 <a> 标签的 href 属性，当 url 发生变化时，href 会自动更新。
 
-## 条件渲染
+## 2、条件渲染
 
 Vue 通过 v-if、v-else-if 和 v-else 指令实现条件渲染，根据某个数据条件来决定是否渲染某个 DOM 元素。
 
@@ -730,16 +730,16 @@ Vue 通过 v-if、v-else-if 和 v-else 指令实现条件渲染，根据某个�
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
-const isVisible = ref(true)
-const toggleVisibility = () => isVisible.value = !isVisible.value
+    import { ref } from 'vue'
+    const isVisible = ref(true)
+    const toggleVisibility = () => isVisible.value = !isVisible.value
 
 </script>
 ```
 
 当 isVisible 为 true 时，<p> 标签会被渲染，当点击按钮时，isVisible 会反转，<p> 标签的显示与否也会自动改变。
 
-## 列表渲染
+## 3、列表渲染
 
 使用 v-for 指令可以渲染一个列表。
 
@@ -755,14 +755,141 @@ Vue 会根据数组的每一项渲染对应的 DOM 元素，并且在数组数�
 </template>
 
 <script setup lang="ts">
-import { reactive } from 'vue'
-const items = reactive([
-  { id: 1, name: 'Vue 3' },
-  { id: 2, name: 'JavaScript' },
-  { id: 3, name: 'HTML' }
-])
+    import { reactive } from 'vue'
+    const items = reactive([
+      { id: 1, name: 'Vue 3' },
+      { id: 2, name: 'JavaScript' },
+      { id: 3, name: 'HTML' }
+    ])
 
 </script>
 ```
 
 v-for 会根据 items 数组渲染出一个列表。每个列表项都有一个 key 来帮助 Vue 跟踪每一项，从而提高渲染效率。
+
+## 4、双向数据绑定
+
+Vue 提供了 v-model 指令来实现表单元素（如 <input>）和组件数据之间的双向绑定，这样，表单元素的值与数据模型保持同步，用户输入时会自动更新数据，数据变化时会自动更新视图。
+
+```vue
+<template>
+  <div>
+    <input v-model="msg" placeholder="输入一些文本" />
+    <p>你输入了：{{ msg }}</p>
+  </div>
+</template>
+
+<script setup lang="ts">
+    import { ref } from 'vue'
+    const msg = ref('')
+</script>
+```
+
+v-model 使得 input 元素的值与 msg 数据保持同步。当用户在输入框中输入文本时，msg 会自动更新，<p> 标签中的内容也会自动变化。
+
+## 5、事件处理
+
+Vue 提供了 v-on 指令来监听 DOM 事件并在事件触发时执行方法，这种方式让你能够声明式地处理用户输入、点击等事件。
+
+```vue
+<template>
+  <div>
+    <button v-on:click="increment">点击我</button>
+    <p>点击次数：{{ count }}</p>
+  </div>
+</template>
+
+<script setup lang="ts">
+    const count = ref(0)
+    const increment = () => count.value++
+</script>
+```
+
+v-on:click 会监听按钮的点击事件，并在每次点击时调用 increment 方法来增加 count 的值，count 会自动更新到视图中。
+
+## 6、计算属性
+
+计算属性是 Vue 提供的一种声明式计算值的方式。
+
+计算属性基于响应式数据，且只有在依赖的数据发生变化时才会重新计算。
+
+```vue
+<template>
+  <div>
+    <p>
+      <a>原始金额：</a>
+      <input v-model="amount" placeholder="输入一些数字" />
+    </p>
+    <p>税后金额：{{ computedAmount }}</p>
+  </div>
+</template>
+
+<script setup lang="ts">
+    const amount = ref<number>(100)
+    // 假设税率为10%, 程序尽量避免小数运算 
+    const computedAmount = computed(() => amount.value * 1.1 
+</script>
+```
+
+computedAmount 是一个计算属性，基于 amount 计算出税后金额。当 amount 改变时，computedAmount 会自动更新，而不需要手动触发视图更新。
+
+# 四、 指令
+
+Vue 指令（Directives）是 Vue.js 的一项核心功能，它们可以在 HTML 模板中以 v- 开头的特殊属性形式使用，用于将响应式数据绑定到 DOM 元素上或在 DOM 元素上进行一些操作。
+
+Vue 指令是带有前缀 v- 的特殊 HTML 属性，它赋予 HTML 标签额外的功能。
+
+与传统的 JavaScript 方法相比，使用 Vue 创建响应式页面要容易得多，并且需要的代码更少。
+
+以下是几个常用的 Vue 指令：
+
+| 指令      | 描述                                                         |
+| --------- | ------------------------------------------------------------ |
+| `v-bind`  | 用于将 Vue 实例的数据绑定到 HTML 元素的属性上。              |
+| `v-if`    | 用于根据表达式的值来条件性地渲染元素或组件。                 |
+| `v-show`  | v-show 是 Vue.js 提供的一种指令，用于根据表达式的值来条件性地显示或隐藏元素。 |
+| `v-for`   | 用于根据数组或对象的属性值来循环渲染元素或组件。             |
+| `v-on`    | 用于在 HTML 元素上绑定事件监听器，使其能够触发 Vue 实例中的方法或函数。 |
+| `v-model` | 用于在表单控件和 Vue 实例的数据之间创建双向数据绑定。        |
+
+除了这些常用的指令，Vue 还提供了一些其他的指令，如 v-text、v-html 等，以及自定义指令，让开发者能够更加灵活地操作 DOM 元素。
+
+## v-bind
+
+使用 v-bind 指令将 Vue 实例的数据绑定到 HTML 元素的属性上：
+
+```vue
+<template>
+  <div>
+    <a v-bind:href="url">点我</a>
+  </div>
+</template>
+
+<script setup lang="ts">
+    import { ref } from 'vue'
+    const url = ref('https://www.baidu.com')
+</script>
+```
+
+## v-if
+
+使用 v-if 和 v-else 指令根据表达式的值来条件性地渲染元素或组件：
+
+```vue
+<template>
+  <div>
+    <p v-if="isVisible">这段文本是可见的</p>
+    <p v-else>Goodbye Vue!</p>
+    <button @click="toggleVisibility">切换可见性</button>
+  </div>
+</template>
+
+<script setup lang="ts">
+    import { ref } from 'vue'
+    const isVisible = ref(true)
+    const toggleVisibility = () => isVisible.value = !isVisible.value
+
+</script>
+```
+
+## v-show

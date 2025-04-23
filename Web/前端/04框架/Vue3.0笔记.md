@@ -893,3 +893,666 @@ Vue 指令是带有前缀 v- 的特殊 HTML 属性，它赋予 HTML 标签额外
 ```
 
 ## v-show
+
+和v-if区别：
+
+- v-if：控制元素不显示，并且标签也不存在
+
+- v-show是控制元素：display: none;(根据条件显示和隐藏（标签都会渲染到页面）)
+
+```vue
+<template>
+  <div>
+    <p v-show="isVisible">这段文本是可见的</p>
+    <button @click="toggleVisibility">显示/隐藏</button>
+  </div>
+</template>
+
+<script setup lang="ts">
+    import { ref } from 'vue'
+    const isVisible = ref(true)
+    const toggleVisibility = () => isVisible.value = !isVisible.value
+</script>
+```
+
+## v-for
+
+使用 v-for 指令根据数组的属性值循环渲染元素或组件
+
+```vue
+<template>
+  <div>
+    <ul>
+      <li v-for="item in items" :key="item.id">{{ item.name }}</li>
+    </ul>
+  </div>
+</template>
+
+<script setup lang="ts">
+    import { reactive } from 'vue'
+    const items = reactive([
+      { id: 1, name: 'Vue 3' },
+      { id: 2, name: 'JavaScript' },
+      { id: 3, name: 'HTML' }
+    ])
+
+</script>
+```
+
+## v-on
+
+使用 v-on 指令在 HTML 元素上绑定事件监听器
+
+```vue
+<template>
+  <div>
+    <button v-on:click="increment">点击我</button>
+    <p>点击次数：{{ count }}</p>
+  </div>
+</template>
+
+<script setup lang="ts">
+    const count = ref(0)
+    const increment = () => count.value++
+</script>
+```
+
+## v-model
+
+使用 v-model 指令实现表单数据双向绑定
+
+```vue
+<template>
+  <div>
+    <input v-model="msg" placeholder="输入一些文本" />
+    <p>你输入了：{{ msg }}</p>
+  </div>
+</template>
+
+<script setup lang="ts">
+    import { ref } from 'vue'
+    const msg = ref('')
+</script>
+```
+
+# 五、Vue3 模板语法
+
+Vue 使用了基于 HTML 的模板语法，允许开发者声明式地将 DOM 绑定至底层 Vue 实例的数据。
+
+Vue 的核心是一个允许你采用简洁的模板语法来声明式的将数据渲染进 DOM 的系统。
+
+结合响应系统，在应用状态改变时， Vue 能够智能地计算出重新渲染组件的最小代价并应用到 DOM 操作上。
+
+```vue
+<template>
+  <div>
+    <!-- 插值 -->
+    <p>{{ message }}</p>
+    
+    <!-- v-bind -->
+    <a :href="url">Link</a>
+    
+    <!-- v-on -->
+    <button @click="handleClick">Click me</button>
+    
+    <!-- v-for -->
+    <ul>
+      <li v-for="item in items" :key="item.id">{{ item.name }}</li>
+    </ul>
+  </div>
+</template>
+```
+
+## 插值
+
+### 文本
+
+数据绑定最常见的形式就是使用 {{...}}（双大括号）的文本插值：
+
+```vue
+<div id="app">
+  <p>{{ message }}</p>
+</div>
+```
+
+{{...}} 标签的内容将会被替代为对应组件实例中 **message** 属性的值，如果 **message** 属性的值发生了改变，{{...}} 标签内容也会更新。
+
+如果不想改变标签的内容，可以通过使用 **v-once** 指令执行一次性地插值，当数据改变时，插值处的内容不会更新。
+
+```vue
+<span v-once>这个将不会改变: {{ message }}</span>
+```
+
+### Html
+
+使用 v-html 指令用于输出 html 代码：
+
+```vue
+<template>
+  <div>
+    <p>使用双大括号的文本插值: {{ rawHtml }}</p>
+    <p>使用 v-html 指令: <span v-html="rawHtml"></span></p>
+  </div>
+</template>
+
+<script setup lang="ts">
+    import { ref } from 'vue'
+    const rawHtml = ref('<span style="color:red">This should be red.</span>')
+</script>
+```
+
+### 属性
+
+ HTML 属性中的值应使用 v-bind 指令。
+
+```
+<div v-bind:id="dynamicId"></div>
+```
+
+对于布尔属性，常规值为 true 或 false，如果属性值为 null 或 undefined，则该属性不会显示出来。
+
+```
+<button v-bind:disabled="isButtonDisabled">按钮</button>
+```
+
+以上代码中如果 isButtonDisabled 的值是 null 或 undefined，则 disabled 属性甚至不会被包含在渲染出来的 <button> 元素中。
+
+以下实例判断 use 的值，如果为 true 使用 class1 类的样式，否则不使用该类：
+
+```vue
+<template>
+  <div>
+    <label>修改颜色</label>
+    <input type="checkbox" v-model="use">
+    <br><br>
+    <div v-bind:class="{ 'class1': use }">
+      v-bind:class 指令
+    </div>
+  </div>
+</template>
+
+<script setup lang="ts">
+    import { ref } from 'vue'
+    const use = ref(false)
+</script>
+```
+
+### 表达式
+
+Vue.js 都提供了完全的 JavaScript 表达式支持。
+
+```vue
+<template>
+  <div>
+    {{ 5 + 5 }}<br>
+    {{ ok ? 'YES' : 'NO' }}<br>
+    {{ message2.split('').reverse().join('') }}
+    <div v-bind:id="'list-' + id">菜鸟教程</div>
+  </div>
+</template>
+
+<script setup lang="ts">
+    import { ref } from 'vue'
+    const ok = ref(true)
+    const message2 = ref('RUNOOB!!')
+    const id = ref(1)
+</script>
+```
+
+表达式会在当前活动实例的数据作用域下作为 JavaScript 被解析。有个限制就是，每个绑定都只能包含单个表达式，所以下面的例子都不会生效:
+
+```
+<!--  这是语句，不是表达式：-->
+{{ var a = 1 }}
+
+<!-- 流控制也不会生效，请使用三元表达式 -->
+{{ if (ok) { return message } }}
+```
+
+## 指令
+
+指令是带有 v- 前缀的特殊属性。
+
+指令用于在表达式的值改变时，将某些行为应用到 DOM 上。如下例子：
+
+```vue
+<template>
+  <div>
+    <p v-if="isVisible">这段文本是可见的</p>
+    <p v-else>Goodbye Vue!</p>
+    <button @click="toggleVisibility">切换可见性</button>
+  </div>
+</template>
+
+<script setup lang="ts">
+    import { ref } from 'vue'
+    const isVisible = ref(true)
+    const toggleVisibility = () => isVisible.value = !isVisible.value
+
+</script>
+```
+
+这里， v-if 指令将根据表达式 isVisible 的值( true 或 false )来决定是否插入 p 元素。
+
+另外还有其它很多指令，每个都有特殊的功能。例如，v-for 指令可以绑定数组的数据来渲染一个项目列表：
+
+```vue
+<template>
+  <div>
+    <ul>
+      <li v-for="item in items" :key="item.id">{{ item.name }}</li>
+    </ul>
+  </div>
+</template>
+
+<script setup lang="ts">
+    import { reactive } from 'vue'
+    const items = reactive([
+      { id: 1, name: 'Vue 3' },
+      { id: 2, name: 'JavaScript' },
+      { id: 3, name: 'HTML' }
+    ])
+
+</script>
+```
+
+### 参数
+
+参数在指令后以冒号指明。例如， v-bind 指令被用来响应地更新 HTML 属性：
+
+```vue
+<template>
+  <div>
+    <a v-bind:href="url">点我</a>
+  </div>
+</template>
+
+<script setup lang="ts">
+    import { ref } from 'vue'
+    const url = ref('https://www.baidu.com')
+</script>
+```
+
+在这里 href 是参数，告知 v-bind 指令将该元素的 href 属性与表达式 url 的值绑定。
+
+另一个例子是 v-on 指令，它用于监听 DOM 事件：
+
+```vue
+<!-- 完整语法 -->
+<a v-on:click="doSomething"> ... </a>
+
+<!-- 缩写 -->
+<a @click="doSomething"> ... </a>
+
+<!-- 动态参数的缩写 (2.6.0+) -->
+<a @[event]="doSomething"> ... </a>
+```
+
+在这里参数是监听的事件名。
+
+### 修饰符
+
+修饰符是以半角句号 . 指明的特殊后缀，用于指出一个指令应该以特殊方式绑定。例如，**.prevent** 修饰符告诉 v-on 指令对于触发的事件调用 **event.preventDefault()**：
+
+```vue
+<form v-on:submit.prevent="onSubmit"></form>
+```
+
+## 用户输入
+
+在 input 输入框中我们可以使用 v-model 指令来实现双向数据绑定：
+
+```vue
+<template>
+  <div>
+    <input v-model="msg" placeholder="输入一些文本" />
+    <p>你输入了：{{ msg }}</p>
+  </div>
+</template>
+
+<script setup lang="ts">
+    import { ref } from 'vue'
+    const msg = ref('')
+</script>
+```
+
+v-model 指令用来在 input、select、textarea、checkbox、radio 等表单控件元素上创建双向数据绑定，根据表单上的值，自动更新绑定的元素的值。
+
+按钮的事件我们可以使用  v-on 监听事件，并对用户的输入进行响应。
+
+以下实例在用户点击按钮后对字符串进行反转操作：
+
+```vue
+<template>
+  <div>
+    <p>{{ message }}</p>
+    <button v-on:click="reverseMessage">反转字符串</button>
+  </div>
+</template>
+
+<script setup lang="ts">
+import { ref } from 'vue'
+const message = ref('Runoob')
+const reverseMessage = () => { message.value = message.value.split('').reverse().join('') }
+</script>
+```
+
+## 缩写
+
+### v-bind 缩写
+
+Vue.js 为两个最为常用的指令提供了特别的缩写：
+
+```
+<!-- 完整语法 -->
+<a v-bind:href="url"></a>
+<!-- 缩写 -->
+<a :href="url"></a>
+```
+
+### v-on 缩写
+
+```
+<!-- 完整语法 -->
+<a v-on:click="doSomething"></a>
+<!-- 缩写 -->
+<a @click="doSomething"></a>
+```
+
+# 六、条件语句
+
+在 Vue 3 中，你可以在模板中使用多种条件语句来控制组件的渲染。
+
+主要的条件语句有 `v-if`、`v-else-if`、`v-else` 和 `v-show`，以下是它们的用法及区别：
+
+- **`v-if`**：元素在条件为 `false` 时不会被渲染到 DOM 中，适用于条件变化不频繁的情况。
+- **`v-show`**：元素总是渲染到 DOM 中，适用于条件变化频繁的情况，切换显示隐藏性能更好。
+- **`v-else-if` 和 `v-else`**：用于处理多个条件分支，配合 `v-if` 使用。
+
+## 条件判断
+
+### v-if
+
+根据表达式的真假条件性地渲染元素。如果表达式为真，则渲染该元素；如果为假，则不渲染（不会在 DOM 中生成该元素）。
+
+条件判断使用 v-if 指令，指令的表达式返回 true 时才会显示：
+
+**在元素中使用 v-if 指令：**
+
+```vue
+<template>
+  <div>
+    <p v-if="seen">现在你看到我了</p>
+  </div>
+</template>
+
+<script setup lang="ts">
+import { ref } from 'vue'
+const seen = ref(true)  /* 改为false，信息就无法显示 */
+</script>
+```
+
+这里， v-if 指令将根据表达式 seen 的值( true 或 false )来决定是否插入 p 元素。
+
+因为 v-if 是一个指令，所以必须将它添加到一个元素上。如果是多个元素，可以包裹在 <template> 元素上，并在上面使用 v-if。最终的渲染结果将不包含 <template> 元素。
+
+**在 <template> 元素上使用 v-if 指令**
+
+```vue
+<template>
+  <div>
+    <template v-if="seen">
+      <h1>网站</h1>
+      <p>Google</p>
+      <p>Runoob</p>
+      <p>Taobao</p>
+    </template>
+  </div>
+</template>
+
+<script setup lang="ts">
+import { ref } from 'vue'
+const seen = ref(true)  /* 改为false，信息就无法显示 */
+</script>
+```
+
+### v-else
+
+与 v-if 搭配使用，表示在前一个 v-if 表达式为假时渲染的元素。
+
+可以用 v-else 指令给 v-if 添加一个 "else" 块：
+
+**随机生成一个数字，判断是否大于 0.5，然后输出对应信息：**
+
+```vue
+<template>
+  <div>
+   <div v-if="Math.random() > 0.5">
+      随机数大于 0.5
+   </div>
+   <div v-else>
+      随机数小于等于 0.5
+   </div>
+  </div>
+</template>
+```
+
+### v-else-if
+
+在 v-if 和 v-else 之间添加额外的条件判断，可以连续使用多个 v-else-if。
+
+**判断 type 变量的值：**
+
+```VUE
+<template>
+  <div>
+    <div v-if="type === 'A'">
+      A
+    </div>
+    <div v-else-if="type === 'B'">
+      B
+    </div>
+    <div v-else-if="type === 'C'">
+      C
+    </div>
+    <div v-else>
+      Not A/B/C
+    </div>
+  </div>
+</template>
+
+<script setup lang="ts">
+import { ref } from 'vue'
+const type = ref('A')
+</script>
+```
+
+> v-else 、v-else-if 必须跟在 v-if 或者 v-else-if之后。
+
+### v-show
+
+根据表达式的真假条件性地显示或隐藏元素，与 v-if 不同的是，v-show 始终会在 DOM 中保留元素，只是通过 CSS 的 display 属性控制元素的显示和隐藏。
+
+我们也可以使用 v-show 指令来根据条件展示元素：
+
+```VUE
+<h1 v-show="ok">Hello!</h1>
+```
+
+如果需要频繁切换元素的显示与隐藏，推荐使用 v-show，因为它只是简单地切换 CSS 样式，而不是重新渲染整个元素。
+
+# 七、循环语句
+
+在 Vue 中，循环语句主要通过 v-for 指令来实现，用于遍历数组或对象，生成对应数量的元素。
+
+在元素上使用 v-for 指令，根据源数据的数组或对象进行循环渲染元素。
+
+遍历数组：
+
+```
+v-for="(item, index) in items"
+```
+
+遍历对象：
+
+```
+v-for="(value, key, index) in object"
+```
+
+- **key 的作用**: 使用 `v-for` 渲染列表时，必须为每个项提供一个唯一的 `key` 属性，以便 Vue 能够识别每个项的唯一性，从而进行高效的 DOM 更新。
+- **嵌套循环**: 可以嵌套使用多个 `v-for` 来渲染多维数组或对象结构。
+
+### v-for 迭代对象数组
+
+v-for 可以通过一个对象的属性来迭代数据：
+
+**v-for 可以绑定数据到数组来渲染一个列表：**
+
+```vue
+<template>
+  <div>
+    <ul>
+      <li v-for="item in items" :key="item.id">{{ item.name }}</li>
+    </ul>
+  </div>
+</template>
+
+<script setup lang="ts">
+    import { reactive } from 'vue'
+    const items = reactive([
+      { id: 1, name: 'Vue 3' },
+      { id: 2, name: 'JavaScript' },
+      { id: 3, name: 'HTML' }
+    ])
+
+</script>
+```
+
+**v-for 还支持一个可选的第二个参数，参数值为当前项的索引：**
+
+index 为列表项的索引值：
+
+```vue
+<template>
+  <div>
+    <ul>
+      <li v-for="(item, index) in items" :key="item.id">{{ index }} - {{ item.name }} </li>
+    </ul>
+  </div>
+</template>
+
+<script setup lang="ts">
+    import { reactive } from 'vue'
+    const items = reactive([
+      { id: 1, name: 'Vue 3' },
+      { id: 2, name: 'JavaScript' },
+      { id: 3, name: 'HTML' }
+    ])
+
+</script>
+```
+
+**模板 <template> 中使用 v-for：**
+
+```vue
+<ul>
+  <template v-for="item in items">
+    <li>{{ item.name }}</li>
+    <li>--------------</li>
+  </template>
+</ul>
+```
+
+### v-for 迭代对象
+
+v-for 可以通过一个对象的属性来迭代数据：
+
+```vue
+<template>
+  <div>
+    <ul>
+      <li v-for="value in object">
+        {{ value }}
+      </li>
+    </ul>
+  </div>
+</template>
+
+<script setup lang="ts">
+    import { reactive } from 'vue'
+    const object = reactive({
+      name: '菜鸟教程',
+      url: 'http://www.runoob.com',
+      slogan: '学的不仅是技术，更是梦想！'
+    })
+</script>
+```
+
+**也可以提供第二个的参数为键名：**
+
+```vue
+<template>
+  <div>
+    <ul>
+      <li v-for="(value, key) in object">
+        {{ key }} : {{ value }}
+      </li>
+    </ul>
+  </div>
+</template>
+```
+
+**第三个参数为索引：**
+
+```vue
+<div>
+    <ul>
+        <li v-for="(value, key, index) in object">
+            {{ index }}. {{ key }} : {{ value }}
+        </li>
+    </ul>
+</div>
+```
+
+### v-for 迭代整数
+
+v-for 也可以循环整数
+
+```vue
+<template>
+  <div>
+    <ul>
+      <li v-for="n in 10">
+        {{ n }}
+      </li>
+    </ul>
+  </div>
+</template>
+```
+
+### 显示过滤/排序后的结果
+
+我们可以对数组的元素进行处理后再显示出来，一般可以通过创建一个计算属性，来返回过滤或排序后的数组。
+
+**输出数组中的偶数：**
+
+```vue
+<template>
+  <div>
+    <ul>
+      <li v-for="n in evenNumbers">{{ n }}</li>
+    </ul>
+  </div>
+</template>
+
+<script setup lang="ts">
+import { reactive, computed } from 'vue'
+const numbers = reactive([1, 2, 3, 4, 5])
+// .filter 根据指定的条件筛选出满足条件的元素,并返回一个新的数组
+const evenNumbers = computed(() => numbers.filter(number => number % 2 === 0))
+</script>
+```
+
+### v-for/v-if 联合使用
+
+联合使用 v-for/v-if 给 select 设置默认值：

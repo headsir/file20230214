@@ -851,6 +851,7 @@ Vue 指令是带有前缀 v- 的特殊 HTML 属性，它赋予 HTML 标签额外
 | `v-for`   | 用于根据数组或对象的属性值来循环渲染元素或组件。             |
 | `v-on`    | 用于在 HTML 元素上绑定事件监听器，使其能够触发 Vue 实例中的方法或函数。 |
 | `v-model` | 用于在表单控件和 Vue 实例的数据之间创建双向数据绑定。        |
+| `v-once`  | 使用 **v-once** 指令执行一次性地插值，当数据改变时，插值处的内容不会更新 |
 
 除了这些常用的指令，Vue 还提供了一些其他的指令，如 v-text、v-html 等，以及自定义指令，让开发者能够更加灵活地操作 DOM 元素。
 
@@ -974,6 +975,14 @@ Vue 指令是带有前缀 v- 的特殊 HTML 属性，它赋予 HTML 标签额外
     const msg = ref('')
 </script>
 ```
+
+## v-once
+
+```vue
+<span v-once>这个将不会改变: {{ message }}</span>
+```
+
+
 
 # 五、Vue3 模板语法
 
@@ -1402,7 +1411,7 @@ v-for="(value, key, index) in object"
 - **key 的作用**: 使用 `v-for` 渲染列表时，必须为每个项提供一个唯一的 `key` 属性，以便 Vue 能够识别每个项的唯一性，从而进行高效的 DOM 更新。
 - **嵌套循环**: 可以嵌套使用多个 `v-for` 来渲染多维数组或对象结构。
 
-### v-for 迭代对象数组
+### v-for 迭代数组
 
 v-for 可以通过一个对象的属性来迭代数据：
 
@@ -1556,3 +1565,57 @@ const evenNumbers = computed(() => numbers.filter(number => number % 2 === 0))
 ### v-for/v-if 联合使用
 
 联合使用 v-for/v-if 给 select 设置默认值：
+
+```vue
+<template>
+  <div>
+    <select @change="changeVal($event)" v-model="selOption">
+      <template v-for="(site, index) in sites" :site="site" :index="index" :key="site.id">
+        <!-- 索引为 1 的设为默认值，索引值从0 开始-->
+        <option v-if="index == 1" :value="site.name" selected>{{ site.name }}</option>
+        <option v-else :value="site.name">{{ site.name }}</option>
+      </template>
+    </select>
+    <div v-once>您选中了:{{ selOption }}</div>
+  </div>
+</template>
+
+<script setup lang="ts">
+import { ref, reactive, computed } from 'vue'
+let selOption = ref("Runoob")
+const sites = reactive([
+  { id: 1, name: "Google" },
+  { id: 2, name: "Runoob" },
+  { id: 3, name: "Taobao" },
+])
+const changeVal = (event: any) => {
+  selOption.value = event.target.value
+  alert("你选中了" + selOption.value)
+}
+</script>
+```
+
+使用 `selected` 属性设置默认选中的选项。
+
+### 在组件上使用 v-for
+
+在自定义组件上，你可以像在任何普通元素上一样使用 v-for：
+
+```
+<my-component v-for="item in items" :key="item.id"></my-component>
+```
+
+然而，任何数据都不会被自动传递到组件里，因为组件有自己独立的作用域。为了把迭代数据传递到组件里，我们要使用 props：
+
+```
+<my-component
+  v-for="(item, index) in items"
+  :item="item"
+  :index="index"
+  :key="item.id"
+></my-component>
+```
+
+不自动将 item 注入到组件里的原因是，这会使得组件与 v-for 的运作紧密耦合。明确组件数据的来源能够使组件在其他场合重复使用。
+
+下面是一个简单的 todo 列表的完整例子：

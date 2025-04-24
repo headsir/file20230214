@@ -984,7 +984,7 @@ Vue 指令是带有前缀 v- 的特殊 HTML 属性，它赋予 HTML 标签额外
 
 
 
-# 五、Vue3 模板语法
+# 五、模板语法
 
 Vue 使用了基于 HTML 的模板语法，允许开发者声明式地将 DOM 绑定至底层 Vue 实例的数据。
 
@@ -1954,3 +1954,376 @@ type 可以是下面原生构造器：
 - `Symbol`
 
 type 也可以是一个自定义构造器，使用 instanceof 检测。
+
+# 九、 计算属性
+
+计算属性用于根据其他数据的变化动态计算衍生出来的属性值，而且具有缓存机制，只有相关依赖发生变化时才会重新计算。
+
+计算属性关键词: computed。
+
+计算属性在处理一些复杂逻辑时是很有用的。
+
+**反转字符串**
+
+```vue
+<template>
+  <div>
+    {{ message.split('').reverse().join('') }}
+  </div>
+</template>
+<script setup lang="ts">
+import { ref } from 'vue'
+const message = ref("RUNOOB!!")
+</script>
+```
+
+**使用computed 函数来定义计算属性**
+
+```vue
+<template>
+  <div>
+    <p>原始字符串: {{ message }}</p>
+    <p>计算后反转字符串: {{ reversedMessage }}</p>
+  </div>
+</template>
+
+<script setup lang="ts">
+import { ref, computed } from 'vue'
+const message = ref("RUNOOB!!")
+const reversedMessage = computed(() => message.value.split('').reverse().join(''))
+
+</script>
+```
+
+**说明**
+
+**`computed` 函数**:
+
+- 在 `setup` 函数中使用 `computed` 函数来定义计算属性。
+- 通过箭头函数返回计算的值，该函数会自动跟踪其依赖的响应式数据。
+
+**使用计算属性**:
+
+- `reversedMessage` 计算属性衍生自 `message`，每当 `message` 发生变化时，`reversedMessage` 会自动更新。
+
+### computed vs methods
+
+使用 methods 来替代 computed，效果上两个都是一样的，但是 computed 是基于它的依赖缓存，只有相关依赖发生改变时才会重新取值。而使用 methods ，在重新渲染的时候，函数总会重新调用执行。
+
+使用 computed 性能会更好，但是如果你不希望缓存，你可以使用 methods 属性。
+
+### 可写计算属性
+
+计算属性默认是只读的。当你尝试修改一个计算属性时，你会收到一个运行时警告。只在某些特殊场景中你可能才需要用到“可写”的属性，你可以通过同时提供 getter 和 setter 来创建：
+
+```vue
+<template>
+  <div>
+    <p>"fullName"{{ fullName }}</p>
+    <p>"firstName"{{ firstName }}</p>
+    <p>"lastName"{{ lastName }}</p>
+    <input type="text" v-model="lastName" />
+    <input type="text" v-model="fullName" />
+  </div>
+</template>
+
+<script setup>
+import { ref, computed } from 'vue'
+
+const firstName = ref('John')
+const lastName = ref('Doe')
+
+const fullName = computed({
+  // getter previous上一个值
+  get(previous) {
+    return firstName.value + ' ' + lastName.value
+  },
+  // setter newValue最新值
+  set(newValue) {
+    // 注意：我们这里使用的是解构赋值语法
+    [firstName.value, lastName.value] = newValue.split(' ')
+  }
+})
+</script>
+```
+
+### 避免直接修改计算属性值
+
+计算属性的返回值应该被视为只读的，并且永远不应该被更改——应该更新它所依赖的源状态以触发新的计算
+
+# 十、监听属性
+
+通过监听属性 **watch** 来响应数据的变化。
+
+**watch** 的作用是用于监测响应式属性的变化，并在属性发生改变时执行特定的操作，它是 Vue 中的一种响应式机制，允许你在数据发生变化时做出相应的响应，执行自定义的逻辑。
+
+**watch** 使得在响应式属性变化时能够有更多的控制权和灵活性，让你的组件能够更好地响应数据的变化并执行相应的逻辑。
+
+**通过使用 watch 实现计数器：**
+
+```vue
+<template>
+  <div>
+    <p style="font-size:25px;">计数器: {{ counter }}</p>
+    <button @click="counter++" style="font-size:25px;">点我</button>
+  </div>
+</template>
+
+<script setup>
+import { ref, watch } from 'vue'
+const counter = ref(1)
+watch(counter,
+  (newValue,oldValue) => {alert('计数器值的变化 :' + oldValue + ' 变为 ' + newValue + '!')}
+)
+</script>
+```
+
+**千米**与**米**之间的换算：
+
+```vue
+<template>
+  <div>
+    <!-- focus就是input框聚焦时触发，blue就是input框失去焦点时触发。 -->
+    千米 : <input type="text" v-model="kilometers" @focus="currentlyActiveField = 'kilometers'">
+    米 : <input type="text" v-model="meters" @focus="currentlyActiveField = 'meters'">
+  </div>
+  <div v-show=kilometers>修改前值为: {{ oldKilometers }}，修改后值为: {{ kilometers }}</div>
+</template>
+
+<script setup>
+import { ref, watch } from 'vue'
+
+const kilometers = ref(0)
+const meters = ref(0)
+const currentlyActiveField = ref('')
+const oldKilometers = ref(0)
+
+// 监听 kilometers 变化
+watch(kilometers, (newValue, oldValue) => {
+  if (currentlyActiveField.value === 'kilometers') {
+    meters.value = newValue * 1000
+  }
+  // 这个回调将在 kilometers 改变后调用
+  oldKilometers.value = oldValue
+})
+
+// 监听 meters 变化
+watch(meters, (newValue) => {
+  if (currentlyActiveField.value === 'meters') {
+    kilometers.value = newValue / 1000
+  }
+})
+</script>
+```
+
+**异步加载中使用 watch**
+
+异步数据的加载 Vue 通过 watch 选项提供了一个更通用的方法，来响应数据的变化。
+
+```vue
+<template>
+  <div>
+    <p>
+      输入一个问题，以 ? 号结尾输出答案:
+      <input v-model="question" />
+    </p>
+    <p>{{ answer }}</p>
+  </div>
+</template>
+
+<script setup lang="ts">
+import { ref, watch } from 'vue'
+import axios from "axios"
+const question = ref('')
+const answer = ref('每个问题结尾需要输入 ? 号。')
+
+const getAnswer = async () => {
+  answer.value = '加载中...'
+  axios
+    .get('/api/try/ajax/json_vuetest.php')
+    .then((response) => {
+      answer.value = response.data.answer
+    })
+    .catch((error) => {
+      answer.value = '错误! 无法访问 API。 ' + error
+    })
+}
+
+watch(question,
+  async (newQuestion, oldQuestion) => {
+    if (newQuestion.indexOf('?') > -1 || newQuestion.indexOf('？') > -1) {
+      await getAnswer()
+    }
+  })
+</script>
+```
+
+## 用法总结
+
+watch 是 Vue 3 提供的一种响应式数据监听机制，可以监听单个或多个属性。
+
+你可以通过传递回调函数来处理数据变化，支持深度监听、立即执行等选项。
+
+### 1. 基本用法
+
+在 Vue 3 中，watch 函数用于监听响应式属性。
+
+当监听的属性值发生变化时，Vue 会触发回调函数执行。
+
+```vue
+<template>
+  <div>
+    <p style="font-size:25px;">计数器: {{ state.count }}</p>
+    <button @click="state.count++" style="font-size:25px;">点我</button>
+  </div>
+</template>
+<script setup>
+import { reactive, watch } from 'vue'
+const state = reactive({ count: 0 })
+
+watch(
+  () => state.count,  // 监听的属性
+  (newValue, oldValue) => {  // 监听属性变化后执行的回调函数
+    alert('计数器值的变化 :' + oldValue + ' 变为 ' + newValue + '!')
+  }
+)
+</script>
+```
+
+### 2. 监听多个响应式属性
+
+同时监听多个响应式属性，可以通过一个数组来传递监听的多个属性：
+
+```vue
+<template>
+  <div>
+    <p style="font-size:25px;">计数器: {{ state.count }}</p>
+    <button @click="state.count++" style="font-size:25px;">点我</button>
+  </div>
+</template>
+
+<script setup>
+import { ref, reactive, watch } from 'vue'
+const state = reactive({
+  count: 0,
+  name: 'Vue3'
+})
+
+watch(
+  [() => state.count, () => state.name], // 监听多个属性
+  ([newCount, newName], [oldCount, oldName]) => {
+    console.log(`count changed from ${oldCount} to ${newCount}`)
+    console.log(`name changed from ${oldName} to ${newName}`)
+  }
+)
+
+</script>
+```
+
+### 3. 深度监听
+
+如果你要监听的是一个对象或数组，并希望对其内部的嵌套属性进行监听，可以使用 deep: true 选项。这会监听对象的所有属性变化。
+
+```vue
+<template>
+  <div>
+    <p style="font-size:25px;">计数器: {{ state.user.age }}</p>
+    <button @click="state.user.age++" style="font-size:25px;">点我</button>
+  </div>
+</template>
+
+<script setup>
+import { ref, reactive, watch } from 'vue'
+const state = reactive({
+  user: {
+    name: 'Alice',
+    age: 25
+  }
+})
+
+watch(
+  () => state.user, // 监听整个对象
+  (newValue, oldValue) => {
+    // 注意：`newValue` 此处和 `oldValue` 是相等的
+    // *除非* state.user 被整个替换了
+    console.log('User object changed:', newValue, oldValue)
+  },
+  { deep: true } // 启用深度监听
+)
+</script>
+```
+
+在 Vue 3.5+ 中，`deep` 选项还可以是一个数字，表示最大遍历深度——即 Vue 应该遍历对象嵌套属性的级数。
+
+**谨慎使用**
+
+深度侦听需要遍历被侦听对象中的所有嵌套的属性，当用于大型数据结构时，开销很大。因此请只在必要时才使用它，并且要留意性能。
+
+### 4. 立即执行
+
+默认情况下，watch 只会在监听的值发生变化时触发回调，如果你希望在组件加载时就立即执行一次回调，可以设置 immediate: true。
+
+```vue
+<template>
+  <div>
+    <p style="font-size:25px;">计数器: {{ state.user.age }}</p>
+    <button @click="state.user.age++" style="font-size:25px;">点我</button>
+  </div>
+</template>
+
+<script setup>
+import { ref, reactive, watch } from 'vue'
+const state = reactive({
+  user: {
+    name: 'Alice',
+    age: 25
+  }
+})
+
+watch(
+  () => state.user, // 监听整个对象
+  (newValue, oldValue) => {
+    // 注意：`newValue` 此处和 `oldValue` 是相等的
+    // *除非* state.user 被整个替换了
+    console.log('User object changed:', newValue, oldValue)
+  },
+  { deep: true, immediate: true }, // 启用深度监听 立即执行
+)
+</script>
+```
+
+### 5.一次性侦听器
+
+仅支持 3.4 及以上版本
+
+每当被侦听源发生变化时，侦听器的回调就会执行。如果希望回调只在源变化时触发一次，请使用 `once: true` 选项。
+
+```vue
+<template>
+  <div>
+    <p style="font-size:25px;">计数器: {{ state.user.age }}</p>
+    <button @click="state.user.age++" style="font-size:25px;">点我</button>
+  </div>
+</template>
+
+<script setup>
+import { ref, reactive, watch } from 'vue'
+const state = reactive({
+  user: {
+    name: 'Alice',
+    age: 25
+  }
+})
+
+watch(
+  () => state.user, // 监听整个对象
+  (newValue, oldValue) => {
+    // 注意：`newValue` 此处和 `oldValue` 是相等的
+    // *除非* state.user 被整个替换了
+    console.log('User object changed:', newValue, oldValue)
+  },
+  { deep: true, once: true }, // 启用深度监听 仅触发一次
+)
+</script>
+```
+

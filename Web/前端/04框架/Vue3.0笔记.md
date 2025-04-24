@@ -1601,13 +1601,13 @@ const changeVal = (event: any) => {
 
 在自定义组件上，你可以像在任何普通元素上一样使用 v-for：
 
-```
+```vue
 <my-component v-for="item in items" :key="item.id"></my-component>
 ```
 
 然而，任何数据都不会被自动传递到组件里，因为组件有自己独立的作用域。为了把迭代数据传递到组件里，我们要使用 props：
 
-```
+```vue
 <my-component
   v-for="(item, index) in items"
   :item="item"
@@ -1663,7 +1663,7 @@ const addNewTodo = () => {
 ```vue
 <template>
   <li>
-    {{ title }}
+    {{ props.title }}
     <button @click="$emit('remove')">删除</button>
   </li>
 </template>
@@ -1671,10 +1671,9 @@ const addNewTodo = () => {
 <script setup lang="ts">
 import { defineEmits, defineProps } from "vue"
 // 外部传入的哪些是 props
-const { title } = defineProps(['title'])
+const props = defineProps(['title'])
 // 父组件中可以使用 kebab-case 形式来监听
 const emit = defineEmits(['remove'])
-
 </script>
 ```
 
@@ -1706,7 +1705,7 @@ const emit = defineEmits(['remove'])
 
 我们将 Vue 应用挂载到 <div id="app"></div>，应该传入 #app：
 
-```
+```ts
 import { createApp } from 'vue'
 import App from './App.vue'
 
@@ -1715,9 +1714,11 @@ const app = createApp(App)
 app.mount('#app')
 ```
 
+### 注册全局组件
+
 注册一个全局组件语法格式如下：
 
-```
+```ts
 import { createApp } from 'vue'
 import App from './App.vue'
 import myComponentName from './components/myComponentName.vue'
@@ -1738,7 +1739,7 @@ app.mount('#app')
 
 **main.ts**
 
-```vue
+```ts
 import { createApp } from 'vue'
 import App from './App.vue'
 import myComponentName from './components/myComponentName.vue'
@@ -1759,3 +1760,197 @@ app.mount('#app')
 </template>
 ```
 
+### 组件的复用
+
+你可以将组件进行任意次数的复用：
+
+```vue
+<template>
+  <div>
+    <h1>My Component Name</h1>
+    <h2>My Component Name</h2>
+    <h3>My Component Name</h3>
+  </div>
+</template>
+```
+
+### 全局组件
+
+我们的组件都只是通过 component 全局注册的。
+
+全局注册的组件可以在随后创建的 app 模板中使用，也包括根实例组件树中的所有子组件的模板中。
+
+**注册**
+
+ Vue 3 中需要明确地单独注册或使用循环来批量注册组件。
+
+```ts
+import { createApp } from 'vue'
+import App from './App.vue'
+import myComponentName from './components/myComponentName.vue'
+
+const app = createApp(App)
+app.component('my-component-name', myComponentName)
+
+app.mount('#app')
+```
+
+**使用**
+
+```vue
+<template>
+  <div>
+    <h1>My Component Name</h1>
+  </div>
+</template>
+```
+
+### 局部组件
+
+全局注册往往是不够理想的。比如，如果你使用一个像 webpack 这样的构建系统，全局注册所有的组件意味着即便你已经不再使用一个组件了，它仍然会被包含在你最终的构建结果中。这造成了用户下载的 JavaScript 的无谓的增加。
+
+在这些情况下，你可以通过一个普通的 JavaScript 对象来定义组件：
+
+```vue
+<template>
+  <A />
+</template>
+
+<script setup lang="ts">
+import A from './components/A.vue'
+</script>
+```
+
+### Prop
+
+prop 是子组件用来接受父组件传递过来的数据的一个自定义属性。
+
+父组件的数据需要通过 props 把数据传给子组件，子组件需要显式地用 props 选项声明 "prop"：
+
+**父组件**
+
+```vue
+<template>
+  <div>
+    <site-name title="Google" bb="t"></site-name>
+    <site-name title="Runoob" bb="y"></site-name>
+    <site-name title="Taobao" bb="u"></site-name>
+  </div>
+</template>
+
+<script setup lang="ts">
+import siteName from './siteName.vue'
+
+</script>
+```
+
+**子组件**
+
+siteName.vue
+
+```vue
+<template>
+  <h4>{{ props.title }}-{{ props.bb }}</h4>
+</template>
+
+<script setup lang="ts">
+import { defineProps } from "vue"
+// 外部传入的哪些是 props
+const props = defineProps(['title', 'bb'])
+
+</script>
+```
+
+一个组件默认可以拥有任意数量的 prop，任何值都可以传递给任何 prop。
+
+### 动态 Prop
+
+类似于用 v-bind 绑定 HTML 特性到一个表达式，也可以用 v-bind 动态绑定 props 的值到父组件的数据中。每当父组件的数据变化时，该变化也会传导给子组件：
+
+**父组件**
+
+```vue
+<template>
+  <div>
+    <site-name v-for="site in sites" :title=site.title :id=site.id></site-name>
+  </div>
+</template>
+
+<script setup lang="ts">
+import { reactive } from 'vue'
+import siteName from './siteName.vue'
+
+const sites = reactive([
+  { id: 1, title: 'Google' },
+  { id: 2, title: 'Runoob' },
+  { id: 3, title: 'Taobao' }
+])
+
+</script>
+```
+
+子组件
+
+```vue
+<template>
+  <h4>{{ props.id }} - {{ props.title }}</h4>
+</template>
+
+<script setup lang="ts">
+import { defineProps } from "vue"
+// 外部传入的哪些是 props
+const props = defineProps(['title', 'id'])
+
+</script>
+```
+
+### Prop 验证
+
+组件可以为 props 指定验证要求。
+
+为了定制 prop 的验证方式，你可以为 props 中的值提供一个带有验证需求的对象，而不是一个字符串数组。例如：
+
+```vue
+<template>
+  <h4>{{ props.id }} - {{ props.title }}</h4>
+</template>
+
+<script setup lang="ts">
+import { defineProps } from "vue"
+// 外部传入的哪些是 props
+// const props = defineProps(['title', 'id'])
+const props = defineProps({
+  title: {
+    type: String,
+    default: '默认值',
+    validator: (value: string) => {
+      return value.length > 5
+    }
+  },
+  id: {
+    type: Number,
+    required: true,  // 必填
+    default: 1,
+    validator: (value: number) => {
+      return value > 3
+    }
+  }
+})
+
+</script>
+```
+
+当 prop 验证失败的时候，(开发环境构建版本的) Vue 将会产生一个控制台的警告。
+
+type 可以是下面原生构造器：
+
+- `String`
+- `Number`
+- `Boolean`
+- `Array`
+- `Object`
+- `Date`
+- `Function`
+- `Symbol`
+
+type 也可以是一个自定义构造器，使用 instanceof 检测。

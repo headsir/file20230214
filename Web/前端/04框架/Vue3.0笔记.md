@@ -1619,3 +1619,143 @@ const changeVal = (event: any) => {
 不自动将 item 注入到组件里的原因是，这会使得组件与 v-for 的运作紧密耦合。明确组件数据的来源能够使组件在其他场合重复使用。
 
 下面是一个简单的 todo 列表的完整例子：
+
+**父组件**
+
+```vue
+<template>
+  <div id="todo-list-example">
+    <form v-on:submit.prevent="addNewTodo">
+      <label for="new-todo">添加 todo</label>
+      <input v-model="newTodoText" id="new-todo" placeholder="例如：明天早上跑步" />
+      <button>添加</button>
+    </form>
+    <ul>
+      <todo-item v-for="(todo, index) in todos" :key="todo.id" :title="todo.title"
+        @remove="todos.splice(index, 1)"></todo-item>
+    </ul>
+  </div>
+</template>
+
+<script setup lang="ts">
+import { ref, reactive } from 'vue'
+import todoItem from './todoItem.vue'
+
+const newTodoText = ref('')
+const todos = reactive([
+  { id: 1,  title: '看电影'  },
+  { id: 2,  title: '吃饭'  },
+  { id: 3,  title: '上 RUNOOB 学习'  }
+])
+const nextTodoId = ref<number>(4)
+const addNewTodo = () => {
+  todos.push({
+    'id': nextTodoId.value++,
+    'title': newTodoText.value
+  })
+  newTodoText.value = ''
+}
+</script>
+```
+
+**子组件**
+
+```vue
+<template>
+  <li>
+    {{ title }}
+    <button @click="$emit('remove')">删除</button>
+  </li>
+</template>
+
+<script setup lang="ts">
+import { defineEmits, defineProps } from "vue"
+// 外部传入的哪些是 props
+const { title } = defineProps(['title'])
+// 父组件中可以使用 kebab-case 形式来监听
+const emit = defineEmits(['remove'])
+
+</script>
+```
+
+# 八、组件
+
+每个 Vue 组件都是一个独立的 Vue 实例，具有自己的模板、数据、方法和生命周期钩子，使得组件可以自包含地定义和管理自己的功能和样式。
+
+组件（Component）是 Vue.js 最强大的功能之一。
+
+组件可以扩展 HTML 元素，封装可重用的代码，可以帮助你将用户界面拆分成独立和可复用的部分。
+
+每个 Vue 组件都是一个独立的 Vue 实例，具有自己的模板、数据、方法和生命周期钩子，使得组件可以自包含地定义和管理自己的功能和样式。
+
+**组件的特性和优势**
+
+- **复用性**: 组件可以在不同的地方多次使用，提高代码的复用性和可维护性。
+- **封装性**: 每个组件都是独立的作用域，可以封装自己的状态和逻辑，避免全局污染。
+- **组合性**: 可以通过组合多个小组件构建复杂的界面。
+- **响应式**: 组件的数据响应式地绑定到视图，数据更新时自动更新视图。
+- **模块化**: 支持模块化开发，可以使用现代前端工具链进行构建和管理。
+
+组件系统让我们可以用独立可复用的小组件来构建大型应用，几乎任意类型的应用的界面都可以抽象为一个组件树：
+
+![image-20250424160559168](imge/Vue3.0笔记.assets/image-20250424160559168.png)
+
+每个 Vue 应用都是通过用 createApp 函数创建的，传递给 createApp 的选项用于配置根组件。当我们挂载应用时，该组件被用作渲染的起点。
+
+一个应用需要被挂载到一个 DOM 元素中。
+
+我们将 Vue 应用挂载到 <div id="app"></div>，应该传入 #app：
+
+```
+import { createApp } from 'vue'
+import App from './App.vue'
+
+const app = createApp(App)
+
+app.mount('#app')
+```
+
+注册一个全局组件语法格式如下：
+
+```
+import { createApp } from 'vue'
+import App from './App.vue'
+import myComponentName from './components/myComponentName.vue'
+
+const app = createApp(App)
+app.component('my-component-name', myComponentName)
+
+app.mount('#app')
+```
+
+**my-component-name** 为组件名，myComponentName 为组件部分。注册后，我们可以使用以下方式来调用组件：
+
+```
+<my-component-name></my-component-name>
+```
+
+注册一个简单的全局组件 myComponentName，并使用它：
+
+**main.ts**
+
+```vue
+import { createApp } from 'vue'
+import App from './App.vue'
+import myComponentName from './components/myComponentName.vue'
+
+const app = createApp(App)
+app.component('my-component-name', myComponentName)
+
+app.mount('#app')
+```
+
+**myComponentName.vue**
+
+```vue
+<template>
+  <div>
+    <h1>My Component Name</h1>
+  </div>
+</template>
+```
+

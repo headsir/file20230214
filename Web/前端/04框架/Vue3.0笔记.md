@@ -2421,3 +2421,144 @@ setTimeout(() => {
 </script>
 ```
 
+### 8.回调的触发时机
+
+参见资料：https://blog.csdn.net/qq_63358859/article/details/140613562
+
+flush选项：`pre`(默认值)、`post`、`sync`
+
+##### `flush:'pre'`
+
+- **触发时机**：在响应式依赖项的值更新之前执行回调。
+
+##### `flush:'post'`
+
+- **触发时机**：在响应式依赖项的值更新之后执行回调。
+
+想在侦听器回调中能访问被 Vue 更新**之后**的所属组件的 DOM，你需要指明 `flush: 'post'` 选项：
+
+```js
+watch(source, callback, {
+  flush: 'post'
+})
+
+watchEffect(callback, {
+  flush: 'post'
+})
+```
+
+后置刷新的 `watchEffect()` 有个更方便的别名 `watchPostEffect()`：
+
+```js
+import { watchPostEffect } from 'vue'
+
+watchPostEffect(() => {
+  /* 在 Vue 更新后执行 */
+})
+```
+
+**案例**
+
+```vue
+<template>
+  <div>
+    <button id="aa" @click="r++; s++">{{ r }} - {{ s }}</button>
+  </div>
+</template>
+
+<script setup>
+import { ref, reactive, watch, watchEffect, onWatcherCleanup, watchPostEffect } from 'vue'
+const r = ref(2)
+const s = ref(10)
+// 可以立即回调
+// watchEffect(() => {
+//   console.log(r.value, s.value)
+//   console.log(document.querySelector('#aa') && document.querySelector('#aa').innerText)
+// }, { flush: 'post' })
+
+// 不能立即回调
+// watch(r, (newVal, oldVal) => {
+//   console.log(r.value, s.value)
+//   console.log(document.querySelector('#aa') && document.querySelector('#aa').innerText)
+// }, { flush: 'post' })
+
+watchPostEffect(() => {
+  console.log(r.value, s.value)
+  console.log(document.querySelector('#aa') && document.querySelector('#aa').innerText)
+})
+</script>
+```
+
+##### `flush: 'sync'`
+
+**同步侦听器**
+
+- **触发时机**：在数据变化的同步代码块中执行回调。
+
+创建一个同步触发的侦听器，它会在 Vue 进行任何更新之前触发：
+
+```js
+watch(source, callback, {
+  flush: 'sync'
+})
+
+watchEffect(callback, {
+  flush: 'sync'
+})
+```
+
+同步触发的 `watchEffect()` 有个更方便的别名 `watchSyncEffect()`：
+
+```js
+import { watchSyncEffect } from 'vue'
+
+watchSyncEffect(() => {
+  /* 在响应式数据变化时同步执行 */
+})
+```
+
+**注意**
+
+```tex
+谨慎使用
+同步侦听器不会进行批处理，每当检测到响应式数据发生变化时就会触发。可以使用它来监视简单的布尔值，但应避免在可能多次同步修改的数据源 (如数组) 上使用。
+```
+
+# 十一、 样式绑定
+
+class 与 style 是 HTML 元素的属性，用于设置元素的样式，我们可以用 v-bind 来设置样式属性。
+
+v-bind 在处理 class 和 style 时， 表达式除了可以使用字符串之外，还可以是对象或数组。
+
+## class 属性绑定
+
+我们可以为 v-bind:class 设置一个对象，从而动态的切换 **class**:
+
+**isActive 设置为 true 显示了一个绿色的 div 块，如果设置为 false 则不显示：**
+
+```vue
+<template>
+  <div>
+    <button @click="btn">点击</button>
+    <div :class="{ 'active': isActive }"></div>
+  </div>
+</template>
+
+<script setup>
+import { ref, reactive, watch, watchEffect, onWatcherCleanup, watchPostEffect } from 'vue'
+const isActive = ref(true)
+const btn = () => {
+  isActive.value = !isActive.value
+  console.log(isActive.value)
+}
+
+</script>
+<style scoped>
+.active {
+  width: 100px;
+  height: 100px;
+  background: green;
+}
+</style>
+```
+

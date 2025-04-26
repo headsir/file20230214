@@ -2562,3 +2562,319 @@ const btn = () => {
 </style>
 ```
 
+也可以在对象中传入更**多属性**用来动态切换多个 class 。此外，:class 指令也可以与普通的 class 属性共存。
+
+**text-danger 类背景颜色覆盖了 active 类的背景色：**
+
+```vue
+<template>
+  <div>
+    <button @click="btn">点击</button>
+    <div class="static" :class="{ 'active': isActive, 'text-danger': hasError }"></div>
+  </div>
+</template>
+
+<script setup>
+import { ref, reactive, watch, watchEffect, onWatcherCleanup, watchPostEffect } from 'vue'
+const isActive = ref(true)
+const hasError = ref(false)
+const btn = () => {
+  isActive.value = !isActive.value
+  hasError.value = !hasError.value
+  console.log(isActive.value, hasError.value)
+}
+
+</script>
+<style scoped>
+.static {
+  width: 100px;
+  height: 100px;
+}
+
+.active {
+  background: green;
+}
+
+.text-danger {
+  background: red;
+}
+</style>
+```
+
+直接绑定数据里的一个**对象**：
+
+```vue
+<template>
+  <div>
+    <button @click="btn">点击</button>
+    <div class="static" :class="classObject"></div>
+  </div>
+</template>
+
+<script setup>
+import { ref, reactive, watch, watchEffect, onWatcherCleanup, watchPostEffect } from 'vue'
+const classObject = reactive({
+  'active': true,
+  'text-danger': false
+})
+const btn = () => {
+  classObject.active = !classObject.active
+  classObject['text-danger'] = !classObject['text-danger']
+  console.log(classObject)
+}
+
+</script>
+<style scoped>
+.static {
+  width: 100px;
+  height: 100px;
+}
+
+.active {
+  background: green;
+}
+
+.text-danger {
+  background: red;
+}
+</style>
+```
+
+绑定一个返回对象的**计算属性**
+
+```vue
+<template>
+  <div>
+    <button @click="btn">点击</button>
+    <div class="static" :class="classObject"></div>
+    <div>{{ classObject }}</div>
+  </div>
+</template>
+
+<script setup>
+import { ref, reactive, computed, watch, watchEffect, onWatcherCleanup, watchPostEffect } from 'vue'
+const isActive = ref(true)
+const error = ref(false)
+
+const classObject = computed(() => {
+  return {
+    active: isActive.value,
+    'text-danger': error.value
+  }
+})
+const btn = () => {
+  isActive.value = !isActive.value
+  error.value = !error.value
+  console.log(classObject, error.value)
+}
+
+</script>
+<style scoped>
+.static {
+  width: 100px;
+  height: 100px;
+}
+
+.active {
+  background: green;
+}
+
+.text-danger {
+  background: red;
+}
+</style>
+```
+
+**数组语法**
+
+```vue
+<template>
+  <div>
+    <div class="static" :class="[activeClass, errorClass]"></div>
+  </div>
+</template>
+
+<script setup>
+import { ref } from 'vue'
+const activeClass = ref('active')
+const errorClass = ref("text-danger")
+
+</script>
+<style scoped>
+.static {
+  width: 100px;
+  height: 100px;
+}
+
+.active {
+  background: green;
+}
+
+.text-danger {
+  background: red;
+}
+</style>
+```
+
+**三元表达式**
+
+errorClass 是始终存在的，isActive 为 true 时添加 activeClass 类：
+
+```vue
+<template>
+  <div>
+    <div class="static" :class="[isActive ? activeClass : '', errorClass]"></div>
+  </div>
+</template>
+
+<script setup>
+import { ref } from 'vue'
+const isActive = ref(false)
+const activeClass = ref('active')
+const errorClass = ref("text-danger")
+
+</script>
+<style scoped>
+.static {
+  width: 100px;
+  height: 100px;
+}
+
+.active {
+  background: green;
+}
+
+.text-danger {
+  background: red;
+}
+</style>
+```
+
+## style(内联样式)
+
+在 v-bind:style **直接设置**样式，可以简写为 :style：
+
+```vue
+<template>
+  <div>
+    <div :style="{ color: activeColor, fontSize: fontSize + 'px' }">菜鸟教程</div>
+  </div>
+</template>
+
+<script setup>
+import { ref } from 'vue'
+const activeColor = ref('red')
+const fontSize = ref(30)
+
+</script>
+```
+
+直接绑定到一个样式**对象**
+
+```vue
+<template>
+  <div>
+    <div :style="styleObject">菜鸟教程</div>
+  </div>
+</template>
+
+<script setup>
+import { reactive, ref } from 'vue'
+const styleObject = reactive({
+  color: "red",
+  fontSize: "30px"
+})
+</script>
+```
+
+使用**数组**
+
+```vue
+<template>
+  <div>
+    <div :style="[baseStyles, overridingStyles]">菜鸟教程</div>
+  </div>
+</template>
+
+<script setup>
+import { reactive, ref } from 'vue'
+const baseStyles = reactive({
+  color: 'green',
+  fontSize: '30px'
+})
+const overridingStyles = reactive({
+  'font-weight': 'bold'
+})
+</script>
+```
+
+**自动前缀 **
+
+当你在 `:style` 中使用了需要浏览器特殊前缀的 CSS 属性时，Vue 会自动为他们加上相应的前缀。Vue 是在运行时检查该属性是否支持在当前浏览器中使用。如果浏览器不支持某个属性，那么将尝试加上各个浏览器特殊前缀，以找到哪一个是被支持的。
+
+参见：https://developer.mozilla.org/en-US/docs/Glossary/Vendor_Prefix#css_prefixes
+
+可以对一个样式属性提供多个 (不同前缀的) 值，举例来说：
+
+```vue
+<div :style="{ display: ['-webkit-box', '-ms-flexbox', 'flex'] }"></div>
+```
+
+数组仅会渲染浏览器支持的最后一个值。在这个示例中，在支持不需要特别前缀的浏览器中都会渲染为 `display: flex`。
+
+## 组件上使用 class 属性
+
+对于只有一个根元素的组件，当你使用了 `class` attribute 时，这些 class 会被添加到根元素上并与该元素上已有的 class 合并。
+
+举例来说，如果你声明了一个组件名叫 `MyComponent`，模板如下：
+
+```vue
+<!-- 子组件模板 -->
+<p class="foo bar">Hi!</p>
+```
+
+在使用时添加一些 class：
+
+```vue
+<!-- 在使用组件时 -->
+<MyComponent class="baz boo" />
+```
+
+渲染出的 HTML 为：
+
+```vue
+<p class="foo bar baz boo">Hi!</p>
+```
+
+Class 的绑定也是同样的：
+
+```vue
+<MyComponent :class="{ active: isActive }" />
+```
+
+当 `isActive` 为真时，被渲染的 HTML 会是：
+
+```vue
+<p class="foo bar active">Hi!</p>
+```
+
+如果你的组件有多个根元素，你将需要指定哪个根元素来接收这个 class。你可以通过组件的 `$attrs` 属性来指定接收的元素：
+
+```vue
+<!-- MyComponent 模板使用 $attrs 时 -->
+<p :class="$attrs.class">Hi!</p>
+<span>This is a child component</span>
+```
+
+
+
+```vue
+<MyComponent class="baz" />
+```
+
+这将被渲染为：
+
+```html
+<p class="baz">Hi!</p>
+<span>This is a child component</span>
+```

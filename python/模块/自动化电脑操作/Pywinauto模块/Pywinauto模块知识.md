@@ -91,6 +91,8 @@ dlg = app.窗口类名
 ==非英文程序 推荐使用方式一==
 
 ```
+# 顶层窗口
+dlg = app.top_window()
 # 打印窗口中所有的控件
 dlg.print_control_identifiers()
 # 打印可见控件
@@ -109,6 +111,7 @@ app.windows()
 - 查看窗口显示状态：dlg.get_show_state()  # 最大化 返回1，正常返回0
 - 关闭窗口：dlg.close()
 - 获取当前窗口显示的坐标：dlg.rectangle()
+- dlg.set_focus()  *# 设置焦点(激活窗口)*
 
 # 九、窗口控件的相关操作
 

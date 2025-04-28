@@ -2878,3 +2878,624 @@ Class 的绑定也是同样的：
 <p class="baz">Hi!</p>
 <span>This is a child component</span>
 ```
+
+# 十二、 事件处理
+
+## 监听事件
+
+使用 `v-on` 指令 (简写为 `@`) 来监听 DOM 事件，并在事件触发时执行对应的 JavaScript。
+
+用法：`v-on:click="handler"` 或 `@click="handler"`。
+
+事件处理器 (handler) 的值可以是：
+
+1. **内联事件处理器**：事件被触发时执行的内联 JavaScript 语句 (与 `onclick` 类似)。
+2. **方法事件处理器**：一个指向组件上定义的方法的属性名或是路径。
+
+## 内联事件处理器
+
+```	vue
+<template>
+  <div>
+    <button @click="counter += 1">增加 1</button>
+    <p>这个按钮被点击了 {{ counter }} 次。</p>
+  </div>
+</template>
+
+<script setup>
+import { reactive, ref } from 'vue'
+const counter = ref(0)
+</script>
+```
+
+## 方法事件处理器
+
+**v-on 可以接收一个定义的方法来调用：**
+
+```vue
+<template>
+  <div>
+    <!-- `greet` 是在下面定义的方法名 -->
+    <button @click="greet">点我</button>
+  </div>
+</template>
+
+<script setup>
+import { reactive, ref, watch } from 'vue'
+const name = ref('Runoob')
+
+const greet = (event) => {
+  // 当前活动实例
+  alert(`Hello ${name.value}!`)
+  // `event` 是原生 DOM event
+  if (event) {
+    alert(event.target.tagName)
+  }
+}
+</script>
+```
+
+## 方法与内联事件判断
+
+模板编译器会通过检查 `v-on` 的值是否是合法的 JavaScript 标识符或属性访问路径来断定是何种形式的事件处理器。举例来说，`foo`、`foo.bar` 和 `foo['bar']` 会被视为方法事件处理器，而 `foo()` 和 `count++` 会被视为内联事件处理器。
+
+## 在内联处理器中调用方法
+
+除了直接绑定方法名，你还可以在内联事件处理器中调用方法。这允许我们向方法传入自定义参数以代替原生事件：
+
+```vue
+<template>
+  <div>
+    <button @click="say('hi')">Say hi</button>
+    <button @click="say('what')">Say what</button>
+  </div>
+</template>
+
+<script setup>
+import { reactive, ref, watch } from 'vue'
+
+const say = (message) => {
+  alert(message)
+}
+
+</script>
+```
+
+## 在内联事件处理器中访问事件参数
+
+有时我们需要在内联事件处理器中访问原生 DOM 事件。你可以向该处理器方法传入一个特殊的 `$event` 变量，或者使用内联箭头函数：
+
+```vue
+<template>
+  <div>
+    <!-- 使用特殊的 $event 变量 -->
+    <button @click="warn('Form cannot be submitted yet.', $event)">
+      Submit
+    </button>
+
+    <!-- 使用内联箭头函数 -->
+    <button @click="(event) => warn('Form cannot be submitted yet.', event)">
+      Submit
+    </button>
+  </div>
+</template>
+
+<script setup>
+import { reactive, ref, watch } from 'vue'
+const warn = (message, event) => {
+  // 这里可以访问原生事件
+  if (event) {
+    event.preventDefault()
+    console.log(event)
+  }
+  alert(message)
+}
+</script>
+```
+
+**事件处理程序中可以有多个方法，这些方法由逗号运算符分隔：**
+
+```vue
+<template>
+  <div>
+    <!-- 这两个 one() 和 two() 将执行按钮点击事件 -->
+    <button @click="one($event), two($event)"> 点我 </button>
+  </div>
+</template>
+
+<script setup>
+import { reactive, ref, watch } from 'vue'
+const one = (event) => {
+  alert("第一个事件处理器逻辑...")
+}
+const two = (event) => {
+  alert("第二个事件处理器逻辑...")
+}
+</script>
+```
+
+## 事件修饰符
+
+Vue.js 为 v-on 提供了事件修饰符来处理 DOM 事件细节，如：event.preventDefault() 或 event.stopPropagation()。
+
+Vue.js 通过由点 . 表示的指令后缀来调用修饰符。
+
+- `.stop` - 阻止冒泡
+- `.prevent` - 阻止默认事件
+- `.capture` - 阻止捕获
+- `.self` - 只监听触发该元素的事件
+- `.once` - 只触发一次
+- `.left` - 左键事件
+- `.right` - 右键事件
+- `.middle` - 中间滚轮事件
+- `.passive`- 触摸事件
+
+```
+<!-- 阻止单击事件冒泡 -->
+<a v-on:click.stop="doThis"></a>
+<!-- 提交事件不再重载页面 -->
+<form v-on:submit.prevent="onSubmit"></form>
+<!-- 修饰符可以串联  -->
+<a v-on:click.stop.prevent="doThat"></a>
+<!-- 只有修饰符 -->
+<form v-on:submit.prevent></form>
+<!-- 添加事件侦听器时使用事件捕获模式 -->
+<div v-on:click.capture="doThis">...</div>
+<!-- 只当事件在该元素本身（而不是子元素）触发时触发回调 -->
+<div v-on:click.self="doThat">...</div>
+
+<!-- click 事件只能点击一次，2.1.4版本新增 -->
+<a v-on:click.once="doThis"></a>
+
+<!-- 滚动事件的默认行为 (scrolling) 将立即发生而非等待 `onScroll` 完成 -->
+<!--.passive 修饰符一般用于触摸事件的监听器，可以用来改善移动端设备的滚屏性能。-->
+<!-- 以防其中包含 `event.preventDefault()` -->
+<div @scroll.passive="onScroll">...</div>
+```
+
+**注**
+
+```tex
+使用修饰符时需要注意调用顺序，因为相关代码是以相同的顺序生成的。因此使用 @click.prevent.self 会阻止元素及其子元素的所有点击事件的默认行为，而 @click.self.prevent 则只会阻止对元素本身的点击事件的默认行为。
+
+请勿同时使用 .passive 和 .prevent，因为 .passive 已经向浏览器表明了你不想阻止事件的默认行为。如果你这么做了，则 .prevent 会被忽略，并且浏览器会抛出警告。
+```
+
+
+
+## 按键修饰符
+
+Vue 允许为 v-on 在监听键盘事件时添加按键修饰符：
+
+```
+<!-- 只有在 keyCode 是 13 时调用 vm.submit() -->
+<input v-on:keyup.13="submit">
+```
+
+记住所有的 keyCode 比较困难，所以 Vue 为最常用的按键提供了别名：
+
+```
+<!-- 同上 -->
+<input v-on:keyup.enter="submit">
+<!-- 缩写语法 -->
+<input @keyup.enter="submit">
+```
+
+你可以直接使用[`KeyboardEvent.key`](https://developer.mozilla.org/zh-CN/docs/Web/API/UI_Events/Keyboard_event_key_values)暴露的按键名称作为修饰符，但需要转为 kebab-case 形式。
+
+```
+<input @keyup.page-down="onPageDown" />
+```
+
+在上面的例子中，仅会在 `$event.key` 为 `'PageDown'` 时调用事件处理。
+
+
+
+全部的按键别名：
+
+- `.enter`
+- `.tab`
+- `.delete` (捕获 "删除" 和 "退格" 键)
+- `.esc`
+- `.space`
+- `.up`
+- `.down`
+- `.left`
+- `.right`
+
+系统修饰键：
+
+- `.ctrl`
+- `.alt`
+- `.shift`
+- `.meta`
+
+```tex
+注意
+
+在 Mac 键盘上，meta 是 Command 键 (⌘)。在 Windows 键盘上，meta 键是 Windows 键 (⊞)。在 Sun 微机系统键盘上，meta 是钻石键 (◆)。在某些键盘上，特别是 MIT 和 Lisp 机器的键盘及其后代版本的键盘，如 Knight 键盘，space-cadet 键盘，meta 都被标记为“META”。在 Symbolics 键盘上，meta 也被标识为“META”或“Meta”。
+```
+
+```vue
+<!-- Alt + Enter -->
+<input @keyup.alt.enter="clear" />
+
+<!-- Ctrl + 点击 -->
+<div @click.ctrl="doSomething">Do something</div>
+```
+
+```tex
+注意
+
+系统按键修饰符和常规按键不同。与 keyup 事件一起使用时，该按键必须在事件发出时处于按下状态。换句话说，keyup.ctrl 只会在你仍然按住 ctrl 但松开了另一个键时被触发。若你单独松开 ctrl 键将不会触发。
+```
+
+ `.exact` 修饰符
+
+`.exact` 修饰符允许精确控制触发事件所需的系统修饰符的组合。
+
+```
+<!-- 当按下 Ctrl 时，即使同时按下 Alt 或 Shift 也会触发 -->
+<button @click.ctrl="onClick">A</button>
+
+<!-- 仅当按下 Ctrl 且未按任何其他键时才会触发 -->
+<button @click.ctrl.exact="onCtrlClick">A</button>
+
+<!-- 仅当没有按下任何系统按键时触发 -->
+<button @click.exact="onClick">A</button>
+```
+
+## 鼠标按键修饰符
+
+- ` .left`
+- `.right`
+- `.middle`
+
+这些修饰符将处理程序限定为由特定鼠标按键触发的事件。
+
+但请注意，`.left`，`.right` 和 `.middle` 这些修饰符名称是基于常见的右手用鼠标布局设定的，但实际上它们分别指代设备事件触发器的“主”、”次“，“辅助”，而非实际的物理按键。因此，对于左手用鼠标布局而言，“主”按键在物理上可能是右边的按键，但却会触发 `.left` 修饰符对应的处理程序。又或者，触控板可能通过单指点击触发 `.left` 处理程序，通过双指点击触发 `.right` 处理程序，通过三指点击触发 `.middle` 处理程序。同样，产生“鼠标”事件的其他设备和事件源，也可能具有与“左”，“右”完全无关的触发模式。
+
+# 十三、 表单
+
+ v-model 指令在表单 `<input>`、`<textarea>` 及 `<select>` 等元素上创建双向数据绑定。
+
+v-model 会根据控件类型自动选取正确的方法来更新元素。
+
+v-model 会忽略所有表单元素的 value、checked、selected 属性的初始值，使用的是 data 选项中声明初始值。
+
+v-model 在内部为不同的输入元素使用不同的属性并抛出不同的事件：
+
+- text 和 textarea 元素使用 `value` 属性和 `input` 事件；
+- checkbox 和 radio 使用 `checked` 属性和 `change` 事件；
+- select 字段将 `value` 作为属性并将 `change` 作为事件。
+
+---
+
+### 输入框
+
+input 和 textarea 元素中使用 v-model 实现双向数据绑定：
+
+```vue
+<template>
+  <div>
+    <p>input 元素：</p>
+    <input v-model="message" placeholder="编辑我……">
+    <p>input 表单消息是: {{ message }}</p>
+
+    <p>textarea 元素：</p>
+    <textarea v-model="message2" placeholder="多行文本输入……"></textarea>
+    <p>textarea 表单消息是:</p>
+    <p>{{ message2 }}</p>
+  </div>
+</template>
+
+<script setup>
+import { reactive, ref, watch } from 'vue'
+const message = ref('')
+const message2 = ref('菜鸟教程\r\nhttps://www.runoob.com')
+</script>
+```
+
+在文本区域 textarea 插值是不起作用，需要使用 v-model 来代替：
+
+```
+<!-- 错误 -->
+<textarea>{{ text }}</textarea>
+
+<!-- 正确 -->
+<textarea v-model="text"></textarea>
+```
+
+---
+
+### 复选框
+
+复选框如果是单一的复选框，绑定布尔类型值，如果是多个则绑定到同一个数组：
+
+```vue
+<template>
+  <div>
+    <p>单个复选框：</p>
+    <input type="checkbox" id="checkbox" v-model="checked">
+    <label for="checkbox">{{ checked }}</label>
+
+    <p>多个复选框：</p>
+    <input type="checkbox" id="runoob" value="Runoob" v-model="checkedNames">
+    <label for="runoob">Runoob</label>
+    <input type="checkbox" id="google" value="Google" v-model="checkedNames">
+    <label for="google">Google</label>
+    <input type="checkbox" id="taobao" value="Taobao" v-model="checkedNames">
+    <label for="taobao">taobao</label>
+    <br>
+    <span>选择的值为: {{ checkedNames }}</span>
+  </div>
+</template>
+
+<script setup>
+import { reactive, ref, watch } from 'vue'
+const checked = ref(false)
+const checkedNames = ref([])
+</script>
+```
+
+---
+
+### 单选按钮
+
+```vue
+<template>
+  <div>
+    <input type="radio" id="runoob" value="Runoob" v-model="picked">
+    <label for="runoob">Runoob</label>
+    <br>
+    <input type="radio" id="google" value="Google" v-model="picked">
+    <label for="google">Google</label>
+    <br>
+    <span>选中值为: {{ picked }}</span>
+  </div>
+</template>
+
+<script setup>
+import { reactive, ref, watch } from 'vue'
+const picked = ref('')
+</script>
+```
+
+---
+
+### select 列表
+
+单选
+
+```vue
+<template>
+  <div>
+    <select v-model="selected">
+      <option disabled value="">选择一个网站</option>
+      <option value="www.runoob.com">Runoob</option>
+      <option value="www.google.com">Google</option>
+    </select>
+
+    <div id="output">
+      选择的网站是: {{ selected }}
+    </div>
+  </div>
+</template>
+
+<script setup>
+import { reactive, ref, watch } from 'vue'
+const selected = ref('')
+</script>
+```
+
+**注意**
+
+```tex
+如果 v-model 表达式的初始值不匹配任何一个选择项，<select> 元素会渲染成一个“未选择”的状态。在 iOS 上，这将导致用户无法选择第一项，因为 iOS 在这种情况下不会触发一个 change 事件。因此，我们建议提供一个空值的禁用选项，如上面的例子所示。
+```
+
+多选 (值绑定到一个数组)：
+
+```vue
+<template>
+  <div>
+    <!-- size 控制显示行数 默认0 -->
+    <select v-model="selected" multiple size=2>
+      <option value="www.runoob.com">Runoob</option>
+      <option value="www.google.com">Google</option>
+      <option value="www.taobao.com">Taobao</option>
+    </select>
+
+    <div id="output">
+      选择的网站是: {{ selected }}
+    </div>
+  </div>
+</template>
+
+<script setup>
+import { reactive, ref, watch } from 'vue'
+const selected = ref([])
+</script>
+```
+
+选择器的选项可以使用 `v-for` 动态渲染：
+
+```vue
+<template>
+  <div>
+    <select v-model="selected">
+      <option disabled value="">选择一个网站</option>
+      <option v-for="option in options" :value="option.value">
+        {{ option.text }}
+      </option>
+    </select>
+    <span>选择的是: {{ selected }}</span>
+  </div>
+</template>
+
+<script setup>
+import { reactive, ref, watch } from 'vue'
+// const selected = ref('www.google.com')
+const selected = ref('')
+
+const options = ref([
+  { text: 'Runoob', value: 'www.runoob.com' },
+  { text: 'Google', value: 'www.google.com' },
+  { text: 'Taobao', value: 'www.taobao.com' }
+])
+</script>
+```
+
+---
+
+### 值绑定
+
+对于单选按钮，复选框及选择框的选项，v-model 绑定的值通常是静态字符串 (对于复选框也可以是布尔值)：
+
+```vue
+<!-- 当选中时，`picked` 为字符串 "a" -->
+<input type="radio" v-model="picked" value="a" />
+
+<!-- `toggle` 为 true 或 false -->
+<input type="checkbox" v-model="toggle" />
+
+<!-- 当选中第一个选项时，`selected` 为字符串 "abc" -->
+<select v-model="selected">
+<option value="abc">ABC</option>
+</select>
+```
+
+但是有时我们可能想把值绑定到当前活动实例的一个动态属性上，这时可以用 v-bind 实现，此外，使用 v-bind 可以将输入值绑定到非字符串。
+
+**复选框 (Checkbox)：**
+
+```vue
+<input type="checkbox" v-model="toggle" true-value="yes" false-value="no" />
+...
+// 选中时
+toggle === 'yes'
+// 取消选中 
+toggle === 'no'
+```
+
+**单选框 (Radio)：**
+
+```vue
+<input type="radio" v-model="pick" v-bind:value="a" />
+// 当选中时
+pick == a
+```
+
+**选择框选项 (Select)：**
+
+```vue
+<select v-model="selected">
+  <!-- 内联对象字面量 -->
+  <option :value="{ number: 123 }">123</option>
+</select>
+// 当被选中时
+typeof selected // => 'object'
+selected.number // => 123
+```
+
+------
+
+### 修饰符
+
+####  .lazy
+
+在默认情况下， v-model 在 input 事件中同步输入框的值与数据，但你可以添加一个修饰符 lazy ，从而转变为在 change 事件中同步：
+
+```vue
+<!-- 在 "change" 而不是 "input" 事件中更新 -->
+<input v-model.lazy="msg" >
+```
+
+#### .number
+
+如果想自动将用户的输入值转为 Number 类型（如果原值的转换结果为 NaN 则返回原值），可以添加一个修饰符 number 给 v-model 来处理输入值：
+
+```vue
+<input v-model.number="age" type="number">
+```
+
+这通常很有用，因为在 type="number" 时 HTML 中输入的值也总是会返回字符串类型。
+
+####  .trim
+
+如果要自动过滤用户输入的首尾空格，可以添加 trim 修饰符到 v-model 上过滤输入：
+
+```vue
+<input v-model.trim="msg">
+```
+
+# 十四、自定义指令
+
+除了默认设置的核心指令( v-model 和 v-show ), Vue 也允许注册自定义指令。
+
+## 局部注册
+
+下面我们注册一个指令 v-focus, 该指令的功能是在页面加载时，元素获得焦点：
+
+```VUE
+<template>
+  <div>
+    <p>页面载入时，input 元素自动获取焦点：</p>
+    <input v-focus>
+  </div>
+</template>
+
+<script setup>
+import { reactive, ref, watch } from 'vue'
+// 在模板中启用 v-highlight
+const vFocus = {
+  mounted(el) {
+    // 聚焦元素
+    el.focus()
+  }
+}
+</script>
+```
+
+在 `<script setup>` 中，任何以 `v` 开头的驼峰式命名的变量都可以当作自定义指令使用。在上述例子中，`vFocus` 可以在模板中以 `v-focus` 的形式使用。
+
+在不使用 `<script setup>` 的情况下，自定义指令需要通过 `directives` 选项注册：
+
+```vue
+<template>
+  <div>
+    <p v-highlight>This sentence is important!</p>
+  </div>
+</template>
+
+<script>
+// import { reactive, ref, watch } from 'vue'
+export default {
+  setup() {
+    /*...*/
+  },
+  directives: {
+    // 在模板中启用 v-highlight
+    highlight: {
+      /* 添加class 到元素 */
+      mounted: (el) => {
+        el.classList.add('is-highlight')
+      }
+    }
+  }
+}
+</script>
+```
+
+## 全局注册
+
+自定义指令全局注册到应用层级也是一种常见的做法：
+
+```vue
+app.directive('highlight', {
+  mounted: (el) => {
+    el.classList.add('is-highlight')
+  }
+})
+```
+

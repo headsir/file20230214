@@ -3478,7 +3478,7 @@ export default {
     // 在模板中启用 v-highlight
     highlight: {
       /* 添加class 到元素 */
-      mounted: (el) => {
+      mounted: el => {
         el.classList.add('is-highlight')
       }
     }
@@ -3493,7 +3493,7 @@ export default {
 
 ```js
 app.directive('highlight', {
-  mounted: (el) => {
+  mounted: el => {
     el.classList.add('is-highlight')
   }
 })
@@ -3507,7 +3507,7 @@ app.directive('highlight', {
 <script setup>
 import { reactive, ref, watch } from 'vue'
 const vFocus = {
-  mounted: (el) => el.focus()
+  mounted: el => el.focus()
 }
 </script>
 ```
@@ -3646,3 +3646,112 @@ app.directive('demo', (el, binding) => {
 ```
 
 需要注意的是组件可能含有多个根节点。当应用到一个多根组件时，指令将会被忽略且抛出一个警告。和 attribute 不同，指令不能通过 `v-bind="$attrs"` 来传递给一个不同的元素。
+
+# 十五、组合式函数
+
+在 Vue 应用的概念中，“组合式函数”(Composables) 是一个利用 Vue 的组合式 API 来封装和复用**有状态逻辑**的函数。
+
+## 鼠标跟踪器示例
+
+直接在组件中使用组合式 API 实现鼠标跟踪功能
+
+```vue
+<script setup>
+import { ref, onMounted, onUnmounted } from 'vue'
+
+const x = ref(0)
+const y = ref(0)
+
+function update(event) {
+  x.value = event.pageX
+  y.value = event.pageY
+}
+
+// window.addEventListener('mousemove', update) 事件监听
+// 元素对象.addEventListener('事件类型',要执行的函数)
+onMounted(() => window.addEventListener('mousemove', update))
+// window.removeEventListener('mousemove', update) 事件解绑
+// 元素对象.removeEventListener(事件类型,事件处理函数,[获取捕获或冒泡阶段])
+onUnmounted(() => window.removeEventListener('mousemove', update))
+</script>
+
+<template>Mouse position is at: {{ x }}, {{ y }}</template>
+```
+
+把逻辑以一个组合式函数的形式提取到外部文件中：
+
+```vue
+// mouse.js
+import { ref, onMounted, onUnmounted } from 'vue'
+
+// 按照惯例，组合式函数名以“use”开头
+export function useMouse() {
+  // 被组合式函数封装和管理的状态
+  const x = ref(0)
+  const y = ref(0)
+
+  // 组合式函数可以随时更改其状态。
+  function update(event) {
+    x.value = event.pageX
+    y.value = event.pageY
+  }
+
+  // 一个组合式函数也可以挂靠在所属组件的生命周期上
+  // 来启动和卸载副作用
+  onMounted(() => window.addEventListener('mousemove', update))
+  onUnmounted(() => window.removeEventListener('mousemove', update))
+
+  // 通过返回值暴露所管理的状态
+  return { x, y }
+}
+```
+
+在组件中使用的方式：
+
+```vue
+<script setup>
+import { useMouse } from './mouse.js'
+
+const { x, y } = useMouse()
+</script>
+
+<template>Mouse position is at: {{ x }}, {{ y }}</template>
+```
+
+## 嵌套多个组合式函数
+
+将添加和清除 DOM 事件监听器的逻辑封装进一个组合式函数中：
+
+```js
+// event.js
+import { onMounted, onUnmounted } from 'vue'
+
+// 元素对象.addEventListener('事件类型',要执行的函数)
+export function useEventListener(target, event, callback) {
+  // 如果你想的话，
+  // 也可以用字符串形式的 CSS 选择器来寻找目标 DOM 元素
+  onMounted(() => target.addEventListener(event, callback))
+  onUnmounted(() => target.removeEventListener(event, callback))
+}
+```
+
+`useMouse()` 组合式函数可以被简化:
+
+```js
+// mouse.js
+import { ref } from 'vue'
+import { useEventListener } from './event'
+
+export function useMouse() {
+  const x = ref(0)
+  const y = ref(0)
+
+  useEventListener(window, 'mousemove', (event) => {
+    x.value = event.pageX
+    y.value = event.pageY
+  })
+
+  return { x, y }
+}
+```
+

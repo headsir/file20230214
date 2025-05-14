@@ -3989,3 +3989,207 @@ export default {
   // ...其他选项
 }
 ```
+
+# 十六、插件
+
+插件 (Plugins) 是一种能为 Vue 添加全局功能的工具代码。
+
+## 插件安装或引入
+
+```tex
+npm install 插件名称
+
+或
+
+通过CDN引入
+<script src=''></script>
+```
+
+##  使用插件
+
+### **全局**
+
+```js
+import { createApp } from 'vue'
+
+const app = createApp({})
+
+app.use(myPlugin, {
+  /* 可选的选项 */
+})
+```
+
+#### 示例
+
+**插件**
+
+```ts
+// plugins/i18n.ts
+
+import type { App } from 'vue'
+
+export default {
+  install: (app: App, options: Record<string, any>) => {
+
+    // 注入一个全局可用的 $translate() 方法
+    app.config.globalProperties.$translate = (key: string) => {
+      // 获取 `options` 对象的深层属性
+      // 使用 `key` 作为索引
+      return key.split('.').reduce((o: Record<string, any>, i: string) => {
+        if (o) return o[i]
+      }, options)
+    }
+  }
+}
+```
+
+**全局属性补充类型声明（ts特有）**
+
+参见资料：https://blog.csdn.net/m0_71537867/article/details/138017008
+
+```ts
+//env.d.ts
+
+// 新增的全局属性补充类型声明
+// https://cn.vuejs.org/guide/typescript/options-api.html#augmenting-global-properties
+export { }
+
+declare module 'vue' {
+  interface ComponentCustomProperties {
+    // 根据新增加的属性 追加类型声明
+    $translate: (key: string) => Record<string, any> | undefined
+  }
+}
+```
+
+**注册插件**
+
+```ts
+// main.ts
+import i18nPlugin from './plugins/i18n.ts'
+
+// 全局插件
+app.use(i18nPlugin, {
+  greetings: {
+    hello: 'Bonjour!'
+  }
+})
+```
+
+**使用插件**
+
+```vue
+<template>
+	  <!-- 直接使用 -->
+  <h1>{{ $translate('greetings.hello') }}</h1>
+</template>
+
+<script setup lang="ts">
+  // 调用使用  
+ 
+// getCurrentInstance 获取当前组件实例上下文信息
+import { getCurrentInstance } from 'vue'
+//  表示当前组件实例的类型
+import type { ComponentInternalInstance } from 'vue'
+// 获取proxy属性 可以访问挂载在全局的实例和方法（需要断言 否则ts报错）
+const { proxy } = getCurrentInstance() as ComponentInternalInstance
+console.log(proxy?.$translate('greetings.hello'))
+</script>
+
+<style scoped></style>
+```
+
+
+
+## 插件创建
+
+一个插件可以是一个拥有 `install()` 方法的对象，也可以直接是一个安装函数本身。安装函数会接收到安装它的应用实例和传递给 `app.use()` 的额外选项作为参数：
+
+**拥有 `install()` 方法的对象**
+
+```js
+const myPlugin = {
+  install(app, options) {
+    // 配置此应用
+  }
+}
+```
+
+**函数本身**
+
+类似模块、组件 **不推荐**
+
+```js
+const  myPlugin = (app, options) =>{
+    // 逻辑代码
+}
+```
+
+## 插件中的 Provide / Inject
+
+通过 `provide` 来为插件用户供给一些内容。
+
+举例来说，我们可以将插件接收到的 `options` 参数提供给整个应用，让任何组件都能使用这个翻译字典对象。
+
+```js
+// plugins/i18n.js
+export default {
+  install: (app, options) => {
+    app.provide('i18n', options)
+  }
+}
+```
+
+示例
+
+```js
+export default {
+  install: (app: App, options: Record<string, any>) => {
+    console.log("options:" + options);
+
+    // 注入一个全局可用的 $translate() 方法
+    const translate = (key: string) => {
+    console.log("key:" + key)
+    // 获取 `options` 对象的深层属性
+    // 使用 `key` 作为索引
+    const result = key.split('.').reduce(
+        (o: Record<string, any>, i: string) => o?.[i], options
+      )
+
+      // 如果找不到翻译，返回key本身
+      return result || key
+    }
+
+    // 2.挂载到全局属性（模版中可用 $translate）
+    app.config.globalProperties.$translate = translate
+    // 3.提供依赖注入（ composition API可用）
+    app.provide('il8n', options)
+  }
+}
+```
+
+插件用户就可以在他们的组件中以 `i18n` 为 key 注入并访问插件的选项对象了。
+
+```vue
+<script setup>
+import { inject } from 'vue'
+const i18n = inject('i18n')
+console.log(i18n.greetings.hello)
+</script>
+```
+
+示例
+
+```vue
+<template>
+  <h1>{{ $translate('greetings.hello') }}</h1>
+</template>
+
+<script setup>
+import { inject } from 'vue'
+// 使用插件
+const il8n: Record<string, any> | undefined = inject('il8n')
+console.log(il8n?.greetings.hello)
+</script>
+```
+

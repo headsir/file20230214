@@ -1718,6 +1718,613 @@ const app = createApp(App)
 app.mount('#app')
 ```
 
+## 组件基础
+
+### 定义一个组件
+
+当使用构建步骤时，我们一般会将 Vue 组件定义在一个单独的 .vue 文件中，这被叫做单文件组件 (简称 SFC)：
+
+```vue
+<script setup>
+const count = $ref(0)
+</script>
+
+<template>
+  <button @click="count++">点击我 {{ count }} 次数.</button>
+</template>
+```
+
+### 使用组件
+
+要使用一个子组件，我们需要在父组件中导入它。假设我们把计数器组件放在了一个叫做 ButtonCounter.vue 的文件中，这个组件将会以默认导出的形式被暴露给外部。
+
+App.vue
+
+```vue
+<script setup>
+import ButtonCounter from './ButtonCounter.vue'
+</script>
+
+<template>
+  <h1>使用子组件!</h1>
+  <ButtonCounter />
+</template>
+```
+
+通过 <script setup>，导入的组件都在模板中直接可用。
+
+组件可以被重用任意多次：
+
+```vue
+<script setup>
+import ButtonCounter from './ButtonCounter.vue'
+</script>
+
+<template>
+    <h1>使用子组件!</h1>
+    <ButtonCounter />
+    <ButtonCounter />
+    <ButtonCounter />
+</template>
+```
+
+> <font color='red'>**你会注意到，每当点击这些按钮时，每一个组件都维护着自己的状态，是不同的count。这是因为每当你使用一个组件，就创建了一个新的实例。**</font>
+
+### <font color='red'>组件名注意点</font>
+
+在单文件组件中，推荐为子组件使用 PascalCase 的标签名，以此来和原生的 HTML 元素作区分。虽然原生 HTML 标签名是不区分大小写的，但 Vue 单文件组件是可以在编译中区分大小写的。我们也可以使用 /> 来关闭一个标签。
+
+如果你是直接在 DOM 中书写模板 (例如原生 <template> 元素的内容)，模板的编译需要遵从浏览器中 HTML 的解析行为。在这种情况下，你应该需要使用 kebab-case 形式并显式地关闭这些组件的标签。
+
+```vue
+<!-- 如果是在 DOM 中书写该模板 -->
+<button-counter></button-counter>
+<button-counter></button-counter>
+<button-counter></button-counter>
+```
+
+### 样式scoped
+
+主组件如果不加scoped，并且子组件也不加，则会覆盖子组件的样式
+
+但是如果主组件加scoped则只会在当前组件中生效，如果子组件也加了也会有阻挡做种
+
+### 传参
+
+#### 父组件给子组件传参：Prop传参
+
+##### Prop使用
+
+Props 是一种特别的 attributes，你可以在组件上声明注册。要传递给博客文章组件一个标题，我们必须在组件的 props 列表上声明它。这里要用到 defineProps 宏：
+
+BlogPost.vue
+
+```vue
+<script setup>
+defineProps(['title']) //定义一个变量用来接收父组件的数据
+</script>
+
+<template>
+  <h4>{{ title }}</h4>
+</template>
+```
+
+defineProps 是一个仅 <script setup> 中可用的编译宏命令，并不需要显式地导入。声明的 props 会自动暴露给模板。defineProps 会返回一个对象，其中包含了可以传递给组件的所有 props：
+
+BlogPost.vue
+
+```vue
+<script setup>
+const props = defineProps(['title']) //定义一个变量用来接收父组件的数据
+console.log(props.title)
+</script>
+
+<template>
+  <h4>{{ title }}</h4>
+</template>
+```
+
+App.vue
+
+```vue
+<script setup>
+import BlogPost from './BlogPost.vue'
+</script>
+
+<template>
+    <h1>使用子组件!</h1>
+<!-- 如果是在 DOM 中书写该模板 -->
+<blog-post title="来自父组件的消息"></blog-post>
+
+</template>
+
+```
+
+一个组件可以有任意多的 props，默认情况下，所有 prop 都接受任意类型的值。
+
+当一个 prop 被注册后，可以像这样以自定义 attribute 的形式传递数据给它：
+
+```vue
+<BlogPost title="张三正在学习vue" />
+<BlogPost title="李四正在学习vue" />
+<BlogPost title="王五正在学习vue" />
+```
+
+在实际应用中，我们可能在父组件中会有如下的一个博客文章数组：
+
+```vue
+const posts = $ref([
+  { id: 1, title: '张三正在学习vue' },
+  { id: 2, title: '李四正在学习vue' },
+  { id: 3, title: '王五正在学习vue' }
+])
+```
+
+这种情况下，我们可以使用 v-for 来渲染它们：
+
+```vue
+<script setup>
+import BlogPost from './BlogPost.vue'
+
+const posts = $ref([
+  { id: 1, title: '张三正在学习vue' },
+  { id: 2, title: '李四正在学习vue' },
+  { id: 3, title: '王五正在学习vue' }
+])
+
+</script>
+
+<template>
+<BlogPost
+  v-for="post in posts"
+  :key="post.id"
+  :title="post.title"
+ />
+
+</template>
+
+```
+
+##### Prop 名字格式
+
+如果一个 prop 的名字很长，应使用 camelCase【单驼峰】 形式，因为它们是合法的 JavaScript 标识符，可以直接在模板的表达式中使用，也可以避免在作为属性 key 名时必须加上引号。
+
+MyComponent.vue
+
+```vue
+<script setup>
+defineProps({
+  greetingMessage: String
+})
+</script>
+
+<template>
+<span>{{ greetingMessage }}</span>
+</template>
+```
+
+虽然理论上你也可以在向子组件传递 props 时使用 camelCase 形式 (使用 [DOM 模板](https://cn.vuejs.org/guide/essentials/component-basics.html#dom-template-parsing-caveats)时例外)，但实际上为了和 HTML attribute 对齐，我们通常会将其写为 kebab-case 形式：<font color='red'>【HTML属性不区分大小写 所以vue属性一致改为小写】</font>
+
+```vue
+<script setup>
+import MyComponent from './MyComponent.vue'
+</script>
+
+<template>
+<my-component greeting-message="hello" />
+</template>
+
+```
+
+对于组件名我们推荐使用 PascalCase，因为这提高了模板的可读性，能帮助我们区分 Vue 组件和原生 HTML 元素。然而对于传递 props 来说，使用 camelCase 并没有太多优势，因此我们推荐更贴近 HTML 的书写风格。
+
+##### 静态 vs. 动态 Prop
+
+至此，你已经见过了很多像这样的静态值形式的 props：
+
+```vue
+<BlogPost title="My journey with Vue" />
+```
+
+相应地，还有使用 v-bind 或缩写 : 来进行动态绑定的 props：
+
+```vue
+<!-- 根据一个变量的值动态传入 -->
+<BlogPost :title="post.title" />
+
+<!-- 根据一个更复杂表达式的值动态传入 -->
+<BlogPost :title="post.title + ' by ' + post.author.name" />
+```
+
+##### 传递不同的值类型
+
+在上述的两个例子中，我们只传入了字符串值，但实际上**任何**类型的值都可以作为 props 的值被传递。
+
+###### Number
+
+```vue
+<!-- 虽然 `42` 是个常量，我们还是需要使用 v-bind -->
+<!-- 因为这是一个 JavaScript 表达式而不是一个字符串 -->
+<BlogPost :likes="42" />
+
+<!-- 根据一个变量的值动态传入 -->
+<BlogPost :likes="post.likes" />
+```
+
+###### Boolean
+
+```vue
+<!-- 仅写上 prop 但不传值，会隐式转换为 `true` -->
+<BlogPost is-published />
+
+<!-- 虽然 `false` 是静态的值，我们还是需要使用 v-bind -->
+<!-- 因为这是一个 JavaScript 表达式而不是一个字符串 -->
+<BlogPost :is-published="false" />
+
+<!-- 根据一个变量的值动态传入 -->
+<BlogPost :is-published="post.isPublished" />
+```
+
+###### Array
+
+```vue
+<!-- 虽然这个数组是个常量，我们还是需要使用 v-bind -->
+<!-- 因为这是一个 JavaScript 表达式而不是一个字符串 -->
+<BlogPost :comment-ids="[234, 266, 273]" />
+
+<!-- 根据一个变量的值动态传入 -->
+<BlogPost :comment-ids="post.commentIds" />
+```
+
+###### Object
+
+```vue
+<!-- 虽然这个对象字面量是个常量，我们还是需要使用 v-bind -->
+<!-- 因为这是一个 JavaScript 表达式而不是一个字符串 -->
+<BlogPost
+  :author="{
+    name: 'Veronica',
+    company: 'Veridian Dynamics'
+  }"
+ />
+
+<!-- 根据一个变量的值动态传入 -->
+<BlogPost :author="post.author" />
+```
+
+##### 单向数据流
+
+所有的 props 都遵循着**单向绑定**原则，props 因父组件的更新而变化，自然地将新的状态向下流往子组件，而不会逆向传递。这避免了子组件意外修改父组件的状态的情况，不然应用的数据流将很容易变得混乱而难以理解。
+
+另外，每次父组件更新后，所有的子组件中的 props 都会被更新到最新值，这意味着你**不应该**在子组件中去更改一个 prop。若你这么做了，Vue 会在控制台上向你抛出警告：
+
+```vue
+const props = defineProps(['foo'])
+
+// ❌ 警告！prop 是只读的！
+props.foo = 'bar'
+```
+
+导致你想要更改一个 prop 的需求通常来源于以下两种场景
+
+**1.prop 被用于传入初始值；而子组件想在之后将其作为一个局部数据属性**。在这种情况下，最好是新定义一个局部数据属性，从 props 上获取初始值即可：
+
+```vue
+const props = defineProps(['initialCounter'])
+
+// 计数器只是将 props.initialCounter 作为初始值
+// 像下面这样做就使 prop 和后续更新无关了
+const counter = ref(props.initialCounter)
+```
+
+**2.需要对传入的 prop 值做进一步的转换**。在这种情况中，最好是基于该 prop 值定义一个计算属性：
+
+```vue
+const props = defineProps(['size'])
+
+// 该 prop 变更时计算属性也会自动更新
+const normalizedSize = computed(() => props.size.trim().toLowerCase())
+```
+
+##### props数据类型/校验
+
+当对象或数组作为 props 被传入时，虽然子组件无法更改 props 绑定，但仍然**可以**更改对象或数组内部的值。这是因为 JavaScript 的对象和数组是按引用传递，而对 Vue 来说，禁止这样的改动虽然可能，但有很大的性能损耗，比较得不偿失。
+
+这种更改的主要缺陷是它允许了子组件以某种不明显的方式影响父组件的状态，可能会使数据流在将来变得更难以理解。在最佳实践中，你应该尽可能避免这样的更改，除非父子组件在设计上本来就需要紧密耦合。在大多数场景下，子组件应该抛出一个事件来通知父组件做出改变。
+
+###### Prop 校验
+
+Vue 组件可以更细致地声明对传入的 props 的校验要求。比如我们上面已经看到过的类型声明，如果传入的值不满足类型要求，Vue 会在浏览器控制台中抛出警告来提醒使用者。这在开发给其他开发者使用的组件时非常有用。
+
+要声明对 props 的校验，你可以向 defineProps() 宏提供一个带有 props 校验选项的对象，例如：
+
+```vue
+defineProps({
+  // 基础类型检查
+  // （给出 `null` 和 `undefined` 值则会跳过任何类型检查）
+  propA: Number,
+  // 多种可能的类型
+  propB: [String, Number],
+  // 必传，且为 String 类型
+  propC: {
+    type: String,
+    required: true
+  },
+  // Number 类型的默认值
+  propD: {
+    type: Number,
+    default: 100
+  },
+  // 对象类型的默认值
+  propE: {
+    type: Object,
+    // 对象或数组的默认值
+    // 必须从一个工厂函数返回。
+    // 该函数接收组件所接收到的原始 prop 作为参数。
+    default(rawProps) {
+      return { message: 'hello' }
+    }
+  },
+  // 自定义类型校验函数
+  propF: {
+    validator(value) {
+      // The value must match one of these strings
+      return ['success', 'warning', 'danger'].includes(value)
+    }
+  },
+  // 函数类型的默认值
+  propG: {
+    type: Function,
+    // 不像对象或数组的默认，这不是一个工厂函数。这会是一个用来作为默认值的函数
+    default() {
+      return 'Default function'
+    }
+  }
+})
+```
+
+一些补充细节：
+
+- 所有 prop 默认都是可选的，除非声明了 required: true。
+- 除 Boolean 外的未传递的可选 prop 将会有一个默认值 undefined。
+- Boolean 类型的未传递 prop 将被转换为 false。这可以通过为它设置 default 来更改——例如：设置为 default: undefined 将与非布尔类型的 prop 的行为保持一致。
+- 如果声明了 default 值，那么在 prop 的值被解析为 undefined 时，无论 prop 是未被传递还是显式指明的 undefined，都会改为 default 值。
+
+当 prop 的校验失败后，Vue 会抛出一个控制台警告 (在开发模式下)。
+
+如果使用了基于类型的 prop 声明 ，Vue 会尽最大努力在运行时按照 prop 的类型标注进行编译。举例来说，defineProps<{ msg: string }> 会被编译为 { msg: { type: String, required: true }}。
+
+User.vue
+
+```vue
+<script setup>
+defineProps({
+    id:[String,Number],
+    name:{
+        type:String,
+        default:'小王',
+        validator(value){
+            return value === 'admin'
+        }
+    },
+    user:{
+        type:Object,
+        default(newUser){
+            return {id:10,userName:'test',password:'123456'}
+        }
+    },
+    m1:{
+        type:Function,
+        default(){
+            return '默认值'
+        }
+    }
+})
+
+</script>
+
+<template>
+{{ id }},{{ name }},{{ user }},{{ m1() }}
+</template>
+
+<style scoped>
+
+</style>
+```
+
+App.vue
+
+```vue
+<script setup>
+import User from './User.vue'
+const m1 = ()=>{
+    return 'm1...'
+}
+</script>
+
+<template>
+  <User id="abc" name="admin" :m1="m1"></User>
+</template>
+
+<style scoped>
+
+</style>
+
+```
+
+###### 运行时类型检查
+
+校验选项中的 type 可以是下列这些原生构造函数：
+
+- String
+- Number
+- Boolean
+- Array
+- Object
+- Date
+- Function
+- Symbol
+
+另外，type 也可以是自定义的类或构造函数，Vue 将会通过 instanceof 来检查类型是否匹配。例如下面这个类：
+
+```vue
+class Person {
+  constructor(firstName, lastName) {
+    this.firstName = firstName
+    this.lastName = lastName
+  }
+}
+```
+
+你可以将其作为一个 prop 的类型：
+
+```vue
+defineProps({
+  author: Person
+})
+```
+
+Vue 会通过 instanceof Person 来校验 author prop 的值是否是 Person 类的一个实例。
+
+###### Boolean 类型转换
+
+为了更贴近原生 boolean attributes 的行为，声明为 Boolean 类型的 props 有特别的类型转换规则。以带有如下声明的 <MyComponent> 组件为例：
+
+```vue
+defineProps({
+  disabled: Boolean
+})
+```
+
+该组件可以被这样使用：
+
+```vue
+<!-- 等同于传入 :disabled="true" -->
+<MyComponent disabled />
+
+<!-- 等同于传入 :disabled="false" -->
+<MyComponent />
+```
+
+当一个 prop 被声明为允许多种类型时，例如：
+
+```vue
+defineProps({
+  disabled: [Boolean, Number]
+})
+```
+
+无论声明类型的顺序如何，Boolean 类型的特殊转换规则都会被应用。
+
+#### 子组件给父组件传参：监听事件
+
+两种方式：1、$emit方法，2、defineEmits方法
+
+##### $emit方法
+
+###### 父组件
+
+在父组件中定义:@getInfo，子组件通过$emit触发getInfo，可以调用geiInfo中的printInfo方法。
+
+ParentComponent.vue
+
+```vue
+<script setup lang="ts">
+import ChildComponent from "./ChildComponent.vue";
+
+function printInfo(userName,password,age){
+  console.log(userName)
+  console.log(password)
+  console.log(age)
+}
+
+</script>
+
+<template>
+  <h1>子组件给父组件传递参数</h1>
+  <ChildComponent @getInfo="printInfo"></ChildComponent>
+
+</template>
+
+```
+
+###### 子组件
+
+子组件通过$emit调用getInfo方法，可以传递参数
+
+ChildComponent.vue
+
+```vue
+<template>
+<button @click="$emit('getInfo','张三','123123',22)">传递参数</button>
+</template>
+
+<script setup lang="ts">
+
+</script>
+
+<style scoped>
+
+</style>
+```
+
+##### defineEmits
+
+我们可以通过 defineEmits 宏来声明需要抛出的事件：类似于defineProps
+
+###### 父组件
+
+ParentComponent.vue
+
+```vue
+<script setup lang="ts">
+import ChildComponent from "./ChildComponent.vue";
+
+function printInfo(userName,password,age){
+  console.log(userName)
+  console.log(password)
+  console.log(age)
+}
+
+</script>
+
+<template>
+  <h1>子组件给父组件传递参数</h1>
+  <ChildComponent @getInfo="printInfo"></ChildComponent>
+
+</template>
+
+```
+
+###### 子组件
+
+ChildComponent.vue
+
+```vue
+<template>
+<button @click="large">defineEmits传递参数</button><br/>
+</template>
+
+<script setup lang="ts">
+const emit = defineEmits(['getInfo','setInfo'])
+
+function large(){
+  emit('getInfo','张三','123123',22)
+}
+
+</script>
+
+<style scoped>
+
+</style>
+```
+
+
+
+
+
+## 深入组件
+
 ### 注册全局组件
 
 注册一个全局组件语法格式如下：
@@ -4163,7 +4770,11 @@ export default {
     // 2.挂载到全局属性（模版中可用 $translate）
     app.config.globalProperties.$translate = translate
     // 3.提供依赖注入（ composition API可用）
-    app.provide('il8n', options)
+    app.provide('il8n', {
+      translate,
+      options
+    })
+  }
   }
 }
 ```
@@ -4182,14 +4793,19 @@ console.log(i18n.greetings.hello)
 
 ```vue
 <template>
-  <h1>{{ $translate('greetings.hello') }}</h1>
+  <h1>{{ $translate('greetings.hello1.Bonjour') }}</h1>
+  <h1>{{ translate('greetings.hello') }}</h1>
 </template>
 
 <script setup>
 import { inject } from 'vue'
 // 使用插件
-const il8n: Record<string, any> | undefined = inject('il8n')
-console.log(il8n?.greetings.hello)
+const { translate, il8n } = inject('il8n') as {
+  translate: (key: string) => string;
+  il8n: Record<string, any> | undefined;
+}
+console.log(il8n?.greetings.hello1.Bonjour)
 </script>
 ```
 
+# 十七、

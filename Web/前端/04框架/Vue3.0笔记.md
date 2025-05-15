@@ -1885,6 +1885,12 @@ const posts = $ref([
 
 ```
 
+
+
+
+
+
+
 ##### Prop 名字格式
 
 如果一个 prop 的名字很长，应使用 camelCase【单驼峰】 形式，因为它们是合法的 JavaScript 标识符，可以直接在模板的表达式中使用，也可以避免在作为属性 key 名时必须加上引号。
@@ -2319,17 +2325,119 @@ function large(){
 </style>
 ```
 
+### 动态组件
 
+通过component来动态控制页面切换。
+
+注：虽然动态组件可以切换页面布局，但是如果是布局最终还是通过路由去控制更加合理。
+
+创建system.vue、article.vue，以及改造App.vue
+
+system.vue
+
+```vue
+<template >
+  <div class="right">
+    system
+  </div>
+</template>
+
+<script setup lang="ts">
+
+</script>
+
+<style scoped>
+.right{
+  width: calc(100% - 200px);
+  height: calc(100vh);
+  background-color: aqua;
+  float: left;
+}
+</style>
+
+```
+
+article.vue
+
+```vue
+<template >
+  <div class="right">
+    article
+  </div>
+</template>
+
+<script setup lang="ts">
+
+</script>
+
+<style scoped>
+.right{
+  width: calc(100% - 200px);
+  height: calc(100vh);
+  background-color: #646cff;
+  float: left;
+}
+</style>
+
+```
+
+App.vue
+
+```vue
+<script setup>
+import {ref} from 'vue'
+import system from './system.vue'
+import article from './article.vue'
+
+let rightMain = ref('system')
+
+const comList = {system, article}
+
+function openMenu(m){ // 传递进来的就是组件名称
+    console.log(m)
+  rightMain.value = m
+}
+
+</script>
+
+<template>
+  <div class="left">
+    <button @click="openMenu('system')" >打开系统管理</button><br/>
+    <button @click="openMenu('article')" >打开文章管理</button><br/>
+  </div>
+
+  <component :is="comList[rightMain]"></component>
+
+</template>
+
+
+<style scoped>
+.left{
+  width: 200px;
+  height: calc(100vh);
+  background-color: coral;
+  float: left;
+}
+</style>
+```
 
 
 
 ## 深入组件
 
-### 注册全局组件
+### 注册
+
+#### 全局组件
+
+##### 注册全局组件
+
+- 我们的组件都只是通过 **component **全局注册。
+- 需要明确地单独注册或使用循环来批量注册组件。
 
 注册一个全局组件语法格式如下：
 
 ```ts
+// main.ts
 import { createApp } from 'vue'
 import App from './App.vue'
 import myComponentName from './components/myComponentName.vue'
@@ -2339,63 +2447,38 @@ app.component('my-component-name', myComponentName)
 
 app.mount('#app')
 ```
+
+`.component()` 方法可以被链式调用：
+
+```js
+app
+  .component('ComponentA', ComponentA)
+  .component('ComponentB', ComponentB)
+  .component('ComponentC', ComponentC)
+```
+
+##### 使用全局组件
+
+全局注册的组件可以在随后创建的 app 模板中使用，也包括根实例组件树中的所有子组件的模板中。
 
 **my-component-name** 为组件名，myComponentName 为组件部分。注册后，我们可以使用以下方式来调用组件：
 
 ```
+<my-component-name />
+
+或
+
 <my-component-name></my-component-name>
 ```
 
+##### 示例
+
 注册一个简单的全局组件 myComponentName，并使用它：
-
-**main.ts**
-
-```ts
-import { createApp } from 'vue'
-import App from './App.vue'
-import myComponentName from './components/myComponentName.vue'
-
-const app = createApp(App)
-app.component('my-component-name', myComponentName)
-
-app.mount('#app')
-```
-
-**myComponentName.vue**
-
-```vue
-<template>
-  <div>
-    <h1>My Component Name</h1>
-  </div>
-</template>
-```
-
-### 组件的复用
-
-你可以将组件进行任意次数的复用：
-
-```vue
-<template>
-  <div>
-    <h1>My Component Name</h1>
-    <h2>My Component Name</h2>
-    <h3>My Component Name</h3>
-  </div>
-</template>
-```
-
-### 全局组件
-
-我们的组件都只是通过 component 全局注册的。
-
-全局注册的组件可以在随后创建的 app 模板中使用，也包括根实例组件树中的所有子组件的模板中。
 
 **注册**
 
- Vue 3 中需要明确地单独注册或使用循环来批量注册组件。
-
 ```ts
+// main.ts
 import { createApp } from 'vue'
 import App from './App.vue'
 import myComponentName from './components/myComponentName.vue'
@@ -2406,9 +2489,10 @@ app.component('my-component-name', myComponentName)
 app.mount('#app')
 ```
 
-**使用**
+**组件内容**
 
 ```vue
+<!-- myComponentName.vue -->
 <template>
   <div>
     <h1>My Component Name</h1>
@@ -2416,21 +2500,184 @@ app.mount('#app')
 </template>
 ```
 
-### 局部组件
-
-全局注册往往是不够理想的。比如，如果你使用一个像 webpack 这样的构建系统，全局注册所有的组件意味着即便你已经不再使用一个组件了，它仍然会被包含在你最终的构建结果中。这造成了用户下载的 JavaScript 的无谓的增加。
-
-在这些情况下，你可以通过一个普通的 JavaScript 对象来定义组件：
+**使用组件**
 
 ```vue
 <template>
-  <A />
+  <my-component-name />
+	<!-- 或 -->
+  <my-component-name></my-component-name>
+  <sites />
 </template>
+```
 
-<script setup lang="ts">
-import A from './components/A.vue'
+#### 局部组件
+
+全局注册虽然很方便，但有以下几个问题：
+
+1. 全局注册，但并没有被使用的组件无法在生产打包时被自动移除 (也叫“tree-shaking”)。如果你全局注册了一个组件，即使它并没有被实际使用，它仍然会出现在打包后的 JS 文件中。
+2. 全局注册在大型项目中使项目的依赖关系变得不那么明确。在父组件中使用子组件时，不太容易定位子组件的实现。和使用过多的全局变量一样，这可能会影响应用长期的可维护性。
+
+相比之下，局部注册的组件需要在使用它的父组件中显式导入，并且只能在该父组件中使用。它的优点是使组件之间的依赖关系更加明确，并且对 tree-shaking 更加友好。
+
+在使用 `<script setup>` 的单文件组件中，导入的组件可以直接在模板中使用，无需注册：
+
+```vue
+<script setup>
+import ComponentA from './ComponentA.vue'
+</script>
+
+<template>
+  <ComponentA />
+</template>
+```
+
+如果没有使用 `<script setup>`，则需要使用 `components` 选项来显式注册：
+
+```js
+import ComponentA from './ComponentA.js'
+
+export default {
+  components: {
+    ComponentA
+  },
+  setup() {
+    // ...
+  }
+}
+```
+
+对于每个 `components` 对象里的属性，它们的 key 名就是注册的组件名，而值就是相应组件的实现。上面的例子中使用的是**ES2015 缩写语法**，等价于：
+
+```js
+export default {
+  components: {
+    ComponentA: ComponentA
+  }
+  // ...
+}
+```
+
+请注意：**局部注册的组件在后代组件中==不==可用**。在这个例子中，`ComponentA` 注册后仅在当前组件可用，而在任何的子组件或更深层的子组件中都不可用。
+
+#### 组件名格式
+
+使用 PascalCase 作为组件名的注册格式，是因为：
+
+1. PascalCase 是合法的 JavaScript 标识符。这使得在 JavaScript 中导入和注册组件都很容易，同时 IDE 也能提供较好的自动补全。
+2. `<PascalCase />` 在模板中更明显地表明了这是一个 Vue 组件，而不是原生 HTML 元素。同时也能够将 Vue 组件和自定义元素 (web components) 区分开来。
+
+在单文件组件和内联字符串模板中，我们都推荐这样做。但是，PascalCase 的标签名在 DOM 内模板中是不可用的。
+
+为了方便，Vue 支持将模板中使用 kebab-case 的标签解析为使用 PascalCase 注册的组件。这意味着一个以 `MyComponent` 为名注册的组件，在模板 (或由 Vue 渲染的 HTML 元素) 中可以通过 `<MyComponent>` 或 `<my-component>` 引用。这让我们能够使用同样的 JavaScript 组件注册代码来配合不同来源的模板。
+
+### Props
+
+#### Props 声明
+
+一个组件需要显式声明它所接受的 props，这样 Vue 才能知道外部传入的哪些是 props，哪些是透传 attribute 。
+
+在使用 `<script setup>` 的单文件组件中，props 可以使用 `defineProps()` 宏来声明：
+
+```vue
+<script setup>
+const props = defineProps(['foo'])
+
+console.log(props.foo)
 </script>
 ```
+
+在没有使用 `<script setup>` 的组件中，props 可以使用 `props`选项来声明：
+
+```js
+export default {
+  props: ['foo'],
+  setup(props) {
+    // setup() 接收 props 作为第一个参数
+    console.log(props.foo)
+  }
+}
+```
+
+注意传递给 `defineProps()` 的参数和提供给 `props` 选项的值是相同的，两种声明方式背后其实使用的都是 props 选项。
+
+除了使用字符串数组来声明 props 外，还可以使用对象的形式：
+
+```js
+// 使用 <script setup>
+defineProps({
+  title: String,
+  likes: Number
+})
+```
+
+
+
+```js
+// 非 <script setup>
+export default {
+  props: {
+    title: String,
+    likes: Number
+  }
+}
+```
+
+对于以对象形式声明的每个属性，key 是 prop 的名称，而值则是该 prop 预期类型的构造函数。比如，如果要求一个 prop 的值是 `number` 类型，则可使用 `Number` 构造函数作为其声明的值。
+
+对象形式的 props 声明不仅可以一定程度上作为组件的文档，而且如果其他开发者在使用你的组件时传递了错误的类型，也会在浏览器控制台中抛出警告。我们将在本章节稍后进一步讨论有关 [prop 校验](https://cn.vuejs.org/guide/components/props.html#prop-validation)的更多细节。
+
+如果你正在搭配 TypeScript 使用 `<script setup>`，也可以使用类型标注来声明 props：
+
+```vue
+<script setup lang="ts">
+defineProps<{
+  title?: string
+  likes?: number
+}>()
+</script>
+```
+
+更多关于基于类型的声明的细节请参考[组件 props 类型标注](https://cn.vuejs.org/guide/typescript/composition-api.html#typing-component-props)。
+
+#### 响应式 Props 解构
+
+Vue 的响应系统基于属性访问跟踪状态的使用情况。例如，在计算属性或侦听器中访问 `props.foo` 时，`foo` 属性将被跟踪为依赖项。
+
+因此，在以下代码的情况下：
+
+```js
+const { foo } = defineProps(['foo'])
+
+watchEffect(() => {
+  // 在 3.5 之前只运行一次
+  // 在 3.5+ 中在 "foo" prop 变化时重新执行
+  console.log(foo)
+})
+```
+
+在 3.4 及以下版本，`foo` 是一个实际的常量，永远不会改变。在 3.5 及以上版本，当在同一个 `<script setup>` 代码块中访问由 `defineProps` 解构的变量时，Vue 编译器会自动在前面添加 `props.`。因此，上面的代码等同于以下代码：
+
+```js
+const props = defineProps(['foo'])
+
+watchEffect(() => {
+  // `foo` 由编译器转换为 `props.foo`
+  console.log(props.foo)
+})
+```
+
+此外，你可以使用 JavaScript 原生的默认值语法声明 props 默认值。这在使用基于类型的 props 声明时特别有用。
+
+```ts
+const { foo = 'hello' } = defineProps<{ foo?: string }>()
+```
+
+如果你希望在 IDE 中在解构的 props 和普通变量之间有更多视觉上的区分，Vue 的 VSCode 扩展提供了一个设置来启用解构 props 的内联提示。
+
+
+
+
 
 ### Prop
 

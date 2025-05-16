@@ -2577,7 +2577,9 @@ export default {
 
 一个组件需要显式声明它所接受的 props，这样 Vue 才能知道外部传入的哪些是 props，哪些是透传 attribute 。
 
-在使用 `<script setup>` 的单文件组件中，props 可以使用 `defineProps()` 宏来声明：
+在使用 `<script setup>` 的单文件组件中，props 可以用 `defineProps()` 宏==使用字符串数组来声明 props==：
+
+
 
 ```vue
 <script setup>
@@ -2601,7 +2603,7 @@ export default {
 
 注意传递给 `defineProps()` 的参数和提供给 `props` 选项的值是相同的，两种声明方式背后其实使用的都是 props 选项。
 
-除了使用字符串数组来声明 props 外，还可以使用对象的形式：
+除了使用字符串数组来声明 props 外，还可以==使用对象来声明 props==：
 
 ```js
 // 使用 <script setup>
@@ -2627,7 +2629,7 @@ export default {
 
 对象形式的 props 声明不仅可以一定程度上作为组件的文档，而且如果其他开发者在使用你的组件时传递了错误的类型，也会在浏览器控制台中抛出警告。我们将在本章节稍后进一步讨论有关 [prop 校验](https://cn.vuejs.org/guide/components/props.html#prop-validation)的更多细节。
 
-如果你正在搭配 TypeScript 使用 `<script setup>`，也可以使用类型标注来声明 props：
+如果你正在搭配 TypeScript 使用 `<script setup>`，也可以==使用类型标注来声明 props==：
 
 ```vue
 <script setup lang="ts">

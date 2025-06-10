@@ -874,6 +874,20 @@ select COLUMN_NAME from information_schema.COLUMNS
 where table_name="5g小区共享统计查询_(xxxx)"
 ```
 
+### 3.7.21 在查询结果中添加总计
+
+WITH ROLLUP 与 GROUP BY 子句一起使用，用于在查询结果中添加总计
+
+```sql
+SELECT IFNULL(department,'总计') AS department, SUM(sales) AS total_sales
+FROM sales_data
+GROUP BY department WITH ROLLUP;
+
+IFNULL(department,全省) AS department 用于处理总计为空
+```
+
+
+
 
 
 ## 3.8 触发器

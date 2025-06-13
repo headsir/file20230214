@@ -681,3 +681,245 @@ for i in std_ord_desc:
 100011
 1002
 ```
+
+> 参考资料
+
+```text
+    https://www.cnblogs.com/luckzack/p/18182122
+```
+
+# Alembic 的应用
+
+Alembic 使用 SQLAlchemy 作为数据库引擎，为关系型数据提供创建、管理、更改和调用的管理脚本，协助开发和运维人员在系统上线后对数据库进行在线管理。
+
+同任何 Python 扩展库一样，我们可以通过 pip 来快速的安装最新的稳定版 Alembic 扩展库 `pip install alembic`。
+
+```cmd
+pip install alembic
+```
+
+## 创建 Alembic 迁移环境
+
+在使用 Alembic 之前需要先建立一个 Alembic 脚本环境，通过在工程目录下输入 `alembic init alembic` 命令可以快速在应用程序中建立 Alembic 脚本环境，当在命令行看到以下输出时，表示 alembic 脚本环境创建完成。
+
+```cmd
+alembic init alembic
+
+Creating directory 'D:\\数据库\\202409项目\\03模块使用说明\\05_ORM_SQLAlchemy\\Alembic 的应用\\alembic' ...  done
+Creating directory 'D:\\数据库\\202409项目\\03模块使用说明\\05_ORM_SQLAlchemy\\Alembic 的应用\\alembic\\versions' ...  done
+Generating D:\数据库\202409项目\03模块使用说明\05_ORM_SQLAlchemy\Alembic 的应用\alembic.ini ...  done
+Generating D:\数据库\202409项目\03模块使用说明\05_ORM_SQLAlchemy\Alembic 的应用\alembic\env.py ...  done
+Generating D:\数据库\202409项目\03模块使用说明\05_ORM_SQLAlchemy\Alembic 的应用\alembic\README ...  done
+Generating D:\数据库\202409项目\03模块使用说明\05_ORM_SQLAlchemy\Alembic 的应用\alembic\script.py.mako ...  done
+Please edit configuration/connection/logging settings in 'D:\\数据库\\202409项目\\03模块使用说明\\05_ORM_SQLAlchemy\\Alembic 的应用\\alembic.ini' before proceeding.
+```
+
+你可以通过 -t 选项来选择一个初始化的模板，Alembic 目前支持三个初始化模板「通过 alembic list_templates 可以查看支持的模板类型」，默认情况下使用的是通用模板，在大多数情况下使用通用模板即可。
+
+```text
+Available templates:
+
+async - Generic single-database configuration with an async dbapi.
+generic - Generic single-database configuration.
+multidb - Rudimentary multi-database configuration.
+
+Templates are used via the 'init' command, e.g.:
+
+  alembic init --template generic ./scripts
+```
+
+生成的迁移脚本目录如下：
+
+```text
+├── alembic
+│   ├── README
+│   ├── env.py
+│   ├── script.py.mako
+│   └── versions
+```
+
+- alembic 目录：迁移脚本的根目录，放置在应用程序的根目录下，可以设置为任意名称。在多数据库应用程序可以为每个数据库单独设置一个 Alembic 脚本目录。
+- README 文件：说明文件，初始化完成时没有什么意义。
+- env.py 文件：一个 python 文件，在调用 Alembic 命令时该脚本文件运行。
+- script.py.mako 文件：是一个 mako 模板文件，用于生成新的迁移脚本文件。
+- versions 目录：用于存放各个版本的迁移脚本。初始情况下为空目录，通过 revision 命令可以生成新的迁移脚本。
+
+```text
+alembic 会在你的应用程序的根目录下生成一个 alembic.ini 的配置文件，在开始任何的操作之前需要先修改该文件中的 sqlalchemy.url 指向你自己的数据库地址。
+
+比如：sqlalchemy.url = mysql+pymysql://temp:qazwsx@localhost/temp
+```
+
+## 生成迁移脚本
+
+当 Alembic 配置环境创建完成后，可以通过 Alembic 的子命令 revision 来生成新的迁移脚本。
+
+```cmd
+alembic revision -m "first create script"
+
+Generating D:\数据库\202409项目\03模块使用说明\05_ORM_SQLAlchemy\Alembic 的应用\alembic\versions\39449bfacab3_first_create_script.py ...  done
+```
+
+初始的迁移脚本中并没有实际有效的内容，相当于一个空白的模板文件「增加了版本信息」。如果对整改工程的数据表进行修改后，再次运行 revision 子命令可以看到新生成的脚本文件中的内容增加了我们对数据表的改变内容。
+
+```cmd
+alembic revision -m "add create date in user table"
+
+Generating D:\数据库\202409项目\03模块使用说明\05_ORM_SQLAlchemy\Alembic 的应用\alembic\versions\293d5ef8f65f_add_create_date_in_user_table.py ...  done
+```
+
+此时在 alembic 文件夹中可以看到以下文件:
+
+```text
+alembic
+├── README
+├── env.py
+├── script.py.mako
+└── versions
+    ├── 3602707b314b_first_create_script.py
+    └── eac6fb06ced5_add_create_date_in_user_table.py
+```
+
+可以看到在 versions 目录中生成了两个迁移脚本文件，但是此时的迁移脚本文件中没有任何的有效代码，文件内容如下:
+add create date in user table.py
+
+```text
+Revision ID: eac6fb06ced5
+Revises: 3602707b314b
+Create Date: 2019-11-03 06:54:23.862575
+"""
+from alembic import op
+import sqlalchemy as sa
+# revision identifiers, used by Alembic.
+revision = 'eac6fb06ced5'
+down_revision = '3602707b314b'
+branch_labels = None
+depends_on = None
+def upgrade():
+    pass
+def downgrade():
+    pass
+```
+
+在该文件中制定了当前版本号 revision 和父版本号 down_revision ，以及相应的升级操作函数 upgrade 和降级操作函数 dwongrade。在 upgrade 和 dwongrade 函数中通过相应的 API 来操作 op 和 sa 对象来完成对数据库的修改，以下代码完成了在数据库中新增一个 account 数据表的功能。
+注意：`alembic upgrade head` 可升级最新版本
+
+```text
+def upgrade():
+    op.create_table(
+        'account',
+        sa.Column('id', sa.Integer, primary_key=True),
+        sa.Column('name', sa.String(50), nullable=False),
+        sa.Column('description', sa.Unicode(200)),
+    )
+def downgrade():
+    op.drop_table('account')
+```
+
+每次编写完代码还需要手动编写迁移脚本这并不是程序员所需要的，幸运的是 Alembic 的开发者为程序员提供了更美好的操作「自动生成迁移脚本」。自动生成迁移脚本无需考虑数据库相关操作，只需完成 ROM 中相关类的编写即可，通过 Alembic 命令即可在数据库中自动完成数据表的生成和更新。在 Alembic 中通过 revision 子命令的 --autogrenerate 选项参数来生成自动迁移脚本。
+
+在使用自动生成命令之前，需要在 env.py 文件中修改 target_metadata 配置使其指向应用程序中的元数据对象。
+env.py
+
+```python
+# add your model's MetaData object here
+# for 'autogenerate' support
+# from myapp import mymodel
+# target_metadata = mymodel.Base.metadata
+# target_metadata = None
+
+# 引入数据库基类
+import os, sys
+sys.path.append(os.path.dirname(os.path.abspath(__file__)))
+import module
+target_metadata = module.Base.metadata
+```
+
+module.py
+
+```python
+from sqlalchemy import create_engine, Column, Integer, String
+from sqlalchemy.ext.declarative import declarative_base
+
+engine = create_engine('mysql+pymysql://temp:qazwsx@localhost/temp')
+Base = declarative_base()
+
+
+class Student(Base):  # Student类继承自Base
+    __tablename__ = 'student2'
+    id = Column(Integer, primary_key=True)
+    name = Column(String(100))
+    age = Column(Integer)
+    address = Column(String(100))
+```
+
+在 temp 数据库中新增 student2 数据表，然后使用自动生成迁移脚本命令，查看我们的配置是否完成。运行命令`alembic revision --autogenerate`后可以看到以下信息：
+
+```text
+INFO  [alembic.runtime.migration] Context impl MySQLImpl.
+INFO  [alembic.runtime.migration] Will assume non-transactional DDL.
+INFO  [alembic.autogenerate.compare] Detected added table 'student2'
+Generating D:\数据库\202409项目\03模块使用说明\05_ORM_SQLAlchemy\Alembic 的应用\alembic\versions\67fd988f79d5_.py ...  done
+```
+
+生成的迁移脚本文件内容如下：
+
+```python
+def upgrade() -> None:
+    # ### commands auto generated by Alembic - please adjust! ###
+    op.create_table(
+        'student2',
+        sa.Column('id', sa.Integer(), nullable=False),
+        sa.Column('name', sa.String(length=100), nullable=True),
+        sa.Column('age', sa.Integer(), nullable=True),
+        sa.Column('address', sa.String(length=100), nullable=True),
+        sa.PrimaryKeyConstraint('id'),
+    )
+    # ### end Alembic commands ###
+
+
+def downgrade() -> None:
+    # ### commands auto generated by Alembic - please adjust! ###
+    op.drop_table('student2')
+    # ### end Alembic commands ###
+```
+
+## 变更数据库
+
+Alembic 最重要的功能是自动完成数据库的迁移「变更」，所做的配置以及生成的脚本文件都是为数据的迁移做准备的，数据库的迁移主要用到 upgrade 和 downgrade 子命令。
+
+数据看的变更主要用到以下命令：
+
+- **alembic upgrade head**：将数据库升级到最新版本。
+- **alembic downgrade base**：将数据库降级到最初版本。
+- **alembic upgrade <version>**：将数据库升级到指定版本。
+- **alembic downgrade <version>**：将数据库降级到指定版本。
+- **alembic upgrade +2**：相对升级，将数据库升级到当前版本后的两个版本。
+- **alembic downgrade +2**：相对降级，将数据库降级到当前版本前的两个版本。
+- **alembic stamp head**：命令的作用是将数据库标记为已应用最新迁移版本
+
+以上所有的升降级方式都是在线方式实时更新数据库文件，实际环境中总会存在一些环境无法在线升级，Alembic 提供了生成 SQL 脚本的形式，已提供离线升降级的功能。
+
+```text
+alembic upgrade <version> --sql > migration.sql
+
+或
+
+alembic downgrade <version> --sql > migration.sql
+```
+
+随着项目的进展，项目下不可避免的会生成很多版本的迁移脚本，此时可以使用 current 来查看线上数据库处于什么版本，也可以通过 history 来查看项目目录中的迁移脚本信息。
+
+```tex
+alembic current
+
+INFO  [alembic.runtime.migration] Context impl MySQLImpl.
+INFO  [alembic.runtime.migration] Will assume non-transactional DDL.
+822973f596d5 (head)
+
+alembic history
+
+67fd988f79d5 -> 822973f596d5 (head), add create date in user table
+<base> -> 67fd988f79d5, empty message
+```
+

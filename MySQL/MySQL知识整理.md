@@ -888,7 +888,52 @@ GROUP BY department WITH ROLLUP;
 IFNULL(department,全省) AS department 用于处理总计为空
 ```
 
+### 3.7.21 自定义函数
 
+#### 过程
+
+```sql
+CREATE DEFINER=`iron_tower_fee`@`%` PROCEDURE `pro_add_del_tt`(`start_moth` char(255),`end_moth` char(255))
+BEGIN
+    /* 起退租明细查询，注意重复订单*/
+    CREATE TABLE IF NOT EXISTS `temp_全量订单`
+    SELECT *,fun_moth_offset(a.`账期月份`,1) AS '下一个月份'
+    FROM `铁塔费用_费用统计_全部订单汇总` AS a
+    WHERE a.`账期月份`>= fun_moth_offset(start_moth,-1) 
+    ;
+
+    -- 退租订单
+    SELECT a.*,a.下一个月份 AS 订单终止月份,
+    IF(a.`产品服务费合计（出账费用）（不含税）`=0,'退租-费用为0','退租-费用不为0') AS 分类
+    FROM `temp_全量订单` AS a
+    LEFT JOIN `temp_全量订单` AS b 
+    ON CONCAT(a.`下一个月份`,a.`产品业务确认单编号`)=CONCAT(b.`账期月份`,b.`产品业务确认单编号`)
+    WHERE a.`账期月份`>= fun_moth_offset(start_moth,-1) AND a.`下一个月份`<= fun_moth_offset(end_moth,0) 
+    AND b.`账期月份` is NULL
+    ORDER BY a.`账期月份`
+    ;
+    DROP TABLE `temp_全量订单`;
+END
+```
+
+
+
+#### 函数
+
+```sql
+CREATE DEFINER=`iron_tower_fee`@`%` FUNCTION `fun_moth_offset`(`mothStr` char(255),offset int) RETURNS char(255) CHARSET utf8mb4 COLLATE utf8mb4_general_ci
+BEGIN
+	DECLARE OffsetMoth char(255); # '偏移后的日期' 
+	DECLARE OffsetMothstr char(255);  # '偏移后的年月'
+	SET OffsetMoth = DATE_ADD(
+	STR_TO_DATE(
+	CONCAT(LEFT(mothStr,4),"-",RIGHT(mothStr,2),"-01"),'%Y-%m-%d')
+	, INTERVAL offset MONTH
+	)	;
+	SET OffsetMothstr = CONCAT(SUBSTRING(OffsetMoth,1,4),SUBSTRING(OffsetMoth,6,2));
+	RETURN OffsetMothstr;
+END
+```
 
 
 

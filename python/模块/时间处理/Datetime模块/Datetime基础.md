@@ -154,3 +154,37 @@ datetime.timedelta(days=2, seconds=83880)
   
   Timestamp('2022-06-26 20:27:00')
   ```
+
+
+
+- relativedelta
+
+  ```
+  from datetime import datetime
+  from dateutil.relativedelta import relativedelta
+  
+  def moth_offset(moth: str, offset: int):
+      """
+      月份偏移
+  
+      举例：
+          from datetime import datetime
+  
+          from dateutil.relativedelta import relativedelta
+  
+          MONTH = "202401"
+  
+          T = (datetime.strptime(MOTH, "%Y%m")+relativedelta(months=-1)).strftime("%Y%m")
+  
+          print(T)  # 202312
+  
+      :param moth: 月份
+      :param offset: 偏移量
+      :return:
+      """
+      return (datetime.strptime(moth, "%Y%m") + relativedelta(months=offset)).strftime(
+          "%Y%m"
+      )
+  ```
+
+  

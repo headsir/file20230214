@@ -633,6 +633,8 @@ GROUP BY `ta`.`账期月份`, `ta`.`运营商地市`
 
 ```mysql
 date_sub(curdate(),interval 1 day)
+
+DATE_ADD(CURRENT_DATE(), INTERVAL 1 MONTH)
 ```
 
 ### 3.7.15 避免插入重复数据

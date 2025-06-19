@@ -748,6 +748,15 @@ Templates are used via the 'init' command, e.g.:
 alembic 会在你的应用程序的根目录下生成一个 alembic.ini 的配置文件，在开始任何的操作之前需要先修改该文件中的 sqlalchemy.url 指向你自己的数据库地址。
 
 比如：sqlalchemy.url = mysql+pymysql://temp:qazwsx@localhost/temp
+
+[dev]
+version_locations = %(here)s/alembic/versions_dev
+sqlalchemy.url = mysql+pymysql://root:qazwsx@127.0.0.1:3306/fast-api
+
+
+[pro]
+version_locations = %(here)s/alembic/versions_pro
+sqlalchemy.url = mysql+pymysql://root:qazwsx@127.0.0.1:3306/fast-api
 ```
 
 ## 生成迁移脚本

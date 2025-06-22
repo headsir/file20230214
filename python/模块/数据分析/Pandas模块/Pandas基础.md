@@ -2646,6 +2646,43 @@ df_groupby = df[['year','num']].groupby(by='year',as_index=False).max()
 df_merge = pd.merge(df_groupby,df,on=['year','num'],how='left')
 ```
 
+### 10.7 多行合并一行
+
+```python
+import pandas as pd
+df = pd.DataFrame(
+    [
+        ['FJZ', 'A123', 1],
+        ['FOC', 'A123', 1],
+        ['FJZ', 'B456', 1],
+        ['FJZ', 'B456', 2],
+        ['FJZ', 'B456', 2],
+        ['FOC', 'C789', 3],
+        ['FOC', 'C789', 5],
+    ],
+    columns=['site', 'material', 'usages'],
+)
+print(df)
+order = ['site', 'material', 'usages']
+data_new = df[order]
+
+def concat_func(row):
+    return pd.Series(
+        {
+            'site': ','.join(map(str, row['site'].unique())),
+            'usages': ','.join(map(str, row['usages'])),
+        }
+    )
+data_new = (
+    data_new.groupby(data_new['material'])
+    .apply(lambda row: concat_func(row))
+    .reset_index()
+)
+
+data_new = data_new[order]
+print(data_new)
+```
+
 
 
 [^1]: inplace参数：是否改变原始表数据

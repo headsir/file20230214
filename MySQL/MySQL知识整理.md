@@ -265,6 +265,16 @@ select id,name,case id when 1 then value * 2
 from tble;
 ```
 
+筛选数据<>会把NULL 数据一并过滤
+
+解决方案：
+
+```sql
+where IFNULL(字段,'')<>值
+```
+
+
+
 ## 3.3 更新
 
 ```SQL

@@ -90,6 +90,16 @@ def db_getter():
             yield session
 ```
 
+创建session有2种方式：
+
+- Session(engine)
+
+- sessionmaker(bind=engine) 推荐这种
+
+  通过sessionmake方法创建一个Session工厂，然后在调用工厂的方法来实例化一个Session对象
+
+
+
 # 二、创建表
 
 ```python
@@ -233,6 +243,12 @@ Base.metadata.create_all(engine)
 
 ```
 
+
+
+
+
+
+
 # 三、增删改查
 
 使用的是ORM方式连接数据库，会自动提交数据，此处省略session.commit()
@@ -254,19 +270,15 @@ from get_db import db_getter
 
 with db_getter() as session:
     # 声明式(Declarative) - ORM方式 插入数据 （对象实例化）
+
+    # 情况1：需要获取插入后的对象（如需要自增ID）
+    # ================================批量数据插入=============================
+    # 方法1
     departments = [
         VadminDept(name="总经办", dept_key="ceo", order=0),
         VadminDept(name="研发中心", dept_key="rd", order=1),
         VadminDept(name="产品部", dept_key="product", order=2),
     ]
-
-    dept2 = VadminDept(
-        name="前端组", dept_key="frontend", parent_id=1, order=1  # 关联父部门ID
-    )
-
-    # 情况1：需要获取插入后的对象（如需要自增ID）
-    # ================================批量数据插入=============================
-    # 方法1
     # add_all 会逐个检测对象状态，不适合大规模插入,会返回主键
     departments_result = session.add_all(departments)
     # 方法2
@@ -283,6 +295,9 @@ with db_getter() as session:
 
     # ===================================单个数据添加=============================
     # 方法1
+    dept2 = VadminDept(
+        name="前端组", dept_key="frontend", parent_id=1, order=1  # 关联父部门ID
+    )
     dept2_result = session.add(dept2)
     # 方法2
     departments2 = insert(VadminDept).values(name="产品部22", dept_key="product")
@@ -380,5 +395,199 @@ with db_getter() as session:
     )
     result = session.execute(query)
     print(result.all())
+```
+
+### 筛选数据
+
+where、filter、filter_by
+
+**性能对比**
+
+| 方法              | 适用场景        | 性能特点                                                  | 推荐使用场景                      |
+| ----------------- | --------------- | --------------------------------------------------------- | --------------------------------- |
+| **`where()`**     | SQLAlchemy Core | 直接生成原生 SQL，性能最优（适合高频、复杂查询）          | 需要极致性能或直接操作 SQL 时使用 |
+| **`filter()`**    | ORM             | 转换为 SQL 时有一定开销，但灵活性高（适合复杂条件）       | 大多数 ORM 查询场景               |
+| **`filter_by()`** | ORM（简化版）   | 语法糖，最终转换为 `filter()`，性能与 `filter()` 几乎相同 | 简单**等值**查询                  |
+
+**使用示例**
+
+```python
+import time
+from sqlalchemy import select
+
+# ORM filter 
+    session.query(User).filter(User.name == "Alice").all()
+    # 多条件组合
+	session.query(User).filter(User.name == "Alice",User.age > 30).all()
+	# 使用逻辑运算符
+	session.query(User).filter(or_(User.name == "Alice", User.name == "Bob")).all()
+
+
+# ORM filter_by 简单等值查询
+    session.query(User).filter_by(name="Alice").all()
+    # 多字段等值查询
+	session.query(User).filter_by(name="Alice", age=30).first()
+
+# Core where
+	stmt = select(User).where(User.name == "Alice")
+  	# 多条件查询 下面2种方式 效果一样  
+    v_where = [VadminDept.name == "总经办",VadminDept.dept_key == "ceo" ]
+    sql1 = select(VadminDept).where(and_(*v_where))
+    sql2 = select(VadminDept).where(
+        and_(
+            VadminDept.name == "总经办",
+            VadminDept.dept_key == "ceo",
+        )
+    )
+
+```
+
+### 查询方式
+
+query、select，具体返回数据类型需结合查询方法
+
+| 特性         | `query` (ORM)          | `select` (Core)               |
+| ------------ | ---------------------- | ----------------------------- |
+| **接口类型** | 面向对象               | 面向 SQL                      |
+| **返回结果** | ORM 对象（如模型实例） | 原始数据（如元组）            |
+| **性能**     | 稍慢（需 ORM 转换）    | 更快（直接生成 SQL）          |
+| **适用场景** | 常规业务逻辑           | 高频查询、复杂 SQL 或批量操作 |
+
+ **混合使用示例**
+
+ORM 和 Core 可以互相转换：
+
+```python
+from sqlalchemy.orm import aliased
+
+# ORM 转 Core
+user_alias = aliased(User)
+stmt = select(user_alias).where(user_alias.age > 30)
+result = session.execute(stmt).scalars().all()  # 返回 ORM 对象
+```
+
+### 查询方法
+
+| 特性             | `execute()`                   | `scalars()`               |
+| ---------------- | ----------------------------- | ------------------------- |
+| **返回结果**     | 原始数据（如元组或 `Result`） | 第一列的标量值或 ORM 对象 |
+| **适用查询类型** | Core 和 ORM                   | Core 和 ORM               |
+| **典型用途**     | 需要多列数据或原生结果时      | 只需要第一列或 ORM 对象时 |
+| **性能**         | 稍低（需处理多列）            | 更高（只处理一列）        |
+
+**使用示例**
+
+```python
+from sqlalchemy import select
+
+# query 可直接查询，无需查询方法
+# query + ORM
+# 返回[ORM对象,ORM对象,...]
+departments = session.query(VadminDept).all()
+
+# query + Core 无此方法
+
+# query + ORM + execute
+# 返回 [(ORM对象,),...]
+query_orm_sql = session.query(VadminDept)
+query_orm = session.execute(query_orm_sql).all()
+
+# query + ORM + scalars
+# 返回 [ORM对象,ORM对象,...]
+query_orm_sql = session.query(VadminDept)
+query_orm = session.scalars(query_orm_sql).all()
+
+
+# select 不能单独使用，必须配合查询方法
+# select + ORM + execute
+# 返回 [(ORM对象,),...]
+query_orm_sql = select(VadminDept)
+query_orm = session.execute(query_orm_sql).all()
+
+# select + ORM + scalars  SQLAlchemy 2.0+ 推荐方式
+# 返回 [ORM对象,ORM对象,...]
+query_orm_sql = select(VadminDept)
+query_orm = session.scalars(query_orm_sql).all()
+
+# select + Core + execute
+# 返回 [(行数据),...]
+query_orm_sql = vadmin_auth_user_roles.select()
+query_orm = session.execute(query_orm_sql).all()
+
+# select + Core + scalars
+# [第一行第一列,第二行第一列,...]
+query_orm_sql = vadmin_auth_user_roles.select()
+query_orm = session.scalars(query_orm_sql).all()
+```
+
+## 更新数据
+
+```python
+from sqlalchemy import select, and_, update
+from create_table import VadminDept, vadmin_auth_user_roles
+from get_db import db_getter
+
+with db_getter() as session:
+    # ========================方法1 Core 方式（直接操作表） ==============================
+    # 更新数量和查询数量有关（单个或批量）
+    stmt = (
+        update(vadmin_auth_user_roles)
+        .where(vadmin_auth_user_roles.c.user_id == 1)
+        .values(role_id=2)
+    )
+    session.execute(stmt)
+
+    # ========================方法2 OMR方式（需定义模型类） ==============================
+    # 只能更新单个对象
+    dept = session.query(VadminDept).filter(VadminDept.name == "批量更新部门").first()
+    if dept:
+        # 方法1
+        dept.name = "更新后的总经办2"
+        dept.dept_key = "updated_ceo"
+        # 方法2：
+        for key, value in {
+            "name": "更新后的总经办2",
+            "dept_key": "updated_ceo",
+        }.items():
+            setattr(dept, key, value)
+
+    # 更新数量和查询数量有关（单个或批量）
+    dept = session.query(VadminDept).filter(VadminDept.id > 5)
+    if dept:
+        dept.update({"name": "批量更新部门", "email": "2025-07-23"})
+
+    # ===========================方法3 混合方式（Core + ORM）==================================
+    # 更新数量和查询数量有关（单个或批量）
+    stmt = (
+        update(VadminDept)
+        .where(VadminDept.id > 5)
+        .values(name="批量更新部门", email="2025-07-23")
+    )
+    session.execute(stmt)
+```
+
+
+
+## 删除数据
+
+```python
+from sqlalchemy import select, and_, delete
+from init.create_table import VadminDept, vadmin_auth_user_roles
+from init.get_db import db_getter
+
+with db_getter() as session:
+    # ========================方法1 Core 方式（直接操作表） ==============================
+    # 删除数量和查询数量有关（单个或批量）
+    stmt = delete(vadmin_auth_user_roles).where(vadmin_auth_user_roles.c.user_id == 1)
+    session.execute(stmt)
+
+    # ========================方法2 OMR方式（需定义模型类） ==============================
+    # 删除数量和查询数量有关（单个或批量）
+    dept = session.query(VadminDept).filter(VadminDept.name == "批量更新部门").delete()
+
+    # ===========================方法3 混合方式（Core + ORM）==================================
+    # 更新数量和查询数量有关（单个或批量）
+    stmt = delete(VadminDept.__table__).where(VadminDept.id > 5)
+    session.execute(stmt)
 ```
 

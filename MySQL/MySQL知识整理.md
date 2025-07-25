@@ -273,6 +273,14 @@ from tble;
 where IFNULL(字段,'')<>值
 ```
 
+中文排序
+
+```
+ORDER BY convert(e.`地市` using gbk);
+```
+
+
+
 
 
 ## 3.3 更新

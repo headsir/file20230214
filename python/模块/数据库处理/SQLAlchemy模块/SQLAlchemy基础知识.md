@@ -27,7 +27,32 @@ sqlalchemy.__version__
 
 ## 连接数据库
 
-### 直连方式
+### 第一步：创建数据库引擎
+
+#### 创建sqlite数据库引擎
+
+```python
+from sqlalchemy import create_engine
+
+# 创建引擎 echo=True 会打印SQL语句,方便调试,生产环境建议关闭
+# SQLite连接方式，默认使用sqlite3引擎，无需安装第三方库，直接使用
+# db文件不存在会自动创建
+engine = create_engine('sqlite:///test.db', echo=True)
+```
+
+#### 创建MySQL数据库引擎
+
+```python
+from sqlalchemy import create_engine
+
+# 创建引擎 echo=True 会打印SQL语句,方便调试,生产环境建议关闭
+# MYSQL数据库默认MySQLdb引擎，如需使用其它引擎，需要通过【mysql+引擎】指明，推荐pymysql
+engine = create_engine('mysql+pymysql://root:qazwsx@localhost:3306/塔租费用', echo=True)
+```
+
+### 第二步：连接数据库
+
+#### 直连方式
 
 - 低级SQL核心接口，接近原生SQL
 - 需要手动处理结果集映射
@@ -35,47 +60,40 @@ sqlalchemy.__version__
 - connect 实现面向表操作
 
 ```python
-from sqlalchemy import create_engine, text
-
-# 创建引擎 echo=True 会打印SQL语句,方便调试,生产环境建议关闭
-
-# SQLite连接方式，默认使用sqlite3引擎，无需安装第三方库，直接使用
-# db文件不存在会自动创建
-# engine = create_engine('sqlite:///test.db', echo=True)
-
-# MYSQL数据库默认MySQLdb引擎，如需使用其它引擎，需要通过【mysql+引擎】指明，推荐pymysql
-engine = create_engine('mysql+pymysql://root:qazwsx@localhost:3306/塔租费用', echo=True)
+"""省略创建引擎过程"""
 
 # 创建连接
-conn = engine.connect()
-# 查询语句
-query = text('select * from `地市确认单金额` limit 1;')
-# 执行查询
-result = conn.execute(query)
-# 获取结果集
-# fetchall() 获取所有结果,返回一个列表
-# fetchone() 获取一条结果,返回一个元组
-# fetchmany(n) 获取n条结果返回一个列表
-get_data = result.fetchall()
+connection = engine.connect()
+
 # 关闭连接
-conn.close()
+connection.close()
 # 关闭引擎
 engine.dispose()
 ```
 
-### ORM方式
+#### ORM方式
 
 - 高级ORM接口，面向对象操作
 - 自动管理对象状态（如脏数据检测）
 - session 实现面向对象操作
+- 创建session有2种方式：
+
+  - Session(engine)
+
+  - sessionmaker(bind=engine) 推荐这种
+
+    通过sessionmake方法创建一个Session工厂，然后在调用工厂的方法来实例化一个Session对象
+
+
+**方法一：创建事务，半自动 commit**
+
+提交数据 不需要commit提交事务
 
 ```python
-from sqlalchemy import create_engine
 from sqlalchemy.orm import Session
 from contextlib import contextmanager
 
-# 创建引擎（连接数据库）
-engine = create_engine("sqlite:///mydatabase.db", echo=True)
+"""省略创建引擎过程"""
 
 # @contextmanager 是 Python 标准库 contextlib 模块提供的一个装饰器，
 # 用于将一个生成器函数转换为上下文管理器。它的主要作用是简化上下文管理器的创建过程。
@@ -84,7 +102,8 @@ def db_getter():
     """
     获取数据库连接
     """
-    # 创建会话
+    # 创建会话2种方式
+    ## 第一种
     with Session(engine) as session:
         # 创建一个新的事务，半自动 commit
         with session.begin():
@@ -92,17 +111,139 @@ def db_getter():
             yield session
 ```
 
-创建session有2种方式：
+**方法二：创建事务**
 
-- Session(engine)
+提交数据 需要commit提交事务
 
-- sessionmaker(bind=engine) 推荐这种
+```python
+from sqlalchemy.orm import Session
+from contextlib import contextmanager
 
-  通过sessionmake方法创建一个Session工厂，然后在调用工厂的方法来实例化一个Session对象
+"""省略创建引擎过程"""
 
+# @contextmanager 是 Python 标准库 contextlib 模块提供的一个装饰器，
+# 用于将一个生成器函数转换为上下文管理器。它的主要作用是简化上下文管理器的创建过程。
+@contextmanager
+def db_getter():
+    """
+    获取数据库连接
+    """
+    # 创建会话2种方式
+    ## 第一种
+    with Session(engine) as session:
+            yield session
+```
 
+## 查询数据库
+
+使用直连方式，操作原始SQL语句
+
+```python
+from sqlalchemy import text
+
+query = text("SELECT * FROM students")
+result = connection.execute(query)  # result是sqlalchemy.engine.cursor.CursorResult对象
+print(result.all())  # 返回[(),(),()]
+```
 
 # 二、创建表
+
+## sql语句
+
+```python
+
+sql = '''create table student(
+    id int not null primary key,
+    name varchar(50),
+    age int,
+    address varchar(100));
+'''
+
+"""省略创建引擎和连接数据库过程"""
+
+conn.execute(sql)
+```
+
+
+
+## core方式
+
+- MetaData类主要用于保存表结构，连接字符串等数据，是一个多表共享的对象
+- meta_data = MetaData(engine)    #绑定一个数据源的metadata
+- meta_data.create_all(engine)         #是来创建表，这个操作是安全的操作，会先判断表是否存在。
+
+```python
+"""
+程序说明：
+    功能：创建表
+    使用MetaData,Table,Column以及字段类型在代码中来创建表
+"""
+# here put the import lib
+from sqlalchemy import  MetaData, Table, Column, Integer, String
+
+"""省略创建引擎过程"""
+ 
+meta_data = MetaData()
+
+students = Table(
+    'students',
+    meta_data,
+    Column('id', Integer, primary_key=True),
+    Column('name', String(50), ),
+    Column('age', Integer),
+    Column('address', String(10)),
+)
+
+meta.create_all(engine)
+```
+
+Table 参数说明：
+
+```tex
+name    表名
+ metadata      共享的元数据
+ *args： Column 是列定义
+ **kwargs 定义：
+ schema 此表的结构名称，默认None
+ autoload 自动从现有表中读入表结构，默认False
+ autoload_with 从其他engine读取结构，默认None
+
+include_columns 如果autoload设置为True，则此项数组中的列明将被引用，没有写的列明将被忽略，None表示所有都列明都引用，默认None
+ mustexist 如果为True，表示这个表必须在其他的python应用中定义，必须是metadata的一部分，默认False
+ useexisting 如果为True，表示这个表必须被其他应用定义过，将忽略结构定义，默认False
+ owner 表所有者，用于Orcal，默认None
+ quote 设置为True，如果表明是SQL关键字，将强制转义，默认False
+ quote_schema  设置为True，如果列明是SQL关键字，将强制转义，默认False
+ mysql_engine  mysql专用，可以设置'InnoDB'或'MyISAM'
+```
+
+Column参数说明：
+
+```text
+1、name 列名
+ 2、type_ 类型，更多类型 sqlalchemy.types
+ 3、*args： Constraint（约束）,  ForeignKey（外键）,  ColumnDefault（默认）, Sequenceobjects（序列）定义
+ 4、key 列名的别名，默认None
+ **kwargs：
+ 5、primary_key 如果为True，则是主键
+ 6、nullable 是否可为Null，默认是True
+ 7、default 默认值，默认是None
+ 8、index 是否是索引，默认是True
+ 9、unique 是否唯一键，默认是False
+ 10、onupdate 指定一个更新时候的值，这个操作是定义在SQLAlchemy中，不是在数据库里的，当更新一条数据时设置，大部分用于updateTime这类字段
+ 11、autoincrement 设置为整型自动增长，只有没有默认值，并且是Integer类型，默认是True
+ 12、quote 如果列明是关键字，则强制转义，默认False
+```
+
+
+
+
+
+
+
+
+
+
 
 ```python
 """
@@ -253,9 +394,152 @@ Base.metadata.create_all(engine)
 
 # 三、增删改查
 
+## 添加数据
+
+### sql语句
+
+省略
+
+### core方式
+
+- **没有返回值**
+
+#### 添加一条数据
+
+```python
+from init.create_table import engine, vadmin_auth_user_roles
+
+# 生成sql语句 
+# INSERT INTO vadmin_auth_user_roles (user_id, role_id) VALUES (:user_id, :role_id)
+insert_sql = vadmin_auth_user_roles.insert()
+insert_data =insert_sql.values(user_id='1', role_id='1')
+with engine.connect() as conn:
+    # 执行
+    result = conn.execute(insert_data)
+    # 提交
+    conn.commit()
+```
+
+#### 批量插入
+
+```python
+from init.create_table import engine, vadmin_auth_user_roles
+# 生成sql语句 
+# INSERT INTO vadmin_auth_user_roles (user_id, role_id) VALUES (:user_id, :role_id)
+insert_sql = vadmin_auth_user_roles.insert()
+with engine.connect() as conn:
+    # 执行
+    result = conn.execute(
+        insert_sql,
+        [
+            {'user_id': 2, 'role_id': 2},
+            {'user_id': 3, 'role_id': 3},
+            {'user_id': 4, 'role_id': 4},
+        ],
+    )
+    # 提交
+    conn.commit()
+```
+
+## 查询数据
+
+### sql语句
+
+- 返回[(),(),()]
+
+#### 查询所有数据
+
+```python
+from sqlalchemy import text
+
+"""省略创建引擎过程"""
+
+query = text("SELECT * FROM `vadmin_auth_user_roles`;")
+with engine.connect() as conn:
+    result = conn.execute(query)  # result是sqlalchemy.engine.cursor.CursorResult对象
+    print(result.all())  # 返回[(),(),()]
+```
+
+#### 条件查询
+
+```python
+from sqlalchemy import text
+
+"""省略创建引擎过程"""
+
+# 条件查询
+query = text("SELECT * FROM `vadmin_auth_user_roles` WHERE user_id > 3;")
+with engine.connect() as conn:
+    result = conn.execute(query)  # result是sqlalchemy.engine.cursor.CursorResult对象
+    print(result.all())  # 返回[(),(),()]
+```
+
+
+
+### core方式
+
+- 返回[(),(),()]
+
+#### 查询所有数据
+
+```python
+from init.create_table import vadmin_auth_user_roles
+
+"""省略创建引擎过程"""
+
+# 生成sql语句
+select_sql = vadmin_auth_user_roles.select()
+with engine.connect() as conn:
+    result = conn.execute(select_sql)
+    print(result.all())  # [(),()]
+```
+
+#### 条件查询
+
+```python
+from init.create_table import vadmin_auth_user_roles
+
+"""省略创建引擎过程"""
+
+## 单条件
+# select_sql = vadmin_auth_user_roles.select().where(vadmin_auth_user_roles.c.user_id > 3)
+## 多条件 且的关系
+select_sql = (
+    vadmin_auth_user_roles.select()
+    .where(vadmin_auth_user_roles.c.user_id > 1)
+    .where(vadmin_auth_user_roles.c.role_id > 2)
+)
+## 复杂查询 and_、or_、in_
+select_sql = vadmin_auth_user_roles.select().where(
+    and_(vadmin_auth_user_roles.c.user_id > 1, vadmin_auth_user_roles.c.role_id > 2)
+)
+with engine.connect() as conn:
+    result = conn.execute(
+        select_sql
+    )  # result是sqlalchemy.engine.cursor.CursorResult对象
+    print(result.all())  # [(),()]
+```
+
+## 修改数据
+
+### sql语句
+
+```python
+```
+
+
+
+### core方式
+
+
+
+## 删除数据
+
+## ORM方式
+
 使用的是ORM方式连接数据库，会自动提交数据，此处省略session.commit()
 
-## 添加数据
+### 添加数据
 
 ```python
 """
@@ -342,7 +626,7 @@ with db_getter() as session:
     print("role_assignment_results:", role_assignment_results)
 ```
 
-## 查询数据
+### 查询数据
 
 ```python
 from sqlalchemy import select, and_
@@ -522,7 +806,7 @@ query_orm_sql = vadmin_auth_user_roles.select()
 query_orm = session.scalars(query_orm_sql).all()
 ```
 
-## 更新数据
+### 更新数据
 
 ```python
 from sqlalchemy import select, and_, update
@@ -570,7 +854,7 @@ with db_getter() as session:
 
 
 
-## 删除数据
+### 删除数据
 
 ```python
 from sqlalchemy import select, and_, delete

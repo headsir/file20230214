@@ -32,6 +32,7 @@ sqlalchemy.__version__
 - 低级SQL核心接口，接近原生SQL
 - 需要手动处理结果集映射
 - 直接执行SQL语句
+- connect 实现面向表操作
 
 ```python
 from sqlalchemy import create_engine, text
@@ -66,6 +67,7 @@ engine.dispose()
 
 - 高级ORM接口，面向对象操作
 - 自动管理对象状态（如脏数据检测）
+- session 实现面向对象操作
 
 ```python
 from sqlalchemy import create_engine
@@ -591,3 +593,174 @@ with db_getter() as session:
     session.execute(stmt)
 ```
 
+# 四、关联表之一对一
+
+## 表定义
+
+通过在子表创建外键约束实现关联
+
+```python
+"""
+程序说明：
+    功能：创建表
+    共有2种建表方式
+    1、声明式(Declarative) - ORM方式（推荐）
+    2、命令式(Imperative) - Core方式
+    此处使用ORM方式创建表
+    重点注意：外键约束，关系映射
+"""
+# here put the import lib
+from datetime import datetime
+from sqlalchemy import (
+    String,
+    ForeignKey,
+    create_engine,
+    Table,
+    Column,
+    DateTime,
+    Integer,
+    func,
+    Boolean,
+)
+from sqlalchemy.orm import (
+    DeclarativeBase,
+    Mapped,
+    mapped_column,
+    declared_attr,
+    relationship,
+)
+from .get_db import engine
+
+
+class Base(DeclarativeBase):
+    """
+    创建基本映射类
+    稍后，我们将继承该类，创建每个 ORM 模型
+    """
+
+    pass  #  代码省略
+
+
+# 方法1：声明式(Declarative) - ORM方式（推荐）
+# 使用类定义表结构，更适合ORM操作
+class BaseModel(Base):
+    """
+    公共 ORM 模型，基表
+    """
+
+    pass  # 代码省略
+
+
+class User(BaseModel):
+    __tablename__ = "users"  # type: ignore
+    __table_args__ = {'comment': '用户表'}
+
+    username: Mapped[str] = mapped_column(  # pylint:disable=unsubscriptable-object
+        String(50), nullable=False, comment="用户名"
+    )
+    email: Mapped[str | None] = mapped_column(
+        String(100), nullable=True, comment="邮箱"
+    )
+
+    # 定义一对一关系
+    profile: Mapped["Profile"] = relationship("Profile", back_populates="user")
+
+
+class Profile(BaseModel):
+    __tablename__ = "profiles"  # type: ignore
+    __table_args__ = {'comment': '用户资料表'}
+
+    full_name: Mapped[str] = mapped_column(String(100), nullable=False, comment="全名")
+    bio: Mapped[str | None] = mapped_column(String(255), comment="个人简介")
+
+    # 外键指向 User 表
+    # unique=True 唯一性约束，保证1对1唯一性关系
+    user_id: Mapped[int] = mapped_column(
+        Integer, ForeignKey("users.id"), unique=True, comment="关联用户ID"
+    )
+
+    # 定义一对一关系
+    user: Mapped["User"] = relationship("User", back_populates="profile")
+
+
+# 数据库创建表
+Base.metadata.create_all(engine)
+```
+
+
+
+## 添加数据
+
+```python
+import os
+# 修改项目根目录
+os.chdir(os.path.dirname(__file__))
+from sqlalchemy import insert, select
+from init.create_table import engine, User, Profile
+from init.get_db import db_getter
+
+
+with db_getter() as session:
+    # 声明式(Declarative) - ORM方式 插入数据 （对象实例化）
+    userments = [
+        User(username="总经办",),
+        User(username="研发中心",),
+        User(username="产品部",),
+    ]
+
+    new_profile = [
+        Profile(full_name="总经办11", user=userments[0]),
+        Profile(full_name="研发中心22", user=userments[1]),
+        Profile(full_name="产品部33", user=userments[2]),
+    ]
+
+    # 第一种方式 
+    # 创建 profile 表同时会自动创建 user 表 ，可批量可单个
+    session.add_all(new_profile)
+    # 第二种方式
+    # 通过查询已存在表创建，可批量可单个
+    session.add_all(userments)
+    session.execute(
+        insert(Profile).values(
+            [
+                {
+                    'full_name': "总经办11",
+                    'user_id': select(User.id).where(User.username == '总经办'),
+                }
+            ]
+        )
+    )
+
+```
+
+
+
+## 查询数据
+
+## 更新数据
+
+## 删除数据
+
+# 五、关联表之一对多
+
+## 表定义
+
+## 添加数据
+
+## 查询数据
+
+## 更新数据
+
+## 删除数据
+
+# 六、关联表之多对多
+
+## 表定义
+
+## 添加数据
+
+## 查询数据
+
+## 更新数据
+
+## 删除数据

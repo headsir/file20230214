@@ -2128,6 +2128,18 @@ print(df.values.tolist())
 [[1, 2, 3, 4], [4, 5, 6, 7]]
 ```
 
+#### 字符转换成日期：to_datetime
+
+```
+    # 时间格式化
+    df["放假起始日期"] = pd.to_datetime(
+        df["放假起始日期"].str.replace('/', '-'), format=r"%Y-%m-%d"
+    )
+    df["放假起始日期"] = df["放假起始日期"].dt.strftime(r"%Y-%m-%d")
+```
+
+
+
 ### 5.21 日期时间求差
 
 ```python

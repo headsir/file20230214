@@ -73,7 +73,8 @@ engine.dispose()
 
 #### ORM方式
 
-- 高级ORM接口，面向对象操作
+- 使用session代替connection，实现面向对象操作
+
 - 自动管理对象状态（如脏数据检测）
 - session 实现面向对象操作
 - 创建session有2种方式：
@@ -235,15 +236,33 @@ Column参数说明：
  12、quote 如果列明是关键字，则强制转义，默认False
 ```
 
+## orm方式
+
+### 基础方式
+
+```python
+from sqlalchemy import String,create_engine,Column,Integer, Date
+from sqlalchemy.ext.declarative import declarative_base
+
+# 创建引擎（连接数据库）
+engine = create_engine("sqlite:///mydatabase.db", echo=True)
+Base = declarative_base()  # 继承自DeclarativeBase
+
+class Person(Base):
+    __tablename__ = 'person'
+    id = Column(Integer, primary_key=True)
+    name = Column(String(128), nullable=False, unique=True)
+    # nullable=True 为 False，数据不能为 None
+    birthday = Column(Date, nullable=True)
+    address = Column(String(255), nullable=True)
+Base.metadata.create_all(engine)
+```
 
 
 
+### 自定义封装版 sqlalchemy 2.0版本
 
-
-
-
-
-
+- 2.0版本引入：Mapped， mapped_column，Annotated（用于定义公共属性）
 
 ```python
 """
@@ -370,25 +389,7 @@ vadmin_auth_user_roles = Table(
 # 方法1：使用声明式的Base,配合第一种建表方法
 # 继承 Base 的表都会被创建
 Base.metadata.create_all(engine)
-
-# # 方法2：使用命令式的metadata
-# metadata = MetaData(engine)
-
-# vadmin_auth_user_roles = Table(
-#     "vadmin_auth_user_roles",
-#     # 注意区别
-#     metadata,
-#     Column("user_id", Integer, comment="用户id"),
-#     Column("role_id", Integer, comment="角色id"),
-# )
-
-# metadata.create_all(engine)
-
 ```
-
-
-
-
 
 
 
@@ -440,6 +441,45 @@ with engine.connect() as conn:
     # 提交
     conn.commit()
 ```
+
+### orm方式
+
+- 无返回值
+
+#### 添加一条数据
+
+```
+from init.create_table import VadminDept
+from init.get_db import db_getter
+
+# 半自动化提交
+with db_getter() as session:
+    dept2= VadminDept(
+        name="前端组", dept_key="frontend", parent_id=1, order=1  # 关联父部门ID
+    )
+    dept2_result = session.add(dept2)
+    
+```
+
+#### **批量添加数据**
+
+```
+
+    departments = [
+        VadminDept(name="总经办", dept_key="ceo", order=0),
+        VadminDept(name="研发中心", dept_key="rd", order=1),
+        VadminDept(name="产品部", dept_key="product", order=2),
+    ]
+    
+    # add_all 会逐个检测对象状态，不适合大规模插入,会返回主键
+    departments_result = session.add_all(departments)
+```
+
+
+
+
+
+
 
 ## 查询数据
 
@@ -520,20 +560,156 @@ with engine.connect() as conn:
     print(result.all())  # [(),()]
 ```
 
+### orm方式
+
+- 获取查询结果**所有值**，**all()**返回值：[ORM对象,ORM对象,ORM对象,...]
+- 获取查询结果**第一个值**，**first()**返回值：ORM对象
+- 获取查询结果(**结果必须只能有一个，否则报异常**)，**one()**返回值：ORM对象
+- 获取查询结果(**结果只能有一个或者空，否则报异常**)，**scalar()**返回值：ORM对象
+
+#### 查询所有数据
+
+```
+from init.create_table import VadminDept
+from init.get_db import db_getter
+
+with db_getter() as session:
+    departments = session.query(VadminDept)
+    print(departments.all(), "query")
+```
+
+#### 条件查询
+
+- filter过滤器
+
+```
+from init.create_table import VadminDept
+from init.get_db import db_getter
+
+with db_getter() as session:
+   departments = session.query(VadminDept).filter(VadminDept.id == 1)
+    print(departments.all())
+```
+
 ## 修改数据
 
 ### sql语句
 
 ```python
+from sqlalchemy import  text
+from init.get_db import engine
+
+update_sql = text("UPDATE `vadmin_auth_user_roles` SET user_id= 5 WHERE role_id >3")
+with engine.connect() as conn:
+    conn.execute(update_sql)
+    conn.commit()
+```
+
+### core方式
+
+```python
+from sqlalchemy import update
+from init.create_table import vadmin_auth_user_roles
+from init.get_db import db_getter
+
+with db_getter() as session:
+    # 更新数量和查询数量有关（单个或批量）
+    stmt = (
+        update(vadmin_auth_user_roles)
+        .values(role_id=2)
+        .where(vadmin_auth_user_roles.c.user_id == 1)
+    )
+    session.execute(stmt)
+```
+
+### orm方式
+
+方法一：
+
+```
+dept = session.query(VadminDept).filter(VadminDept.name == "批量更新部门").one()
+dept.name = "更新后的总经办2"
+```
+
+方法二：
+
+```
+    # 更新数量和查询数量有关（单个或批量）
+    dept = session.query(VadminDept).filter(VadminDept.id > 5)
+    if dept:
+        dept.update({"name": "批量更新部门", "email": "2025-07-23"})
+        # dept.update({dept.name: "批量更新部门", dept.email: "2025-07-23"})
 ```
 
 
 
-### core方式
-
 
 
 ## 删除数据
+
+### sql语句
+
+**删除所有数据**
+
+```python
+from sqlalchemy import  text
+from init.get_db import engine
+
+update_sql = text("DELETE FROM `vadmin_auth_user_roles`")
+with engine.connect() as conn:
+    conn.execute(update_sql)
+    conn.commit()
+```
+
+**删除符合条件的数据**
+
+```python
+from sqlalchemy import  text
+from init.get_db import engine
+
+update_sql = text("DELETE FROM `vadmin_auth_user_roles` WHERE role_id >3")
+with engine.connect() as conn:
+    conn.execute(update_sql)
+    conn.commit()
+```
+
+### core方式
+
+**删除所有数据**
+
+```python
+from sqlalchemy import delete
+from init.create_table import vadmin_auth_user_roles
+from init.get_db import db_getter
+
+with db_getter() as session:
+    stmt = delete(vadmin_auth_user_roles)
+    session.execute(stmt)
+```
+
+**删除符合条件的数据**
+
+```python
+from sqlalchemy import delete
+from init.create_table import vadmin_auth_user_roles
+from init.get_db import db_getter
+
+with db_getter() as session:
+    stmt = (
+        delete(vadmin_auth_user_roles)
+        .where(vadmin_auth_user_roles.c.user_id == 1)
+    )
+    session.execute(stmt)
+```
+
+### orm方式
+
+```
+    # 删除数量和查询数量有关（单个或批量）
+    dept = session.query(VadminDept).filter(VadminDept.name == "批量更新部门").delete()
+```
+
+
 
 ## ORM方式
 
@@ -1029,9 +1205,164 @@ with db_getter() as session:
 
 ## 表定义
 
+### core方式
+
+- 关键语句：
+
+  ```
+      # 一对多关系关联部门的外键
+      Column("department_id", Integer, ForeignKey("department.id")),
+  ```
+
+  
+
+```python
+from sqlalchemy import (
+    String,
+    ForeignKey,
+    Table,
+    Column,
+    Integer,
+    MetaData,
+    Date,
+)
+
+from .get_db import engine
+
+meta_data = MetaData()
+
+department = Table(
+    "department",
+    meta_data,
+    Column("id", Integer, primary_key=True),
+    # unique=True 可以保证数据唯一
+    Column("name", String(32), unique=True, nullable=False),
+)
+
+employee = Table(
+    "employee",
+    meta_data,
+    Column("id", Integer, primary_key=True),
+    # 一对多关系关联部门的外键
+    Column("department_id", Integer, ForeignKey("department.id")),
+    Column("name", String(16), nullable=False),
+    Column("birthday", Date, nullable=False),
+)
+
+meta_data.create_all(engine)
+```
+
+
+
+
+
+
+
 ## 添加数据
 
+### core方式
+
+- 关键语句
+
+  ```
+   conn.execute(employee.insert(), employees_data)
+  ```
+
+```python
+from datetime import datetime
+from init.create_table_core import engine, department, employee
+
+with engine.connect() as conn:
+    conn.execute(
+        department.insert(),
+        [
+            {'name': '研发部'},
+            {'name': '市场部'},
+            {'name': '开发部'},
+            {'name': '测试部'},
+        ],
+    )
+
+    # department_id 一对多关联字段
+    employees_data: list[dict] = [
+        {'name': 'Jack', 'department_id': 1, 'birthday': '2022-08-25'},
+        {'name': 'Mark', 'department_id': 2, 'birthday': '2022-05-08'},
+        {'name': 'Sue', 'department_id': 3, 'birthday': '2022-10-18'},
+        {'name': 'Petter', 'department_id': 4, 'birthday': '2022-12-19'},
+        {'name': 'Mary', 'department_id': 4, 'birthday': '2022-04-02'},
+        {'name': 'Piter', 'department_id': 1, 'birthday': '2022-11-08'},
+    ]
+
+    # 将字符串日期转换为 date 对象
+    for employee in employees_data:
+        employee['birthday'] = datetime.strptime(employee['birthday'], r'%Y-%m-%d')
+
+    conn.execute(employee.insert(), employees_data)
+    conn.commit()
+```
+
+
+
 ## 查询数据
+
+### core方式
+
+**关联表，全量信息**
+
+- 关键语句
+
+  ```
+      # 关联表查询
+      join = employee.join(department, employee.c.department_id == department.c.id)
+      # 关联表查询，全量表
+      query = select(join).where(department.c.name == '研发部')
+  ```
+
+```python
+from sqlalchemy import select
+from init.get_db import engine
+from init.create_table_core import department, employee
+
+with engine.connect() as conn:
+    # 关联表查询
+    join = employee.join(department, employee.c.department_id == department.c.id)
+    # 关联表查询，全量表
+    query = select(join).where(department.c.name == '研发部')
+    result = conn.execute(query).all()
+    # [(1, 1, 'Jack', datetime.date(2022, 8, 25), 1, '研发部'),
+    #  (6, 1, 'Piter', datetime.date(2022, 11, 8), 1, '研发部')]
+    print(result)
+```
+
+**关联表，部分信息**
+
+- 关键语句
+
+  ```
+      query_employee =  select(employee).select_from(join).where(department.c.name == '研发部')
+  ```
+
+```python
+from sqlalchemy import select
+from init.get_db import engine
+from init.create_table_core import department, employee
+
+with engine.connect() as conn:
+    # 关联表查询
+    
+	省略join语句
+
+    # 关联表查询，但只查询单个表
+    query_employee = (
+        select(employee).select_from(join).where(department.c.name == '研发部')
+    )
+	
+    省略结果查询
+```
+
+
+
+
 
 ## 更新数据
 

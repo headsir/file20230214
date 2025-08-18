@@ -471,7 +471,7 @@ with db_getter() as session:
         VadminDept(name="产品部", dept_key="product", order=2),
     ]
     
-    # add_all 会逐个检测对象状态，不适合大规模插入,会返回主键
+    # add_all 会逐个检测对象状态，不适合大规模插入
     departments_result = session.add_all(departments)
 ```
 
@@ -717,6 +717,8 @@ with db_getter() as session:
 
 ### 添加数据
 
+
+
 ```python
 """
 程序说明：
@@ -741,7 +743,7 @@ with db_getter() as session:
         VadminDept(name="研发中心", dept_key="rd", order=1),
         VadminDept(name="产品部", dept_key="product", order=2),
     ]
-    # add_all 会逐个检测对象状态，不适合大规模插入,会返回主键
+    # add_all 会逐个检测对象状态，不适合大规模插入
     departments_result = session.add_all(departments)
     # 方法2
     departments_result2 = session.execute(
@@ -752,7 +754,6 @@ with db_getter() as session:
             {"name": "产品部", "dept_key": "product", "order": 2},
         ],
     )
-    # 获取插入后的对象主键
     print("departments2:", departments_result2)
 
     # ===================================单个数据添加=============================
@@ -803,6 +804,77 @@ with db_getter() as session:
 ```
 
 ### 查询数据
+
+#### 查询单个类
+
+```
+query = select(Employee).order_by(Employee.name)
+result = session.execute(query)
+print(result.all())  # [(),(),...]
+```
+
+#### 查询多个类
+
+##### **JOIN 查询**
+
+使用`join`函数，默认 inner join
+
+- full=True：全连接
+
+```
+query = select(Employee, Department).join(Department.employees)  # from department
+query = select(Department).join(Employee,Department.employees)  # from department
+
+query = select(Employee).join(Department,Employee.department)  # from employee
+
+query = select(Employee.name, Department.name).select_from(join(Employee, Department))
+```
+
+##### **使用别名**
+
+```
+emp_cls = aliased(Employee, name="emp")
+dep_cls = aliased(Department, name="dep")
+query = select(emp_cls, dep_cls).join(dep_cls.employees.of_type(emp_cls))
+```
+
+##### **查询部分字段**
+
+```
+query = select(Employee.name, Department.name).join_from(Employee, Department)
+# 字段使用别名
+query = select(Employee.name.label("ename"), Department.name.label("dname")).join_from(Employee, Department)
+```
+
+##### **OUTER JOIN 查询**
+
+- *isouter*=True：外连接，默认左连接
+
+  ```
+  query = select(Employee,Department).join( Employee.department, isouter=True)
+  ```
+
+- outjoin
+
+  ```
+  from sqlalchemy import outerjoin
+  
+  query = select(Employee.name.label("ename"), Department.name.label("dname")
+  ).select_from(outerjoin(Employee, Department))
+  ```
+
+#####  **WHERE条件**
+
+- **基本比较**： `==` 、 `!=` 、 `>` 、 `<` 、 `>=` 、 `<=` 。
+- **范围检查**： `between()` 。
+- **空值检查**： `is_(None)` 、 `is_not(None)` 。
+- **字符串匹配**： `like()` 、 `ilike()` 。
+- **集合操作**： `in_()` 、 `contains()` 。
+- **逻辑组合**： `&` （与）、 `|` （或）、 `~` （非）。
+
+- **正则匹配**：op('regexp')  
+
+  
 
 ```python
 from sqlalchemy import select, and_
@@ -1026,6 +1098,16 @@ with db_getter() as session:
         .values(name="批量更新部门", email="2025-07-23")
     )
     session.execute(stmt)
+    
+	# 更新相应id 行数据
+    session.execute(
+        update(VadminDept),
+        [
+            {"id":1,..},
+            {"id":2,..},
+            
+        ]
+    )
 ```
 
 
@@ -1176,10 +1258,11 @@ with db_getter() as session:
 
     # 第一种方式 
     # 创建 profile 表同时会自动创建 user 表 ，可批量可单个
-    session.add_all(new_profile)
+    # session.add_all(new_profile)
+    # 创建 user 表 同时也会自动创建 profile 表，可批量可单个
+    session.add_all(userments)
     # 第二种方式
     # 通过查询已存在表创建，可批量可单个
-    session.add_all(userments)
     session.execute(
         insert(Profile).values(
             [
@@ -1252,7 +1335,116 @@ employee = Table(
 meta_data.create_all(engine)
 ```
 
+### orm方式
 
+- `__repr__`：会自动调用
+
+-  默认懒惰加载，关联表不会自动加载，会产生N+1查询， 可通过设置 relationship 懒惰加载参数(lazy)解决
+
+- back_populates（显式声明关系） 和 backre （隐式声明关系）
+
+#### **单向关联**
+
+- department: Mapped['Department'] = relationship()
+
+```python
+import datetime
+from typing import Annotated
+from sqlalchemy import String, ForeignKey
+from sqlalchemy.orm import Mapped, mapped_column, relationship
+from sqlalchemy.ext.declarative import declarative_base
+from .get_db import engine
+
+Base = declarative_base()
+
+int_pk = Annotated[int, mapped_column(primary_key=True)]
+required_unique_name = Annotated[
+    str, mapped_column(String(128), unique=True, nullable=False)
+]
+timestamp_not_null = Annotated[
+    datetime.datetime, mapped_column(default=datetime.datetime.now, nullable=False)
+]
+
+
+class Department(Base):
+    __tablename__ = 'department'
+    id: Mapped[int_pk]
+    name: Mapped[required_unique_name]
+
+    def __repr__(self):
+        return f'id: {self.id}, name: {self.name}'
+
+
+class Employee(Base):
+    __tablename__ = 'employee'
+    id: Mapped[int_pk]
+    department_id: Mapped[int] = mapped_column(ForeignKey("department.id"))
+    name: Mapped[required_unique_name]
+    birthday: Mapped[timestamp_not_null]
+
+    department: Mapped['Department'] = relationship()
+
+    def __repr__(self):
+        return f'id: {self.id}, name: {self.name}, dep_id: {self.dep_id}, birthday: {self.birthday}'
+
+Base.metadata.create_all(engine)
+```
+
+#### **双向关联**
+
+- department: Mapped['Department'] = relationship(*back_populates*="employees")  多
+
+- employees: Mapped[list['Employee']] = relationship(back_populates="department") 一
+
+- 不建议在多里面定义关系
+
+  ```python
+  import datetime
+  from typing import Annotated
+  from sqlalchemy import String, ForeignKey
+  from sqlalchemy.orm import Mapped, mapped_column, relationship
+  from sqlalchemy.ext.declarative import declarative_base
+  from .get_db import engine
+  
+  Base = declarative_base()
+  
+  int_pk = Annotated[int, mapped_column(primary_key=True)]
+  required_unique_name = Annotated[
+      str, mapped_column(String(128), unique=True, nullable=False)
+  ]
+  timestamp_not_null = Annotated[
+      datetime.datetime, mapped_column(default=datetime.datetime.now, nullable=False)
+  ]
+  
+  
+  class Department(Base):
+      __tablename__ = 'department'
+      id: Mapped[int_pk]
+      name: Mapped[required_unique_name]
+  
+      employees: Mapped[list['Employee']] = relationship(back_populates="department")
+  
+      def __repr__(self):
+          return f'id: {self.id}, name: {self.name}'
+  
+  
+  class Employee(Base):
+      __tablename__ = 'employee'
+      id: Mapped[int_pk]
+      department_id: Mapped[int] = mapped_column(ForeignKey("department.id"))
+      name: Mapped[required_unique_name]
+      birthday: Mapped[timestamp_not_null]
+  
+      department: Mapped['Department'] = relationship(back_populates="employees")
+  
+      def __repr__(self):
+          return f'id: {self.id}, name: {self.name}, dep_id: {self.department_id}, birthday: {self.birthday}'
+  
+  
+  Base.metadata.create_all(engine)
+  ```
+
+  
 
 
 
@@ -1299,6 +1491,19 @@ with engine.connect() as conn:
 
     conn.execute(employee.insert(), employees_data)
     conn.commit()
+```
+
+### orm方式
+
+```python
+from init.create_table_orm import Department, Employee
+from init.get_db import db_getter
+
+with db_getter() as session:
+    d1 = Department(name="hr")
+    e1 = Employee(department=d1, name="hr-1")
+
+    session.add(e1)  # 会同步添加 department 表，如果表不存在则创建
 ```
 
 
@@ -1360,6 +1565,14 @@ with engine.connect() as conn:
     省略结果查询
 ```
 
+### orm方式
+
+```
+    e = session.query(Employee).filter(Employee.id == 1).first()
+    print(e)
+    print(e.department)
+```
+
 
 
 
@@ -1372,10 +1585,151 @@ with engine.connect() as conn:
 
 ## 表定义
 
+### orm方式
+
+- 通过关系表关联
+
+#### 单向关联
+
+- roles: Mapped[list['Role']] = relationship(secondary="role_user")
+
+```python
+import datetime
+from typing import Annotated
+from sqlalchemy import String, ForeignKey, Integer, Column, Table
+from sqlalchemy.orm import Mapped, mapped_column, relationship
+from sqlalchemy.ext.declarative import declarative_base
+from .get_db import engine
+
+Base = declarative_base()
+
+int_pk = Annotated[int, mapped_column(primary_key=True)]
+required_unique_name = Annotated[
+    str, mapped_column(String(128), unique=True, nullable=False)
+]
+timestamp_not_null = Annotated[
+    datetime.datetime, mapped_column(default=datetime.datetime.now, nullable=False)
+]
+
+role_user = Table(
+    "role_user",
+    Base.metadata,
+    Column("user_id", Integer, ForeignKey("users.id"), primary_key=True),
+    Column("role_id", Integer, ForeignKey("roles.id"), primary_key=True),
+)
+
+
+class Role(Base):
+    __tablename__ = 'roles'
+    id: Mapped[int_pk]
+    name: Mapped[required_unique_name]
+
+    def __repr__(self):
+        return f'id: {self.id}, name: {self.name}'
+
+
+class User(Base):
+    __tablename__ = 'users'
+    id: Mapped[int_pk]
+    name: Mapped[required_unique_name]
+    birthday: Mapped[timestamp_not_null]
+
+    roles: Mapped[list['Role']] = relationship(secondary="role_user")
+
+    def __repr__(self):
+        return f'id: {self.id}, name: {self.name}, dep_id: {self.department_id}, birthday: {self.birthday}'
+
+
+Base.metadata.create_all(engine)
+```
+
+#### 双向关联
+
+- users: Mapped[list['User']] = relationship(secondary="role_user",back_populates="roles")
+- roles: Mapped[list['Role']] = relationship(secondary="role_user",back_populates="users")
+
+```python
+import datetime
+from typing import Annotated
+from sqlalchemy import String, ForeignKey, Integer, Column, Table
+from sqlalchemy.orm import Mapped, mapped_column, relationship
+from sqlalchemy.ext.declarative import declarative_base
+from .get_db import engine
+
+Base = declarative_base()
+
+int_pk = Annotated[int, mapped_column(primary_key=True)]
+required_unique_name = Annotated[
+    str, mapped_column(String(128), unique=True, nullable=False)
+]
+timestamp_not_null = Annotated[
+    datetime.datetime, mapped_column(default=datetime.datetime.now, nullable=False)
+]
+
+role_user = Table(
+    "role_user",
+    Base.metadata,
+    Column("user_id", Integer, ForeignKey("users.id"), primary_key=True),
+    Column("role_id", Integer, ForeignKey("roles.id"), primary_key=True),
+)
+
+
+class Role(Base):
+    __tablename__ = 'roles'
+    id: Mapped[int_pk]
+    name: Mapped[required_unique_name]
+
+    users: Mapped[list['User']] = relationship(secondary="role_user",back_populates="roles")
+
+    def __repr__(self):
+        return f'id: {self.id}, name: {self.name}'
+
+
+class User(Base):
+    __tablename__ = 'users'
+    id: Mapped[int_pk]
+    name: Mapped[required_unique_name]
+    birthday: Mapped[timestamp_not_null]
+
+    roles: Mapped[list['Role']] = relationship(secondary="role_user",back_populates="users")
+
+    def __repr__(self):
+        return f'id: {self.id}, name: {self.name}, dep_id: {self.department_id}, birthday: {self.birthday}'
+```
+
+
+
+
+
 ## 添加数据
+
+### orm方式
+
+```python
+from init.create_table_orm import User, Role
+from init.get_db import db_getter
+
+with db_getter() as session:
+    role1 = Role(name="admin")
+    role2 = Role(name="user")
+
+    user1 = User(name="Jack", roles=[role1, role2])
+    user2 = User(name="Tom", roles=[role2])
+    user3 = User(name="Bob", roles=[role1])
+
+    session.add_all([user1, user2, user3])
+```
+
+
 
 ## 查询数据
 
 ## 更新数据
 
 ## 删除数据
+
+# 七、多个数据源事务管理
+
+# 八、Alembic 数据库迁移环境
+
+# 九、反射自动生成单表类

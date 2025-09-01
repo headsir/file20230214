@@ -60,9 +60,15 @@ sys.stdout = Logger(stream=sys.stdout)
 
 ## 7、获取当前正在处理的异常类
 
-​		`exc_type`、`exc_value`、`exc_traceback`
-
 ​		当前处理的异常详细信息`sys.exc_info() `
+
+```
+exc_type, exc_value, exc_traceback = sys.exc_info()
+
+line_number = exc_traceback.tb_lineno  # 异常行号
+```
+
+
 
 ```
 #获取Python解释程序的版本值，16进制格式如：0x020403F0sys.hexversion    

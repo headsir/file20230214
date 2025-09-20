@@ -158,6 +158,9 @@ for file in current_directory.glob('*.py'):
 # 使用rglob递归查找所有Python文件
 for file in current_directory.rglob('*.py'):
     print(file.absolute())
+# 包含当前路径下的所有文件和目录，但不包括子目录    
+for file in current_directory.iterdir():
+	print(file.absolute())
 ```
 
 ### **处理路径的不同部分**

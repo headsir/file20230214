@@ -2503,12 +2503,9 @@ df2.to_excel(writer,sheet_name = "df7",index = False)
 df3.to_excel(writer,sheet_name = "df6",index = False)
 writer.save()
 
-# 推荐使用：
-book = load_workbook(path_file)  # 保存Excel表原始数据
-with pd.ExcelWriter(path_file, engine="openpyxl") as writer:
-    writer.book = book
-    data.to_excel(excel_writer=writer, sheet_name=sheeetname, index=False)  # index=False,忽略行标签
-    writer.save()
+# 推荐使用 更新于20251115：
+with pd.ExcelWriter(file,engine="openpyxl",mode='a',if_sheet_exists="replace") as writer:
+     df_month.to_excel(writer,sheet_name="单通断续",index=False,)
 ```
 
 ### 9.2 导出为 .csv 文件

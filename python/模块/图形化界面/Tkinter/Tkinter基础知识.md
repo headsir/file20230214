@@ -19,3 +19,13 @@ win.title("示例")
 win.mainloop()
 ```
 
+## 2、组件
+
+![image-20251130140723217](imge/Tkinter基础知识.assets/image-20251130140723217.png)
+
+```text
+Wm：窗口之间通信
+Pack、Place、Grid：布局管理器
+TopLevel：置顶窗口
+```
+

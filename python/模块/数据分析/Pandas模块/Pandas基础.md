@@ -876,7 +876,7 @@ Name: ENodeBID, Length: 43503, dtype: string
 
 - to_numeric()
 
-  可以将无法解析为数字的值替换为NaN
+  可以将无法解析为数字的值替换为NaN pd.to_numeric(self.data[file_name], errors="coerce")
 
 
 

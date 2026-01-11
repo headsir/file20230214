@@ -14,12 +14,18 @@
 ## 安装 node.js
 
 ```tex
-下载地址:https://nodejs.org/en/download/prebuilt-installer
+下载地址:https://nodejs.org/zh-cn/download
 
 测试安装环境
 C:\Users\admin>node --version
 v16.15.0
 ```
+
+![image-20260109230439028](imge/Vue3.0笔记.assets/image-20260109230439028.png)
+
+![image-20260109230602927](imge/Vue3.0笔记.assets/image-20260109230602927.png)
+
+
 
 ## 创建项目
 
@@ -39,6 +45,9 @@ npm init vite@latest
   cd vue3.0    进入项目目录
   npm install  安装依赖
   npm run dev  启动服务器
+  
+  ------------------
+  npm uninstall 依赖名
   ```
 
 - 推荐IDE和工具
@@ -377,6 +386,14 @@ File-> Settings -> Tools -> Terminal -> Shell path中内容由cmd.exe修改为C:
 ```
 npm i @types/node
 ```
+
+## 卸载依赖
+
+```
+npm uninstall 依赖名
+```
+
+![image-20260109234157083](imge/Vue3.0笔记.assets/image-20260109234157083.png)
 
 # 二、基础语法
 
@@ -4998,7 +5015,259 @@ console.log(il8n?.greetings.hello1.Bonjour)
 </script>
 ```
 
-# 十七、
+# 十七、 Elementplus
+
+## 安装
+
+### 安装依赖
+
+官网文档
+
+https://element-plus.org/zh-CN/guide/installation.html
+
+```
+npm install element-plus -S
+```
+
+### 导入
+
+官网文档
+
+https://element-plus.org/zh-CN/guide/quickstart.html
+
+main.ts
+
+```
+import { createApp } from 'vue'
+import ElementPlus from 'element-plus'
+import 'element-plus/dist/index.css'
+import App from './App.vue'
+
+const app = createApp(App)
+
+app.use(ElementPlus)
+app.mount('#app')
+```
+
+### 例子
+
+其他组件参考官网：
+
+https://element-plus.org/zh-CN/component/button.html
+
+App.vue
+
+```
+<template>
+  <el-row class="mb-4">
+    <el-button>Default</el-button>
+    <el-button type="primary">Primary</el-button>
+    <el-button type="success">Success</el-button>
+    <el-button type="info">Info</el-button>
+    <el-button type="warning">Warning</el-button>
+    <el-button type="danger">Danger</el-button>
+  </el-row>
+
+  <el-row class="mb-4">
+    <el-button plain>Plain</el-button>
+    <el-button type="primary" plain>Primary</el-button>
+    <el-button type="success" plain>Success</el-button>
+    <el-button type="info" plain>Info</el-button>
+    <el-button type="warning" plain>Warning</el-button>
+    <el-button type="danger" plain>Danger</el-button>
+  </el-row>
+
+  <el-row class="mb-4">
+    <el-button round>Round</el-button>
+    <el-button type="primary" round>Primary</el-button>
+    <el-button type="success" round>Success</el-button>
+    <el-button type="info" round>Info</el-button>
+    <el-button type="warning" round>Warning</el-button>
+    <el-button type="danger" round>Danger</el-button>
+  </el-row>
+
+  <el-row>
+    <el-button :icon="Search" circle />
+    <el-button type="primary" :icon="Edit" circle />
+    <el-button type="success" :icon="Check" circle />
+    <el-button type="info" :icon="Message" circle />
+    <el-button type="warning" :icon="Star" circle />
+    <el-button type="danger" :icon="Delete" circle />
+  </el-row>
+
+  <el-row class="mb-4">
+    <el-button disabled>Default</el-button>
+    <el-button type="primary" disabled>Primary</el-button>
+    <el-button type="success" disabled>Success</el-button>
+    <el-button type="info" disabled>Info</el-button>
+    <el-button type="warning" disabled>Warning</el-button>
+    <el-button type="danger" disabled>Danger</el-button>
+  </el-row>
+
+  <el-row>
+    <el-button plain disabled>Plain</el-button>
+    <el-button type="primary" plain disabled>Primary</el-button>
+    <el-button type="success" plain disabled>Success</el-button>
+    <el-button type="info" plain disabled>Info</el-button>
+    <el-button type="warning" plain disabled>Warning</el-button>
+    <el-button type="danger" plain disabled>Danger</el-button>
+  </el-row>
+
+  <p>Basic link button</p>
+  <div class="flex justify-space-between mb-4 flex-wrap gap-4">
+    <el-button
+        v-for="button in buttons"
+        :key="button.text"
+        :type="button.type"
+        link
+    >{{ button.text }}</el-button
+    >
+  </div>
+
+  <p>Disabled link button</p>
+  <div class="flex justify-space-between flex-wrap gap-4">
+    <el-button
+        v-for="button in buttons"
+        :key="button.text"
+        :type="button.type"
+        link
+        disabled
+    >{{ button.text }}</el-button
+    >
+  </div>
+
+</template>
+
+<script setup lang="ts">
+import {
+  Check,
+  Delete,
+  Edit,
+  Message,
+  Search,
+  Star,
+} from '@element-plus/icons-vue'
+
+const buttons = [
+  { type: '', text: 'plain' },
+  { type: 'primary', text: 'primary' },
+  { type: 'success', text: 'success' },
+  { type: 'info', text: 'info' },
+  { type: 'warning', text: 'warning' },
+  { type: 'danger', text: 'danger' },
+] as const
+
+</script>
+
+<style scoped>
+
+</style>
+
+```
+
+## 中文包
+
+```
+import zhCn from 'element-plus/es/locale/lang/zh-cn'
+
+app.use(ElementPlus, {
+  locale: zhCn,})
+```
+
+
+
+
+
+
+
+## 布局
+
+官网：https://element-plus.gitee.io/zh-CN/component/container.html
+
+注意：布局类似于bootstrap，只给框架，不添加样式，背景色、高度、宽度可以自定义控制。
+
+复制出来的代码是没有颜色的
+
+添加样式颜色
+
+```
+<template>
+  <div class="common-layout">
+    <el-container>
+      <el-header>Header</el-header>
+      <el-main>Main</el-main>
+    </el-container>
+  </div>
+</template>
+
+<script setup lang="ts">
+
+</script>
+
+<style scoped>
+.el-header{
+  background-color: #646cff;
+}
+.el-main{
+  background-color: chocolate;
+}
+</style>
+```
+
+## Icon 图标
+
+### 安装
+
+```
+npm install @element-plus/icons-vue
+```
+
+### 注册所有图标
+
+从 @element-plus/icons-vue 中导入所有图标并进行全局注册
+
+```
+// main.ts
+
+// 如果您正在使用CDN引入，请删除下面一行。
+import * as ElementPlusIconsVue from '@element-plus/icons-vue'
+
+const app = createApp(App)
+for (const [key, component] of Object.entries(ElementPlusIconsVue)) {
+  app.component(key, component)
+}
+```
+
+### 基础用法
+
+这里的size、color值是需要手动添加的，官网例子中没有，需要注意下。
+
+```javascript
+<template>
+  <div>
+    <el-icon :size="size" :color="color" >
+      <Edit />
+    </el-icon>
+    <!-- 或者独立使用它，不从父级获取属性 -->
+    <Edit />
+  </div>
+
+</template>
+
+<script setup lang="ts">
+
+let size = $ref(20)
+let color = $ref('red')
+</script>
+
+<style scoped>
+
+</style>
+```
+
+
+
+
 
 # 脚注
 

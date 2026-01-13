@@ -217,6 +217,49 @@ File Utils插件,可以方便快捷的来创建、复制、移动、重命名文
 
 ![image-20240728215606161](imge/VSCode使用.assets/image-20240728215606161.png)
 
+## launch.json文件说明：
+
+调试器配置
+
+```
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+    // python 调试器
+        {
+            "name": "Debug FastAPI Project backend: Python Debugger",
+            "type": "debugpy",
+            "request": "launch",
+            "module": "uvicorn",
+            "args": [
+                "app.main:app",
+                "--reload"
+            ],
+            "cwd": "${workspaceFolder}/backend",
+            "jinja": true,
+            "envFile": "${workspaceFolder}/.env",
+        },
+        // WEB 调试器
+        {
+            "type": "chrome",
+            "request": "launch",
+            "name": "Debug Frontend: Launch Chrome against http://localhost:5173",
+            "url": "http://localhost:5173",
+            "webRoot": "${workspaceFolder}/frontend"
+        },
+    ]
+}
+```
+
+
+
+
+
+
+
 # 快捷操作：
 
 ```

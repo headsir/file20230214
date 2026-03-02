@@ -33,7 +33,7 @@ cmd 运行
 
 ```
 # 两种方式
-npm create vue@latest  推荐
+npm create vue@latest  推荐   frontend_vue
 npm init vite@latest
 ```
 
@@ -48,6 +48,7 @@ npm init vite@latest
   
   ------------------
   npm uninstall 依赖名
+  npm install 依赖名 --save-dev 开发环境
   ```
 
 - 推荐IDE和工具

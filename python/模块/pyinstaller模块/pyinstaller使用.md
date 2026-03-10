@@ -50,6 +50,11 @@ pyinstaller --help
 
 ```
 pyinstaller -F -n chengxu main.py -w
+
+pyinstaller -F -n chengxu main.py -w --icon="static/图标.ico" --add-data="static/typing-0.wav;static" # 打包音频文件
+
+# PyInstaller 打包后的路径
+base_path = getattr(sys, '_MEIPASS', "")
 ```
 
 

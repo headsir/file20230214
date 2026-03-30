@@ -155,6 +155,14 @@ sudo apt install python3-pip
 pip install uwsgi
 ```
 
+## 系统使用相关
+
+更新系统
+
+```
+sudo apt update && sudo apt upgrade -y
+```
+
 
 
 

@@ -18,7 +18,7 @@ VMware Workstation Pro 15 存放于百度网盘
 
 ![image-20221011210644147](imge/VMware 安装.assets/image-20221011210644147.png)
 
-## 3.3 网络验证
+## 3.3 网络验证 
 
 ![image-20221012021340333](imge/VMware 安装.assets/image-20221012021340333.png)
 

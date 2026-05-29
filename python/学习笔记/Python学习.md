@@ -3559,7 +3559,9 @@ print(StateTax(0.03)) #通过 value 来访问
 
 枚举 (Enum)  是绑定到唯一值的符号。我们可以通过定义一个继承自 Enum 的类来创建枚举，使用 enum[member_name] 通过名称访问 Enum  成员，也可以通过并通过 enum(member_value) 访问，还可以通过 enum.member_name 来访问。Enum  可以帮助我们使代码更具可读性，更具可维护性，枚举类型一旦定义，不可修改，更安全，推荐大家都用一用。
 
+# 十三、日常练习
 
+![image-20260528151155485](imge/Python学习.assets/image-20260528151155485.png)
 
 
 

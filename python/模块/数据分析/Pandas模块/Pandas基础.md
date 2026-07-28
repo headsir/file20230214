@@ -2184,6 +2184,20 @@ print(df)
 2  3-5  6-7  3  5
 ```
 
+### 5.33 单行拆多行
+
+```
+# 拆分
+df["小区CGI"] = df["小区CGI"].str.split(";")
+# 展开
+df = df.explode("小区CGI")
+# 去空格
+df["小区CGI"] = df["小区CGI"].str.strip()
+# 过滤空行
+df = df[df["小区CGI"].notna() & (df["小区CGI"] != "")]
+df = df.reset_index(drop=True)
+```
+
 
 
 ## 六、Pandas 数据分组

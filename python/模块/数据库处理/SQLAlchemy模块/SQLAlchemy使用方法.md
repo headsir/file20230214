@@ -932,3 +932,12 @@ alembic history
 <base> -> 67fd988f79d5, empty message
 ```
 
+
+
+```
+alembic revision -m "first create script"  # 创建迁移脚本（首次需要）
+alembic upgrade head  # 升级数据库
+alembic revision --autogenerate -m "add user table"  # 对比模型与数据库，生成迁移脚本
+alembic upgrade head  # 升级数据库
+```
+
